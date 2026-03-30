@@ -1,0 +1,32 @@
+export const metadata = {
+  title: "Recovering with reflog",
+  slug: "reflog-recovery",
+  locale: "en",
+  section: "recovery",
+  summary: "Use reflog to locate previous references and recover from reset, rebase, or lost branch states.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-reflog.html",
+    "https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection.html",
+  ],
+};
+
+# Recovering with reflog
+
+## What reflog is
+
+Reflog is a local record of reference movement. When `HEAD` or a branch reference changes, Git usually records that movement.
+
+That makes it especially useful after:
+
+- a reset you regret
+- a rebase that went wrong
+- a checkout, merge, or commit you want to backtrack from
+
+## The usual recovery flow
+
+```bash
+git reflog
+git branch recovery/<name> <commit>
+```
+
+Create a rescue branch first when you want a safer recovery path.

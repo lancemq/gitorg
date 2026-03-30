@@ -1,0 +1,161 @@
+export const metadata = {
+  title: "Git 快速上手学习路径",
+  slug: "quick-start",
+  locale: "zh",
+  section: "learning-path",
+  summary: "面向初学者的 Git 学习入口，覆盖 clone、add、commit、fetch、pull、push 的最低可用路径。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Branching-Summary",
+    "https://git-scm.com/docs/git-fetch.html",
+    "https://git-scm.com/docs/git-pull.html",
+  ],
+};
+
+# Git 快速上手学习路径
+
+## 这篇内容解决什么问题
+
+很多人第一次接触 Git 时，会把命令当成一串要背的咒语。更稳妥的学习方式是先建立一条最小闭环：
+
+1. 拿到仓库
+2. 修改文件
+3. 暂存改动
+4. 生成提交
+5. 与远端同步
+
+只要这条闭环能跑通，再去理解 rebase、reflog、引用和对象模型就会容易很多。
+
+## 建议的第一阶段命令
+
+### 1. `git clone`
+
+用途：把远端仓库复制到本地，并自动记录默认远端 `origin`。
+
+```bash
+git clone <repository-url>
+```
+
+学习重点：
+
+- 本地仓库不只是文件副本，也包含完整历史
+- `origin` 只是默认远端名字，不是特殊关键字
+- clone 完成后，先看 `git status` 和 `git branch -vv`
+
+### 2. `git add`
+
+用途：把当前工作区改动加入暂存区。
+
+```bash
+git add .
+```
+
+学习重点：
+
+- 工作区、暂存区、提交历史是三个不同层次
+- `git add` 不是“提交”，而是“准备提交内容”
+- 可以只暂存部分文件，而不是一次把所有内容都提交
+
+### 3. `git commit`
+
+用途：把暂存区内容保存成一个新的提交。
+
+```bash
+git commit -m "feat: add login form"
+```
+
+学习重点：
+
+- 提交应该表达一个明确意图
+- 提交信息要让未来的自己和同事都能看懂
+- 频繁、小粒度提交通常比一次大提交更安全
+
+### 4. `git fetch`
+
+用途：只下载远端最新引用和对象，不改本地当前分支。
+
+```bash
+git fetch origin
+```
+
+学习重点：
+
+- fetch 更像“先观察，再决定”
+- 它适合在合并或 rebase 之前先同步远端状态
+- 如果你经常担心 `pull` 改坏当前分支，先养成 fetch 的习惯
+
+### 5. `git pull`
+
+用途：先 fetch，再把远端变更整合进当前分支。
+
+```bash
+git pull --ff-only
+```
+
+学习重点：
+
+- pull 不是一个原子概念，它本质上是“下载 + 整合”
+- 整合阶段可能是 fast-forward、merge、rebase 或 squash
+- 初学阶段优先使用 `--ff-only`，更不容易在不知情时生成 merge commit
+
+### 6. `git push`
+
+用途：把本地提交发布到远端。
+
+```bash
+git push origin main
+```
+
+学习重点：
+
+- push 失败通常意味着远端比你更新
+- 推送前先确认你要发布的是不是正确分支
+- 对共享分支的强推要格外谨慎
+
+## 推荐的学习顺序
+
+### 第 1 天：先跑通单人闭环
+
+```bash
+git clone <url>
+git status
+git add .
+git commit -m "docs: update README"
+git push
+```
+
+### 第 2 天：开始区分 fetch 和 pull
+
+```bash
+git fetch origin
+git log --oneline --graph --decorate --all
+git pull --ff-only
+```
+
+### 第 3 天：补上分支与同步
+
+- 创建特性分支
+- 提交改动
+- fetch 观察远端变化
+- 决定 merge 还是 rebase
+
+## 初学者最常见的误区
+
+### 误区 1：把 `git add` 当作“提交”
+
+不是。`add` 只是在选择下一次提交要包含什么内容。
+
+### 误区 2：默认把 `git pull` 当安全操作
+
+不是。pull 会真正改变当前分支，尤其是在分支已经分叉时。
+
+### 误区 3：提交前不看 `git status`
+
+这会导致无关文件被误提交。建议把 `git status` 变成每次提交前的固定动作。
+
+## 下一步应该学什么
+
+学完这篇以后，建议继续进入下面三个主题：
+
+1. `fetch` 和 `pull` 的区别
+2. `git rebase` 的使用边界
+3. `git reflog` 的恢复思路

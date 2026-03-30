@@ -1,0 +1,124 @@
+export const metadata = {
+  title: "git rebase 教程",
+  slug: "git-rebase",
+  locale: "zh",
+  section: "commands",
+  summary: "解释 git rebase 的核心模型、推荐流程、风险边界和恢复办法。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rebase.html",
+    "https://git-scm.com/book/en/v2/Git-Branching-Rebasing.html",
+    "https://git-scm.com/docs/git-pull.html",
+  ],
+};
+
+# git rebase 教程
+
+## 一句话理解
+
+`git rebase` 会把一组提交重新应用到新的基底之上，所以你通常会得到“内容相近但提交 ID 变化过”的历史。
+
+## 什么时候应该用
+
+- 让特性分支追上最新的 `main`
+- 合并前整理提交历史
+- 使用交互式 rebase 调整提交顺序、压缩提交、修改提交信息
+
+## 什么时候不要轻易用
+
+- 公共分支已经被其他人基于其继续开发时
+- 你不清楚团队对共享历史是否允许改写时
+- 你还没有准备好恢复方案时
+
+实践上，rebase 最适合“自己的特性分支”。
+
+## 基本流程
+
+### 场景：让特性分支同步最新主分支
+
+```bash
+git checkout feature/login
+git fetch origin
+git rebase origin/main
+```
+
+建议按这个顺序做的原因：
+
+1. 先切到目标分支
+2. 先 fetch，确保你看到的是远端最新状态
+3. 再明确指定新的基底
+
+## 冲突时怎么处理
+
+当 rebase 过程中发生冲突时，一般按下面的节奏处理：
+
+```bash
+git status
+# 手动解决冲突
+git add <resolved-files>
+git rebase --continue
+```
+
+如果你决定放弃这次 rebase：
+
+```bash
+git rebase --abort
+```
+
+## 交互式 rebase 最常见的用途
+
+```bash
+git rebase -i HEAD~4
+```
+
+它常用于：
+
+- 压缩零碎提交
+- 让提交顺序更符合阅读逻辑
+- 修改提交信息
+- 删除不该保留的实验性提交
+
+## 一个安全的团队建议
+
+如果你的分支已经推送到远端，但仍想整理历史，优先遵守这条规则：
+
+- 只 rebase 自己负责的分支
+- 推送时使用 `git push --force-with-lease`
+
+`--force-with-lease` 比裸 `--force` 更安全，因为它会先检查远端引用是否已经被别人更新。
+
+## 常见误区
+
+### 误区 1：rebase 和 merge 只是长得不一样
+
+不完全对。它们都会整合代码，但对历史的表达方式不同。rebase 会改写提交基底，因此历史更线性，但也更容易在共享分支上制造混乱。
+
+### 误区 2：rebase 出错就完了
+
+通常没有。只要对象还在，`reflog` 往往可以帮你回到 rebase 前的状态。
+
+### 误区 3：pull 默认就是我想要的 rebase
+
+不是。`git pull` 是否使用 rebase，取决于配置或命令行参数。
+
+## 推荐的恢复思路
+
+如果你在 rebase 后发现历史不对，第一反应不是慌，而是：
+
+```bash
+git reflog
+```
+
+找到 rebase 前的 `HEAD`，再决定是否：
+
+```bash
+git reset --hard <safe-commit>
+```
+
+## 教学补充建议
+
+后续可以继续补充以下分支专题：
+
+1. `--onto` 的可视化解释
+2. 交互式 rebase 的指令清单
+3. rebase 与 merge 的对照案例
+4. 共享分支历史改写的团队规范

@@ -7555,8 +7555,19 @@
           "x": 0,
           "y": 0,
           "descendants": {
+            "G3EQQ": {
+              "width": "fill_container"
+            },
+            "nmO34": {
+              "width": "fit_content",
+              "height": "fit_content",
+              "x": 32,
+              "y": 28
+            },
             "MIpaj": {
-              "content": "GIT/ACADEMY"
+              "content": "GIT/ACADEMY",
+              "x": 40,
+              "y": 7
             },
             "NvL81": {
               "height": "fill_container",
@@ -7565,6 +7576,8 @@
                 16
               ],
               "gap": 4,
+              "width": "fill_container",
+              "y": 112,
               "children": [
                 {
                   "id": "BWCnA",
@@ -7573,9 +7586,13 @@
                   "name": "sec1",
                   "x": 16,
                   "y": 24,
+                  "height": "fit_content",
                   "descendants": {
                     "b8JIN": {
-                      "content": "Learning Path"
+                      "content": "Learning Path",
+                      "width": "fill_container",
+                      "x": 16,
+                      "y": 16
                     }
                   }
                 },
@@ -7586,12 +7603,18 @@
                   "name": "nav1",
                   "x": 16,
                   "y": 76,
+                  "height": "fit_content",
                   "descendants": {
                     "xGT5g": {
-                      "iconFontName": "home"
+                      "iconFontName": "home",
+                      "x": 16,
+                      "y": 12
                     },
                     "TXca3": {
-                      "content": "Overview"
+                      "content": "Overview",
+                      "width": "fill_container",
+                      "x": 56,
+                      "y": 12
                     }
                   }
                 },
@@ -7602,12 +7625,14 @@
                   "name": "nav2",
                   "x": 16,
                   "y": 128,
+                  "height": "fit_content",
                   "descendants": {
                     "xGT5g": {
                       "iconFontName": "rocket_launch"
                     },
                     "TXca3": {
-                      "content": "Quick Start"
+                      "content": "Quick Start",
+                      "width": "fill_container"
                     }
                   }
                 },
@@ -7618,12 +7643,14 @@
                   "name": "nav3",
                   "x": 16,
                   "y": 180,
+                  "height": "fit_content",
                   "descendants": {
                     "xGT5g": {
                       "iconFontName": "checklist"
                     },
                     "TXca3": {
-                      "content": "Best Practices"
+                      "content": "Best Practices",
+                      "width": "fill_container"
                     }
                   }
                 },
@@ -7634,12 +7661,14 @@
                   "name": "nav4",
                   "x": 16,
                   "y": 232,
+                  "height": "fit_content",
                   "descendants": {
                     "xGT5g": {
                       "iconFontName": "memory"
                     },
                     "TXca3": {
-                      "content": "Git Internals"
+                      "content": "Git Internals",
+                      "width": "fill_container"
                     }
                   }
                 },
@@ -7650,9 +7679,13 @@
                   "name": "sec2",
                   "x": 16,
                   "y": 284,
+                  "height": "fit_content",
                   "descendants": {
                     "b8JIN": {
-                      "content": "Resources"
+                      "content": "Resources",
+                      "width": "fill_container",
+                      "x": 16,
+                      "y": 16
                     }
                   }
                 },
@@ -7663,12 +7696,14 @@
                   "name": "nav5",
                   "x": 16,
                   "y": 336,
+                  "height": "fit_content",
                   "descendants": {
                     "xGT5g": {
                       "iconFontName": "description"
                     },
                     "TXca3": {
-                      "content": "Reference"
+                      "content": "Reference",
+                      "width": "fill_container"
                     }
                   }
                 },
@@ -7679,19 +7714,40 @@
                   "name": "nav6",
                   "x": 16,
                   "y": 388,
+                  "height": "fit_content",
                   "descendants": {
                     "xGT5g": {
                       "iconFontName": "help"
                     },
                     "TXca3": {
-                      "content": "FAQ"
+                      "content": "FAQ",
+                      "width": "fill_container"
                     }
                   }
                 }
               ]
             },
             "3F5am": {
-              "y": 2300
+              "y": 2300,
+              "width": "fill_container",
+              "height": "fit_content"
+            },
+            "rT0dx": {
+              "width": "fill_container",
+              "height": "fit_content",
+              "x": 32,
+              "y": 24
+            },
+            "uiUgV": {
+              "width": "fill_container"
+            },
+            "eUcmA": {
+              "width": "fill_container",
+              "y": 28
+            },
+            "UlKF0": {
+              "x": 224,
+              "y": 38
             }
           }
         },
@@ -7734,6 +7790,8 @@
                       "name": "badge",
                       "x": 0,
                       "y": 26.5,
+                      "width": "fit_content",
+                      "height": "fit_content",
                       "descendants": {
                         "49I5i": {
                           "content": "Version Control Essentials"
@@ -7779,12 +7837,15 @@
                           "name": "cta1",
                           "x": 0,
                           "y": 0,
+                          "width": "fit_content",
                           "descendants": {
                             "oNDwn": {
                               "enabled": false
                             },
                             "J3Z6N": {
-                              "content": "开始学习"
+                              "content": "开始学习",
+                              "x": 24,
+                              "y": 13
                             }
                           }
                         },
@@ -7795,12 +7856,15 @@
                           "name": "cta2",
                           "x": 116,
                           "y": 0,
+                          "width": "fit_content",
                           "descendants": {
                             "r97g1": {
                               "enabled": false
                             },
                             "7ZVG7": {
-                              "content": "查看最佳实践"
+                              "content": "查看最佳实践",
+                              "x": 16,
+                              "y": 10
                             }
                           }
                         }
@@ -7825,9 +7889,17 @@
                       "name": "callout",
                       "x": 0,
                       "y": 0,
+                      "height": "fit_content",
                       "descendants": {
+                        "fS3NL": {
+                          "x": 16,
+                          "y": 16
+                        },
                         "7IdrZ": {
-                          "width": "fill_container"
+                          "width": "fill_container",
+                          "height": "fit_content",
+                          "x": 52,
+                          "y": 16
                         },
                         "TPf8O": {
                           "width": "fill_container",
@@ -7835,7 +7907,8 @@
                         },
                         "X4L5E": {
                           "width": "fill_container",
-                          "content": "1. 理解工作区 / 暂存区 / 仓库\n2. 学会提交、分支与合并\n3. 掌握 rebase、cherry-pick、reset、reflog\n4. 看懂 Git 如何存对象和引用"
+                          "content": "1. 理解工作区 / 暂存区 / 仓库\n2. 学会提交、分支与合并\n3. 掌握 rebase、cherry-pick、reset、reflog\n4. 看懂 Git 如何存对象和引用",
+                          "y": 28
                         }
                       }
                     },
@@ -8147,6 +8220,10 @@
                       "x": 0,
                       "y": 124,
                       "descendants": {
+                        "0N3gW": {
+                          "x": 16,
+                          "y": 16
+                        },
                         "7IdrZ": {
                           "width": "fill_container",
                           "height": "fit_content"
@@ -8272,6 +8349,8 @@
                               "name": "tag1",
                               "x": 20,
                               "y": 20,
+                              "width": "fit_content",
+                              "height": "fit_content",
                               "descendants": {
                                 "49I5i": {
                                   "content": "blob"
@@ -8315,6 +8394,8 @@
                               "name": "tag2",
                               "x": 20,
                               "y": 20,
+                              "width": "fit_content",
+                              "height": "fit_content",
                               "descendants": {
                                 "49I5i": {
                                   "content": "tree"
@@ -8358,6 +8439,8 @@
                               "name": "tag3",
                               "x": 20,
                               "y": 30.5,
+                              "width": "fit_content",
+                              "height": "fit_content",
                               "descendants": {
                                 "49I5i": {
                                   "content": "commit"
@@ -8586,17 +8669,21 @@
                   "y": 52,
                   "descendants": {
                     "MHwKC": {
-                      "width": "fill_container"
+                      "width": "fill_container",
+                      "height": "fit_content"
                     },
                     "ckp1f": {
-                      "content": "`git pull` 为什么会产生我不想要的 merge commit？"
+                      "content": "`git pull` 为什么会产生我不想要的 merge commit？",
+                      "y": 16
                     },
                     "WLBKp": {
-                      "x": 1080
+                      "x": 1080,
+                      "y": 20.5
                     },
                     "frame-1764940517647": {
                       "width": "fill_container",
-                      "height": "fit_content"
+                      "height": "fit_content",
+                      "y": 57
                     },
                     "Gqs2u": {
                       "width": "fill_container",
@@ -8615,17 +8702,21 @@
                   "y": 158,
                   "descendants": {
                     "MHwKC": {
-                      "width": "fill_container"
+                      "width": "fill_container",
+                      "height": "fit_content"
                     },
                     "ckp1f": {
-                      "content": "误删分支或 reset 之后还能找回吗？"
+                      "content": "误删分支或 reset 之后还能找回吗？",
+                      "y": 16
                     },
                     "WLBKp": {
-                      "x": 1080
+                      "x": 1080,
+                      "y": 20.5
                     },
                     "frame-1764940517647": {
                       "width": "fill_container",
-                      "height": "fit_content"
+                      "height": "fit_content",
+                      "y": 57
                     },
                     "Gqs2u": {
                       "width": "fill_container",
@@ -8684,12 +8775,15 @@
                   "name": "ctaBtn",
                   "x": 940,
                   "y": 33.5,
+                  "width": "fit_content",
                   "descendants": {
                     "oNDwn": {
                       "enabled": false
                     },
                     "J3Z6N": {
-                      "content": "浏览全部文档"
+                      "content": "浏览全部文档",
+                      "x": 24,
+                      "y": 13
                     }
                   }
                 }
@@ -8718,8 +8812,19 @@
           "x": 0,
           "y": 0,
           "descendants": {
+            "G3EQQ": {
+              "width": "fill_container"
+            },
+            "nmO34": {
+              "width": "fit_content",
+              "height": "fit_content",
+              "x": 32,
+              "y": 28
+            },
             "MIpaj": {
-              "content": "GIT/ACADEMY"
+              "content": "GIT/ACADEMY",
+              "x": 40,
+              "y": 7
             },
             "NvL81": {
               "height": "fill_container",
@@ -8728,6 +8833,8 @@
                 16
               ],
               "gap": 4,
+              "width": "fill_container",
+              "y": 112,
               "children": [
                 {
                   "id": "mlBae",
@@ -8736,9 +8843,13 @@
                   "name": "cmdSec",
                   "x": 16,
                   "y": 24,
+                  "height": "fit_content",
                   "descendants": {
                     "b8JIN": {
-                      "content": "Docs"
+                      "content": "Docs",
+                      "width": "fill_container",
+                      "x": 16,
+                      "y": 16
                     }
                   }
                 },
@@ -8749,12 +8860,18 @@
                   "name": "cmdItem1",
                   "x": 16,
                   "y": 76,
+                  "height": "fit_content",
                   "descendants": {
                     "xGT5g": {
-                      "iconFontName": "swap_horiz"
+                      "iconFontName": "swap_horiz",
+                      "x": 16,
+                      "y": 12
                     },
                     "TXca3": {
-                      "content": "git rebase"
+                      "content": "git rebase",
+                      "width": "fill_container",
+                      "x": 56,
+                      "y": 12
                     }
                   }
                 },
@@ -8765,12 +8882,14 @@
                   "name": "cmdItem2",
                   "x": 16,
                   "y": 128,
+                  "height": "fit_content",
                   "descendants": {
                     "xGT5g": {
                       "iconFontName": "merge"
                     },
                     "TXca3": {
-                      "content": "git merge"
+                      "content": "git merge",
+                      "width": "fill_container"
                     }
                   }
                 },
@@ -8781,19 +8900,40 @@
                   "name": "cmdItem3",
                   "x": 16,
                   "y": 180,
+                  "height": "fit_content",
                   "descendants": {
                     "xGT5g": {
                       "iconFontName": "history"
                     },
                     "TXca3": {
-                      "content": "git reflog"
+                      "content": "git reflog",
+                      "width": "fill_container"
                     }
                   }
                 }
               ]
             },
             "3F5am": {
-              "y": 2100
+              "y": 2100,
+              "width": "fill_container",
+              "height": "fit_content"
+            },
+            "rT0dx": {
+              "width": "fill_container",
+              "height": "fit_content",
+              "x": 32,
+              "y": 24
+            },
+            "uiUgV": {
+              "width": "fill_container"
+            },
+            "eUcmA": {
+              "width": "fill_container",
+              "y": 28
+            },
+            "UlKF0": {
+              "x": 224,
+              "y": 38
             }
           }
         },
@@ -8821,6 +8961,8 @@
                   "name": "crumb1",
                   "x": 0,
                   "y": 0,
+                  "width": "fit_content",
+                  "height": "fit_content",
                   "descendants": {
                     "bT3Mm": {
                       "content": "Docs"
@@ -8833,7 +8975,13 @@
                   "ref": "axCNF",
                   "name": "sep1",
                   "x": 41,
-                  "y": 0
+                  "y": 0,
+                  "descendants": {
+                    "w41Yx": {
+                      "x": 3,
+                      "y": 3
+                    }
+                  }
                 },
                 {
                   "id": "XbVQA",
@@ -8842,6 +8990,8 @@
                   "name": "crumb2",
                   "x": 69,
                   "y": 0,
+                  "width": "fit_content",
+                  "height": "fit_content",
                   "descendants": {
                     "bT3Mm": {
                       "content": "Commands"
@@ -8854,7 +9004,13 @@
                   "ref": "axCNF",
                   "name": "sep2",
                   "x": 150,
-                  "y": 0
+                  "y": 0,
+                  "descendants": {
+                    "w41Yx": {
+                      "x": 3,
+                      "y": 3
+                    }
+                  }
                 },
                 {
                   "id": "ukviH",
@@ -8863,6 +9019,8 @@
                   "name": "crumb3",
                   "x": 178,
                   "y": 0,
+                  "width": "fit_content",
+                  "height": "fit_content",
                   "descendants": {
                     "bT3Mm": {
                       "content": "git rebase"
@@ -8893,6 +9051,8 @@
                       "name": "cmdBadge",
                       "x": 0,
                       "y": 0,
+                      "width": "fit_content",
+                      "height": "fit_content",
                       "descendants": {
                         "49I5i": {
                           "content": "Command Detail"
@@ -9150,9 +9310,15 @@
                           "x": 24,
                           "y": 164,
                           "descendants": {
+                            "fS3NL": {
+                              "x": 16,
+                              "y": 16
+                            },
                             "7IdrZ": {
                               "width": "fill_container",
-                              "height": "fit_content"
+                              "height": "fit_content",
+                              "x": 52,
+                              "y": 16
                             },
                             "TPf8O": {
                               "content": "冲突处理",
@@ -9160,7 +9326,8 @@
                             },
                             "X4L5E": {
                               "content": "发生冲突后，先解决文件冲突，再执行 `git add <files>` 和 `git rebase --continue`。若需要放弃，可执行 `git rebase --abort`。",
-                              "width": "fill_container"
+                              "width": "fill_container",
+                              "y": 28
                             }
                           }
                         }
@@ -9276,8 +9443,19 @@
           "x": 0,
           "y": 0,
           "descendants": {
+            "G3EQQ": {
+              "width": "fill_container"
+            },
+            "nmO34": {
+              "width": "fit_content",
+              "height": "fit_content",
+              "x": 32,
+              "y": 28
+            },
             "MIpaj": {
-              "content": "GIT/ACADEMY"
+              "content": "GIT/ACADEMY",
+              "x": 40,
+              "y": 7
             },
             "NvL81": {
               "height": "fill_container",
@@ -9286,6 +9464,8 @@
                 16
               ],
               "gap": 4,
+              "width": "fill_container",
+              "y": 112,
               "children": [
                 {
                   "id": "iESYq",
@@ -9294,9 +9474,13 @@
                   "name": "practiceSec",
                   "x": 16,
                   "y": 24,
+                  "height": "fit_content",
                   "descendants": {
                     "b8JIN": {
-                      "content": "Playbooks"
+                      "content": "Playbooks",
+                      "width": "fill_container",
+                      "x": 16,
+                      "y": 16
                     }
                   }
                 },
@@ -9307,12 +9491,18 @@
                   "name": "practiceItem1",
                   "x": 16,
                   "y": 76,
+                  "height": "fit_content",
                   "descendants": {
                     "xGT5g": {
-                      "iconFontName": "groups"
+                      "iconFontName": "groups",
+                      "x": 16,
+                      "y": 12
                     },
                     "TXca3": {
-                      "content": "Team Workflow"
+                      "content": "Team Workflow",
+                      "width": "fill_container",
+                      "x": 56,
+                      "y": 12
                     }
                   }
                 },
@@ -9323,12 +9513,14 @@
                   "name": "practiceItem2",
                   "x": 16,
                   "y": 128,
+                  "height": "fit_content",
                   "descendants": {
                     "xGT5g": {
                       "iconFontName": "rocket_launch"
                     },
                     "TXca3": {
-                      "content": "Release Flow"
+                      "content": "Release Flow",
+                      "width": "fill_container"
                     }
                   }
                 },
@@ -9339,19 +9531,40 @@
                   "name": "practiceItem3",
                   "x": 16,
                   "y": 180,
+                  "height": "fit_content",
                   "descendants": {
                     "xGT5g": {
                       "iconFontName": "build"
                     },
                     "TXca3": {
-                      "content": "Incident Recovery"
+                      "content": "Incident Recovery",
+                      "width": "fill_container"
                     }
                   }
                 }
               ]
             },
             "3F5am": {
-              "y": 2100
+              "y": 2100,
+              "width": "fill_container",
+              "height": "fit_content"
+            },
+            "rT0dx": {
+              "width": "fill_container",
+              "height": "fit_content",
+              "x": 32,
+              "y": 24
+            },
+            "uiUgV": {
+              "width": "fill_container"
+            },
+            "eUcmA": {
+              "width": "fill_container",
+              "y": 28
+            },
+            "UlKF0": {
+              "x": 224,
+              "y": 38
             }
           }
         },
@@ -9379,6 +9592,8 @@
                   "name": "p1",
                   "x": 0,
                   "y": 0,
+                  "width": "fit_content",
+                  "height": "fit_content",
                   "descendants": {
                     "bT3Mm": {
                       "content": "Best Practices"
@@ -9391,7 +9606,13 @@
                   "ref": "axCNF",
                   "name": "ps1",
                   "x": 101,
-                  "y": 0
+                  "y": 0,
+                  "descendants": {
+                    "w41Yx": {
+                      "x": 3,
+                      "y": 3
+                    }
+                  }
                 },
                 {
                   "id": "56Rhy",
@@ -9400,6 +9621,8 @@
                   "name": "p2",
                   "x": 129,
                   "y": 0,
+                  "width": "fit_content",
+                  "height": "fit_content",
                   "descendants": {
                     "bT3Mm": {
                       "content": "Team Workflow"
@@ -9430,6 +9653,8 @@
                       "name": "pBadge",
                       "x": 0,
                       "y": 0,
+                      "width": "fit_content",
+                      "height": "fit_content",
                       "descendants": {
                         "49I5i": {
                           "content": "Best Practice Detail"
@@ -9469,6 +9694,10 @@
                   "x": 756,
                   "y": 0,
                   "descendants": {
+                    "N77wx": {
+                      "x": 16,
+                      "y": 16
+                    },
                     "7IdrZ": {
                       "width": "fill_container",
                       "height": "fit_content"
@@ -9823,8 +10052,19 @@
           "x": 0,
           "y": 0,
           "descendants": {
+            "G3EQQ": {
+              "width": "fill_container"
+            },
+            "nmO34": {
+              "width": "fit_content",
+              "height": "fit_content",
+              "x": 32,
+              "y": 28
+            },
             "MIpaj": {
-              "content": "GIT/ACADEMY"
+              "content": "GIT/ACADEMY",
+              "x": 40,
+              "y": 7
             },
             "NvL81": {
               "height": "fill_container",
@@ -9833,6 +10073,8 @@
                 16
               ],
               "gap": 4,
+              "width": "fill_container",
+              "y": 112,
               "children": [
                 {
                   "id": "Wy5rT",
@@ -9841,9 +10083,13 @@
                   "name": "internalSec",
                   "x": 16,
                   "y": 24,
+                  "height": "fit_content",
                   "descendants": {
                     "b8JIN": {
-                      "content": "Internals"
+                      "content": "Internals",
+                      "width": "fill_container",
+                      "x": 16,
+                      "y": 16
                     }
                   }
                 },
@@ -9854,12 +10100,18 @@
                   "name": "internalItem1",
                   "x": 16,
                   "y": 76,
+                  "height": "fit_content",
                   "descendants": {
                     "xGT5g": {
-                      "iconFontName": "account_tree"
+                      "iconFontName": "account_tree",
+                      "x": 16,
+                      "y": 12
                     },
                     "TXca3": {
-                      "content": "Object Model"
+                      "content": "Object Model",
+                      "width": "fill_container",
+                      "x": 56,
+                      "y": 12
                     }
                   }
                 },
@@ -9870,12 +10122,14 @@
                   "name": "internalItem2",
                   "x": 16,
                   "y": 128,
+                  "height": "fit_content",
                   "descendants": {
                     "xGT5g": {
                       "iconFontName": "my_location"
                     },
                     "TXca3": {
-                      "content": "Refs & HEAD"
+                      "content": "Refs & HEAD",
+                      "width": "fill_container"
                     }
                   }
                 },
@@ -9886,19 +10140,40 @@
                   "name": "internalItem3",
                   "x": 16,
                   "y": 180,
+                  "height": "fit_content",
                   "descendants": {
                     "xGT5g": {
                       "iconFontName": "inventory_2"
                     },
                     "TXca3": {
-                      "content": "Packfiles"
+                      "content": "Packfiles",
+                      "width": "fill_container"
                     }
                   }
                 }
               ]
             },
             "3F5am": {
-              "y": 2100
+              "y": 2100,
+              "width": "fill_container",
+              "height": "fit_content"
+            },
+            "rT0dx": {
+              "width": "fill_container",
+              "height": "fit_content",
+              "x": 32,
+              "y": 24
+            },
+            "uiUgV": {
+              "width": "fill_container"
+            },
+            "eUcmA": {
+              "width": "fill_container",
+              "y": 28
+            },
+            "UlKF0": {
+              "x": 224,
+              "y": 38
             }
           }
         },
@@ -9926,6 +10201,8 @@
                   "name": "i1",
                   "x": 0,
                   "y": 0,
+                  "width": "fit_content",
+                  "height": "fit_content",
                   "descendants": {
                     "bT3Mm": {
                       "content": "Internals"
@@ -9938,7 +10215,13 @@
                   "ref": "axCNF",
                   "name": "isep",
                   "x": 64,
-                  "y": 0
+                  "y": 0,
+                  "descendants": {
+                    "w41Yx": {
+                      "x": 3,
+                      "y": 3
+                    }
+                  }
                 },
                 {
                   "id": "xsYfa",
@@ -9947,6 +10230,8 @@
                   "name": "i2",
                   "x": 92,
                   "y": 0,
+                  "width": "fit_content",
+                  "height": "fit_content",
                   "descendants": {
                     "bT3Mm": {
                       "content": "Object Model"
@@ -9977,6 +10262,8 @@
                       "name": "iBadge",
                       "x": 0,
                       "y": 0,
+                      "width": "fit_content",
+                      "height": "fit_content",
                       "descendants": {
                         "49I5i": {
                           "content": "Internals Detail"
@@ -10323,9 +10610,15 @@
                       "x": 0,
                       "y": 258,
                       "descendants": {
+                        "fS3NL": {
+                          "x": 16,
+                          "y": 16
+                        },
                         "7IdrZ": {
                           "width": "fill_container",
-                          "height": "fit_content"
+                          "height": "fit_content",
+                          "x": 52,
+                          "y": 16
                         },
                         "TPf8O": {
                           "width": "fill_container",
@@ -10333,7 +10626,8 @@
                         },
                         "X4L5E": {
                           "width": "fill_container",
-                          "content": "reflog 能工作，是因为 Git 会记录引用移动轨迹。很多“丢失的提交”并不是消失了，只是暂时没有被某个分支名指向。"
+                          "content": "reflog 能工作，是因为 Git 会记录引用移动轨迹。很多“丢失的提交”并不是消失了，只是暂时没有被某个分支名指向。",
+                          "y": 28
                         }
                       }
                     }

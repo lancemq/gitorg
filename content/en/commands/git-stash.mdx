@@ -1,0 +1,76 @@
+export const metadata = {
+  title: "git stash Tutorial",
+  slug: "git-stash",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how to temporarily shelve local changes with git stash and later inspect, restore, or remove stash entries.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-stash.html",
+    "https://git-scm.com/book/en/v2/Git-Tools-Stashing-and-Cleaning.html",
+  ],
+};
+
+# git stash Tutorial
+
+## The short version
+
+`git stash` temporarily shelves your uncommitted work so you can switch tasks and come back later.
+
+## Good use cases
+
+- you need to jump to another branch quickly
+- the work is not ready to commit yet
+- you want to preserve a short-lived experiment without keeping it in the working tree
+
+## Common operations
+
+### Save current work
+
+```bash
+git stash push -m "wip: login form"
+```
+
+### Inspect stash entries
+
+```bash
+git stash list
+```
+
+### Reapply the latest stash
+
+```bash
+git stash apply
+```
+
+### Reapply and remove it
+
+```bash
+git stash pop
+```
+
+### Inspect what a stash contains
+
+```bash
+git stash show -p stash@{0}
+```
+
+## apply vs pop
+
+- `apply`: restore but keep the stash entry
+- `pop`: restore and delete it if successful
+
+If you are not fully sure yet, `apply` is usually the safer option.
+
+## Two practical habits
+
+### Always add a message
+
+```bash
+git stash push -m "wip: checkout flow"
+```
+
+That makes `git stash list` much easier to read later.
+
+### Prefer `apply` before deleting
+
+For important work, restoring first and deleting later is often safer than using `pop` immediately.

@@ -1,0 +1,60 @@
+export const metadata = {
+  title: "git rebase Tutorial",
+  slug: "git-rebase",
+  locale: "en",
+  section: "commands",
+  summary: "Explains the core model of git rebase, recommended workflows, risks, and recovery options.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rebase.html",
+    "https://git-scm.com/book/en/v2/Git-Branching-Rebasing.html",
+    "https://git-scm.com/docs/git-pull.html",
+  ],
+};
+
+# git rebase Tutorial
+
+## The short version
+
+`git rebase` reapplies a set of commits onto a new base, so you often end up with similar content but different commit IDs.
+
+## When it is a good fit
+
+- Bring a feature branch up to date with `main`
+- Clean up commit history before merging
+- Reorder, squash, or rewrite commits with interactive rebase
+
+## Basic workflow
+
+```bash
+git checkout feature/login
+git fetch origin
+git rebase origin/main
+```
+
+## Handling conflicts
+
+```bash
+git status
+# resolve conflicts manually
+git add <resolved-files>
+git rebase --continue
+```
+
+Abort if needed:
+
+```bash
+git rebase --abort
+```
+
+## Why interactive rebase matters
+
+```bash
+git rebase -i HEAD~4
+```
+
+Interactive rebase is useful for:
+
+- squashing noisy commits
+- reordering history for readability
+- rewriting commit messages
+- dropping experimental commits

@@ -1,0 +1,81 @@
+export const metadata = {
+  title: "fetch 与 pull 的区别",
+  slug: "fetch-vs-pull",
+  locale: "zh",
+  section: "workflows",
+  summary: "解释为什么先 fetch 再决定 merge 或 rebase，往往比直接 pull 更可控。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-pull.html",
+    "https://git-scm.com/docs/git-fetch.html",
+  ],
+};
+
+# fetch 与 pull 的区别
+
+## 先记住结论
+
+- `git fetch`：下载远端最新信息，但不直接改你的当前分支
+- `git pull`：先 fetch，再把远端变化整合进当前分支
+
+这也是为什么很多团队更推荐：
+
+```bash
+git fetch origin
+# 看清楚变化后，再决定 merge 或 rebase
+```
+
+## 为什么 fetch 更适合作为默认习惯
+
+因为它把“同步远端状态”和“修改当前分支”拆成了两个动作。
+
+这意味着你可以先观察：
+
+- 远端是否比本地更新
+- 当前分支是否已经分叉
+- 接下来更适合 merge、rebase，还是只做 fast-forward
+
+## pull 的四种常见整合结果
+
+根据官方文档，pull 在下载完成后，整合阶段可能表现为：
+
+1. fast-forward
+2. rebase
+3. merge
+4. squash merge
+
+所以，pull 不应该被简单理解成“安全同步一下”。
+
+## 推荐的教学用法
+
+### 对个人分支
+
+```bash
+git fetch origin
+git rebase origin/main
+```
+
+### 对稳定主分支
+
+```bash
+git pull --ff-only
+```
+
+`--ff-only` 的好处是：如果本地和远端已经分叉，它会直接失败，而不是替你做一个你没意识到的整合动作。
+
+## 常见误区
+
+### 误区 1：pull 比 fetch 更省事，所以更适合初学者
+
+恰恰相反。初学者更需要观察空间，而不是在一个命令里同时发生“下载 + 整合”。
+
+### 误区 2：只要 pull 成功，就说明历史一定干净
+
+不一定。它可能已经帮你做了 merge 或 rebase，只是你没有立刻意识到。
+
+## 团队建议
+
+如果你正在设计团队 Git 规范，可以把下面这条写进约定：
+
+- 开发分支同步前优先 `fetch`
+- 共享分支默认 `pull --ff-only`
+- 是否启用 `pull.rebase` 需要团队统一说明

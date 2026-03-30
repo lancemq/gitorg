@@ -1,8 +1,15 @@
 import { notFound } from "next/navigation";
 
-import { CommandTabs } from "@/components/command-tabs";
 import { SiteShell } from "@/components/site-shell";
-import { getDictionary, isValidLocale, type CommandSlug, type Locale } from "@/lib/i18n";
+import { getCommandDoc } from "@/lib/content";
+import {
+  commandSlugs,
+  getDictionary,
+  isValidLocale,
+  locales,
+  type CommandSlug,
+  type Locale,
+} from "@/lib/i18n";
 
 type Props = {
   params: Promise<{
@@ -12,13 +19,9 @@ type Props = {
 };
 
 export async function generateStaticParams() {
-  const params: Array<{ lang: Locale; slug: CommandSlug }> = [];
-
-  for (const lang of ["zh", "en"] as const) {
-    params.push({ lang, slug: "git-rebase" });
-  }
-
-  return params;
+  return locales.flatMap((lang) =>
+    commandSlugs.map((slug) => ({ lang, slug })),
+  ) as Array<{ lang: Locale; slug: CommandSlug }>;
 }
 
 export default async function CommandPage({ params }: Props) {
@@ -30,13 +33,13 @@ export default async function CommandPage({ params }: Props) {
 
   const locale = lang as Locale;
   const dict = getDictionary(locale);
-
-  if (!(slug in dict.commandDocs)) {
+  if (!dict.commandSlugs.includes(slug as CommandSlug)) {
     notFound();
   }
 
   const commandSlug = slug as CommandSlug;
-  const doc = dict.commandDocs[commandSlug];
+  const doc = await getCommandDoc(locale, commandSlug);
+  const DocBody = doc.Component;
 
   return (
     <SiteShell locale={locale} sidebar={dict.sidebar.command(commandSlug)}>
@@ -45,18 +48,18 @@ export default async function CommandPage({ params }: Props) {
         <span>/</span>
         <a href={`/${locale}#reference`}>{dict.commandPage.breadcrumbs.commands}</a>
         <span>/</span>
-        <strong>{doc.title}</strong>
+        <strong>{doc.metadata.title}</strong>
       </nav>
 
       <section className="command-hero">
         <div className="command-copy">
           <p className="eyebrow">{dict.commandPage.eyebrow}</p>
-          <h1>{doc.title}</h1>
-          <p className="lead">{doc.lead}</p>
+          <h1>{doc.metadata.title}</h1>
+          <p className="lead">{doc.metadata.summary}</p>
         </div>
 
         <aside className="command-meta panel">
-          {doc.meta.map((item) => (
+          {dict.commandMeta[commandSlug].map((item) => (
             <div className="meta-row" key={item.label}>
               <span>{item.label}</span>
               <strong>{item.value}</strong>
@@ -65,7 +68,11 @@ export default async function CommandPage({ params }: Props) {
         </aside>
       </section>
 
-      <CommandTabs tabs={doc.tabs} />
+      <section className="panel doc-content command-doc-content">
+        <div className="mdx-content">
+          <DocBody />
+        </div>
+      </section>
     </SiteShell>
   );
 }

@@ -1,0 +1,67 @@
+export const metadata = {
+  title: "git cherry-pick Tutorial",
+  slug: "git-cherry-pick",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how to apply a selected commit onto the current branch and when cherry-pick is the right tool.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-cherry-pick.html",
+    "https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History.html",
+  ],
+};
+
+# git cherry-pick Tutorial
+
+## The short version
+
+`git cherry-pick` reapplies the change introduced by a specific commit onto your current branch.
+
+## Where it fits best
+
+- backporting a fix into another branch
+- selecting only one or two commits instead of merging a whole branch
+- moving precise changes into a release branch
+
+## Basic usage
+
+```bash
+git checkout release/1.2
+git cherry-pick <commit-hash>
+```
+
+This creates a new commit on the current branch with the same change effect, but not the same commit ID.
+
+## Typical use cases
+
+### Backporting a fix
+
+If a bug is fixed on one branch but you only want that one patch on a release branch, cherry-pick is often the cleanest option.
+
+### Selecting one good commit from an experimental branch
+
+When only one or two commits are worth keeping, cherry-pick is usually lighter than merging the entire branch.
+
+## Conflict handling
+
+```bash
+git status
+# resolve conflicts
+git add <resolved-files>
+git cherry-pick --continue
+```
+
+Abort if needed:
+
+```bash
+git cherry-pick --abort
+```
+
+## A practical warning
+
+Cherry-pick is great for precise patch transfer, but heavy use across many branches can make history harder to reason about.
+
+## Before you use it
+
+- confirm whether the commit depends on earlier commits
+- confirm whether the destination branch already includes a similar change
+- confirm whether a full merge would actually be clearer

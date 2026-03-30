@@ -1,0 +1,106 @@
+export const metadata = {
+  title: "git stash 教程",
+  slug: "git-stash",
+  locale: "zh",
+  section: "commands",
+  summary: "解释如何用 git stash 临时保存未提交改动，并在后续恢复、查看和清理 stash 条目。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-stash.html",
+    "https://git-scm.com/book/en/v2/Git-Tools-Stashing-and-Cleaning.html",
+  ],
+};
+
+# git stash 教程
+
+## 一句话理解
+
+`git stash` 用于把当前未提交的工作状态临时搁置起来，让你先切换任务，再回来继续。
+
+## 适合什么场景
+
+- 正在写一半，需要紧急切到别的分支
+- 改动还不适合提交，但你必须先清理工作区
+- 想快速保存实验状态，再决定是否继续
+
+## 最常见操作
+
+### 临时保存当前改动
+
+```bash
+git stash push -m "wip: login form"
+```
+
+### 查看已有 stash
+
+```bash
+git stash list
+```
+
+### 恢复最近一次 stash
+
+```bash
+git stash apply
+```
+
+### 恢复并删除该 stash
+
+```bash
+git stash pop
+```
+
+### 查看 stash 里的具体改动
+
+```bash
+git stash show -p stash@{0}
+```
+
+## apply 和 pop 的区别
+
+- `apply`：恢复，但保留 stash 记录
+- `pop`：恢复，并在成功后删除 stash 记录
+
+如果你还不确定恢复结果是否正确，优先用 `apply` 更稳。
+
+## 一个常被忽略的点
+
+stash 不是长期存档方案。它更像短期缓存区，不适合长期堆积重要变更。
+
+## 两个实用习惯
+
+### 习惯 1：总是写 message
+
+```bash
+git stash push -m "wip: checkout flow"
+```
+
+这样后续回看 `git stash list` 时更容易知道每个条目在干什么。
+
+### 习惯 2：优先 `apply`，确认无误后再删除
+
+对重要改动，`apply` 比 `pop` 更稳。
+
+## 常见误区
+
+### 误区 1：stash 可以替代分支
+
+不建议。需要持续开发或协作的工作，更适合显式分支。
+
+### 误区 2：stash 一定不会冲突
+
+不是。恢复 stash 时，如果代码上下文已经变化，仍然可能产生冲突。
+
+## 实践建议
+
+如果 stash 条目开始越来越多，说明你可能需要：
+
+1. 更频繁的小提交
+2. 更清晰的分支切换策略
+3. 把短期实验显式转成分支而不是一直堆在 stash 里
+
+## 继续学习建议
+
+推荐继续阅读：
+
+1. `git reset`
+2. `git restore`
+3. `git clean`

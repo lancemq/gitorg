@@ -1,0 +1,86 @@
+export const metadata = {
+  title: "git merge Tutorial",
+  slug: "git-merge",
+  locale: "en",
+  section: "commands",
+  summary: "Explains the purpose of git merge, the difference between fast-forward and merge commits, and how to handle conflicts.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-merge.html",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging.html",
+  ],
+};
+
+# git merge Tutorial
+
+## The short version
+
+`git merge` integrates another branch into the current branch without requiring you to rewrite existing commits.
+
+## When it is a good fit
+
+- merging a feature branch back into `main`
+- preserving the real branch integration history
+- integrating shared branches without rewriting history
+
+## Two common outcomes
+
+### Fast-forward
+
+If the current branch has not diverged, Git can simply move the branch pointer forward.
+
+### Merge commit
+
+If both branches moved forward independently, Git creates a merge commit that records where the histories joined.
+
+## Basic workflow
+
+```bash
+git checkout main
+git fetch origin
+git merge feature/login
+```
+
+## Common flags and strategies
+
+### `--ff-only`
+
+Only allow fast-forward merges. If the histories diverged, the merge fails instead of creating a merge commit.
+
+```bash
+git merge --ff-only origin/main
+```
+
+### `--no-ff`
+
+Create a merge commit even when a fast-forward would be possible. Teams sometimes use this to preserve the explicit branch boundary.
+
+```bash
+git merge --no-ff feature/login
+```
+
+## Handling conflicts
+
+```bash
+git status
+# resolve conflicts
+git add <resolved-files>
+git merge --continue
+```
+
+Abort if needed:
+
+```bash
+git merge --abort
+```
+
+## When merge is a better choice than rebase
+
+- the branch is already shared
+- you want to preserve the integration graph
+- your team values non-rewritten collaboration history
+
+## A practical decision rule
+
+If your question is “Should I integrate this whole branch history here?”, merge is usually the more natural tool.
+
+If your question is “Should I rewrite how my branch history is expressed?”, that usually points more toward rebase.

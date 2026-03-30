@@ -1,0 +1,79 @@
+export const metadata = {
+  title: "git reset Tutorial",
+  slug: "git-reset",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how git reset moves HEAD, updates the index, and optionally overwrites the working tree through soft, mixed, and hard modes.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-reset.html",
+    "https://git-scm.com/book/en/v2/Git-Tools-Reset-Demystified.html",
+  ],
+};
+
+# git reset Tutorial
+
+## The short version
+
+`git reset` moves the current reference and, depending on the mode, may also update the index and working tree.
+
+## The three layers to remember
+
+1. commit history
+2. staging area
+3. working tree
+
+Understanding reset means understanding which layers are affected.
+
+## The three modes that matter most
+
+### `--soft`
+
+Moves the reference only.
+
+### `--mixed`
+
+Moves the reference and resets the index, while keeping working tree changes.
+
+### `--hard`
+
+Moves the reference, resets the index, and overwrites working tree changes.
+
+## Three common use cases
+
+### Undo the last commit but keep the changes
+
+```bash
+git reset --soft HEAD~1
+```
+
+### Unstage a file
+
+```bash
+git reset HEAD path/to/file
+```
+
+### Move all the way back to a safe commit
+
+```bash
+git reset --hard <commit>
+```
+
+## Common examples
+
+```bash
+git reset --soft HEAD~1
+git reset HEAD path/to/file
+git reset --hard <commit>
+```
+
+## Safety note
+
+Before destructive reset operations, check `git status`, inspect `git reflog`, or create a rescue branch first.
+
+## reset vs restore vs revert
+
+- `reset`: move references and optionally reset index / working tree
+- `restore`: recover file content more directly
+- `revert`: create a new commit that undoes an older one
+
+If the history is already shared with others, `revert` is often safer than rewriting it with `reset`.

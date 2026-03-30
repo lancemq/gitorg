@@ -4,7 +4,12 @@ export type Locale = (typeof locales)[number];
 
 export const defaultLocale: Locale = "zh";
 
-export type CommandSlug = "git-rebase";
+export type CommandSlug =
+  | "git-rebase"
+  | "git-merge"
+  | "git-cherry-pick"
+  | "git-reset"
+  | "git-stash";
 
 export function isValidLocale(value: string): value is Locale {
   return locales.includes(value as Locale);
@@ -36,30 +41,17 @@ type FaqItem = {
   answer: string;
 };
 
-type CommandDoc = {
-  title: string;
-  lead: string;
-  meta: ReadonlyArray<{ label: string; value: string }>;
-  tabs: ReadonlyArray<{
-    id: string;
-    label: string;
-    sections: ReadonlyArray<{
-      title: string;
-      body?: string;
-      list?: readonly string[];
-      code?: string;
-      warning?: boolean;
-    }>;
-    sideCards: ReadonlyArray<{
-      title: string;
-      description: string;
-    }>;
-  }>;
-};
+type DocsSectionId =
+  | "learning-path"
+  | "commands"
+  | "workflows"
+  | "recovery"
+  | "concepts";
 
 type Dictionary = {
   sidebar: {
     home: SidebarContent;
+    docs: SidebarContent;
     command: (activeSlug: CommandSlug) => SidebarContent;
   };
   home: {
@@ -125,6 +117,18 @@ type Dictionary = {
       action: string;
     };
   };
+  docsIndex: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    sourcesTitle: string;
+    sections: ReadonlyArray<{
+      id: DocsSectionId;
+      eyebrow: string;
+      title: string;
+      description: string;
+    }>;
+  };
   commandPage: {
     eyebrow: string;
     breadcrumbs: {
@@ -132,15 +136,16 @@ type Dictionary = {
       commands: string;
     };
   };
-  commandDocs: Record<CommandSlug, CommandDoc>;
+  commandSlugs: readonly CommandSlug[];
+  commandMeta: Record<CommandSlug, ReadonlyArray<{ label: string; value: string }>>;
 };
 
-function homeSidebar(locale: Locale, groups: NavGroup[]): SidebarContent {
+function baseSidebar(locale: Locale, groups: NavGroup[]): SidebarContent {
   return {
     brandLabel: "Git Academy",
-    searchLabel: locale === "zh" ? "搜索文档" : "Search documentation",
+    searchLabel: locale === "zh" ? "搜索文档" : "Search docs",
     footerTitle: "Auto Doc",
-    footerText: locale === "zh" ? "双语文档站" : "Bilingual docs",
+    footerText: locale === "zh" ? "内容驱动文档站" : "Content-driven docs",
     localeLabel: locale === "zh" ? "语言" : "Language",
     localeNames: {
       zh: locale === "zh" ? "中文" : "Chinese",
@@ -150,21 +155,17 @@ function homeSidebar(locale: Locale, groups: NavGroup[]): SidebarContent {
   };
 }
 
-function commandSidebar(
-  locale: Locale,
-  groups: NavGroup[],
-  footerText: string,
-): SidebarContent {
-  return {
-    ...homeSidebar(locale, groups),
-    searchLabel: locale === "zh" ? "搜索命令" : "Search commands",
-    footerText,
-  };
-}
+export const commandSlugs = [
+  "git-rebase",
+  "git-merge",
+  "git-cherry-pick",
+  "git-reset",
+  "git-stash",
+] as const;
 
 const zhDictionary: Dictionary = {
   sidebar: {
-    home: homeSidebar("zh", [
+    home: baseSidebar("zh", [
       {
         title: "Learning Path",
         items: [
@@ -177,30 +178,62 @@ const zhDictionary: Dictionary = {
       {
         title: "Resources",
         items: [
-          { label: "参考路线", href: "/zh#reference" },
-          { label: "常见问题", href: "/zh#faq" },
+            { label: "文档库", href: "/zh/docs" },
+            { label: "常见问题", href: "/zh#faq" },
+          ],
+      },
+    ]),
+    docs: baseSidebar("zh", [
+      {
+        title: "Docs",
+        items: [
+          { label: "全部文档", href: "/zh/docs", active: true },
+          { label: "快速上手", href: "/zh/docs/learning-path/quick-start" },
+          { label: "git rebase", href: "/zh/commands/git-rebase" },
+          { label: "git merge", href: "/zh/commands/git-merge" },
+          { label: "git cherry-pick", href: "/zh/commands/git-cherry-pick" },
+          { label: "git reset", href: "/zh/commands/git-reset" },
+          { label: "git stash", href: "/zh/commands/git-stash" },
+          { label: "恢复手册", href: "/zh/docs/recovery/reflog-recovery" },
         ],
       },
     ]),
     command: (activeSlug) =>
-      commandSidebar(
-        "zh",
-        [
-          {
-            title: "Docs",
-            items: [
-              {
-                label: "git rebase",
-                href: "/zh/commands/git-rebase",
-                active: activeSlug === "git-rebase",
-              },
-              { label: "git merge", href: "/zh#reference" },
-              { label: "git reflog", href: "/zh#faq" },
-            ],
-          },
-        ],
-        "rebase 模块",
-      ),
+      baseSidebar("zh", [
+        {
+          title: "Command Docs",
+          items: [
+            { label: "全部文档", href: "/zh/docs" },
+            {
+              label: "git rebase",
+              href: "/zh/commands/git-rebase",
+              active: activeSlug === "git-rebase",
+            },
+            {
+              label: "git merge",
+              href: "/zh/commands/git-merge",
+              active: activeSlug === "git-merge",
+            },
+            {
+              label: "git cherry-pick",
+              href: "/zh/commands/git-cherry-pick",
+              active: activeSlug === "git-cherry-pick",
+            },
+            {
+              label: "git reset",
+              href: "/zh/commands/git-reset",
+              active: activeSlug === "git-reset",
+            },
+            {
+              label: "git stash",
+              href: "/zh/commands/git-stash",
+              active: activeSlug === "git-stash",
+            },
+            { label: "fetch vs pull", href: "/zh/docs/workflows/fetch-vs-pull" },
+            { label: "reflog 恢复", href: "/zh/docs/recovery/reflog-recovery" },
+          ],
+        },
+      ]),
   },
   home: {
     hero: {
@@ -213,14 +246,14 @@ const zhDictionary: Dictionary = {
     },
     meta: {
       modulesTitle: "核心模块",
-      modules: 4,
-      modulesLabel: "从工作流到对象模型",
-      commandCardsTitle: "命令卡片",
-      commandCards: 42,
-      exercisesTitle: "练习题",
-      exercises: 18,
+      modules: 5,
+      modulesLabel: "从工作流到恢复手册",
+      commandCardsTitle: "文档专题",
+      commandCards: 14,
+      exercisesTitle: "双语页面",
+      exercises: 4,
       recommendedPathTitle: "Recommended path",
-      recommendedPath: "Quick Start → Best Practices → Internals",
+      recommendedPath: "Quick Start → fetch/pull → rebase → reflog",
     },
     quickStart: {
       eyebrow: "Quick Start",
@@ -294,26 +327,10 @@ const zhDictionary: Dictionary = {
       title: "命令参考路线",
       description: "把高频命令整理成渐进式学习路径。",
       steps: [
-        {
-          step: "01",
-          title: "clone",
-          description: "拉取仓库并建立本地副本，理解 origin 和默认分支。",
-        },
-        {
-          step: "02",
-          title: "add",
-          description: "把改动加入暂存区，准备组成一个可提交的快照。",
-        },
-        {
-          step: "03",
-          title: "commit",
-          description: "生成不可变提交对象，形成可回溯的历史节点。",
-        },
-        {
-          step: "04",
-          title: "rebase",
-          description: "重写提交基底，整理特性分支历史。",
-        },
+        { step: "01", title: "clone", description: "拉取仓库并建立本地副本。" },
+        { step: "02", title: "add", description: "把改动加入暂存区。" },
+        { step: "03", title: "commit", description: "生成新的提交对象。" },
+        { step: "04", title: "rebase", description: "重写提交基底并整理历史。" },
       ],
     },
     faq: {
@@ -324,21 +341,58 @@ const zhDictionary: Dictionary = {
         {
           question: "`git pull` 为什么会产生我不想要的 merge commit？",
           answer:
-            "因为 pull 默认会在 fetch 之后直接 merge。你可以改成先 git fetch，再手动选择 merge 或 rebase，或者配置 pull.rebase=true。",
+            "因为 pull 默认会在 fetch 之后直接 merge。你可以先 fetch，再显式选择 merge 或 rebase。",
         },
         {
           question: "误删分支或 reset 之后还能找回吗？",
-          answer:
-            "多数情况下可以。只要对象还没有被垃圾回收，git reflog 往往能帮你定位历史引用并恢复。",
+          answer: "多数情况下可以。只要对象还没被清理，git reflog 往往能帮你定位历史引用并恢复。",
         },
       ],
     },
     cta: {
       eyebrow: "Git Docs",
-      title: "从 Git 快速指南，到对象模型和工作流实战。",
-      description: "继续阅读命令详解，或者把这套页面扩展成你自己的团队文档站。",
-      action: "去看命令页",
+      title: "教程材料已经进入 content/ 内容源。",
+      description: "继续浏览文档库，或者把更多 Git 主题接进同一套 MDX 渲染体系。",
+      action: "浏览文档库",
     },
+  },
+  docsIndex: {
+    eyebrow: "Docs Library",
+    title: "内容文档库",
+    description: "所有教程都从 content/ 目录下的 Markdown / MDX 文件渲染而来。",
+    sourcesTitle: "参考来源",
+    sections: [
+      {
+        id: "learning-path",
+        eyebrow: "Learning Path",
+        title: "学习路径",
+        description: "适合从零开始构建 Git 使用闭环。",
+      },
+      {
+        id: "commands",
+        eyebrow: "Commands",
+        title: "命令专题",
+        description: "围绕高频命令提供结构化教程。",
+      },
+      {
+        id: "workflows",
+        eyebrow: "Workflows",
+        title: "工作流",
+        description: "帮助你区分相似命令和日常协作策略。",
+      },
+      {
+        id: "recovery",
+        eyebrow: "Recovery",
+        title: "恢复手册",
+        description: "误操作后的定位与恢复思路。",
+      },
+      {
+        id: "concepts",
+        eyebrow: "Concepts",
+        title: "概念基础",
+        description: "理解 Git 的对象、引用和 HEAD。",
+      },
+    ],
   },
   commandPage: {
     eyebrow: "Command Reference",
@@ -347,105 +401,39 @@ const zhDictionary: Dictionary = {
       commands: "命令",
     },
   },
-  commandDocs: {
-    "git-rebase": {
-      title: "git rebase",
-      lead: "把当前分支上的提交挪到新的基底之上。它常用于清理特性分支历史、保持主干线性，或在合并前同步最新主分支。",
-      meta: [
-        { label: "复杂度", value: "中等偏高" },
-        { label: "常见场景", value: "同步主分支、整理提交" },
-        { label: "恢复手段", value: "reflog / ORIG_HEAD" },
-      ],
-      tabs: [
-        {
-          id: "overview",
-          label: "总览",
-          sections: [
-            {
-              title: "核心心智模型",
-              body: "rebase 会找到一组提交，把它们按顺序重新应用到新的起点上，所以你看到的是同样的改动、不同的提交 ID。",
-              code: "git checkout feature/login\ngit fetch origin\ngit rebase origin/main",
-            },
-            {
-              title: "典型场景",
-              list: [
-                "让特性分支跟上最新 main。",
-                "在合并前压缩、整理提交历史。",
-                "交互式修改 commit message 或拆分提交。",
-              ],
-            },
-            {
-              title: "高频用法",
-              body: "交互式 rebase 适合整理历史：",
-              code: "git rebase -i HEAD~4\n\npick a1b2c3 feat: add login form\nreword d4e5f6 fix: improve validation\nsquash 9a0b1c chore: polish copy",
-            },
-          ],
-          sideCards: [
-            {
-              title: "注意点",
-              description: "已经推送给他人协作的公共分支，谨慎 rebase，避免改写共享历史。",
-            },
-            {
-              title: "冲突处理",
-              description: "解决冲突后执行 git add，再用 git rebase --continue 继续。",
-            },
-          ],
-        },
-        {
-          id: "workflow",
-          label: "流程",
-          sections: [
-            {
-              title: "推荐流程",
-              list: [
-                "确认工作区干净，或者先 stash。",
-                "git fetch origin 获取最新远端。",
-                "git rebase origin/main 迁移提交基底。",
-                "冲突解决后 git rebase --continue。",
-                "必要时用 git push --force-with-lease 更新远端分支。",
-              ],
-            },
-          ],
-          sideCards: [
-            {
-              title: "为什么不用 force push",
-              description: "--force-with-lease 会先检查远端是否被别人更新，安全性更高。",
-            },
-          ],
-        },
-        {
-          id: "pitfalls",
-          label: "风险点",
-          sections: [
-            {
-              title: "常见坑位",
-              list: [
-                "把公共分支 rebase 后直接强推，导致同事历史错位。",
-                "冲突解决后忘记继续，误以为 rebase 已经完成。",
-                "交互式 rebase 时误删 commit 行，导致提交丢失。",
-              ],
-            },
-            {
-              title: "恢复思路",
-              body: "如果 rebase 过程出错，优先看 git reflog。通常可以找到 rebase 前的 HEAD，然后用 git reset --hard <hash> 回到安全点。",
-              warning: true,
-            },
-          ],
-          sideCards: [
-            {
-              title: "撤销命令",
-              description: "git rebase --abort 可在 rebase 进行中回到开始前状态。",
-            },
-          ],
-        },
-      ],
-    },
+  commandSlugs,
+  commandMeta: {
+    "git-rebase": [
+      { label: "复杂度", value: "中等偏高" },
+      { label: "常见场景", value: "同步主分支、整理提交" },
+      { label: "内容来源", value: "MDX / 官方资料提炼" },
+    ],
+    "git-merge": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "整合分支历史" },
+      { label: "内容来源", value: "MDX / 官方资料提炼" },
+    ],
+    "git-cherry-pick": [
+      { label: "复杂度", value: "中等偏高" },
+      { label: "常见场景", value: "挑选特定提交" },
+      { label: "内容来源", value: "MDX / 官方资料提炼" },
+    ],
+    "git-reset": [
+      { label: "复杂度", value: "高" },
+      { label: "常见场景", value: "撤销、回退、取消暂存" },
+      { label: "内容来源", value: "MDX / 官方资料提炼" },
+    ],
+    "git-stash": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "临时保存未提交改动" },
+      { label: "内容来源", value: "MDX / 官方资料提炼" },
+    ],
   },
 };
 
 const enDictionary: Dictionary = {
   sidebar: {
-    home: homeSidebar("en", [
+    home: baseSidebar("en", [
       {
         title: "Learning Path",
         items: [
@@ -458,30 +446,62 @@ const enDictionary: Dictionary = {
       {
         title: "Resources",
         items: [
-          { label: "Reference", href: "/en#reference" },
+          { label: "Docs Library", href: "/en/docs" },
           { label: "FAQ", href: "/en#faq" },
         ],
       },
     ]),
-    command: (activeSlug) =>
-      commandSidebar(
-        "en",
-        [
-          {
-            title: "Docs",
-            items: [
-              {
-                label: "git rebase",
-                href: "/en/commands/git-rebase",
-                active: activeSlug === "git-rebase",
-              },
-              { label: "git merge", href: "/en#reference" },
-              { label: "git reflog", href: "/en#faq" },
-            ],
-          },
+    docs: baseSidebar("en", [
+      {
+        title: "Docs",
+        items: [
+          { label: "All Docs", href: "/en/docs", active: true },
+          { label: "Quick Start", href: "/en/docs/learning-path/quick-start" },
+          { label: "git rebase", href: "/en/commands/git-rebase" },
+          { label: "git merge", href: "/en/commands/git-merge" },
+          { label: "git cherry-pick", href: "/en/commands/git-cherry-pick" },
+          { label: "git reset", href: "/en/commands/git-reset" },
+          { label: "git stash", href: "/en/commands/git-stash" },
+          { label: "Reflog Recovery", href: "/en/docs/recovery/reflog-recovery" },
         ],
-        "rebase module",
-      ),
+      },
+    ]),
+    command: (activeSlug) =>
+      baseSidebar("en", [
+        {
+          title: "Command Docs",
+          items: [
+            { label: "All Docs", href: "/en/docs" },
+            {
+              label: "git rebase",
+              href: "/en/commands/git-rebase",
+              active: activeSlug === "git-rebase",
+            },
+            {
+              label: "git merge",
+              href: "/en/commands/git-merge",
+              active: activeSlug === "git-merge",
+            },
+            {
+              label: "git cherry-pick",
+              href: "/en/commands/git-cherry-pick",
+              active: activeSlug === "git-cherry-pick",
+            },
+            {
+              label: "git reset",
+              href: "/en/commands/git-reset",
+              active: activeSlug === "git-reset",
+            },
+            {
+              label: "git stash",
+              href: "/en/commands/git-stash",
+              active: activeSlug === "git-stash",
+            },
+            { label: "fetch vs pull", href: "/en/docs/workflows/fetch-vs-pull" },
+            { label: "reflog recovery", href: "/en/docs/recovery/reflog-recovery" },
+          ],
+        },
+      ]),
   },
   home: {
     hero: {
@@ -494,14 +514,14 @@ const enDictionary: Dictionary = {
     },
     meta: {
       modulesTitle: "Core Modules",
-      modules: 4,
-      modulesLabel: "From workflow to object model",
-      commandCardsTitle: "Command Cards",
-      commandCards: 42,
-      exercisesTitle: "Exercises",
-      exercises: 18,
+      modules: 5,
+      modulesLabel: "From workflow to recovery",
+      commandCardsTitle: "Doc Topics",
+      commandCards: 14,
+      exercisesTitle: "Bilingual Pages",
+      exercises: 4,
       recommendedPathTitle: "Recommended path",
-      recommendedPath: "Quick Start → Best Practices → Internals",
+      recommendedPath: "Quick Start → fetch/pull → rebase → reflog",
     },
     quickStart: {
       eyebrow: "Quick Start",
@@ -575,26 +595,10 @@ const enDictionary: Dictionary = {
       title: "Command Learning Path",
       description: "Organize high-frequency commands into a progressive path.",
       steps: [
-        {
-          step: "01",
-          title: "clone",
-          description: "Create a local copy of a repository and understand origin and the default branch.",
-        },
-        {
-          step: "02",
-          title: "add",
-          description: "Move changes into the staging area to prepare a snapshot.",
-        },
-        {
-          step: "03",
-          title: "commit",
-          description: "Create an immutable commit object and build a traceable history.",
-        },
-        {
-          step: "04",
-          title: "rebase",
-          description: "Rewrite the base of commits and clean up feature branch history.",
-        },
+        { step: "01", title: "clone", description: "Create a local copy of a repository." },
+        { step: "02", title: "add", description: "Move changes into the staging area." },
+        { step: "03", title: "commit", description: "Create a new immutable commit." },
+        { step: "04", title: "rebase", description: "Rewrite commit bases and clean history." },
       ],
     },
     faq: {
@@ -604,22 +608,58 @@ const enDictionary: Dictionary = {
       items: [
         {
           question: "Why does `git pull` create a merge commit I did not want?",
-          answer:
-            "Because pull defaults to fetch plus merge. You can fetch first and then choose merge or rebase manually, or set pull.rebase=true.",
+          answer: "Because pull defaults to fetch plus merge. Fetch first if you want to decide the integration strategy explicitly.",
         },
         {
           question: "Can I recover after deleting a branch or running reset?",
-          answer:
-            "Often yes. As long as the objects have not been garbage collected, git reflog can usually help you locate and restore the previous reference.",
+          answer: "Often yes. If the objects have not been cleaned up yet, git reflog can usually help you recover the previous reference.",
         },
       ],
     },
     cta: {
       eyebrow: "Git Docs",
-      title: "From a fast Git guide to object model and workflow practice.",
-      description: "Keep reading command deep-dives, or extend this into your own team documentation site.",
-      action: "Open command page",
+      title: "The content library now renders directly from MDX.",
+      description: "Browse the docs library, or keep expanding the same content pipeline with more Git topics.",
+      action: "Open docs library",
     },
+  },
+  docsIndex: {
+    eyebrow: "Docs Library",
+    title: "Content Library",
+    description: "Every tutorial on this page is rendered from Markdown / MDX files inside the content/ directory.",
+    sourcesTitle: "References",
+    sections: [
+      {
+        id: "learning-path",
+        eyebrow: "Learning Path",
+        title: "Learning Path",
+        description: "A practical path for building a usable Git workflow from scratch.",
+      },
+      {
+        id: "commands",
+        eyebrow: "Commands",
+        title: "Commands",
+        description: "Focused deep-dives on high-frequency Git commands.",
+      },
+      {
+        id: "workflows",
+        eyebrow: "Workflows",
+        title: "Workflows",
+        description: "Understand the tradeoffs behind similar commands and team habits.",
+      },
+      {
+        id: "recovery",
+        eyebrow: "Recovery",
+        title: "Recovery",
+        description: "Recover from mistakes and build a safer operating model.",
+      },
+      {
+        id: "concepts",
+        eyebrow: "Concepts",
+        title: "Concepts",
+        description: "Learn the foundations behind refs, HEAD, and history.",
+      },
+    ],
   },
   commandPage: {
     eyebrow: "Command Reference",
@@ -628,99 +668,33 @@ const enDictionary: Dictionary = {
       commands: "Commands",
     },
   },
-  commandDocs: {
-    "git-rebase": {
-      title: "git rebase",
-      lead: "Move the current branch commits onto a new base. It is commonly used to keep history linear, clean up feature branch commits, or sync with the latest main branch before merging.",
-      meta: [
-        { label: "Complexity", value: "Medium to high" },
-        { label: "Typical use", value: "Sync main branch, clean up commits" },
-        { label: "Recovery", value: "reflog / ORIG_HEAD" },
-      ],
-      tabs: [
-        {
-          id: "overview",
-          label: "Overview",
-          sections: [
-            {
-              title: "Core mental model",
-              body: "Rebase finds a set of commits and reapplies them one by one onto a new starting point, which is why you end up with the same changes but different commit IDs.",
-              code: "git checkout feature/login\ngit fetch origin\ngit rebase origin/main",
-            },
-            {
-              title: "Typical scenarios",
-              list: [
-                "Bring a feature branch up to date with main.",
-                "Compress or polish commit history before merging.",
-                "Interactively edit commit messages or split commits.",
-              ],
-            },
-            {
-              title: "Common workflow",
-              body: "Interactive rebase is great for cleaning up history:",
-              code: "git rebase -i HEAD~4\n\npick a1b2c3 feat: add login form\nreword d4e5f6 fix: improve validation\nsquash 9a0b1c chore: polish copy",
-            },
-          ],
-          sideCards: [
-            {
-              title: "Watch out",
-              description: "Be careful rebasing public branches that other people already depend on.",
-            },
-            {
-              title: "Conflict handling",
-              description: "After resolving conflicts, run git add and then git rebase --continue.",
-            },
-          ],
-        },
-        {
-          id: "workflow",
-          label: "Workflow",
-          sections: [
-            {
-              title: "Recommended steps",
-              list: [
-                "Make sure your working tree is clean, or stash first.",
-                "Run git fetch origin to get the latest remote state.",
-                "Run git rebase origin/main to move your commit base.",
-                "Resolve conflicts and continue with git rebase --continue.",
-                "Use git push --force-with-lease if you need to update the remote branch.",
-              ],
-            },
-          ],
-          sideCards: [
-            {
-              title: "Why not plain force push",
-              description: "--force-with-lease checks whether the remote was updated by someone else first.",
-            },
-          ],
-        },
-        {
-          id: "pitfalls",
-          label: "Pitfalls",
-          sections: [
-            {
-              title: "Common mistakes",
-              list: [
-                "Rebasing a shared branch and force pushing it immediately.",
-                "Solving conflicts but forgetting to continue the rebase.",
-                "Deleting commit lines by mistake during interactive rebase.",
-              ],
-            },
-            {
-              title: "Recovery path",
-              body: "If a rebase goes wrong, start with git reflog. In many cases you can find the previous HEAD and reset back to a safe point with git reset --hard <hash>.",
-              warning: true,
-            },
-          ],
-          sideCards: [
-            {
-              title: "Abort command",
-              description: "git rebase --abort returns the branch to its pre-rebase state while the rebase is still in progress.",
-            },
-          ],
-        },
-      ],
-    },
+  commandSlugs,
+  commandMeta: {
+    "git-rebase": [
+      { label: "Complexity", value: "Medium to high" },
+      { label: "Typical use", value: "Sync main branch, clean up commits" },
+      { label: "Content source", value: "MDX / distilled from official docs" },
+    ],
+    "git-merge": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Join branch histories" },
+      { label: "Content source", value: "MDX / distilled from official docs" },
+    ],
+    "git-cherry-pick": [
+      { label: "Complexity", value: "Medium to high" },
+      { label: "Typical use", value: "Apply selected commits" },
+      { label: "Content source", value: "MDX / distilled from official docs" },
+    ],
+    "git-reset": [
+      { label: "Complexity", value: "High" },
+      { label: "Typical use", value: "Undo, move HEAD, unstage changes" },
+      { label: "Content source", value: "MDX / distilled from official docs" },
+    ],
+    "git-stash": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Temporarily shelve local changes" },
+      { label: "Content source", value: "MDX / distilled from official docs" },
+    ],
   },
 };
 
@@ -729,6 +703,6 @@ const dictionaries: Record<Locale, Dictionary> = {
   en: enDictionary,
 };
 
-export function getDictionary(locale: Locale): Dictionary {
+export function getDictionary(locale: Locale) {
   return dictionaries[locale];
 }

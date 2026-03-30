@@ -1,0 +1,101 @@
+export const metadata = {
+  title: "git cherry-pick 教程",
+  slug: "git-cherry-pick",
+  locale: "zh",
+  section: "commands",
+  summary: "解释如何把某个提交的改动拣选到当前分支，以及 cherry-pick 的典型适用边界。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-cherry-pick.html",
+    "https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History.html",
+  ],
+};
+
+# git cherry-pick 教程
+
+## 一句话理解
+
+`git cherry-pick` 会把指定提交引入的改动，重新应用到当前分支上。
+
+## 它最适合什么场景
+
+- 把某个修复补丁从一个分支带到另一个分支
+- 只需要某几个提交，而不是整条分支历史
+- 发布分支需要精确挑选变更时
+
+## 基本用法
+
+```bash
+git checkout release/1.2
+git cherry-pick <commit-hash>
+```
+
+这会在当前分支上创建一个新的提交，内容来自被挑选的提交，但提交 ID 会不同。
+
+## 一次挑多个提交
+
+```bash
+git cherry-pick <commit-a> <commit-b>
+```
+
+如果这些提交存在依赖关系，建议按照原始顺序挑选。
+
+## 典型使用场景
+
+### 场景 1：把线上修复带回发布分支
+
+主分支上已经修了一个 bug，但你不想把整条开发历史合并到发布分支时，cherry-pick 很适合做补丁回带。
+
+### 场景 2：从实验分支中选中一个成熟提交
+
+如果实验分支里只有一部分提交值得保留，直接 merge 往往太重，这时 cherry-pick 更精确。
+
+## 冲突时怎么处理
+
+```bash
+git status
+# 解决冲突
+git add <resolved-files>
+git cherry-pick --continue
+```
+
+放弃当前操作：
+
+```bash
+git cherry-pick --abort
+```
+
+## 它和 merge / rebase 的区别
+
+- merge：整合一段分支历史
+- rebase：重写一组提交的基底
+- cherry-pick：只拿某个或某几个提交的内容
+
+所以 cherry-pick 更像“精确搬运改动”，而不是“整合整条历史线”。
+
+## 使用前要注意什么
+
+- 先确认目标提交是否依赖别的前置提交
+- 先确认当前分支是否已经包含同类改动
+- 先确认你是不是应该整合整条分支，而不是单挑提交
+
+## 常见误区
+
+### 误区 1：cherry-pick 完全等于复制提交
+
+不对。它复制的是改动效果，不是原始提交对象本身。
+
+### 误区 2：cherry-pick 越多越灵活
+
+过度使用会让不同分支之间出现重复但不完全相同的提交，后续排查历史时会更复杂。
+
+## 实践建议
+
+如果一个功能需要长期存在于多个分支，优先考虑更稳定的分支策略；cherry-pick 更适合补丁级、精选式迁移。
+
+## 继续学习建议
+
+后续建议配合阅读：
+
+1. `git merge`
+2. `git rebase`
+3. `git reset`

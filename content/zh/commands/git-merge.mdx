@@ -1,0 +1,114 @@
+export const metadata = {
+  title: "git merge 教程",
+  slug: "git-merge",
+  locale: "zh",
+  section: "commands",
+  summary: "解释 git merge 的核心作用、fast-forward 与 merge commit 的区别，以及冲突处理策略。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-merge.html",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging.html",
+  ],
+};
+
+# git merge 教程
+
+## 一句话理解
+
+`git merge` 会把另一个分支的历史整合到当前分支。它不要求改写已有提交，因此很适合共享分支上的常规整合。
+
+## 什么时候应该用
+
+- 把特性分支合并回 `main`
+- 在团队协作中保留分支汇合关系
+- 你不希望改写已有提交历史时
+
+## 两种常见结果
+
+### 1. fast-forward
+
+如果当前分支没有新的分叉提交，Git 可以直接把分支指针向前移动。
+
+### 2. merge commit
+
+如果两个分支都各自向前发展，Git 会创建一个新的 merge commit 来表达“历史在这里汇合了”。
+
+## 基本流程
+
+```bash
+git checkout main
+git fetch origin
+git merge feature/login
+```
+
+建议先 fetch，再 merge，这样你看到的是远端最新状态。
+
+## 常见参数和策略
+
+### `--ff-only`
+
+只允许 fast-forward。只要历史已经分叉，就直接失败。
+
+```bash
+git merge --ff-only origin/main
+```
+
+### `--no-ff`
+
+即使可以 fast-forward，也强制生成一个 merge commit，适合团队希望保留“某个分支在这里被合并”的边界时使用。
+
+```bash
+git merge --no-ff feature/login
+```
+
+## 冲突时怎么处理
+
+```bash
+git status
+# 手动解决冲突
+git add <resolved-files>
+git merge --continue
+```
+
+如果想放弃当前合并：
+
+```bash
+git merge --abort
+```
+
+## 什么时候 merge 比 rebase 更合适
+
+- 分支已经被多人共享
+- 你想清楚保留分叉和汇合关系
+- 团队更重视“历史真实过程”，而不是绝对线性
+
+## 一个实际判断方法
+
+如果你问自己的是“我是不是要把整条分支的历史整合进来”，通常 merge 是更自然的选择。
+
+如果你问自己的是“我是不是只想整理自己分支的历史表达”，通常才更像 rebase 的适用场景。
+
+## 常见误区
+
+### 误区 1：merge 一定比 rebase 更脏
+
+不一定。它只是更明确地保留了分支整合关系。
+
+### 误区 2：merge 冲突比 rebase 冲突更难
+
+本质上都是在解决同一类文本或语义冲突，只是发生时机和历史表达不同。
+
+## 一个团队建议
+
+对共享主分支，可以优先明确三条规则：
+
+1. 是否允许 merge commit
+2. 是否默认要求 fast-forward
+3. pull request 合并策略是什么
+
+## 继续学习建议
+
+如果你已经理解 merge，下一步建议连着学：
+
+1. `git rebase` 和 merge 的历史差异
+2. `fetch` 与 `pull` 的整合边界
+3. 冲突解决后的恢复策略

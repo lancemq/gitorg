@@ -1,0 +1,35 @@
+export const metadata = {
+  title: "fetch vs pull",
+  slug: "fetch-vs-pull",
+  locale: "en",
+  section: "workflows",
+  summary: "Explains why fetch-first workflows are often more controllable than pulling directly.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-pull.html",
+    "https://git-scm.com/docs/git-fetch.html",
+  ],
+};
+
+# fetch vs pull
+
+## The core difference
+
+- `git fetch`: download remote refs and objects without directly changing your current branch
+- `git pull`: fetch first, then integrate the remote changes into your current branch
+
+That is why many teams prefer:
+
+```bash
+git fetch origin
+# inspect first, then choose merge or rebase
+```
+
+## Why fetch is a better default habit
+
+Fetch separates “sync remote state” from “modify my branch”.
+
+That gives you room to inspect:
+
+- whether the remote moved ahead
+- whether your branch diverged
+- whether merge, rebase, or fast-forward is the better next step

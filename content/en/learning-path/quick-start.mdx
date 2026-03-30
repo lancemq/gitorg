@@ -1,0 +1,84 @@
+export const metadata = {
+  title: "Git Quick Start Learning Path",
+  slug: "quick-start",
+  locale: "en",
+  section: "learning-path",
+  summary: "A beginner-friendly Git path that covers clone, add, commit, fetch, pull, and push as a minimum usable workflow.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Branching-Summary",
+    "https://git-scm.com/docs/git-fetch.html",
+    "https://git-scm.com/docs/git-pull.html",
+  ],
+};
+
+# Git Quick Start Learning Path
+
+## What this guide helps with
+
+Many people first meet Git as a pile of commands to memorize. A better approach is to build one minimum closed loop first:
+
+1. Get the repository
+2. Change files
+3. Stage changes
+4. Create a commit
+5. Sync with the remote
+
+Once that loop feels natural, topics like rebase, reflog, references, and the object model become much easier to learn.
+
+## The first commands to learn
+
+### 1. `git clone`
+
+Use it to copy a remote repository locally and record the default remote as `origin`.
+
+```bash
+git clone <repository-url>
+```
+
+### 2. `git add`
+
+Use it to move changes from the working tree into the staging area.
+
+```bash
+git add .
+```
+
+### 3. `git commit`
+
+Use it to turn the staged snapshot into a new commit.
+
+```bash
+git commit -m "feat: add login form"
+```
+
+### 4. `git fetch`
+
+Use it to download new remote refs and objects without modifying your current branch directly.
+
+```bash
+git fetch origin
+```
+
+### 5. `git pull`
+
+Use it to fetch first and then integrate remote changes into your current branch.
+
+```bash
+git pull --ff-only
+```
+
+### 6. `git push`
+
+Use it to publish your local commits to the remote.
+
+```bash
+git push origin main
+```
+
+## What to learn next
+
+After this guide, the next three topics should usually be:
+
+1. The difference between `fetch` and `pull`
+2. The boundaries of `git rebase`
+3. Recovery with `git reflog`

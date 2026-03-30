@@ -32,10 +32,10 @@ export default async function LocalizedHomePage({ params }: Props) {
           <h1>{dict.home.hero.title}</h1>
           <p className="lead">{dict.home.hero.description}</p>
           <div className="hero-actions">
-            <a className="button button-primary" href={`/${locale}/commands/git-rebase`}>
+            <a className="button button-primary" href={`/${locale}/docs/learning-path/quick-start`}>
               {dict.home.hero.primaryAction}
             </a>
-            <a className="button button-secondary" href={`/${locale}#reference`}>
+            <a className="button button-secondary" href={`/${locale}/docs`}>
               {dict.home.hero.secondaryAction}
             </a>
           </div>
@@ -148,7 +148,7 @@ export default async function LocalizedHomePage({ params }: Props) {
           <h2>{dict.home.cta.title}</h2>
           <p>{dict.home.cta.description}</p>
         </div>
-        <a className="button button-primary" href={`/${locale}/commands/git-rebase`}>
+        <a className="button button-primary" href={`/${locale}/docs`}>
           {dict.home.cta.action}
         </a>
       </section>

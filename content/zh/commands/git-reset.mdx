@@ -1,0 +1,123 @@
+export const metadata = {
+  title: "git reset 教程",
+  slug: "git-reset",
+  locale: "zh",
+  section: "commands",
+  summary: "解释 git reset 如何移动 HEAD、分支和暂存区，并区分 --soft、--mixed、--hard 的影响范围。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-reset.html",
+    "https://git-scm.com/book/en/v2/Git-Tools-Reset-Demystified.html",
+  ],
+};
+
+# git reset 教程
+
+## 一句话理解
+
+`git reset` 的本质是移动当前引用，并按模式决定是否同步更新暂存区和工作区。
+
+## 先记住三个层次
+
+1. 提交历史
+2. 暂存区
+3. 工作区
+
+理解 reset 的关键，就是看它影响到哪一层。
+
+## 三种最常见模式
+
+### `--soft`
+
+只移动提交引用，不改暂存区和工作区。
+
+### `--mixed`
+
+移动提交引用，并重置暂存区，但保留工作区改动。默认模式通常就是它。
+
+### `--hard`
+
+同时移动提交引用、重置暂存区、覆盖工作区改动。风险最高。
+
+## 最常见的三类用途
+
+### 1. 撤回提交但保留改动
+
+```bash
+git reset --soft HEAD~1
+```
+
+### 2. 取消暂存
+
+```bash
+git reset HEAD path/to/file
+```
+
+### 3. 彻底回退到某个安全点
+
+```bash
+git reset --hard <commit>
+```
+
+## 基本示例
+
+### 撤回最近一次提交，但保留改动待重新提交
+
+```bash
+git reset --soft HEAD~1
+```
+
+### 取消暂存，但保留工作区内容
+
+```bash
+git reset HEAD path/to/file
+```
+
+### 彻底回到某个提交
+
+```bash
+git reset --hard <commit>
+```
+
+## reset、restore、revert 的区别
+
+- `reset`：移动当前引用，可能影响暂存区和工作区
+- `restore`：更偏向恢复文件内容
+- `revert`：通过新增一个“反向提交”来撤销历史
+
+团队协作里，如果改动已经发布给别人，通常要优先考虑 `revert`，而不是直接 reset 已共享历史。
+
+## 什么时候要特别小心
+
+- 你不确定当前分支是不是共享分支
+- 你还没有确认 reflog 可恢复路径
+- 工作区里还有未保存的重要改动
+
+## reset 与 restore 的关系
+
+现代 Git 把一部分“工作区 / 暂存区恢复”语义拆给了 `git restore`，但 reset 仍然是理解 Git 引用移动的关键命令。
+
+## 常见误区
+
+### 误区 1：reset 就是删除提交
+
+不准确。很多时候它只是让当前引用不再指向那些提交，对象本身未必立刻消失。
+
+### 误区 2：`--hard` 只是更快一点
+
+不是。它会真正覆盖工作区内容，风险性质完全不同。
+
+## 安全建议
+
+执行破坏性 reset 前，先做至少一件事：
+
+1. `git status`
+2. `git reflog`
+3. 建一个救援分支
+
+## 继续学习建议
+
+接下来建议继续补：
+
+1. `git reflog`
+2. `git restore`
+3. `git revert`

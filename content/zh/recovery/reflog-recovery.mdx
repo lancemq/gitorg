@@ -1,0 +1,86 @@
+export const metadata = {
+  title: "用 reflog 恢复误操作",
+  slug: "reflog-recovery",
+  locale: "zh",
+  section: "recovery",
+  summary: "用 reflog 定位历史引用，恢复 reset、rebase、误删分支等操作后的状态。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-reflog.html",
+    "https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection.html",
+  ],
+};
+
+# 用 reflog 恢复误操作
+
+## reflog 是什么
+
+可以把 reflog 理解为“本地引用移动记录”。当 `HEAD`、分支等引用发生变化时，Git 会把这些变化记下来。
+
+这使得它特别适合处理下面几类事故：
+
+- reset 之后想回到之前
+- rebase 之后历史变乱
+- checkout、commit、merge 后想找回某个旧位置
+
+## 一个重要边界
+
+reflog 主要是本地信息，不是远端共享历史。它对你自己的本地恢复特别有用，但不能替代团队层面的备份策略。
+
+## 最常见的恢复流程
+
+### 第一步：先看 reflog
+
+```bash
+git reflog
+```
+
+你会看到一串引用移动记录，例如：
+
+- 某次 commit
+- 某次 reset
+- 某次 rebase 开始和完成
+- 某次 checkout
+
+### 第二步：找到安全位置
+
+一旦定位到“误操作前”的提交，就可以用它做恢复锚点。
+
+### 第三步：选择恢复方式
+
+如果你确认要把当前分支彻底退回去：
+
+```bash
+git reset --hard <commit>
+```
+
+如果你只是想先保守地建立一个救援分支：
+
+```bash
+git branch recovery/<name> <commit>
+```
+
+这个方式更稳，因为它不会立刻破坏当前工作状态。
+
+## 典型场景
+
+### 场景 1：rebase 之后发现不对
+
+```bash
+git reflog
+git reset --hard <rebase-before-head>
+```
+
+### 场景 2：误执行 hard reset
+
+只要 reflog 里还能看到之前的 `HEAD`，通常就能回去。
+
+### 场景 3：分支引用丢了
+
+如果对应提交仍然可达或尚未被清理，你可以从 reflog 记录里重新建一个分支。
+
+## 教学建议
+
+在文档站里，reflog 教程最好强调两件事：
+
+1. 恢复之前先观察，不要连续再执行更多破坏性命令
+2. 优先新建救援分支，再决定是否 hard reset
