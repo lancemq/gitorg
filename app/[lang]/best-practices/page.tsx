@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { SiteShell } from "@/components/site-shell";
-import { getBestPracticeDocs } from "@/lib/content";
+import { getBestPracticeDocs, getFeaturedSectionDocs } from "@/lib/content";
 import {
   bestPracticeSlugs,
   getDictionary,
@@ -52,7 +52,10 @@ export default async function BestPracticesChannelPage({ params }: Props) {
 
   const locale = lang as Locale;
   const dict = getDictionary(locale);
-  const docs = await getBestPracticeDocs(locale);
+  const [docs, featuredDocs] = await Promise.all([
+    getBestPracticeDocs(locale),
+    getFeaturedSectionDocs(locale, "best-practices", 4),
+  ]);
 
   const sortedDocs = docs.sort(
     (a, b) =>
@@ -76,6 +79,27 @@ export default async function BestPracticesChannelPage({ params }: Props) {
           </div>
           <p>{dict.bestPracticeIndex.description}</p>
         </div>
+
+        <section className="panel docs-group">
+          <div className="docs-group-head">
+            <p className="eyebrow">{dict.bestPracticeIndex.eyebrow}</p>
+            <h2>{locale === "zh" ? "推荐学习顺序" : "Recommended Sequence"}</h2>
+            <p>
+              {locale === "zh"
+                ? "先建立提交和分支习惯，再进入同步策略、共享历史边界与安全推送。"
+                : "Start with commit and branch hygiene, then move into sync strategy, shared-history boundaries, and safer push habits."}
+            </p>
+          </div>
+          <div className="docs-list">
+            {featuredDocs.map((doc, index) => (
+              <Link className="docs-card" href={doc.href} key={doc.href}>
+                <span className="card-kicker">{String(index + 1).padStart(2, "0")}</span>
+                <h3>{doc.title}</h3>
+                <p>{doc.summary}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <section className="panel docs-group">
           <div className="docs-group-head">

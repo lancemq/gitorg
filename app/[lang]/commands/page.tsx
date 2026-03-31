@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { SiteShell } from "@/components/site-shell";
-import { getCommandDocs } from "@/lib/content";
+import { getCommandDocs, getFeaturedSectionDocs } from "@/lib/content";
 import {
   advancedCommandSlugs,
   basicCommandSlugs,
@@ -54,7 +54,10 @@ export default async function CommandsIndexPage({ params }: Props) {
 
   const locale = lang as Locale;
   const dict = getDictionary(locale);
-  const docs = await getCommandDocs(locale);
+  const [docs, featuredDocs] = await Promise.all([
+    getCommandDocs(locale),
+    getFeaturedSectionDocs(locale, "commands", 4),
+  ]);
 
   const sortedDocs = docs.sort(
     (a, b) =>
@@ -85,6 +88,27 @@ export default async function CommandsIndexPage({ params }: Props) {
           </div>
           <p>{dict.commandIndex.description}</p>
         </div>
+
+        <section className="panel docs-group">
+          <div className="docs-group-head">
+            <p className="eyebrow">{dict.commandIndex.eyebrow}</p>
+            <h2>{locale === "zh" ? "推荐学习顺序" : "Recommended Sequence"}</h2>
+            <p>
+              {locale === "zh"
+                ? "先从查看状态、提交和同步开始，再进入会改写历史、恢复状态和排查问题的命令。"
+                : "Start with inspection, commit, and sync, then move into commands that rewrite history, recover state, or debug regressions."}
+            </p>
+          </div>
+          <div className="docs-list">
+            {featuredDocs.map((doc, index) => (
+              <Link className="docs-card" href={doc.href} key={doc.href}>
+                <span className="card-kicker">{String(index + 1).padStart(2, "0")}</span>
+                <h3>{doc.title}</h3>
+                <p>{doc.summary}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <section className="panel docs-group">
           <div className="docs-group-head">

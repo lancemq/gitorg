@@ -38,6 +38,14 @@ Moves the reference and resets the index, while keeping working tree changes.
 
 Moves the reference, resets the index, and overwrites working tree changes.
 
+## Re-reading reset through the three-layer model
+
+Reset becomes much easier if you ask three questions:
+
+1. should HEAD / the current branch move
+2. should the index be reset
+3. should the working tree be overwritten
+
 ## Three common use cases
 
 ### Undo the last commit but keep the changes
@@ -58,6 +66,16 @@ git reset HEAD path/to/file
 git reset --hard <commit>
 ```
 
+## A safer operating order
+
+Before a risky reset, a better sequence is:
+
+1. `git status`
+2. `git log --oneline --decorate -5`
+3. `git reflog`
+4. create a backup branch if needed
+5. only then run reset
+
 ## Common examples
 
 ```bash
@@ -77,3 +95,18 @@ Before destructive reset operations, check `git status`, inspect `git reflog`, o
 - `revert`: create a new commit that undoes an older one
 
 If the history is already shared with others, `revert` is often safer than rewriting it with `reset`.
+
+## Why `git reset HEAD <file>` confuses people
+
+It often looks like “restore the file,” but in practice its most common role is “unstage this file while keeping my working-tree edits.”
+
+## Extra caution cases
+
+Be especially careful if:
+
+- you are on a shared branch
+- you are not sure whether some of the current work should survive
+
+## Another common misconception
+
+Reset does not always permanently destroy commits right away. Often the obvious ref is gone before the underlying objects are actually unrecoverable.

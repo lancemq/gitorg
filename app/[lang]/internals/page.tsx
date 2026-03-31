@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { SiteShell } from "@/components/site-shell";
-import { getInternalsDocs } from "@/lib/content";
+import { getFeaturedSectionDocs, getInternalsDocs } from "@/lib/content";
 import {
   getDictionary,
   getSidebarContent,
@@ -52,7 +52,10 @@ export default async function GitInternalsChannelPage({ params }: Props) {
 
   const locale = lang as Locale;
   const dict = getDictionary(locale);
-  const docs = await getInternalsDocs(locale);
+  const [docs, featuredDocs] = await Promise.all([
+    getInternalsDocs(locale),
+    getFeaturedSectionDocs(locale, "internals", 4),
+  ]);
 
   const sortedDocs = docs.sort(
     (a, b) =>
@@ -76,6 +79,27 @@ export default async function GitInternalsChannelPage({ params }: Props) {
           </div>
           <p>{dict.internalsIndex.description}</p>
         </div>
+
+        <section className="panel docs-group">
+          <div className="docs-group-head">
+            <p className="eyebrow">{dict.internalsIndex.eyebrow}</p>
+            <h2>{locale === "zh" ? "推荐学习顺序" : "Recommended Sequence"}</h2>
+            <p>
+              {locale === "zh"
+                ? "建议先掌握对象库和暂存模型，再进入 refs、提交图和存储维护这些更底层的原理。"
+                : "Start with the object store and staging model, then move into refs, commit graphs, and storage maintenance."}
+            </p>
+          </div>
+          <div className="docs-list">
+            {featuredDocs.map((doc, index) => (
+              <Link className="docs-card" href={doc.href} key={doc.href}>
+                <span className="card-kicker">{String(index + 1).padStart(2, "0")}</span>
+                <h3>{doc.title}</h3>
+                <p>{doc.summary}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <section className="panel docs-group">
           <div className="docs-group-head">

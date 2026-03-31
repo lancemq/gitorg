@@ -1,8 +1,10 @@
 import Link from "next/link";
 import type { ComponentType } from "react";
 
+import { DocSupport } from "@/components/doc-support";
 import { SiteShell } from "@/components/site-shell";
 import type { Locale, SidebarContent } from "@/lib/i18n";
+import type { DocCard, DocNeighbors } from "@/lib/content";
 
 type DocTemplateProps = {
   locale: Locale;
@@ -18,6 +20,8 @@ type DocTemplateProps = {
   sourceUrls: string[];
   Body: ComponentType;
   showSources?: boolean;
+  relatedDocs?: DocCard[];
+  neighbors?: DocNeighbors;
 };
 
 export function DocTemplate({
@@ -31,6 +35,8 @@ export function DocTemplate({
   sourceUrls,
   Body,
   showSources = false,
+  relatedDocs = [],
+  neighbors,
 }: DocTemplateProps) {
   return (
     <SiteShell locale={locale} sidebar={sidebar}>
@@ -55,6 +61,8 @@ export function DocTemplate({
             <Body />
           </div>
         </section>
+
+        <DocSupport locale={locale} relatedDocs={relatedDocs} neighbors={neighbors} />
 
         {showSources ? (
           <section className="panel doc-sources">

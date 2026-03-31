@@ -54,12 +54,36 @@ git stash pop
 git stash show -p stash@{0}
 ```
 
+## Two advanced but very practical patterns
+
+### Include untracked files
+
+```bash
+git stash push -u -m "wip: include new files"
+```
+
+### Stash only part of the tree
+
+```bash
+git stash push src/checkout.ts
+```
+
 ## apply vs pop
 
 - `apply`: restore but keep the stash entry
 - `pop`: restore and delete it if successful
 
 If you are not fully sure yet, `apply` is usually the safer option.
+
+## A safer restore workflow
+
+Instead of immediately using `pop`, a safer sequence is often:
+
+1. `git stash list`
+2. `git stash show -p stash@{0}`
+3. `git stash apply stash@{0}`
+4. confirm the result
+5. `git stash drop stash@{0}`
 
 ## Two practical habits
 
@@ -74,3 +98,13 @@ That makes `git stash list` much easier to read later.
 ### Prefer `apply` before deleting
 
 For important work, restoring first and deleting later is often safer than using `pop` immediately.
+
+## Why stash restores can still conflict
+
+Stash records a set of changes, but the surrounding code may have changed by the time you reapply it. That is why apply and pop can still produce conflicts.
+
+## A practical decision rule
+
+- use stash for short interruptions
+- use branches for work that lives longer than a quick context switch
+- use commits and branches for anything reviewable or shared

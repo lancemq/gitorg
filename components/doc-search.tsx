@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   useDeferredValue,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type KeyboardEvent,
 } from "react";
@@ -66,21 +65,39 @@ const helperLabels = {
   en: "Press Esc to close, or Cmd/Ctrl + K to reopen",
 };
 
+const allFilterLabels = {
+  zh: "全部",
+  en: "All",
+};
+
 export function DocSearch({ items, label, locale }: DocSearchProps) {
   const pathname = usePathname();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<SearchDoc["section"] | "all">("all");
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const deferredQuery = useDeferredValue(query);
   const normalizedQuery = deferredQuery.trim().toLowerCase();
+  const availableSections = useMemo(
+    () =>
+      Array.from(new Set(items.map((item) => item.section))).sort((a, b) =>
+        sectionLabels[locale][a].localeCompare(sectionLabels[locale][b]),
+      ),
+    [items, locale],
+  );
 
   const results = useMemo(() => {
+    const scopedItems =
+      activeSection === "all"
+        ? items
+        : items.filter((item) => item.section === activeSection);
+
     if (!normalizedQuery) {
-      return items.slice(0, 6);
+      return scopedItems.slice(0, 8);
     }
 
-    return items
+    return scopedItems
       .map((item) => {
         const haystack = [item.title, item.summary, item.slug, item.path]
           .join(" ")
@@ -101,14 +118,14 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
       .filter((item) => item.score > 0)
       .sort((a, b) => b.score - a.score || a.title.localeCompare(b.title))
       .slice(0, 8);
-  }, [items, normalizedQuery]);
+  }, [activeSection, items, normalizedQuery]);
+  const highlightedResult = results[Math.min(selectedIndex, Math.max(results.length - 1, 0))];
 
   useEffect(() => {
     if (!isOpen) {
       return;
     }
 
-    inputRef.current?.focus();
     document.body.style.overflow = "hidden";
 
     return () => {
@@ -123,6 +140,7 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
 
       if (triggerShortcut) {
         event.preventDefault();
+        setSelectedIndex(0);
         setIsOpen(true);
       }
 
@@ -138,23 +156,49 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
     };
   }, []);
 
-  function handleArrowDown(event: KeyboardEvent<HTMLInputElement>) {
+  function handleInputKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (!results.length) {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+      return;
+    }
+
     if (event.key === "ArrowDown") {
       event.preventDefault();
-      containerRef.current
-        ?.querySelector<HTMLAnchorElement>(".search-result")
-        ?.focus();
+      setSelectedIndex((current) => (current + 1) % results.length);
+    }
+
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setSelectedIndex((current) => (current - 1 + results.length) % results.length);
+    }
+
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const result = highlightedResult;
+      if (result) {
+        setIsOpen(false);
+        router.push(result.href);
+      }
+    }
+
+    if (event.key === "Escape") {
+      setIsOpen(false);
     }
   }
 
   return (
-    <div className={`doc-search${isOpen ? " is-open" : ""}`} ref={containerRef}>
+    <div className={`doc-search${isOpen ? " is-open" : ""}`}>
       <button
         aria-expanded={isOpen}
         aria-haspopup="dialog"
         aria-label={triggerLabels[locale]}
         className="search-trigger"
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          setSelectedIndex(0);
+          setIsOpen(true);
+        }}
         type="button"
       >
         <span className="search-trigger-icon" aria-hidden="true">
@@ -189,13 +233,42 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
               aria-controls={`doc-search-results-${locale}`}
               className="search-input"
               id={`doc-search-${locale}`}
-              onChange={(event) => setQuery(event.target.value)}
-              onKeyDown={handleArrowDown}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setSelectedIndex(0);
+              }}
+              onKeyDown={handleInputKeyDown}
               placeholder={inputPlaceholders[locale]}
-              ref={inputRef}
+              autoFocus
               type="search"
               value={query}
             />
+
+            <div className="search-filters" role="tablist" aria-label={label}>
+              <button
+                className={`search-filter${activeSection === "all" ? " is-active" : ""}`}
+                onClick={() => {
+                  setActiveSection("all");
+                  setSelectedIndex(0);
+                }}
+                type="button"
+              >
+                {allFilterLabels[locale]}
+              </button>
+              {availableSections.map((section) => (
+                <button
+                  className={`search-filter${activeSection === section ? " is-active" : ""}`}
+                  key={section}
+                  onClick={() => {
+                    setActiveSection(section);
+                    setSelectedIndex(0);
+                  }}
+                  type="button"
+                >
+                  {sectionLabels[locale][section]}
+                </button>
+              ))}
+            </div>
 
             <div className="search-helper">
               <span>{helperLabels[locale]}</span>
@@ -210,9 +283,14 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
               {results.length > 0 ? (
                 results.map((item) => (
                   <Link
-                    className={`search-result${pathname === item.href ? " is-active" : ""}`}
+                    className={`search-result${pathname === item.href ? " is-active" : ""}${
+                      highlightedResult?.href === item.href ? " is-selected" : ""
+                    }`}
                     href={item.href}
                     key={item.href}
+                    onMouseEnter={() =>
+                      setSelectedIndex(results.findIndex((result) => result.href === item.href))
+                    }
                     onClick={() => setIsOpen(false)}
                   >
                     <div className="search-result-copy">

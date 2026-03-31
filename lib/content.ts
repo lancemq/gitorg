@@ -1,6 +1,14 @@
 import type { ComponentType } from "react";
 
-import type { CommandSlug, InternalsSlug, Locale } from "@/lib/i18n";
+import {
+  bestPracticeSlugs,
+  commandSlugs,
+  internalsSlugs,
+  workflowSlugs,
+  type CommandSlug,
+  type InternalsSlug,
+  type Locale,
+} from "@/lib/i18n";
 
 export type DocSection =
   | "learning-path"
@@ -190,6 +198,20 @@ export type SearchDoc = {
   summary: string;
 };
 
+export type DocCard = {
+  href: string;
+  path: DocPath;
+  section: DocSection;
+  slug: string;
+  title: string;
+  summary: string;
+};
+
+export type DocNeighbors = {
+  prev?: DocCard;
+  next?: DocCard;
+};
+
 export type ContentStats = {
   totalDocs: number;
   commandDocs: number;
@@ -218,24 +240,74 @@ export async function getAllDocs(locale: Locale) {
   return docs.sort((a, b) => a.metadata.title.localeCompare(b.metadata.title));
 }
 
+function toDocCard(locale: Locale, doc: Awaited<ReturnType<typeof getDocByPath>>): DocCard {
+  return {
+    href: getDocHref(locale, doc.path),
+    path: doc.path,
+    section: doc.metadata.section,
+    slug: doc.metadata.slug,
+    title: doc.metadata.title,
+    summary: doc.metadata.summary,
+  };
+}
+
+function getOrderedPathSeries(section: DocSection): DocPath[] {
+  switch (section) {
+    case "commands":
+      return commandSlugs.map((slug) => `commands/${slug}` as DocPath);
+    case "best-practices":
+      return bestPracticeSlugs.map((slug) => `best-practices/${slug}` as DocPath);
+    case "workflows":
+      return workflowSlugs.map((slug) => `workflows/${slug}` as DocPath);
+    case "internals":
+      return internalsSlugs.map((slug) => `internals/${slug}` as DocPath);
+    case "learning-path":
+      return ["learning-path/quick-start"];
+    case "recovery":
+      return ["recovery/reflog-recovery"];
+    case "concepts":
+      return ["concepts/git-history"];
+    default:
+      return [];
+  }
+}
+
+function sortBySeriesOrder<T extends { path: DocPath }>(docs: T[]) {
+  const order = new Map(
+    [
+      ...getOrderedPathSeries("learning-path"),
+      ...getOrderedPathSeries("commands"),
+      ...getOrderedPathSeries("best-practices"),
+      ...getOrderedPathSeries("workflows"),
+      ...getOrderedPathSeries("internals"),
+      ...getOrderedPathSeries("recovery"),
+      ...getOrderedPathSeries("concepts"),
+    ].map((path, index) => [path, index]),
+  );
+
+  return [...docs].sort(
+    (a, b) => (order.get(a.path) ?? Number.MAX_SAFE_INTEGER) - (order.get(b.path) ?? Number.MAX_SAFE_INTEGER),
+  );
+}
+
 export async function getCommandDocs(locale: Locale) {
   const docs = await getAllDocs(locale);
-  return docs.filter((doc) => doc.metadata.section === "commands");
+  return sortBySeriesOrder(docs.filter((doc) => doc.metadata.section === "commands"));
 }
 
 export async function getBestPracticeDocs(locale: Locale) {
   const docs = await getAllDocs(locale);
-  return docs.filter((doc) => doc.path.startsWith("best-practices/"));
+  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("best-practices/")));
 }
 
 export async function getWorkflowDocs(locale: Locale) {
   const docs = await getAllDocs(locale);
-  return docs.filter((doc) => doc.path.startsWith("workflows/"));
+  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("workflows/")));
 }
 
 export async function getInternalsDocs(locale: Locale) {
   const docs = await getAllDocs(locale);
-  return docs.filter((doc) => doc.path.startsWith("internals/"));
+  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("internals/")));
 }
 
 export function getDocHref(locale: Locale, docPath: DocPath) {
@@ -273,6 +345,84 @@ export async function getSearchDocs(locale: Locale): Promise<SearchDoc[]> {
     title: doc.metadata.title,
     summary: doc.metadata.summary,
   }));
+}
+
+export async function getDocNeighbors(locale: Locale, docPath: DocPath): Promise<DocNeighbors> {
+  const doc = await getDocByPath(locale, docPath);
+  const series = getOrderedPathSeries(doc.metadata.section);
+  const index = series.indexOf(docPath);
+
+  if (index === -1) {
+    return {};
+  }
+
+  const prevPath = series[index - 1];
+  const nextPath = series[index + 1];
+
+  const [prevDoc, nextDoc] = await Promise.all([
+    prevPath ? getDocByPath(locale, prevPath) : Promise.resolve(null),
+    nextPath ? getDocByPath(locale, nextPath) : Promise.resolve(null),
+  ]);
+
+  return {
+    prev: prevDoc ? toDocCard(locale, prevDoc) : undefined,
+    next: nextDoc ? toDocCard(locale, nextDoc) : undefined,
+  };
+}
+
+const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
+  "learning-path/quick-start": [
+    "commands/git-fetch",
+    "commands/git-commit",
+    "workflows/fetch-vs-pull",
+  ],
+  "concepts/git-history": [
+    "internals/commit-graph",
+    "internals/refs-and-head",
+    "commands/git-reflog",
+  ],
+  "recovery/reflog-recovery": [
+    "commands/git-reflog",
+    "commands/git-reset",
+    "commands/git-rebase",
+  ],
+};
+
+export async function getRelatedDocs(
+  locale: Locale,
+  docPath: DocPath,
+  limit = 3,
+): Promise<DocCard[]> {
+  const overridePaths = relatedOverrides[docPath];
+
+  if (overridePaths?.length) {
+    const docs = await Promise.all(
+      overridePaths.slice(0, limit).map((path) => getDocByPath(locale, path)),
+    );
+    return docs.map((doc) => toDocCard(locale, doc));
+  }
+
+  const doc = await getDocByPath(locale, docPath);
+  const series = getOrderedPathSeries(doc.metadata.section).filter((path) => path !== docPath);
+  const docs = await Promise.all(series.slice(0, limit).map((path) => getDocByPath(locale, path)));
+  return docs.map((entry) => toDocCard(locale, entry));
+}
+
+export async function getFeaturedSectionDocs(
+  locale: Locale,
+  section: Extract<DocSection, "commands" | "best-practices" | "workflows" | "internals">,
+  limit = 3,
+): Promise<DocCard[]> {
+  const docs =
+    section === "commands"
+      ? await getCommandDocs(locale)
+      : section === "best-practices"
+        ? await getBestPracticeDocs(locale)
+        : section === "workflows"
+          ? await getWorkflowDocs(locale)
+          : await getInternalsDocs(locale);
+
+  return docs.slice(0, limit).map((doc) => toDocCard(locale, doc));
 }
 
 export async function getContentStats(locale: Locale): Promise<ContentStats> {

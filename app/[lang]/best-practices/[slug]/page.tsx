@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { DocTemplate } from "@/components/doc-template";
-import { getDocByPath, getDocPaths, type DocPath } from "@/lib/content";
+import { getDocByPath, getDocNeighbors, getDocPaths, getRelatedDocs, type DocPath } from "@/lib/content";
 import {
   bestPracticeSlugs,
   getDictionary,
@@ -63,6 +63,10 @@ export default async function BestPracticeDetailPage({ params }: Props) {
 
   const dict = getDictionary(locale);
   const doc = await getDocByPath(locale, docPath);
+  const [neighbors, relatedDocs] = await Promise.all([
+    getDocNeighbors(locale, docPath),
+    getRelatedDocs(locale, docPath),
+  ]);
   const DocBody = doc.Component;
 
   return (
@@ -80,6 +84,8 @@ export default async function BestPracticeDetailPage({ params }: Props) {
       sourcesTitle={dict.docsIndex.sourcesTitle}
       sourceUrls={doc.metadata.sourceUrls}
       Body={DocBody}
+      relatedDocs={relatedDocs}
+      neighbors={neighbors}
     />
   );
 }

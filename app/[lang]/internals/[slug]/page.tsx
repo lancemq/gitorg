@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { DocTemplate } from "@/components/doc-template";
-import { getDocPaths, getInternalDoc, type DocPath } from "@/lib/content";
+import { getDocNeighbors, getDocPaths, getInternalDoc, getRelatedDocs, type DocPath } from "@/lib/content";
 import {
   getDictionary,
   getSidebarContent,
@@ -63,6 +63,10 @@ export default async function InternalDetailPage({ params }: Props) {
 
   const dict = getDictionary(locale);
   const doc = await getInternalDoc(locale, slug as InternalsSlug);
+  const [neighbors, relatedDocs] = await Promise.all([
+    getDocNeighbors(locale, docPath),
+    getRelatedDocs(locale, docPath),
+  ]);
   const DocBody = doc.Component;
 
   return (
@@ -80,6 +84,8 @@ export default async function InternalDetailPage({ params }: Props) {
       sourcesTitle={dict.docsIndex.sourcesTitle}
       sourceUrls={doc.metadata.sourceUrls}
       Body={DocBody}
+      relatedDocs={relatedDocs}
+      neighbors={neighbors}
     />
   );
 }

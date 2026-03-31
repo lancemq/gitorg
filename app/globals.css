@@ -177,6 +177,28 @@ kbd {
   letter-spacing: 0.08em;
 }
 
+.search-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.search-filter {
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.search-filter.is-active {
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--surface);
+}
+
 .search-input {
   width: 100%;
   padding: 12px 14px;
@@ -217,7 +239,8 @@ kbd {
 
 .search-result:hover,
 .search-result:focus-visible,
-.search-result.is-active {
+.search-result.is-active,
+.search-result.is-selected {
   background: var(--background);
   transform: translateY(-1px);
 }
@@ -845,7 +868,9 @@ h3 {
 .docs-group,
 .doc-hero,
 .doc-content,
-.doc-sources {
+.doc-sources,
+.doc-related,
+.doc-sequence {
   padding: 24px;
 }
 
@@ -954,6 +979,54 @@ h3 {
   word-break: break-all;
 }
 
+.sequence-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.sequence-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 160px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--background);
+  transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.sequence-card:hover,
+.sequence-card:focus-visible {
+  transform: translateY(-2px);
+  border-color: var(--text);
+  background: #fcfcfa;
+}
+
+.sequence-card span {
+  color: var(--text-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.sequence-card strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sequence-card p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+.sequence-card.is-empty {
+  visibility: hidden;
+}
+
 .command-doc-content {
   margin-top: 24px;
 }
@@ -1030,6 +1103,10 @@ h3 {
 
   .content {
     padding-top: 0;
+  }
+
+  .sequence-grid {
+    grid-template-columns: 1fr;
   }
 }
 

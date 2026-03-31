@@ -64,6 +64,24 @@ git rebase --continue
 git rebase --abort
 ```
 
+## 一个更稳的实际工作流
+
+如果你准备在本地整理自己的特性分支，比较稳的顺序通常是：
+
+1. `git status`，确认工作区干净
+2. `git fetch origin`
+3. 如担心风险，先建一个备份分支
+4. 再执行 `git rebase origin/main`
+5. 最后用 `git log --oneline --graph` 快速复核历史
+
+备份分支很简单：
+
+```bash
+git branch backup/feature-login-before-rebase
+```
+
+这一步在高风险场景下非常值，因为它把“能回去”先做实了。
+
 ## 交互式 rebase 最常见的用途
 
 ```bash
@@ -77,6 +95,16 @@ git rebase -i HEAD~4
 - 修改提交信息
 - 删除不该保留的实验性提交
 
+## 交互式 rebase 里最常见的动作
+
+虽然 `rebase -i` 可以做很多事，但最常见的其实就这几类：
+
+- `pick`：保留提交
+- `reword`：修改提交信息
+- `squash`：把小提交压进前一个提交
+- `fixup`：类似 squash，但丢弃当前提交说明
+- `drop`：删除不想保留的提交
+
 ## 一个安全的团队建议
 
 如果你的分支已经推送到远端，但仍想整理历史，优先遵守这条规则：
@@ -85,6 +113,16 @@ git rebase -i HEAD~4
 - 推送时使用 `git push --force-with-lease`
 
 `--force-with-lease` 比裸 `--force` 更安全，因为它会先检查远端引用是否已经被别人更新。
+
+## `pull --rebase` 和手动 rebase 的区别
+
+很多人会问：既然可以 `git pull --rebase`，为什么还推荐先 fetch 再手动 rebase？
+
+原因是手动流程更清楚：
+
+1. 你先看到远端状态
+2. 再自己决定要不要改写本地历史
+3. 出问题时也更容易判断是哪一步出了问题
 
 ## 常见误区
 
@@ -100,6 +138,10 @@ git rebase -i HEAD~4
 
 不是。`git pull` 是否使用 rebase，取决于配置或命令行参数。
 
+### 误区 4：只要是自己的分支就一定可以放心 rebase
+
+也不绝对。如果这个分支已经被 CI、review 流程或同事依赖，改写历史仍然会带来协调成本。
+
 ## 推荐的恢复思路
 
 如果你在 rebase 后发现历史不对，第一反应不是慌，而是：
@@ -113,6 +155,26 @@ git reflog
 ```bash
 git reset --hard <safe-commit>
 ```
+
+如果你不确定该不该直接 reset，更保守的做法是：
+
+```bash
+git checkout -b rescue/rebase HEAD@{1}
+```
+
+先把 rebase 前位置接住，再决定后续怎么处理。
+
+## 哪些场景最适合 rebase
+
+- 本地特性分支落后于主分支
+- 发起 PR 前整理提交
+- 你希望把“修修补补的小提交”压成更清晰的逻辑块
+
+## 哪些场景更适合 merge
+
+- 这段历史已经共享给多人
+- 团队更重视保留真实分叉过程
+- 你不想承担 force push 带来的沟通成本
 
 ## 教学补充建议
 

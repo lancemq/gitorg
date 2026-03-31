@@ -46,6 +46,22 @@ Abort if needed:
 git rebase --abort
 ```
 
+## A safer real-world workflow
+
+When you want to clean up a local feature branch, a safer sequence is usually:
+
+1. run `git status` and confirm the working tree is clean
+2. run `git fetch origin`
+3. create a backup branch if the rewrite is risky
+4. run `git rebase origin/main`
+5. review the result with `git log --oneline --graph`
+
+For example:
+
+```bash
+git branch backup/feature-login-before-rebase
+```
+
 ## Why interactive rebase matters
 
 ```bash
@@ -58,3 +74,35 @@ Interactive rebase is useful for:
 - reordering history for readability
 - rewriting commit messages
 - dropping experimental commits
+
+The most common actions are still just:
+
+- `pick`
+- `reword`
+- `squash`
+- `fixup`
+- `drop`
+
+For most teams, turning a messy branch into a few clearer logical commits already delivers most of the value.
+
+## `pull --rebase` versus fetch-then-rebase
+
+Fetch-then-rebase is still easier to reason about because it separates:
+
+1. learning upstream state
+2. choosing to rewrite local history
+3. recovering when something goes wrong
+
+## Additional caution
+
+Rebase is not automatically safe just because the branch is “yours.” If CI, review flows, or teammates already rely on that branch, rewriting it can still create coordination cost.
+
+## Recovery mindset
+
+If the result looks wrong, use reflog first. A conservative recovery path is:
+
+```bash
+git checkout -b rescue/rebase HEAD@{1}
+```
+
+Anchor the old position before deciding whether to reset or replay work again.

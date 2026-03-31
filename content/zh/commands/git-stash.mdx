@@ -54,6 +54,22 @@ git stash pop
 git stash show -p stash@{0}
 ```
 
+## 进阶但很常用的两种写法
+
+### 把未跟踪文件一起 stash 进去
+
+```bash
+git stash push -u -m "wip: include new files"
+```
+
+如果你只执行普通 stash，新建但未跟踪的文件往往不会被带进去。
+
+### 只 stash 部分路径
+
+```bash
+git stash push src/checkout.ts
+```
+
 ## apply 和 pop 的区别
 
 - `apply`：恢复，但保留 stash 记录
@@ -61,9 +77,22 @@ git stash show -p stash@{0}
 
 如果你还不确定恢复结果是否正确，优先用 `apply` 更稳。
 
+## 一个更稳的恢复顺序
+
+很多人习惯直接 `pop`，但更稳的顺序通常是：
+
+1. `git stash list`
+2. `git stash show -p stash@{0}`
+3. `git stash apply stash@{0}`
+4. 确认改动无误后再 `git stash drop stash@{0}`
+
 ## 一个常被忽略的点
 
 stash 不是长期存档方案。它更像短期缓存区，不适合长期堆积重要变更。
+
+## stash 恢复时为什么也会冲突
+
+因为 stash 不是“冻结整个世界”，它只是把当时的一组改动记录下来。等你恢复时，当前分支代码上下文可能已经变了，所以 apply 或 pop 仍然可能冲突。
 
 ## 两个实用习惯
 
@@ -89,6 +118,10 @@ git stash push -m "wip: checkout flow"
 
 不是。恢复 stash 时，如果代码上下文已经变化，仍然可能产生冲突。
 
+### 误区 3：stash 越多越说明我保存得越安全
+
+通常相反。stash 太多往往说明工作切换策略不清晰，恢复成本和遗忘风险都在上升。
+
 ## 实践建议
 
 如果 stash 条目开始越来越多，说明你可能需要：
@@ -96,6 +129,12 @@ git stash push -m "wip: checkout flow"
 1. 更频繁的小提交
 2. 更清晰的分支切换策略
 3. 把短期实验显式转成分支而不是一直堆在 stash 里
+
+## 一个实用判断原则
+
+- 临时切任务、稍后马上回来：stash 很合适
+- 需要保留几小时到几天并继续演进：更建议建分支
+- 涉及团队协作或 review：优先提交到分支，而不是藏在 stash 里
 
 ## 继续学习建议
 

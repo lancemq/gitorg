@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { DocSupport } from "@/components/doc-support";
 import { SiteShell } from "@/components/site-shell";
-import { getCommandDoc } from "@/lib/content";
+import { getCommandDoc, getDocNeighbors, getRelatedDocs } from "@/lib/content";
 import {
   commandSlugs,
   getDictionary,
@@ -65,6 +66,11 @@ export default async function CommandPage({ params }: Props) {
 
   const commandSlug = slug as CommandSlug;
   const doc = await getCommandDoc(locale, commandSlug);
+  const docPath = `commands/${commandSlug}` as const;
+  const [neighbors, relatedDocs] = await Promise.all([
+    getDocNeighbors(locale, docPath),
+    getRelatedDocs(locale, docPath),
+  ]);
   const DocBody = doc.Component;
 
   return (
@@ -99,6 +105,8 @@ export default async function CommandPage({ params }: Props) {
           <DocBody />
         </div>
       </section>
+
+      <DocSupport locale={locale} relatedDocs={relatedDocs} neighbors={neighbors} />
     </SiteShell>
   );
 }

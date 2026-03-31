@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { SiteShell } from "@/components/site-shell";
-import { getWorkflowDocs } from "@/lib/content";
+import { getFeaturedSectionDocs, getWorkflowDocs } from "@/lib/content";
 import {
   getDictionary,
   getSidebarContent,
@@ -52,7 +52,10 @@ export default async function WorkflowsChannelPage({ params }: Props) {
 
   const locale = lang as Locale;
   const dict = getDictionary(locale);
-  const docs = await getWorkflowDocs(locale);
+  const [docs, featuredDocs] = await Promise.all([
+    getWorkflowDocs(locale),
+    getFeaturedSectionDocs(locale, "workflows", 4),
+  ]);
 
   const sortedDocs = docs.sort(
     (a, b) =>
@@ -76,6 +79,27 @@ export default async function WorkflowsChannelPage({ params }: Props) {
           </div>
           <p>{dict.workflowIndex.description}</p>
         </div>
+
+        <section className="panel docs-group">
+          <div className="docs-group-head">
+            <p className="eyebrow">{dict.workflowIndex.eyebrow}</p>
+            <h2>{locale === "zh" ? "推荐学习顺序" : "Recommended Sequence"}</h2>
+            <p>
+              {locale === "zh"
+                ? "先掌握 fetch 与 pull 的边界，再学习协作、评审前同步和紧急修复的操作顺序。"
+                : "Start with the fetch-versus-pull boundary, then move into collaboration, pre-review sync, and urgent-fix flows."}
+            </p>
+          </div>
+          <div className="docs-list">
+            {featuredDocs.map((doc, index) => (
+              <Link className="docs-card" href={doc.href} key={doc.href}>
+                <span className="card-kicker">{String(index + 1).padStart(2, "0")}</span>
+                <h3>{doc.title}</h3>
+                <p>{doc.summary}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <section className="panel docs-group">
           <div className="docs-group-head">

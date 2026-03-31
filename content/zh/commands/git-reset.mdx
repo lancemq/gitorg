@@ -38,6 +38,16 @@ export const metadata = {
 
 同时移动提交引用、重置暂存区、覆盖工作区改动。风险最高。
 
+## 用三层模型重新理解 reset
+
+你可以把 reset 的行为拆成三问：
+
+1. 当前分支 / HEAD 要不要移动
+2. 暂存区要不要跟着目标提交重置
+3. 工作区文件要不要也被覆盖
+
+这三问基本就对应了 soft、mixed、hard 的差别。
+
 ## 最常见的三类用途
 
 ### 1. 撤回提交但保留改动
@@ -56,6 +66,23 @@ git reset HEAD path/to/file
 
 ```bash
 git reset --hard <commit>
+```
+
+## 一个更稳的操作顺序
+
+当你准备做可能破坏当前状态的 reset 时，推荐顺序是：
+
+1. `git status`
+2. `git log --oneline --decorate -5`
+3. `git reflog`
+4. 如有必要先建救援分支
+5. 再执行 reset
+
+比如：
+
+```bash
+git branch backup/before-reset
+git reset --hard HEAD~1
 ```
 
 ## 基本示例
@@ -86,11 +113,20 @@ git reset --hard <commit>
 
 团队协作里，如果改动已经发布给别人，通常要优先考虑 `revert`，而不是直接 reset 已共享历史。
 
+## `git reset HEAD <file>` 为什么常被新手搞混
+
+因为它看起来像是在“回退文件”，但更准确地说，它主要是在把文件从暂存区拿出来，让工作区继续保留改动。
+
 ## 什么时候要特别小心
 
 - 你不确定当前分支是不是共享分支
 - 你还没有确认 reflog 可恢复路径
 - 工作区里还有未保存的重要改动
+
+尤其是下面两种情况：
+
+- 你正在公共分支上
+- 你不确定这次 reset 之后还需不需要保留部分改动
 
 ## reset 与 restore 的关系
 
@@ -106,6 +142,10 @@ git reset --hard <commit>
 
 不是。它会真正覆盖工作区内容，风险性质完全不同。
 
+### 误区 3：reset 之后提交就永久没了
+
+很多时候不是。只要旧提交还在 reflog 或仍然可达，就通常还有恢复空间。
+
 ## 安全建议
 
 执行破坏性 reset 前，先做至少一件事：
@@ -113,6 +153,14 @@ git reset --hard <commit>
 1. `git status`
 2. `git reflog`
 3. 建一个救援分支
+
+## 一个实战判断原则
+
+如果你的目标是：
+
+- 重新整理本地未共享提交：可以考虑 reset
+- 撤销已经共享给团队的历史：优先考虑 revert
+- 只想恢复文件内容：优先考虑 restore
 
 ## 继续学习建议
 
