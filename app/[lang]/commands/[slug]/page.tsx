@@ -89,7 +89,7 @@ export default async function CommandPage({ params }: Props) {
           url: `${siteUrl}/${locale}/commands/${commandSlug}`,
           isPartOf: {
             "@type": "CollectionPage",
-            name: `${dict.commandPage.breadcrumbs.commands} | Git Org Academy`,
+            name: `${dict.commandPage.breadcrumbs.commands} | GitOrg Atlas`,
             url: `${siteUrl}/${locale}/commands`,
           },
           citation: doc.metadata.sourceUrls,

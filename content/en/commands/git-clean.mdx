@@ -29,3 +29,35 @@ git clean -fd
 ```
 
 Always preview first with `-n`.
+
+
+## What problem this command solves in a workflow
+
+`git clean` is less about a single commit and more about managing working copies, directory layout, or temporary local state. It helps solve questions like “how do I parallelize local work?” and “how do I preserve or clean my current scene?”
+
+## Typical use cases
+
+- Use `git clean` when juggling multiple tasks, temporarily switching context, or cleaning up local workspace state.
+- Place `git clean` inside team habits that reduce dirty-working-tree friction and improve local task switching.
+- Use `git clean` in large repos, submodule-heavy environments, or multi-worktree setups to lower checkout cost and local cognitive load.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="Workspace-oriented command scope"
+  caption="These commands focus on managing local working copies rather than simply producing new commits."
+  inputsLabel="Local context"
+  inputs="Branches|Directories|Worktrees|Uncommitted edits"
+  commandLabel="git clean"
+  outputsLabel="Results"
+  outputs="Extra checkouts|Saved context|Cleaned workspace"
+  note="Whenever a command may alter what is visible on disk, ask whether the current local scene still needs to be preserved."
+/>
+
+## Special cases and boundaries
+
+- These commands often change what is physically present on disk, so think about file preservation before you think about syntax.
+- If there are still active edits, decide whether they should move with you, be parked temporarily, or be removed explicitly.
+- When multiple directories or nested repositories are involved, validate the scope on a small example first.
+- Run `git clean -n` first so you can inspect exactly which untracked files and directories would be removed.
+

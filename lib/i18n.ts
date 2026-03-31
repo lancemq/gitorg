@@ -276,7 +276,7 @@ export type SidebarSelection = { kind: "docs"; activePath?: string };
 
 function baseSidebar(locale: Locale, groups: NavGroup[]): SidebarContent {
   return {
-    brandLabel: "Git Org Academy",
+    brandLabel: "GitOrg Atlas",
     searchLabel: locale === "zh" ? "搜索文档" : "Search docs",
     footerTitle: "Auto Doc",
     footerText: locale === "zh" ? "内容驱动文档站" : "Content-driven docs",

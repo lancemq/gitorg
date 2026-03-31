@@ -58,7 +58,7 @@ export function DocTemplate({
             url: `${siteUrl}${pathname}`,
             isPartOf: {
               "@type": "WebSite",
-              name: "Git Org Academy",
+              name: "GitOrg Atlas",
               url: `${siteUrl}/${locale}`,
             },
             about: breadcrumbs.map((item) => item.label),

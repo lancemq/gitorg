@@ -122,3 +122,35 @@ git checkout -b rescue/rebase HEAD@{1}
 ```
 
 Anchor the old position before deciding whether to reset or replay work again.
+
+
+## What problem this command solves in a workflow
+
+`git rebase` directly affects history shape, ref position, or relationships between commits. The first decision is whether you are organizing private local history or touching history that is already shared with others.
+
+## Typical use cases
+
+- Use `git rebase` when integrating branches, undoing changes, selecting commits, or reshaping a sequence of commits.
+- Put `git rebase` inside a “backup first, mutate second, verify last” flow so higher-risk history operations stay recoverable.
+- Use `git rebase` to understand ancestry, recovery paths, and commit causality during conflict resolution or post-incident analysis.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="What history commands act on"
+  caption="History-oriented commands revolve around commit sequences, branch pointers, and ancestry. The difference is whether they add history, move refs, or rewrite an existing sequence."
+  inputsLabel="Inputs"
+  inputs="Commit sequence|Current branch|Ancestry"
+  commandLabel="git rebase"
+  outputsLabel="Results"
+  outputs="New commit relations|Moved refs|Recovery path"
+  note="The highest-value preflight question for this category is simple: “Has this history already been shared?”"
+/>
+
+## Special cases and boundaries
+
+- The most expensive failure mode in history commands is rewriting or moving commits that other people already depend on.
+- If the operation might affect team flow, run `git status`, `git log --oneline --graph`, and `git reflog` first so the recovery path is visible.
+- When in doubt, create a backup branch before continuing so you preserve an obvious way back.
+- If the branch is already under review, CI, or someone else has based work on it, stop and check whether rewriting it is still safe.
+

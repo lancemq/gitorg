@@ -119,7 +119,7 @@ export default async function LocalizedHomePage({ params }: Props) {
         data={{
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "Git Org Academy",
+          name: "GitOrg Atlas",
           url: pageUrl,
           inLanguage,
           description: dict.home.hero.description,
@@ -319,18 +319,16 @@ export default async function LocalizedHomePage({ params }: Props) {
         <div className="section-head">
           <div>
             <p className="eyebrow">{dict.home.faq.eyebrow}</p>
-            <h2>{dict.home.faq.title}</h2>
+            <h2>
+              <Link className="column-heading-link" href={`/${locale}/faq`}>
+                {dict.home.faq.title}
+              </Link>
+            </h2>
           </div>
           <p>{dict.home.faq.description}</p>
         </div>
 
         <FaqList items={dict.home.faq.items.slice(0, 3)} />
-
-        <div className="section-actions">
-          <Link className="button button-secondary" href={`/${locale}/faq`}>
-            {dict.home.faq.action}
-          </Link>
-        </div>
       </section>
     </SiteShell>
   );

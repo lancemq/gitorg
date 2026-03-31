@@ -55,7 +55,7 @@ export default function OpenGraphImage() {
               <div style={{ fontSize: 22, textTransform: "uppercase", letterSpacing: 3 }}>
                 Git Learning System
               </div>
-              <div style={{ fontSize: 34, fontWeight: 700 }}>Git Org Academy</div>
+              <div style={{ fontSize: 34, fontWeight: 700 }}>GitOrg Atlas</div>
             </div>
           </div>
 

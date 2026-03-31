@@ -44,3 +44,34 @@ Treat it as a read-only inspection tool first, then move to write-oriented usage
 ## Related reading
 
 Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.
+
+
+## What problem this command solves in a workflow
+
+`git ls-files` lives closer to Git’s implementation model: objects, refs, and the index. It is best suited for scripting, automation, and advanced debugging rather than being your first manual tool.
+
+## Typical use cases
+
+- Use `git ls-files` when you need precise control over objects, refs, or index state in a scriptable flow.
+- Reach for `git ls-files` when learning internals or validating low-level repository state during debugging.
+- Use `git ls-files` only when porcelain commands no longer express the exact operation you need.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="Objects, refs, and index path"
+  caption="Plumbing commands are powerful because they operate directly on Git internals, not because they are “more advanced” in the everyday workflow sense."
+  inputsLabel="Internal inputs"
+  inputs="Object database|Tree objects|Index|Refs"
+  commandLabel="git ls-files"
+  outputsLabel="Results"
+  outputs="Scriptable output|Updated low-level state|Fine-grained control"
+  note="If you are still thinking only in terms of branches and files, pause and separate objects, refs, and index state first."
+/>
+
+## Special cases and boundaries
+
+- The real risk in plumbing commands is not just that they can fail, but that they can successfully perform the wrong low-level action.
+- Before running `git ls-files` in a real repo, test it in a tiny disposable repository and verify whether a safer porcelain command would do the job.
+- If arguments contain refs, trees, index paths, or raw object IDs, inspect those inputs independently before performing writes.
+

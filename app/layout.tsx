@@ -6,7 +6,7 @@ import { getSiteOrigin } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Git Org Academy",
+  title: "GitOrg Atlas",
   description: "学会 Git，写出更好的历史。Master Git. Build Better History.",
   metadataBase: getSiteOrigin(),
 };

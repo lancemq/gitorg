@@ -257,3 +257,72 @@ export function StashFigure({
     </FigureFrame>
   );
 }
+
+type CommandFlowFigureProps = {
+  title: string;
+  caption: string;
+  inputsLabel: string;
+  inputs: string;
+  commandLabel: string;
+  outputsLabel: string;
+  outputs: string;
+  note: string;
+};
+
+function splitItems(value: string) {
+  return value
+    .split("|")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+export function CommandFlowFigure({
+  title,
+  caption,
+  inputsLabel,
+  inputs,
+  commandLabel,
+  outputsLabel,
+  outputs,
+  note,
+}: CommandFlowFigureProps) {
+  const inputItems = splitItems(inputs);
+  const outputItems = splitItems(outputs);
+
+  return (
+    <FigureFrame title={title} caption={caption}>
+      <div className="command-flow-figure">
+        <section className="command-flow-card">
+          <span className="command-flow-label">{inputsLabel}</span>
+          <div className="command-flow-items">
+            {inputItems.map((item) => (
+              <span className="command-flow-item" key={item}>
+                {item}
+              </span>
+            ))}
+          </div>
+        </section>
+
+        <div className="command-flow-center" aria-hidden="true">
+          <span className="command-flow-arrow">→</span>
+          <strong>{commandLabel}</strong>
+        </div>
+
+        <section className="command-flow-card">
+          <span className="command-flow-label">{outputsLabel}</span>
+          <div className="command-flow-items">
+            {outputItems.map((item) => (
+              <span className="command-flow-item command-flow-item-accent" key={item}>
+                {item}
+              </span>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <div className="command-flow-note">
+        <span>{note}</span>
+      </div>
+    </FigureFrame>
+  );
+}

@@ -44,3 +44,34 @@ Rehearse the flow on a small reproducible history before running it in a product
 ## Related reading
 
 Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.
+
+
+## What problem this command solves in a workflow
+
+`git verify-tag` focuses on object storage, pack files, reachability, and repository maintenance quality. It is usually a diagnostic or maintenance tool, not part of the normal commit loop.
+
+## Typical use cases
+
+- Use `git verify-tag` when the repository grows large, when object integrity is in question, or when you need to understand storage layout.
+- Put `git verify-tag` into maintenance flow when you need visibility into packs, object counts, and reachability.
+- Use `git verify-tag` during performance, size, or integrity investigations when porcelain commands do not expose enough storage detail.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="Storage and maintenance view"
+  caption="Storage-oriented commands work against the object database, pack files, and reachability model to verify, analyze, or clean repository state."
+  inputsLabel="Storage inputs"
+  inputs="Object database|Pack files|Reachability data"
+  commandLabel="git verify-tag"
+  outputsLabel="Results"
+  outputs="Diagnostics|Maintenance actions|Size / integrity signals"
+  note="If a command may prune, compress, or reorganize storage, confirm whether you are still in a phase where recovery clues matter."
+/>
+
+## Special cases and boundaries
+
+- Maintenance commands are usually better scheduled in a controlled window than improvised during a stressful release moment.
+- If you are actively doing recovery or incident analysis, verify that `git verify-tag` will not remove useful evidence before continuing.
+- When something looks wrong, preserve diagnostics first and choose cleanup second.
+

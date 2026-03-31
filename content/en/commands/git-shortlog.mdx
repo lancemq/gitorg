@@ -45,3 +45,34 @@ Pair it with status, log, or diff so you can confirm what actually changed.
 ## Related reading
 
 Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.
+
+
+## What problem this command solves in a workflow
+
+In the workflow, `git shortlog` is mostly a “inspect first, decide second” command. It usually does not rewrite history by itself; instead, it helps you confirm the current state of the working tree, index, refs, or commit objects.
+
+## Typical use cases
+
+- Use `git shortlog` before changing files or history so you have observable evidence first.
+- Put `git shortlog` into review, debugging, and incident-analysis flow so the team can align on the same context.
+- When you need to explain why the repository looks the way it does, let `git shortlog` surface verifiable information first.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="Where inspection commands operate"
+  caption="These commands mainly read repository state and emit information. The key is knowing which layer you are observing."
+  inputsLabel="Observed layers"
+  inputs="Working tree|Index|Commit history|Refs"
+  commandLabel="git shortlog"
+  outputsLabel="Outputs"
+  outputs="Console output|Diff context|Decision signal"
+  note="If the output looks wrong, the first thing to question is usually the scope you inspected, not whether the command “worked”."
+/>
+
+## Special cases and boundaries
+
+- Most inspection commands do not mutate history, but their output still depends on which HEAD, path, range, or ref you asked them to inspect.
+- If `git shortlog` shows something unexpected, first verify whether you are looking at the working tree, the index, the current branch, or a historical commit.
+- Combining `git shortlog` with `git status`, `git log`, and `git show` is usually safer than trusting a single output in isolation.
+

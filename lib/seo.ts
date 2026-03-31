@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import type { Locale } from "@/lib/i18n";
 
-const siteName = "Git Org Academy";
+const siteName = "GitOrg Atlas";
 
 export function getLocaleLang(locale: Locale) {
   return locale === "zh" ? "zh-CN" : "en";
@@ -10,8 +10,8 @@ export function getLocaleLang(locale: Locale) {
 
 function getLocalizedSiteDescription(locale: Locale) {
   return locale === "zh"
-    ? "Git Org Academy 是一个基于 MDX 的双语 Git 学习站，覆盖快速开始、命令专题、工作流、恢复和原理。"
-    : "Git Org Academy is a bilingual MDX-powered Git learning site covering quick start, command guides, workflows, recovery, and internals.";
+    ? "GitOrg Atlas 是一个基于 MDX 的双语 Git 学习站，覆盖快速开始、命令专题、工作流、恢复和原理。"
+    : "GitOrg Atlas is a bilingual MDX-powered Git learning site covering quick start, command guides, workflows, recovery, and internals.";
 }
 
 export function buildAlternates(locale: Locale, pathname: string) {

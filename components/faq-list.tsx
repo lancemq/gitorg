@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 type FaqItem = {
@@ -9,9 +10,11 @@ type FaqItem = {
 
 type FaqListProps = {
   items: readonly FaqItem[];
+  itemLinks?: readonly string[];
+  linkLabel?: string;
 };
 
-export function FaqList({ items }: FaqListProps) {
+export function FaqList({ items, itemLinks, linkLabel }: FaqListProps) {
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
@@ -32,6 +35,11 @@ export function FaqList({ items }: FaqListProps) {
             </button>
             <div className="faq-body">
               <p>{item.answer}</p>
+              {itemLinks?.[index] && linkLabel ? (
+                <Link className="faq-link" href={itemLinks[index]}>
+                  {linkLabel}
+                </Link>
+              ) : null}
             </div>
           </article>
         );

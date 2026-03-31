@@ -48,3 +48,35 @@ Use `-D` only when you deliberately want a force delete.
 ## Local vs remote-tracking refs
 
 People often confuse `main` with `origin/main`. The first is your local branch. The second is a remote-tracking ref updated by fetch. Understanding that distinction helps explain many sync workflows.
+
+
+## What problem this command solves in a workflow
+
+`git branch` sits close to the working tree, the index, and the current branch. The most important question is not “which flag exists,” but “which layer will this command modify?”
+
+## Typical use cases
+
+- Use `git branch` inside the daily loop of edit, inspect, stage, and commit so local state stays intentional.
+- Reach for `git branch` when you need to prepare a clean handoff between file changes, staging decisions, and branch movement.
+- Use `git branch` to clean up local state before collaboration steps that are more expensive to recover from later.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="Working tree / index / ref relationship"
+  caption="State-oriented commands revolve around file content, staging state, and the current branch pointer."
+  inputsLabel="Input state"
+  inputs="Working tree files|Index snapshot|Current branch"
+  commandLabel="git branch"
+  outputsLabel="Possible changes"
+  outputs="File content|Staging result|Current ref"
+  note="A quick before-and-after git status check is often enough to validate whether a state command behaved as intended."
+/>
+
+## Special cases and boundaries
+
+- The risk in state-changing commands is usually not the syntax itself, but whether you correctly identified which layer they will touch.
+- If there are still valuable local edits in the working tree, decide whether they should be committed, stashed, or discarded before running `git branch`.
+- Running `git status` before and after `git branch` is often the fastest way to confirm what really changed.
+- Before deleting or renaming a branch, confirm whether it is fully merged and whether any remote or worktree still depends on it.
+

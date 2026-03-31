@@ -45,3 +45,35 @@ Test the flow in a small sandbox repository before rolling it into the main repo
 ## Related reading
 
 Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.
+
+
+## What problem this command solves in a workflow
+
+`git submodule` is less about a single commit and more about managing working copies, directory layout, or temporary local state. It helps solve questions like “how do I parallelize local work?” and “how do I preserve or clean my current scene?”
+
+## Typical use cases
+
+- Use `git submodule` when juggling multiple tasks, temporarily switching context, or cleaning up local workspace state.
+- Place `git submodule` inside team habits that reduce dirty-working-tree friction and improve local task switching.
+- Use `git submodule` in large repos, submodule-heavy environments, or multi-worktree setups to lower checkout cost and local cognitive load.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="Workspace-oriented command scope"
+  caption="These commands focus on managing local working copies rather than simply producing new commits."
+  inputsLabel="Local context"
+  inputs="Branches|Directories|Worktrees|Uncommitted edits"
+  commandLabel="git submodule"
+  outputsLabel="Results"
+  outputs="Extra checkouts|Saved context|Cleaned workspace"
+  note="Whenever a command may alter what is visible on disk, ask whether the current local scene still needs to be preserved."
+/>
+
+## Special cases and boundaries
+
+- These commands often change what is physically present on disk, so think about file preservation before you think about syntax.
+- If there are still active edits, decide whether they should move with you, be parked temporarily, or be removed explicitly.
+- When multiple directories or nested repositories are involved, validate the scope on a small example first.
+- Submodule updates are not automatically “absorbed” by the parent repo; you still need to commit the updated submodule pointer in the superproject.
+

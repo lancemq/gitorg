@@ -1,6 +1,6 @@
 # Content Library
 
-本目录用于维护 Git Org Academy 的教程素材，统一采用 Markdown / MDX 存储。
+本目录用于维护 GitOrg Atlas 的教程素材，统一采用 Markdown / MDX 存储。
 
 ## 目录约定
 

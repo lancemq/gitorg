@@ -51,3 +51,35 @@ This puts you into detached HEAD, which is useful for inspection but easy to mis
 - many older tutorials still teach it
 - old scripts and internal docs still use it
 - it helps explain where `switch` and `restore` came from
+
+
+## What problem this command solves in a workflow
+
+`git checkout` sits close to the working tree, the index, and the current branch. The most important question is not “which flag exists,” but “which layer will this command modify?”
+
+## Typical use cases
+
+- Use `git checkout` inside the daily loop of edit, inspect, stage, and commit so local state stays intentional.
+- Reach for `git checkout` when you need to prepare a clean handoff between file changes, staging decisions, and branch movement.
+- Use `git checkout` to clean up local state before collaboration steps that are more expensive to recover from later.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="Working tree / index / ref relationship"
+  caption="State-oriented commands revolve around file content, staging state, and the current branch pointer."
+  inputsLabel="Input state"
+  inputs="Working tree files|Index snapshot|Current branch"
+  commandLabel="git checkout"
+  outputsLabel="Possible changes"
+  outputs="File content|Staging result|Current ref"
+  note="A quick before-and-after git status check is often enough to validate whether a state command behaved as intended."
+/>
+
+## Special cases and boundaries
+
+- The risk in state-changing commands is usually not the syntax itself, but whether you correctly identified which layer they will touch.
+- If there are still valuable local edits in the working tree, decide whether they should be committed, stashed, or discarded before running `git checkout`.
+- Running `git status` before and after `git checkout` is often the fastest way to confirm what really changed.
+- `git checkout` mixes branch switching and path restoration, so always inspect whether the last argument is a ref or a path.
+

@@ -1,6 +1,7 @@
 import type { MDXComponents } from "mdx/types";
 
 import {
+  CommandFlowFigure,
   MergeFigure,
   RebaseFigure,
   ResetFigure,
@@ -9,6 +10,7 @@ import {
 
 const components: MDXComponents = {
   h1: () => null,
+  CommandFlowFigure,
   MergeFigure,
   RebaseFigure,
   ResetFigure,

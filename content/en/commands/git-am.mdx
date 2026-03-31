@@ -44,3 +44,35 @@ Read the patch series first and keep abort, continue, or a backup branch ready.
 ## Related reading
 
 Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.
+
+
+## What problem this command solves in a workflow
+
+`git am` is about how your local repository exchanges information with remotes, patches, or transportable artifacts. The mental model becomes clearer once you separate download, publish, integrate, and distribute.
+
+## Typical use cases
+
+- Use `git am` when synchronizing upstream state, publishing local work, or packaging history for review or transfer.
+- Place `git am` inside collaboration flow so the team can control when information is fetched, integrated, or exposed.
+- Use `git am` in automation, mirroring, offline transfer, or email-based workflows when Git history needs to move between systems.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="Local-to-external information flow"
+  caption="Remote and patch commands are easiest to reason about when you separate where data comes from, where it goes, and whether the current branch changes as a side effect."
+  inputsLabel="Sources"
+  inputs="Local refs|Remote refs|Patches / artifacts"
+  commandLabel="git am"
+  outputsLabel="Results"
+  outputs="Updated tracking refs|Published commits|Transfer artifacts"
+  note="Any time a shared branch is involved, confirm the target ref and team policy before running the action that publishes or integrates history."
+/>
+
+## Special cases and boundaries
+
+- A common remote-workflow mistake is treating download, integration, and publication as the same action. Split them first, then choose flags.
+- If the result may affect shared branches or externally visible history, double-check the remote, the target ref, and the permission boundary before executing `git am`.
+- Looking at `git fetch`, `git push`, and `git remote -v` together usually makes it easier to tell whether the problem is transport, auth, or ref selection.
+- When patch application fails, separate “context mismatch” from “the patch no longer fits this history” before choosing a recovery path.
+
