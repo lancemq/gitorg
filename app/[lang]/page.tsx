@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { FaqList } from "@/components/faq-list";
 import { SiteShell } from "@/components/site-shell";
+import { getContentStats } from "@/lib/content";
 import {
   getDictionary,
   getSidebarContent,
@@ -50,9 +51,11 @@ export default async function LocalizedHomePage({ params }: Props) {
 
   const locale = lang as Locale;
   const dict = getDictionary(locale);
+  const stats = await getContentStats(locale);
+  const moduleCount = Object.values(stats.sectionCounts).filter((count) => count > 0).length;
 
   return (
-    <SiteShell locale={locale} sidebar={getSidebarContent(locale, { kind: "home" })}>
+    <SiteShell locale={locale} sidebar={getSidebarContent(locale, { kind: "docs", activePath: "overview" })}>
       <section className="hero panel" id="overview">
         <div className="hero-copy">
           <p className="eyebrow">{dict.home.hero.eyebrow}</p>
@@ -71,17 +74,17 @@ export default async function LocalizedHomePage({ params }: Props) {
         <div className="hero-meta">
           <div className="meta-card">
             <p className="meta-label">{dict.home.meta.modulesTitle}</p>
-            <strong>{dict.home.meta.modules}</strong>
+            <strong>{moduleCount}</strong>
             <span>{dict.home.meta.modulesLabel}</span>
           </div>
           <div className="meta-grid">
             <article className="stat-card">
               <span>{dict.home.meta.commandCardsTitle}</span>
-              <strong>{dict.home.meta.commandCards}</strong>
+              <strong>{stats.commandDocs}</strong>
             </article>
             <article className="stat-card">
               <span>{dict.home.meta.exercisesTitle}</span>
-              <strong>{dict.home.meta.exercises}</strong>
+              <strong>{stats.totalDocs}</strong>
             </article>
           </div>
           <article className="note-card">

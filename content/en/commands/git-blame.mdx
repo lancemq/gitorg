@@ -1,0 +1,38 @@
+export const metadata = {
+  title: "git blame",
+  slug: "git-blame",
+  locale: "en",
+  section: "commands",
+  summary: "Track which commit last changed each line in a file, making it useful for recovering context around why a line looks the way it does now.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-blame",
+    "https://git-scm.com/book/en/v2/Git-Tools-Debugging-with-Git",
+  ],
+};
+
+# git blame
+
+`git blame` annotates a file line by line with the commit, author, and timestamp that most recently changed each line.
+
+## Common examples
+
+```bash
+git blame src/app.ts
+git blame -L 20,60 src/app.ts
+```
+
+## When it helps
+
+- understanding where a line came from
+- jumping from current code back to the relevant commit
+- reconstructing context around a behavior change
+
+## Best practice
+
+Use blame together with:
+
+- `git show <commit>`
+- `git log -- <file>`
+- `git diff`
+
+Blame tells you who last touched a line, but not always the full story behind why the change happened.

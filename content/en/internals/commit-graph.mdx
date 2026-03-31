@@ -1,0 +1,107 @@
+export const metadata = {
+  title: "Git Commit Graph and History Shape",
+  slug: "commit-graph",
+  locale: "en",
+  section: "internals",
+  summary: "Understand why Git history is fundamentally a graph rather than a simple timeline, and how merge and rebase reshape that graph.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+    "https://git-scm.com/book/en/v2/Git-Branching-Rebasing",
+  ],
+};
+
+# Git Commit Graph and History Shape
+
+## The short version
+
+Git stores a commit graph. A linear log is just one way of reading that graph, not the only shape Git actually keeps underneath.
+
+## 1. Why a graph is a better model than a list
+
+If history is treated as only a list, it becomes hard to explain:
+
+- why merge commits can have two parents
+- why rebase produces new commit IDs
+- how the same logical change sequence can be expressed with different structure
+
+The graph model makes those behaviors natural.
+
+## 2. How ordinary commits look linear
+
+Most commits have a single parent, so a local stretch of history often looks like:
+
+`A -> B -> C -> D`
+
+That does not mean Git is fundamentally list-based. It only means this part of the graph happens to read like a line.
+
+## 3. What a merge commit records
+
+A merge commit usually has two parents. It says:
+
+- two development lines existed
+- they join at this point
+
+So merge is not only about combining file content. It is also about preserving the historical fact that parallel work converged here.
+
+## 4. Why rebase feels more linear
+
+Rebase does not edit old commits in place. Instead it:
+
+1. takes the changes represented by a series of commits
+2. places them on top of a new base
+3. creates a new set of commit objects
+
+That makes the graph read more linearly, but through new commit identities.
+
+## 5. The real difference between merge and rebase
+
+Both can integrate work. The difference is mainly in history expression.
+
+### merge
+
+- preserves branching and join points
+- is often more faithful to the collaboration path
+- is usually safer on already-shared history
+
+### rebase
+
+- rewrites a series of commits onto a new base
+- produces a cleaner linear reading
+- is best for local or not-yet-shared cleanup
+
+## 6. Why commit IDs change with graph shape
+
+A commit object stores parent information. If the parent changes, the commit object changes. If the object changes, the ID changes.
+
+That is the internal reason rebase is a history rewrite.
+
+## 7. How the graph model helps with risk judgment
+
+Once you think in graphs, it becomes easier to judge:
+
+- whether a merge commit is a meaningful join point
+- whether a branch only contains a short local-only tail
+- whether reset or force push might remove a path other people still rely on
+
+## 8. Re-reading common commands through the graph
+
+### `git log --graph`
+
+It does not invent the graph. It reveals parent relationships that already exist.
+
+### `git merge`
+
+It often adds a node with multiple parents.
+
+### `git rebase`
+
+It recreates equivalent changes on a different parent chain.
+
+### `git cherry-pick`
+
+It copies the effect of a commit into a new node elsewhere in the graph.
+
+## The practical takeaway
+
+If you care about preserving the real branching story, merge is often clearer. If you care about polishing your own unpublished series before integration, rebase is often cleaner. The graph model explains both without turning either one into magic.

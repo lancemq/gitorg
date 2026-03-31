@@ -1,0 +1,32 @@
+export const metadata = {
+  title: "工作区、暂存区与对象库",
+  slug: "index-and-working-tree",
+  locale: "zh",
+  section: "internals",
+  summary: "理解 working tree、index 和 object database 这三层，是看懂 add、commit、restore、reset 的关键前提。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+    "https://git-scm.com/book/en/v2/Git-Tools-Reset-Demystified",
+  ],
+};
+
+# 工作区、暂存区与对象库
+
+Git 的许多困惑都来自把这三层混在一起：
+
+- 工作区：你正在编辑的文件
+- 暂存区：下一次提交准备写入的快照
+- 对象库：已经被 Git 固化下来的对象
+
+## 为什么这三层必须分开理解
+
+因为很多命令的区别就在于它们影响哪一层：
+
+- `git add` 主要改暂存区
+- `git commit` 把暂存区内容写进对象库
+- `git restore` 可以恢复工作区，也可以恢复暂存区
+- `git reset` 可能移动引用，也可能同步暂存区和工作区
+
+## 一个最稳的理解方式
+
+把暂存区看成“下一次提交的候选快照”，而不是“临时文件堆”。这样 add、commit、reset 的行为就会直观很多。

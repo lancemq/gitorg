@@ -1,0 +1,52 @@
+export const metadata = {
+  title: "git show",
+  slug: "git-show",
+  locale: "zh",
+  section: "commands",
+  summary: "查看某个提交、标签或对象的详细内容，是把历史节点和对象读清楚的高频命令。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-show",
+    "https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History",
+  ],
+};
+
+# git show
+
+`git show` 用来展开查看一个具体对象。最常见的是看某次提交的作者、说明和 diff，但它也可以查看 tag、tree 甚至 blob。
+
+## 什么时候最常用
+
+- 想快速看一条提交到底改了什么
+- 想核对某个 tag 指向哪个提交
+- 想把 `HEAD~1`、`main`、某个 commit hash 展开成可读信息
+
+## 常见写法
+
+```bash
+git show HEAD
+git show HEAD~1
+git show v1.2.0
+git show --stat <commit>
+git show --name-only <commit>
+```
+
+## 应该怎么理解它
+
+把 `git log` 理解成“列出很多提交”，把 `git show` 理解成“把某一个对象打开看细节”会更直观。
+
+## 最实用的几个参数
+
+- `--stat`：看文件级改动摘要
+- `--name-only`：只看改动到哪些文件
+- `--name-status`：看新增、删除、修改状态
+- `--no-patch`：只看提交元数据，不看 diff
+
+## 常见误区
+
+### `git show` 只能看提交
+
+不是。它本质上是看对象，只是最常用在 commit 上。
+
+### 它会修改仓库状态
+
+不会。`git show` 是纯读取命令，适合在排查和 review 时放心使用。

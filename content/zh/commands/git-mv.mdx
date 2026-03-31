@@ -1,0 +1,41 @@
+export const metadata = {
+  title: "git mv",
+  slug: "git-mv",
+  locale: "zh",
+  section: "commands",
+  summary: "用于重命名或移动已跟踪文件，帮助你把文件系统变化和暂存区状态一次保持一致。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-mv",
+    "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+  ],
+};
+
+# git mv
+
+`git mv` 把文件移动或重命名，并把这次变化一并放进暂存区。
+
+## 常见写法
+
+```bash
+git mv old-name.ts new-name.ts
+git mv docs/guide.md docs/intro.md
+```
+
+## 什么时候值得用
+
+- 你希望文件移动和 Git 暂存保持一步完成
+- 你在大规模重命名目录，希望操作更一致
+
+## 它和手动 `mv` 的关系
+
+手动移动文件后再 `git add -A` 也可以。Git 最终会通过内容相似度推断 rename。`git mv` 的价值主要是让命令更直接、暂存状态更清晰。
+
+## 常见误区
+
+### Git 底层真的保存“重命名对象”吗
+
+不完全是。Git 更关注内容和路径变化，rename 更多是比较和展示层面的结果。
+
+### `git mv` 比普通 `mv` 更“高级”
+
+它主要是更方便，不是完全不同的底层机制。

@@ -1,0 +1,56 @@
+export const metadata = {
+  title: "git rm",
+  slug: "git-rm",
+  locale: "zh",
+  section: "commands",
+  summary: "删除已跟踪文件并同步到暂存区，理解它有助于区分文件系统删除和 Git 记录删除。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rm",
+    "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+  ],
+};
+
+# git rm
+
+`git rm` 不只是删文件，它还会把“删除”这件事放进暂存区，准备进入下一次提交。
+
+## 常见写法
+
+```bash
+git rm app/old-file.ts
+git rm -r legacy-folder
+git rm --cached .env.local
+```
+
+## 三种最常见场景
+
+### 删除文件并提交删除
+
+```bash
+git rm notes.txt
+git commit -m "remove old notes"
+```
+
+### 只从 Git 跟踪中移除，但保留本地文件
+
+```bash
+git rm --cached .env.local
+```
+
+这在把文件加入 `.gitignore` 时很常见。
+
+### 递归删除目录
+
+```bash
+git rm -r tmp/
+```
+
+## 为什么它和直接 `rm` 不一样
+
+你可以先用系统 `rm` 删除文件，再用 `git add -u` 或 `git commit -a` 让 Git 感知删除；但 `git rm` 会把“删除文件”和“暂存删除记录”一起完成。
+
+## 风险点
+
+- `git rm` 删除的是已跟踪文件
+- 如果还没提交，通常还能从历史或工作区恢复
+- 一旦提交并推送，删除就会进入共享历史

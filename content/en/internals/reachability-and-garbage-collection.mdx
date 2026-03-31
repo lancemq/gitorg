@@ -1,0 +1,28 @@
+export const metadata = {
+  title: "Reachability and Garbage Collection",
+  slug: "reachability-and-garbage-collection",
+  locale: "en",
+  section: "internals",
+  summary: "Whether objects can still be recovered often depends more on reachability and garbage collection than on the command that made them harder to find.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Internals-Maintenance-and-Data-Recovery",
+    "https://git-scm.com/docs/git-reflog",
+    "https://git-scm.com/docs/git-gc",
+  ],
+};
+
+# Reachability and Garbage Collection
+
+An object still existing in the repository is not the same as that object still being easy to reach.
+
+## What reachability means
+
+If an object can still be reached from branches, tags, HEAD, or reflog history, it is usually easier for Git to retain and for you to recover.
+
+## Why recovery often works after mistakes
+
+After reset, rebase, or merge, old objects often do not disappear immediately. What you lose first is frequently the obvious name, not the underlying data.
+
+## Why you still should act quickly
+
+Over time, unreachable objects can be collected. That is why recovery gets harder if you wait too long after a destructive mistake.

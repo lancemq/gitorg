@@ -1,0 +1,28 @@
+export const metadata = {
+  title: "对象可达性与垃圾回收",
+  slug: "reachability-and-garbage-collection",
+  locale: "zh",
+  section: "internals",
+  summary: "理解对象为什么有时还能恢复、有时会永久丢失，本质上取决于可达性和垃圾回收，而不只是命令本身。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Internals-Maintenance-and-Data-Recovery",
+    "https://git-scm.com/docs/git-reflog",
+    "https://git-scm.com/docs/git-gc",
+  ],
+};
+
+# 对象可达性与垃圾回收
+
+对象“还在仓库里”和“你还容易找到它”不是一回事。
+
+## 什么是可达性
+
+如果一个对象还能从分支、tag、HEAD、reflog 等入口一路追踪到，它通常就是可达的。可达对象更容易被保留，也更容易恢复。
+
+## 为什么误操作后常常还能找回
+
+因为 reset、rebase、merge 之后，旧对象往往不会马上消失。很多时候先丢的是“名字”，不是“对象”。
+
+## 为什么又不能无限乐观
+
+随着时间推移和垃圾回收，不再可达且过旧的对象可能被清理。所以恢复操作越早做越稳。

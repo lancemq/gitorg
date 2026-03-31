@@ -1,0 +1,30 @@
+export const metadata = {
+  title: "Remote-Tracking References",
+  slug: "remote-tracking-refs",
+  locale: "en",
+  section: "internals",
+  summary: "Understand the difference between `main` and `origin/main` so fetch, pull, push, and branch sync become easier to reason about.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
+    "https://git-scm.com/docs/git-fetch",
+    "https://git-scm.com/docs/git-pull",
+  ],
+};
+
+# Remote-Tracking References
+
+Many sync mistakes come from not separating these two names:
+
+- `main`: your local branch
+- `origin/main`: your local record of the remote state
+
+## Why fetch matters
+
+`git fetch` updates the remote-tracking ref, not your working branch. That separation is what lets Git say:
+
+1. learn what changed upstream
+2. decide how to integrate it locally
+
+## Why this helps with pull
+
+`git pull` is fetch plus integration. The better you understand remote-tracking refs, the easier it becomes to reason about why pull merges, rebases, fast-forwards, or stops.

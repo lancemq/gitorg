@@ -1,0 +1,27 @@
+export const metadata = {
+  title: "远端跟踪引用",
+  slug: "remote-tracking-refs",
+  locale: "zh",
+  section: "internals",
+  summary: "理解 `main` 与 `origin/main` 的区别，能够帮助你更稳定地掌握 fetch、pull、push 和分支同步。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
+    "https://git-scm.com/docs/git-fetch",
+    "https://git-scm.com/docs/git-pull",
+  ],
+};
+
+# 远端跟踪引用
+
+很多同步误解都来自没有把这两者区分清楚：
+
+- `main`：你的本地分支
+- `origin/main`：你本地记录的远端状态
+
+## 为什么 fetch 很重要
+
+`git fetch` 更新的是远端跟踪引用，而不是直接改写你的本地分支。这让 Git 能把“先知道远端现在在哪里”和“要不要改自己的分支”分成两步。
+
+## 为什么这会影响 pull
+
+`git pull` 本质上是 fetch 再整合。你越理解远端跟踪引用，就越能理解 pull 为什么有时会产生 merge、有时会 rebase，有时还会被拦住。

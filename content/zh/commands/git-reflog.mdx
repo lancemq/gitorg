@@ -1,0 +1,51 @@
+export const metadata = {
+  title: "git reflog",
+  slug: "git-reflog",
+  locale: "zh",
+  section: "commands",
+  summary: "查看引用移动历史，是 reset、rebase、误删分支等恢复场景里最常用的自救命令之一。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-reflog",
+    "https://git-scm.com/book/en/v2/Git-Internals-Git-References",
+  ],
+};
+
+# git reflog
+
+`git reflog` 记录的是引用移动历史，而不是普通提交历史。很多恢复操作首先要看的不是 `git log`，而是 reflog。
+
+## 为什么它特别重要
+
+当你做了这些操作后：
+
+- `reset --hard`
+- `rebase`
+- `pull`
+- 删除或改写分支
+
+旧提交未必立刻消失，但你可能失去了“当前分支名”。这时 reflog 常常还能告诉你原来在哪里。
+
+## 常见写法
+
+```bash
+git reflog
+git reflog show HEAD
+git reset --hard HEAD@{1}
+git checkout -b rescue HEAD@{2}
+```
+
+## 实战思路
+
+1. 先用 `git reflog` 找到误操作前的位置
+2. 再决定是新建救援分支，还是直接 reset 回去
+
+## 和 `git log` 的区别
+
+- `git log` 看的是提交图
+- `git reflog` 看的是引用曾经指向过哪里
+
+所以 reflog 更像“位置历史”，不是“协作历史”。
+
+## 风险提示
+
+reflog 不是永久保险箱。随着时间推移和垃圾回收，过旧且不可达的对象可能被清理。所以出问题后越早处理越稳。

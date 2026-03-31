@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { HtmlLangSync } from "@/components/html-lang-sync";
 import { isValidLocale, type Locale } from "@/lib/i18n";
 import { buildLocaleHomeMetadata, getLocaleLang } from "@/lib/seo";
 
@@ -32,6 +33,7 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <div data-locale={locale} lang={getLocaleLang(locale)}>
+      <HtmlLangSync locale={locale} />
       {children}
     </div>
   );

@@ -1,0 +1,44 @@
+export const metadata = {
+  title: "git blame",
+  slug: "git-blame",
+  locale: "zh",
+  section: "commands",
+  summary: "定位某一行代码最后由哪个提交引入或修改，适合排查行为来源和上下文。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-blame",
+    "https://git-scm.com/book/en/v2/Git-Tools-Debugging-with-Git",
+  ],
+};
+
+# git blame
+
+`git blame` 会按行展示某个文件当前内容分别来自哪个提交、作者和时间。
+
+## 常见写法
+
+```bash
+git blame src/app.ts
+git blame -L 20,60 src/app.ts
+```
+
+## 什么时候最有用
+
+- 想知道某行逻辑是谁在什么背景下改的
+- 想快速跳到对应提交继续看 diff
+- 排查一个行为为什么会变成现在这样
+
+## 应该怎么用它
+
+`git blame` 最好和这些命令配合：
+
+- `git show <commit>`
+- `git log -- <file>`
+- `git diff`
+
+单独看 blame 只能告诉你“最后是谁改了这一行”，不一定能直接说明真实原因。
+
+## 常见误区
+
+### blame 是“追责工具”
+
+更好的理解是“追上下文工具”。它最有价值的地方不是找人，而是快速回到变更发生时的提交背景。

@@ -1,0 +1,37 @@
+export const metadata = {
+  title: "git rm",
+  slug: "git-rm",
+  locale: "en",
+  section: "commands",
+  summary: "Remove tracked files and stage that removal, which makes it easier to separate filesystem deletion from Git history changes.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rm",
+    "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+  ],
+};
+
+# git rm
+
+`git rm` does more than delete a file. It removes the tracked path and stages that deletion for the next commit.
+
+## Common patterns
+
+```bash
+git rm app/old-file.ts
+git rm -r legacy-folder
+git rm --cached .env.local
+```
+
+## Typical scenarios
+
+- delete a tracked file and commit that deletion
+- stop tracking a file while keeping it locally with `--cached`
+- remove whole tracked directories with `-r`
+
+## Why it differs from plain `rm`
+
+You can delete a file with your shell and later stage the deletion another way. `git rm` simply bundles the file removal and staging step together.
+
+## Practical caution
+
+Once committed and shared, the deletion becomes part of project history, so use it deliberately for tracked paths.

@@ -1,9 +1,18 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { DocTemplate } from "@/components/doc-template";
-import { getDocByPath } from "@/lib/content";
-import { getDictionary, getSidebarContent, isValidLocale, locales, type Locale } from "@/lib/i18n";
+import { SiteShell } from "@/components/site-shell";
+import { getInternalsDocs } from "@/lib/content";
+import {
+  getDictionary,
+  getSidebarContent,
+  internalsSlugs,
+  isValidLocale,
+  locales,
+  type InternalsSlug,
+  type Locale,
+} from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo";
 
 type Props = {
@@ -24,17 +33,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const locale = lang as Locale;
-  const doc = await getDocByPath(locale, "concepts/git-internals");
+  const dict = getDictionary(locale);
 
   return buildPageMetadata({
     locale,
     pathname: "/internals",
-    title: doc.metadata.title,
-    description: doc.metadata.summary,
+    title: dict.internalsIndex.title,
+    description: dict.internalsIndex.description,
   });
 }
 
-export default async function GitInternalsPage({ params }: Props) {
+export default async function GitInternalsChannelPage({ params }: Props) {
   const { lang } = await params;
 
   if (!isValidLocale(lang)) {
@@ -43,23 +52,52 @@ export default async function GitInternalsPage({ params }: Props) {
 
   const locale = lang as Locale;
   const dict = getDictionary(locale);
-  const doc = await getDocByPath(locale, "concepts/git-internals");
-  const DocBody = doc.Component;
+  const docs = await getInternalsDocs(locale);
+
+  const sortedDocs = docs.sort(
+    (a, b) =>
+      internalsSlugs.indexOf(a.metadata.slug as InternalsSlug) -
+      internalsSlugs.indexOf(b.metadata.slug as InternalsSlug),
+  );
 
   return (
-    <DocTemplate
-      locale={locale}
-      sidebar={getSidebarContent(locale, { kind: "docs", activePath: "concepts/git-internals" })}
-      breadcrumbs={[
-        { label: dict.commandPage.breadcrumbs.overview, href: `/${locale}` },
-        { label: doc.metadata.title },
-      ]}
-      eyebrow={dict.docsIndex.eyebrow}
-      title={doc.metadata.title}
-      summary={doc.metadata.summary}
-      sourcesTitle={dict.docsIndex.sourcesTitle}
-      sourceUrls={doc.metadata.sourceUrls}
-      Body={DocBody}
-    />
+    <SiteShell locale={locale} sidebar={getSidebarContent(locale, { kind: "docs", activePath: "internals-index" })}>
+      <section className="docs-landing">
+        <nav className="breadcrumbs" aria-label="Breadcrumb">
+          <Link href={`/${locale}`}>{dict.commandPage.breadcrumbs.overview}</Link>
+          <span>/</span>
+          <strong>{dict.commandPage.breadcrumbs.internals}</strong>
+        </nav>
+
+        <div className="section-head">
+          <div>
+            <p className="eyebrow">{dict.internalsIndex.eyebrow}</p>
+            <h1>{dict.internalsIndex.title}</h1>
+          </div>
+          <p>{dict.internalsIndex.description}</p>
+        </div>
+
+        <section className="panel docs-group">
+          <div className="docs-group-head">
+            <p className="eyebrow">{dict.internalsIndex.eyebrow}</p>
+            <h2>{locale === "zh" ? "原理点目录" : "Internals Topics"}</h2>
+            <p>
+              {locale === "zh"
+                ? "从对象模型到提交图，再到 packfiles 与 refs，把原来的一篇原理说明拆成更适合逐篇学习和持续扩写的原理专题。"
+                : "Break the old single internals guide into focused reads spanning the object model, refs, commit graphs, and storage internals."}
+            </p>
+          </div>
+
+          <div className="docs-list">
+            {sortedDocs.map((doc) => (
+              <Link className="docs-card" href={`/${locale}/internals/${doc.metadata.slug}`} key={doc.path}>
+                <h3>{doc.metadata.title}</h3>
+                <p>{doc.metadata.summary}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      </section>
+    </SiteShell>
   );
 }

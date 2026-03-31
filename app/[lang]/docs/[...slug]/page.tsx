@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { DocTemplate } from "@/components/doc-template";
 import { getDocByPath, getDocPathFromSlugParts, getDocPaths } from "@/lib/content";
@@ -63,7 +63,17 @@ export default async function DocDetailPage({ params }: Props) {
 
   const locale = lang as Locale;
   const dict = getDictionary(locale);
+  const rawDocPath = slug.join("/");
   const docPath = getDocPathFromSlugParts(slug);
+
+  if (rawDocPath === "concepts/git-internals") {
+    redirect(`/${locale}/internals`);
+  }
+
+  if (rawDocPath === "concepts/refs-and-head") {
+    redirect(`/${locale}/internals/refs-and-head`);
+  }
+
   const sectionId = docPath.split("/")[0] as DocsSectionId;
 
   if (!getDocPaths(locale).includes(docPath)) {
@@ -73,7 +83,7 @@ export default async function DocDetailPage({ params }: Props) {
   const doc = await getDocByPath(locale, docPath);
   const DocBody = doc.Component;
   const breadcrumbs =
-    docPath === "learning-path/quick-start" || docPath === "concepts/refs-and-head"
+    docPath === "learning-path/quick-start"
       ? [
           { label: dict.commandPage.breadcrumbs.overview, href: `/${locale}` },
           { label: doc.metadata.title },

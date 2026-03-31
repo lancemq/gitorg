@@ -1,0 +1,41 @@
+export const metadata = {
+  title: "git bisect",
+  slug: "git-bisect",
+  locale: "en",
+  section: "commands",
+  summary: "Use binary search across history to locate the commit that introduced a regression, making it one of the most valuable debugging commands in Git.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-bisect",
+    "https://git-scm.com/book/en/v2/Git-Tools-Debugging-with-Git",
+  ],
+};
+
+# git bisect
+
+`git bisect` helps you find the first bad commit by repeatedly cutting the search space in half.
+
+## Basic flow
+
+```bash
+git bisect start
+git bisect bad
+git bisect good <good-commit>
+```
+
+Git then checks out midpoint commits and asks you to classify them as good or bad until the culprit is isolated.
+
+## Best use cases
+
+- regressions with a clear good/bad outcome
+- large history ranges that are too expensive to inspect manually
+- bugs with a reproducible test or verification step
+
+## Important caution
+
+Because bisect moves through many commits, always end with:
+
+```bash
+git bisect reset
+```
+
+The command is most powerful when your test step is stable and repeatable.

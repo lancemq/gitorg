@@ -11,7 +11,10 @@ export type CommandSlug =
   | "git-add"
   | "git-commit"
   | "git-diff"
+  | "git-show"
   | "git-log"
+  | "git-rm"
+  | "git-mv"
   | "git-pull"
   | "git-push"
   | "git-tag"
@@ -27,7 +30,10 @@ export type CommandSlug =
   | "git-revert"
   | "git-switch"
   | "git-branch"
-  | "git-checkout";
+  | "git-checkout"
+  | "git-reflog"
+  | "git-bisect"
+  | "git-blame";
 
 export type BestPracticeSlug =
   | "commit-hygiene"
@@ -44,9 +50,12 @@ export type WorkflowSlug =
 
 export type InternalsSlug =
   | "object-database"
+  | "index-and-working-tree"
   | "refs-and-head"
+  | "remote-tracking-refs"
   | "commit-graph"
-  | "packfiles-and-storage";
+  | "packfiles-and-storage"
+  | "reachability-and-garbage-collection";
 
 export function isValidLocale(value: string): value is Locale {
   return locales.includes(value as Locale);
@@ -94,10 +103,7 @@ export type DocsSectionId =
 
 type Dictionary = {
   sidebar: {
-    home: SidebarContent;
     docs: (activePath?: string) => SidebarContent;
-    command: (activeSlug: CommandSlug) => SidebarContent;
-    faq: SidebarContent;
   };
   commandIndex: {
     eyebrow: string;
@@ -219,11 +225,7 @@ type Dictionary = {
   commandMeta: Record<CommandSlug, ReadonlyArray<{ label: string; value: string }>>;
 };
 
-export type SidebarSelection =
-  | { kind: "home" }
-  | { kind: "faq" }
-  | { kind: "docs"; activePath?: string }
-  | { kind: "command"; activeSlug: CommandSlug };
+export type SidebarSelection = { kind: "docs"; activePath?: string };
 
 function baseSidebar(locale: Locale, groups: NavGroup[]): SidebarContent {
   return {
@@ -332,18 +334,13 @@ function buildInternalsNavItem(locale: Locale, activePath?: string): NavItem {
 
 function buildCommandNavItem(
   locale: Locale,
-  options:
-    | { mode: "home" }
-    | { mode: "docs"; activePath?: string }
-    | { mode: "command"; activeSlug: CommandSlug },
+  activePath?: string,
 ): NavItem {
   const baseHref = `/${locale}/commands`;
   const isActive =
-    options.mode === "docs"
-      ? options.activePath === "commands-index" ||
-        commandSlugs.some((slug) => options.activePath === `commands/${slug}`) ||
-        options.activePath === "recovery/reflog-recovery"
-      : options.mode === "command";
+    activePath === "commands-index" ||
+    commandSlugs.some((slug) => activePath === `commands/${slug}`) ||
+    activePath === "recovery/reflog-recovery";
 
   return {
     label: locale === "zh" ? "Git 命令" : "Git Commands",
@@ -359,7 +356,10 @@ export const commandSlugs = [
   "git-add",
   "git-commit",
   "git-diff",
+  "git-show",
   "git-log",
+  "git-rm",
+  "git-mv",
   "git-fetch",
   "git-pull",
   "git-push",
@@ -374,6 +374,9 @@ export const commandSlugs = [
   "git-stash",
   "git-restore",
   "git-revert",
+  "git-reflog",
+  "git-bisect",
+  "git-blame",
   "git-checkout",
   "git-clean",
 ] as const;
@@ -385,7 +388,10 @@ export const basicCommandSlugs = [
   "git-add",
   "git-commit",
   "git-diff",
+  "git-show",
   "git-log",
+  "git-rm",
+  "git-mv",
   "git-fetch",
   "git-pull",
   "git-push",
@@ -404,6 +410,9 @@ export const advancedCommandSlugs = [
   "git-cherry-pick",
   "git-reset",
   "git-revert",
+  "git-reflog",
+  "git-bisect",
+  "git-blame",
   "git-clean",
 ] as const satisfies readonly CommandSlug[];
 
@@ -424,36 +433,16 @@ export const workflowSlugs = [
 
 export const internalsSlugs = [
   "object-database",
+  "index-and-working-tree",
   "refs-and-head",
+  "remote-tracking-refs",
   "commit-graph",
   "packfiles-and-storage",
+  "reachability-and-garbage-collection",
 ] as const satisfies readonly InternalsSlug[];
 
 const zhDictionary: Dictionary = {
   sidebar: {
-    home: baseSidebar("zh", [
-      {
-        title: "Learning Path",
-        items: [
-          { label: "总览", href: "/zh#overview", active: true },
-          { label: "快速开始", href: "/zh/docs/learning-path/quick-start" },
-          { label: "最佳实践", href: "/zh/best-practices" },
-          { label: "工作流", href: "/zh/workflows" },
-          buildCommandNavItem("zh", { mode: "home" }),
-        ],
-      },
-      {
-        title: "Special Topics",
-        items: [
-          { label: "Git 原理", href: "/zh/internals" },
-          { label: "Git 历史", href: "/zh/history" },
-        ],
-      },
-      {
-        title: "Resources",
-        items: [{ label: "常见问题", href: "/zh/faq" }],
-      },
-    ]),
     docs: (activePath) =>
       baseSidebar("zh", [
         {
@@ -470,7 +459,7 @@ const zhDictionary: Dictionary = {
             },
             buildBestPracticeNavItem("zh", activePath),
             buildWorkflowNavItem("zh", activePath),
-            buildCommandNavItem("zh", { mode: "docs", activePath }),
+            buildCommandNavItem("zh", activePath),
           ],
         },
         {
@@ -492,43 +481,6 @@ const zhDictionary: Dictionary = {
               href: "/zh/faq",
               active: activePath === "faq",
             },
-          ],
-        },
-      ]),
-    faq: baseSidebar("zh", [
-      {
-        title: "Overview",
-        items: [{ label: "总览", href: "/zh" }],
-      },
-      {
-        title: "Resources",
-        items: [
-          { label: "全部文档", href: "/zh#docs" },
-          { label: "Git 历史", href: "/zh/history" },
-          { label: "常见问题", href: "/zh/faq", active: true },
-        ],
-      },
-      {
-        title: "FAQ Topics",
-        items: [
-          { label: "pull 与同步", href: "/zh/faq#pull-sync" },
-          { label: "reset 与恢复", href: "/zh/faq#reset-recovery" },
-          { label: "stash 与切换", href: "/zh/faq#stash-switch" },
-        ],
-      },
-    ]),
-    command: (activeSlug) =>
-      baseSidebar("zh", [
-        {
-          title: "Overview",
-          items: [{ label: "总览", href: "/zh" }],
-        },
-        {
-          title: "Learning Path",
-          items: [
-            { label: "快速上手", href: "/zh/docs/learning-path/quick-start" },
-            { label: "最佳实践", href: "/zh/best-practices" },
-            buildCommandNavItem("zh", { mode: "command", activeSlug }),
           ],
         },
       ]),
@@ -563,13 +515,13 @@ const zhDictionary: Dictionary = {
       secondaryAction: "查看参考资料",
     },
     meta: {
-      modulesTitle: "核心模块",
-      modules: 5,
-      modulesLabel: "从工作流到恢复手册",
-      commandCardsTitle: "文档专题",
-      commandCards: 16,
-      exercisesTitle: "双语页面",
-      exercises: 4,
+      modulesTitle: "内容频道",
+      modules: 0,
+      modulesLabel: "当前已接入的教程频道",
+      commandCardsTitle: "命令专题",
+      commandCards: 0,
+      exercisesTitle: "教程总数",
+      exercises: 0,
       recommendedPathTitle: "Recommended path",
       recommendedPath: "Quick Start → fetch/pull → rebase → reflog",
     },
@@ -757,6 +709,7 @@ const zhDictionary: Dictionary = {
       commands: "命令",
       bestPractices: "最佳实践",
       workflows: "工作流",
+      internals: "Git 原理",
       concepts: "概念",
       faq: "常见问题",
       learningPath: "学习路径",
@@ -797,6 +750,18 @@ const zhDictionary: Dictionary = {
       { label: "复杂度", value: "中等偏高" },
       { label: "常见场景", value: "通过新提交安全撤销变更" },
     ],
+    "git-reflog": [
+      { label: "复杂度", value: "高" },
+      { label: "常见场景", value: "定位引用移动历史并恢复位置" },
+    ],
+    "git-bisect": [
+      { label: "复杂度", value: "高" },
+      { label: "常见场景", value: "二分查找引入问题的提交" },
+    ],
+    "git-blame": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "追踪某行代码来自哪个提交" },
+    ],
     "git-switch": [
       { label: "复杂度", value: "基础" },
       { label: "常见场景", value: "切换或创建分支" },
@@ -833,9 +798,21 @@ const zhDictionary: Dictionary = {
       { label: "复杂度", value: "基础到中等" },
       { label: "常见场景", value: "比较工作区、暂存区和提交差异" },
     ],
+    "git-show": [
+      { label: "复杂度", value: "基础到中等" },
+      { label: "常见场景", value: "查看单个提交、标签或对象详情" },
+    ],
     "git-log": [
       { label: "复杂度", value: "基础到中等" },
       { label: "常见场景", value: "查看提交历史" },
+    ],
+    "git-rm": [
+      { label: "复杂度", value: "基础到中等" },
+      { label: "常见场景", value: "删除已跟踪文件并同步删除记录" },
+    ],
+    "git-mv": [
+      { label: "复杂度", value: "基础到中等" },
+      { label: "常见场景", value: "重命名或移动已跟踪文件" },
     ],
     "git-pull": [
       { label: "复杂度", value: "基础到中等" },
@@ -862,29 +839,6 @@ const zhDictionary: Dictionary = {
 
 const enDictionary: Dictionary = {
   sidebar: {
-    home: baseSidebar("en", [
-      {
-        title: "Learning Path",
-        items: [
-          { label: "Overview", href: "/en#overview", active: true },
-          { label: "Quick Start", href: "/en/docs/learning-path/quick-start" },
-          { label: "Best Practices", href: "/en/best-practices" },
-          { label: "Workflows", href: "/en/workflows" },
-          buildCommandNavItem("en", { mode: "home" }),
-        ],
-      },
-      {
-        title: "Special Topics",
-        items: [
-          { label: "Git Internals", href: "/en/internals" },
-          { label: "Git History", href: "/en/history" },
-        ],
-      },
-      {
-        title: "Resources",
-        items: [{ label: "FAQ", href: "/en/faq" }],
-      },
-    ]),
     docs: (activePath) =>
       baseSidebar("en", [
         {
@@ -901,7 +855,7 @@ const enDictionary: Dictionary = {
             },
             buildBestPracticeNavItem("en", activePath),
             buildWorkflowNavItem("en", activePath),
-            buildCommandNavItem("en", { mode: "docs", activePath }),
+            buildCommandNavItem("en", activePath),
           ],
         },
         {
@@ -923,43 +877,6 @@ const enDictionary: Dictionary = {
               href: "/en/faq",
               active: activePath === "faq",
             },
-          ],
-        },
-      ]),
-    faq: baseSidebar("en", [
-      {
-        title: "Overview",
-        items: [{ label: "Overview", href: "/en" }],
-      },
-      {
-        title: "Resources",
-        items: [
-          { label: "All Docs", href: "/en#docs" },
-          { label: "Git History", href: "/en/history" },
-          { label: "FAQ", href: "/en/faq", active: true },
-        ],
-      },
-      {
-        title: "FAQ Topics",
-        items: [
-          { label: "pull and sync", href: "/en/faq#pull-sync" },
-          { label: "reset and recovery", href: "/en/faq#reset-recovery" },
-          { label: "stash and switching", href: "/en/faq#stash-switch" },
-        ],
-      },
-    ]),
-    command: (activeSlug) =>
-      baseSidebar("en", [
-        {
-          title: "Overview",
-          items: [{ label: "Overview", href: "/en" }],
-        },
-        {
-          title: "Learning Path",
-          items: [
-            { label: "Quick Start", href: "/en/docs/learning-path/quick-start" },
-            { label: "Best Practices", href: "/en/best-practices" },
-            buildCommandNavItem("en", { mode: "command", activeSlug }),
           ],
         },
       ]),
@@ -994,13 +911,13 @@ const enDictionary: Dictionary = {
       secondaryAction: "View references",
     },
     meta: {
-      modulesTitle: "Core Modules",
-      modules: 5,
-      modulesLabel: "From workflow to recovery",
-      commandCardsTitle: "Doc Topics",
-      commandCards: 16,
-      exercisesTitle: "Bilingual Pages",
-      exercises: 4,
+      modulesTitle: "Content Channels",
+      modules: 0,
+      modulesLabel: "Tutorial channels currently wired into the site",
+      commandCardsTitle: "Command Topics",
+      commandCards: 0,
+      exercisesTitle: "Total Tutorials",
+      exercises: 0,
       recommendedPathTitle: "Recommended path",
       recommendedPath: "Quick Start → fetch/pull → rebase → reflog",
     },
@@ -1188,6 +1105,7 @@ const enDictionary: Dictionary = {
       commands: "Commands",
       bestPractices: "Best Practices",
       workflows: "Workflows",
+      internals: "Git Internals",
       concepts: "Concepts",
       faq: "FAQ",
       learningPath: "Learning Path",
@@ -1228,6 +1146,18 @@ const enDictionary: Dictionary = {
       { label: "Complexity", value: "Medium to high" },
       { label: "Typical use", value: "Undo safely with a new commit" },
     ],
+    "git-reflog": [
+      { label: "Complexity", value: "High" },
+      { label: "Typical use", value: "Trace ref movement and recover positions" },
+    ],
+    "git-bisect": [
+      { label: "Complexity", value: "High" },
+      { label: "Typical use", value: "Binary-search the commit that introduced a bug" },
+    ],
+    "git-blame": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Trace which commit last changed a line" },
+    ],
     "git-switch": [
       { label: "Complexity", value: "Basic" },
       { label: "Typical use", value: "Switch or create branches" },
@@ -1264,9 +1194,21 @@ const enDictionary: Dictionary = {
       { label: "Complexity", value: "Basic to medium" },
       { label: "Typical use", value: "Compare working tree, index, and commits" },
     ],
+    "git-show": [
+      { label: "Complexity", value: "Basic to medium" },
+      { label: "Typical use", value: "Inspect a single commit, tag, or object" },
+    ],
     "git-log": [
       { label: "Complexity", value: "Basic to medium" },
       { label: "Typical use", value: "Inspect commit history" },
+    ],
+    "git-rm": [
+      { label: "Complexity", value: "Basic to medium" },
+      { label: "Typical use", value: "Remove tracked files and stage the deletion" },
+    ],
+    "git-mv": [
+      { label: "Complexity", value: "Basic to medium" },
+      { label: "Typical use", value: "Rename or move tracked files" },
     ],
     "git-pull": [
       { label: "Complexity", value: "Basic to medium" },
@@ -1302,19 +1244,7 @@ export function getDictionary(locale: Locale) {
 
 export function getSidebarContent(locale: Locale, selection: SidebarSelection): SidebarContent {
   const dictionary = getDictionary(locale);
-
-  switch (selection.kind) {
-    case "home":
-      return dictionary.sidebar.docs("overview");
-    case "faq":
-      return dictionary.sidebar.faq;
-    case "docs":
-      return dictionary.sidebar.docs(selection.activePath);
-    case "command":
-      return dictionary.sidebar.command(selection.activeSlug);
-    default:
-      return dictionary.sidebar.docs("overview");
-  }
+  return dictionary.sidebar.docs(selection.activePath);
 }
 
 export function getDocsSectionTitle(locale: Locale, sectionId: DocsSectionId) {

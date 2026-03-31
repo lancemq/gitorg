@@ -1,0 +1,46 @@
+export const metadata = {
+  title: "git bisect",
+  slug: "git-bisect",
+  locale: "zh",
+  section: "commands",
+  summary: "通过二分法定位引入 bug 的提交，是排查回归问题时最有价值的高级命令之一。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-bisect",
+    "https://git-scm.com/book/en/v2/Git-Tools-Debugging-with-Git",
+  ],
+};
+
+# git bisect
+
+`git bisect` 的目标不是读历史，而是自动缩小范围，帮你找到“哪次提交第一次把问题引进来”。
+
+## 基本流程
+
+```bash
+git bisect start
+git bisect bad
+git bisect good <good-commit>
+```
+
+然后 Git 会不断把你切到中间提交，你每次判断：
+
+- `git bisect good`
+- `git bisect bad`
+
+直到定位到问题提交。
+
+## 适合什么问题
+
+- 某个 bug 明确是最近引入的
+- 你能清楚判断“这个提交状态是好还是坏”
+- 历史范围较大，不适合人肉一个个翻
+
+## 风险点
+
+- 过程中会频繁切换提交
+- 如果测试步骤不稳定，结论也会不稳
+- 结束后记得 `git bisect reset`
+
+## 最实用的心智模型
+
+把它理解成“让 Git 代替你做回归排查里的二分搜索”，而不是普通日志查看命令。

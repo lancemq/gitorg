@@ -1,0 +1,44 @@
+export const metadata = {
+  title: "git show",
+  slug: "git-show",
+  locale: "en",
+  section: "commands",
+  summary: "Inspect a specific commit, tag, or object in detail, making it one of the most useful commands for reading history precisely.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-show",
+    "https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History",
+  ],
+};
+
+# git show
+
+`git show` expands a single object into readable detail. Most often that means commit metadata plus diff, but it can also be used with tags and other Git objects.
+
+## Common uses
+
+- inspect exactly what one commit changed
+- verify what a tag points to
+- expand `HEAD`, `HEAD~1`, or a hash into readable information
+
+```bash
+git show HEAD
+git show HEAD~1
+git show v1.2.0
+git show --stat <commit>
+git show --name-only <commit>
+```
+
+## Best mental model
+
+Think of `git log` as “list many commits” and `git show` as “open one object and read it carefully.”
+
+## Useful options
+
+- `--stat`
+- `--name-only`
+- `--name-status`
+- `--no-patch`
+
+## Important note
+
+`git show` is read-only. It is safe to use while debugging, reviewing, and understanding history.

@@ -11,6 +11,7 @@
   - `commands/`
   - `best-practices/`
   - `workflows/`
+  - `internals/`
   - `recovery/`
   - `concepts/`
 
@@ -40,7 +41,10 @@
 - `zh/commands/git-add.mdx`
 - `zh/commands/git-commit.mdx`
 - `zh/commands/git-diff.mdx`
+- `zh/commands/git-show.mdx`
 - `zh/commands/git-log.mdx`
+- `zh/commands/git-rm.mdx`
+- `zh/commands/git-mv.mdx`
 - `zh/commands/git-pull.mdx`
 - `zh/commands/git-push.mdx`
 - `zh/commands/git-tag.mdx`
@@ -50,6 +54,9 @@
 - `zh/commands/git-revert.mdx`
 - `zh/commands/git-switch.mdx`
 - `zh/commands/git-branch.mdx`
+- `zh/commands/git-reflog.mdx`
+- `zh/commands/git-bisect.mdx`
+- `zh/commands/git-blame.mdx`
 - `zh/commands/git-checkout.mdx`
 - `zh/best-practices/commit-hygiene.mdx`
 - `zh/best-practices/topic-branches.mdx`
@@ -60,10 +67,15 @@
 - `zh/workflows/feature-branch-collaboration.mdx`
 - `zh/workflows/sync-before-review.mdx`
 - `zh/workflows/hotfix-and-urgent-fixes.mdx`
+- `zh/internals/object-database.mdx`
+- `zh/internals/index-and-working-tree.mdx`
+- `zh/internals/refs-and-head.mdx`
+- `zh/internals/remote-tracking-refs.mdx`
+- `zh/internals/commit-graph.mdx`
+- `zh/internals/packfiles-and-storage.mdx`
+- `zh/internals/reachability-and-garbage-collection.mdx`
 - `zh/recovery/reflog-recovery.mdx`
-- `zh/concepts/git-internals.mdx`
 - `zh/concepts/git-history.mdx`
-- `zh/concepts/refs-and-head.mdx`
 - `en/learning-path/quick-start.mdx`
 - `en/commands/git-rebase.mdx`
 - `en/commands/git-merge.mdx`
@@ -77,7 +89,10 @@
 - `en/commands/git-add.mdx`
 - `en/commands/git-commit.mdx`
 - `en/commands/git-diff.mdx`
+- `en/commands/git-show.mdx`
 - `en/commands/git-log.mdx`
+- `en/commands/git-rm.mdx`
+- `en/commands/git-mv.mdx`
 - `en/commands/git-pull.mdx`
 - `en/commands/git-push.mdx`
 - `en/commands/git-tag.mdx`
@@ -87,6 +102,9 @@
 - `en/commands/git-revert.mdx`
 - `en/commands/git-switch.mdx`
 - `en/commands/git-branch.mdx`
+- `en/commands/git-reflog.mdx`
+- `en/commands/git-bisect.mdx`
+- `en/commands/git-blame.mdx`
 - `en/commands/git-checkout.mdx`
 - `en/best-practices/commit-hygiene.mdx`
 - `en/best-practices/topic-branches.mdx`
@@ -97,7 +115,12 @@
 - `en/workflows/feature-branch-collaboration.mdx`
 - `en/workflows/sync-before-review.mdx`
 - `en/workflows/hotfix-and-urgent-fixes.mdx`
+- `en/internals/object-database.mdx`
+- `en/internals/index-and-working-tree.mdx`
+- `en/internals/refs-and-head.mdx`
+- `en/internals/remote-tracking-refs.mdx`
+- `en/internals/commit-graph.mdx`
+- `en/internals/packfiles-and-storage.mdx`
+- `en/internals/reachability-and-garbage-collection.mdx`
 - `en/recovery/reflog-recovery.mdx`
-- `en/concepts/git-internals.mdx`
 - `en/concepts/git-history.mdx`
-- `en/concepts/refs-and-head.mdx`

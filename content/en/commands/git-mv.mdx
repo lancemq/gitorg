@@ -1,0 +1,35 @@
+export const metadata = {
+  title: "git mv",
+  slug: "git-mv",
+  locale: "en",
+  section: "commands",
+  summary: "Rename or move tracked files while keeping the index in sync, which makes large refactors easier to stage consistently.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-mv",
+    "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+  ],
+};
+
+# git mv
+
+`git mv` renames or moves a tracked file and stages that path change at the same time.
+
+## Common examples
+
+```bash
+git mv old-name.ts new-name.ts
+git mv docs/guide.md docs/intro.md
+```
+
+## When it helps most
+
+- during rename-heavy refactors
+- when you want file movement and staging to happen in one step
+
+## How to think about it
+
+Git still reasons primarily about content plus paths. `git mv` is mainly a convenience command that keeps your working tree and index aligned cleanly.
+
+## Useful reminder
+
+Git can often infer renames even if you use your shell `mv` first. The main value of `git mv` is clarity and staging convenience.

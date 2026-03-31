@@ -1,0 +1,48 @@
+export const metadata = {
+  title: "git reflog",
+  slug: "git-reflog",
+  locale: "en",
+  section: "commands",
+  summary: "Read reference movement history, which makes reflog one of the most important commands for recovery after reset, rebase, and branch mistakes.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-reflog",
+    "https://git-scm.com/book/en/v2/Git-Internals-Git-References",
+  ],
+};
+
+# git reflog
+
+`git reflog` records where refs such as `HEAD` have pointed over time. That makes it central to recovery workflows.
+
+## Why it matters
+
+After operations like:
+
+- `reset --hard`
+- `rebase`
+- `pull`
+- branch deletion or history rewrite
+
+the old commits may still exist, but the visible branch name may no longer point at them. Reflog helps you find those older positions.
+
+## Common examples
+
+```bash
+git reflog
+git reflog show HEAD
+git reset --hard HEAD@{1}
+git checkout -b rescue HEAD@{2}
+```
+
+## Best workflow
+
+1. inspect reflog
+2. locate the pre-mistake position
+3. either create a rescue branch or move the ref back
+
+## Key distinction
+
+- `git log` shows commit history
+- `git reflog` shows reference movement history
+
+That difference is why reflog is so useful when normal history still exists but your pointer is no longer where you expected.

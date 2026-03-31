@@ -1,0 +1,30 @@
+export const metadata = {
+  title: "Working Tree, Index, and Object Store",
+  slug: "index-and-working-tree",
+  locale: "en",
+  section: "internals",
+  summary: "Separating the working tree, index, and object database is the clearest way to understand add, commit, restore, and reset.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+    "https://git-scm.com/book/en/v2/Git-Tools-Reset-Demystified",
+  ],
+};
+
+# Working Tree, Index, and Object Store
+
+Many Git problems become easier once these three layers are separated:
+
+- working tree: files you are editing now
+- index: the next snapshot being prepared
+- object store: durable Git objects already written
+
+## Why this matters
+
+The real difference between many commands is simply which layer they touch:
+
+- `git add` updates the index
+- `git commit` writes index state into durable objects
+- `git restore` can restore the working tree or the index
+- `git reset` can move refs and may also realign the index and working tree
+
+If you treat the index as “the candidate snapshot for the next commit,” Git behavior becomes much more predictable.
