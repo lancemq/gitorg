@@ -61,6 +61,7 @@ export default async function GitHistoryPage({ params }: Props) {
       eyebrow={dict.docsIndex.eyebrow}
       title={doc.metadata.title}
       summary={doc.metadata.summary}
+      pathname={`/${locale}/history`}
       sourcesTitle={dict.docsIndex.sourcesTitle}
       sourceUrls={doc.metadata.sourceUrls}
       Body={DocBody}

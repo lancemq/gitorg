@@ -1,4 +1,7 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import type { ComponentType } from "react";
+import { cache } from "react";
 
 import {
   bestPracticeSlugs,
@@ -34,7 +37,7 @@ type MdxModule = {
 };
 
 type ContentLoader = () => Promise<MdxModule>;
-const docPathRegistry = [
+export const docPathRegistry = [
   "learning-path/quick-start",
   "commands/git-init",
   "commands/git-clone",
@@ -377,6 +380,52 @@ export type ContentStats = {
   sectionCounts: Record<DocSection, number>;
 };
 
+type IndexedDoc = {
+  path: DocPath;
+  metadata: DocMetadata;
+};
+
+const metadataBlockPattern = /export const metadata = \{([\s\S]*?)\n\};/;
+
+function extractMetadataField(source: string, key: keyof Omit<DocMetadata, "sourceUrls">) {
+  const match = source.match(new RegExp(`${key}:\\s*"([^"]+)"`));
+  return match?.[1];
+}
+
+async function readDocMetadata(locale: Locale, docPath: DocPath): Promise<DocMetadata> {
+  const absolutePath = path.join(process.cwd(), "content", locale, `${docPath}.mdx`);
+  const source = await readFile(absolutePath, "utf8");
+  const metadataBlock = source.match(metadataBlockPattern)?.[1] ?? "";
+  const title = extractMetadataField(metadataBlock, "title");
+  const slug = extractMetadataField(metadataBlock, "slug");
+  const summary = extractMetadataField(metadataBlock, "summary");
+  const section = extractMetadataField(metadataBlock, "section") as DocSection | undefined;
+
+  if (!title || !slug || !summary || !section) {
+    throw new Error(`Unable to parse metadata from ${absolutePath}`);
+  }
+
+  return {
+    title,
+    slug,
+    locale,
+    summary,
+    section,
+    sourceUrls: [],
+  };
+}
+
+const getIndexedDocs = cache(async (locale: Locale): Promise<IndexedDoc[]> => {
+  const docs = await Promise.all(
+    docPathRegistry.map(async (docPath) => ({
+      path: docPath,
+      metadata: await readDocMetadata(locale, docPath),
+    })),
+  );
+
+  return docs.sort((a, b) => a.metadata.title.localeCompare(b.metadata.title));
+});
+
 export function getDocPaths(_locale: Locale) {
   void _locale;
   return [...docPathRegistry] as DocPath[];
@@ -392,14 +441,24 @@ export async function getDocByPath(locale: Locale, docPath: DocPath) {
 }
 
 export async function getAllDocs(locale: Locale) {
-  const docs = await Promise.all(
-    getDocPaths(locale).map(async (docPath) => getDocByPath(locale, docPath)),
-  );
+  const indexedDocs = await getIndexedDocs(locale);
+  const docs = await Promise.all(indexedDocs.map(async ({ path: docPath }) => getDocByPath(locale, docPath)));
 
-  return docs.sort((a, b) => a.metadata.title.localeCompare(b.metadata.title));
+  return docs;
 }
 
 function toDocCard(locale: Locale, doc: Awaited<ReturnType<typeof getDocByPath>>): DocCard {
+  return {
+    href: getDocHref(locale, doc.path),
+    path: doc.path,
+    section: doc.metadata.section,
+    slug: doc.metadata.slug,
+    title: doc.metadata.title,
+    summary: doc.metadata.summary,
+  };
+}
+
+function toIndexedDocCard(locale: Locale, doc: IndexedDoc): DocCard {
   return {
     href: getDocHref(locale, doc.path),
     path: doc.path,
@@ -450,22 +509,22 @@ function sortBySeriesOrder<T extends { path: DocPath }>(docs: T[]) {
 }
 
 export async function getCommandDocs(locale: Locale) {
-  const docs = await getAllDocs(locale);
+  const docs = await getIndexedDocs(locale);
   return sortBySeriesOrder(docs.filter((doc) => doc.metadata.section === "commands"));
 }
 
 export async function getBestPracticeDocs(locale: Locale) {
-  const docs = await getAllDocs(locale);
+  const docs = await getIndexedDocs(locale);
   return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("best-practices/")));
 }
 
 export async function getWorkflowDocs(locale: Locale) {
-  const docs = await getAllDocs(locale);
+  const docs = await getIndexedDocs(locale);
   return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("workflows/")));
 }
 
 export async function getInternalsDocs(locale: Locale) {
-  const docs = await getAllDocs(locale);
+  const docs = await getIndexedDocs(locale);
   return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("internals/")));
 }
 
@@ -494,7 +553,7 @@ export function getDocHref(locale: Locale, docPath: DocPath) {
 }
 
 export async function getSearchDocs(locale: Locale): Promise<SearchDoc[]> {
-  const docs = await getAllDocs(locale);
+  const docs = await getIndexedDocs(locale);
 
   return docs.map((doc) => ({
     href: getDocHref(locale, doc.path),
@@ -581,11 +640,11 @@ export async function getFeaturedSectionDocs(
           ? await getWorkflowDocs(locale)
           : await getInternalsDocs(locale);
 
-  return docs.slice(0, limit).map((doc) => toDocCard(locale, doc));
+  return docs.slice(0, limit).map((doc) => toIndexedDocCard(locale, doc));
 }
 
 export async function getContentStats(locale: Locale): Promise<ContentStats> {
-  const docs = await getAllDocs(locale);
+  const docs = await getIndexedDocs(locale);
   const sectionCounts = docs.reduce(
     (acc, doc) => {
       acc[doc.metadata.section] += 1;

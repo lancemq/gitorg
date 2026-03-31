@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 
 import { DocTemplate } from "@/components/doc-template";
-import { getDocByPath, getDocNeighbors, getDocPathFromSlugParts, getDocPaths, getRelatedDocs } from "@/lib/content";
+import { getDocByPath, getDocHref, getDocNeighbors, getDocPathFromSlugParts, getDocPaths, getRelatedDocs } from "@/lib/content";
 import {
   getDictionary,
   getDocsSectionTitle,
@@ -109,6 +109,7 @@ export default async function DocDetailPage({ params }: Props) {
       eyebrow={dict.docsIndex.eyebrow}
       title={doc.metadata.title}
       summary={doc.metadata.summary}
+      pathname={getDocHref(locale, docPath)}
       sourcesTitle={dict.docsIndex.sourcesTitle}
       sourceUrls={doc.metadata.sourceUrls}
       Body={DocBody}

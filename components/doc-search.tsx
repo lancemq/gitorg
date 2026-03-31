@@ -25,6 +25,10 @@ type SearchGroup = {
   items: SearchDoc[];
 };
 
+type SearchResult = SearchDoc & {
+  score: number;
+};
+
 const sectionLabels: Record<Locale, Record<SearchDoc["section"], string>> = {
   zh: {
     "learning-path": "学习路径",
@@ -86,6 +90,57 @@ const recentLabels = {
   en: "Recent Visits",
 };
 
+const emptySuggestionTitles = {
+  zh: "你可能想找",
+  en: "You may be looking for",
+};
+
+const synonymLabels = {
+  zh: "已扩展关键词",
+  en: "Expanded keywords",
+};
+
+const noResultHintTitles = {
+  zh: "没有精确匹配",
+  en: "No exact matches",
+};
+
+const searchSynonyms: Record<Locale, Record<string, string[]>> = {
+  zh: {
+    撤销: ["reset", "revert", "restore"],
+    回退: ["reset", "revert"],
+    恢复: ["reflog", "restore", "recovery"],
+    同步: ["fetch", "pull", "rebase"],
+    合并: ["merge", "rebase", "cherry-pick"],
+    变基: ["rebase"],
+    强推: ["push", "shared-history", "safe-push"],
+    暂存: ["add", "index", "staging"],
+    储藏: ["stash"],
+    冲突: ["merge", "rebase", "conflict"],
+    分支: ["branch", "switch", "checkout"],
+    标签: ["tag"],
+    远端: ["remote", "fetch", "push", "pull"],
+    对象: ["object", "database", "blob", "tree", "commit"],
+    原理: ["internals", "object", "refs", "commit-graph"],
+    历史: ["history", "rebase", "reflog", "log"],
+  },
+  en: {
+    undo: ["reset", "revert", "restore"],
+    rollback: ["reset", "revert"],
+    recover: ["reflog", "restore", "recovery"],
+    sync: ["fetch", "pull", "rebase"],
+    synchronize: ["fetch", "pull", "rebase"],
+    merge: ["merge", "rebase", "cherry-pick"],
+    rewrite: ["rebase", "commit", "history"],
+    stash: ["git-stash", "working-tree"],
+    branch: ["switch", "checkout", "branch"],
+    remote: ["fetch", "push", "pull", "origin"],
+    conflict: ["merge", "rebase", "conflict"],
+    internals: ["object", "refs", "commit-graph", "packfiles"],
+    history: ["log", "reflog", "rebase"],
+  },
+};
+
 const recentStorageKey = "git-org-academy-recent-searches";
 const sectionOrder: SearchDoc["section"][] = [
   "learning-path",
@@ -118,6 +173,22 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
   });
   const deferredQuery = useDeferredValue(query);
   const normalizedQuery = deferredQuery.trim().toLowerCase();
+  const queryTokens = useMemo(
+    () => normalizedQuery.split(/\s+/).filter(Boolean),
+    [normalizedQuery],
+  );
+  const expandedTerms = useMemo(() => {
+    if (!queryTokens.length) {
+      return [];
+    }
+
+    const synonyms = searchSynonyms[locale];
+    return Array.from(
+      new Set(
+        queryTokens.flatMap((token) => [token, ...(synonyms[token] ?? [])]),
+      ),
+    );
+  }, [locale, queryTokens]);
   const availableSections = useMemo(
     () =>
       Array.from(new Set(items.map((item) => item.section))).sort((a, b) =>
@@ -126,14 +197,14 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
     [items, locale],
   );
 
-  const results = useMemo(() => {
+  const results = useMemo<SearchResult[]>(() => {
     const scopedItems =
       activeSection === "all"
         ? items
         : items.filter((item) => item.section === activeSection);
 
     if (!normalizedQuery) {
-      return scopedItems.slice(0, 8);
+      return scopedItems.slice(0, 8).map((item) => ({ ...item, score: 0 }));
     }
 
     return scopedItems
@@ -141,23 +212,39 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
         const haystack = [item.title, item.summary, item.slug, item.path]
           .join(" ")
           .toLowerCase();
-        const titleHit = item.title.toLowerCase().includes(normalizedQuery);
-        const slugHit = item.slug.toLowerCase().includes(normalizedQuery);
-        const pathHit = item.path.toLowerCase().includes(normalizedQuery);
-        const summaryHit = item.summary.toLowerCase().includes(normalizedQuery);
-        const score =
-          (titleHit ? 4 : 0) +
-          (slugHit ? 3 : 0) +
-          (pathHit ? 2 : 0) +
-          (summaryHit ? 1 : 0) +
-          (haystack.startsWith(normalizedQuery) ? 1 : 0);
+        const directTitleHit = item.title.toLowerCase().includes(normalizedQuery);
+        const directSlugHit = item.slug.toLowerCase().includes(normalizedQuery);
+        const directPathHit = item.path.toLowerCase().includes(normalizedQuery);
+        const directSummaryHit = item.summary.toLowerCase().includes(normalizedQuery);
+
+        const score = expandedTerms.reduce((total, term) => {
+          const titleHit = item.title.toLowerCase().includes(term);
+          const slugHit = item.slug.toLowerCase().includes(term);
+          const pathHit = item.path.toLowerCase().includes(term);
+          const summaryHit = item.summary.toLowerCase().includes(term);
+          const directTermBonus = term === normalizedQuery ? 3 : 0;
+
+          return (
+            total +
+            (titleHit ? 5 : 0) +
+            (slugHit ? 4 : 0) +
+            (pathHit ? 3 : 0) +
+            (summaryHit ? 2 : 0) +
+            (haystack.startsWith(term) ? 1 : 0) +
+            ((titleHit || slugHit || pathHit || summaryHit) ? directTermBonus : 0)
+          );
+        }, 0) +
+          (directTitleHit ? 6 : 0) +
+          (directSlugHit ? 4 : 0) +
+          (directPathHit ? 3 : 0) +
+          (directSummaryHit ? 2 : 0);
 
         return { ...item, score };
       })
       .filter((item) => item.score > 0)
       .sort((a, b) => b.score - a.score || a.title.localeCompare(b.title))
       .slice(0, 8);
-  }, [activeSection, items, normalizedQuery]);
+  }, [activeSection, expandedTerms, items, normalizedQuery]);
   const recentItems = useMemo(
     () =>
       recentHrefs
@@ -173,6 +260,26 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
       .filter((item) => !recentItems.some((recentItem) => recentItem.href === item.href))
       .slice(0, 6);
   }, [items, recentItems]);
+  const fallbackItems = useMemo(() => {
+    if (!normalizedQuery || results.length > 0) {
+      return [];
+    }
+
+    const suggestions = expandedTerms
+      .filter((term) => term !== normalizedQuery)
+      .flatMap((term) =>
+        items.filter((item) =>
+          [item.title, item.summary, item.slug, item.path]
+            .join(" ")
+            .toLowerCase()
+            .includes(term),
+        ),
+      );
+
+    return Array.from(new Map(
+      [...suggestions, ...quickLinkItems].map((item) => [item.href, item]),
+    ).values()).slice(0, 4);
+  }, [expandedTerms, items, normalizedQuery, quickLinkItems, results.length]);
   const displayGroups = useMemo<SearchGroup[]>(() => {
     const isBrowsingState = !normalizedQuery && activeSection === "all";
 
@@ -294,6 +401,35 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
     }
   }
 
+  function renderHighlightedText(text: string) {
+    if (!normalizedQuery) {
+      return text;
+    }
+
+    const matchTerm = expandedTerms.find((term) => term.length > 1 && text.toLowerCase().includes(term));
+
+    if (!matchTerm) {
+      return text;
+    }
+
+    const lowerText = text.toLowerCase();
+    const startIndex = lowerText.indexOf(matchTerm);
+
+    if (startIndex === -1) {
+      return text;
+    }
+
+    const endIndex = startIndex + matchTerm.length;
+
+    return (
+      <>
+        {text.slice(0, startIndex)}
+        <mark>{text.slice(startIndex, endIndex)}</mark>
+        {text.slice(endIndex)}
+      </>
+    );
+  }
+
   return (
     <div className={`doc-search${isOpen ? " is-open" : ""}`}>
       <button
@@ -378,6 +514,11 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
 
             <div className="search-helper">
               <span>{helperLabels[locale]}</span>
+              {normalizedQuery && expandedTerms.length > 1 ? (
+                <span className="search-synonyms">
+                  {synonymLabels[locale]}: {expandedTerms.filter((term) => term !== normalizedQuery).join(", ")}
+                </span>
+              ) : null}
             </div>
 
             <div
@@ -411,8 +552,8 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
                           }}
                         >
                           <div className="search-result-copy">
-                            <strong>{item.title}</strong>
-                            <p>{item.summary}</p>
+                            <strong>{renderHighlightedText(item.title)}</strong>
+                            <p>{renderHighlightedText(item.summary)}</p>
                           </div>
                           <span className="search-result-tag">
                             {sectionLabels[locale][item.section]}
@@ -423,7 +564,38 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
                   </section>
                 ))
               ) : (
-                <p className="search-empty">{emptyStates[locale]}</p>
+                <div className="search-empty-state">
+                  <p className="search-empty">{emptyStates[locale]}</p>
+                  {fallbackItems.length > 0 ? (
+                    <section className="search-fallback">
+                      <header className="search-group-header">
+                        <h3>{emptySuggestionTitles[locale]}</h3>
+                      </header>
+                      <p className="search-empty-hint">{noResultHintTitles[locale]}</p>
+                      <div className="search-group-list">
+                        {fallbackItems.map((item) => (
+                          <Link
+                            className="search-result"
+                            href={item.href}
+                            key={item.href}
+                            onClick={() => {
+                              rememberResult(item.href);
+                              setIsOpen(false);
+                            }}
+                          >
+                            <div className="search-result-copy">
+                              <strong>{item.title}</strong>
+                              <p>{item.summary}</p>
+                            </div>
+                            <span className="search-result-tag">
+                              {sectionLabels[locale][item.section]}
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
+                    </section>
+                  ) : null}
+                </div>
               )}
             </div>
           </div>

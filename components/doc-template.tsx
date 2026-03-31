@@ -3,8 +3,10 @@ import type { ComponentType } from "react";
 
 import { DocSupport } from "@/components/doc-support";
 import { SiteShell } from "@/components/site-shell";
+import { StructuredData } from "@/components/structured-data";
 import type { Locale, SidebarContent } from "@/lib/i18n";
 import type { DocCard, DocNeighbors } from "@/lib/content";
+import { getSiteUrl } from "@/lib/site";
 
 type DocTemplateProps = {
   locale: Locale;
@@ -16,6 +18,7 @@ type DocTemplateProps = {
   eyebrow: string;
   title: string;
   summary: string;
+  pathname: string;
   sourcesTitle: string;
   sourceUrls: string[];
   Body: ComponentType;
@@ -31,6 +34,7 @@ export function DocTemplate({
   eyebrow,
   title,
   summary,
+  pathname,
   sourcesTitle,
   sourceUrls,
   Body,
@@ -38,9 +42,29 @@ export function DocTemplate({
   relatedDocs = [],
   neighbors,
 }: DocTemplateProps) {
+  const siteUrl = getSiteUrl();
+  const inLanguage = locale === "zh" ? "zh-CN" : "en";
+
   return (
     <SiteShell locale={locale} sidebar={sidebar}>
       <article className="doc-page">
+        <StructuredData
+          data={{
+            "@context": "https://schema.org",
+            "@type": "TechArticle",
+            headline: title,
+            description: summary,
+            inLanguage,
+            url: `${siteUrl}${pathname}`,
+            isPartOf: {
+              "@type": "WebSite",
+              name: "Git Org Academy",
+              url: `${siteUrl}/${locale}`,
+            },
+            about: breadcrumbs.map((item) => item.label),
+            citation: sourceUrls,
+          }}
+        />
         <nav className="breadcrumbs" aria-label="Breadcrumb">
           {breadcrumbs.map((item, index) => (
             <span key={`${item.label}-${index}`}>

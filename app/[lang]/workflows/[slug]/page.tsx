@@ -81,6 +81,7 @@ export default async function WorkflowDetailPage({ params }: Props) {
       eyebrow={dict.workflowIndex.eyebrow}
       title={doc.metadata.title}
       summary={doc.metadata.summary}
+      pathname={`/${locale}/workflows/${slug}`}
       sourcesTitle={dict.docsIndex.sourcesTitle}
       sourceUrls={doc.metadata.sourceUrls}
       Body={DocBody}

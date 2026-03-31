@@ -81,6 +81,7 @@ export default async function BestPracticeDetailPage({ params }: Props) {
       eyebrow={dict.bestPracticeIndex.eyebrow}
       title={doc.metadata.title}
       summary={doc.metadata.summary}
+      pathname={`/${locale}/best-practices/${slug}`}
       sourcesTitle={dict.docsIndex.sourcesTitle}
       sourceUrls={doc.metadata.sourceUrls}
       Body={DocBody}

@@ -14,9 +14,9 @@ function getLocalizedSiteDescription(locale: Locale) {
     : "Git Org Academy is a bilingual MDX-powered Git learning site covering quick start, command guides, workflows, recovery, and internals.";
 }
 
-export function buildAlternates(pathname: string) {
+export function buildAlternates(locale: Locale, pathname: string) {
   return {
-    canonical: `/zh${pathname}`,
+    canonical: `/${locale}${pathname}`,
     languages: {
       "zh-CN": `/zh${pathname}`,
       en: `/en${pathname}`,
@@ -44,13 +44,14 @@ export function buildPageMetadata({
     title: fullTitle,
     description,
     applicationName: siteName,
-    alternates: buildAlternates(pathname),
+    alternates: buildAlternates(locale, pathname),
     openGraph: {
       title: fullTitle,
       description,
       siteName,
       locale: getLocaleLang(locale),
       type: "website",
+      url: `/${locale}${pathname}`,
     },
     twitter: {
       card: "summary_large_image",
@@ -67,13 +68,14 @@ export function buildLocaleHomeMetadata(locale: Locale): Metadata {
     title: siteName,
     description,
     applicationName: siteName,
-    alternates: buildAlternates(""),
+    alternates: buildAlternates(locale, ""),
     openGraph: {
       title: siteName,
       description,
       siteName,
       locale: getLocaleLang(locale),
       type: "website",
+      url: `/${locale}`,
     },
     twitter: {
       card: "summary_large_image",

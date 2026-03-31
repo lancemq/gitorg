@@ -81,6 +81,7 @@ export default async function InternalDetailPage({ params }: Props) {
       eyebrow={dict.internalsIndex.eyebrow}
       title={doc.metadata.title}
       summary={doc.metadata.summary}
+      pathname={`/${locale}/internals/${slug}`}
       sourcesTitle={dict.docsIndex.sourcesTitle}
       sourceUrls={doc.metadata.sourceUrls}
       Body={DocBody}

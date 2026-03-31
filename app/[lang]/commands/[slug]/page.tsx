@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { DocSupport } from "@/components/doc-support";
 import { SiteShell } from "@/components/site-shell";
+import { StructuredData } from "@/components/structured-data";
 import { getCommandDoc, getDocNeighbors, getRelatedDocs } from "@/lib/content";
 import {
   commandSlugs,
@@ -15,6 +16,7 @@ import {
   type Locale,
 } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo";
+import { getSiteUrl } from "@/lib/site";
 
 type Props = {
   params: Promise<{
@@ -72,9 +74,28 @@ export default async function CommandPage({ params }: Props) {
     getRelatedDocs(locale, docPath),
   ]);
   const DocBody = doc.Component;
+  const siteUrl = getSiteUrl();
+  const inLanguage = locale === "zh" ? "zh-CN" : "en";
 
   return (
     <SiteShell locale={locale} sidebar={getSidebarContent(locale, { kind: "docs", activePath: `commands/${commandSlug}` })}>
+      <StructuredData
+        data={{
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          headline: doc.metadata.title,
+          description: doc.metadata.summary,
+          inLanguage,
+          url: `${siteUrl}/${locale}/commands/${commandSlug}`,
+          isPartOf: {
+            "@type": "CollectionPage",
+            name: `${dict.commandPage.breadcrumbs.commands} | Git Org Academy`,
+            url: `${siteUrl}/${locale}/commands`,
+          },
+          citation: doc.metadata.sourceUrls,
+          about: ["Git", commandSlug],
+        }}
+      />
       <nav className="breadcrumbs" aria-label="Breadcrumb">
         <Link href={`/${locale}`}>{dict.commandPage.breadcrumbs.overview}</Link>
         <span>/</span>
