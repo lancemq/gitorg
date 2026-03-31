@@ -45,7 +45,8 @@ export default async function DocsIndexPage({ params }: Props) {
 
         <div className="docs-groups">
           {dict.docsIndex.sections.map((section) => {
-            const items = groupedDocs[section.id] ?? [];
+            const sourceIds = section.sourceIds ?? [section.id];
+            const items = sourceIds.flatMap((sourceId) => groupedDocs[sourceId] ?? []);
 
             return (
               <section className="panel docs-group" key={section.id}>

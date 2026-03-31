@@ -20,6 +20,11 @@ type SiteShellProps = {
         label: string;
         href: string;
         active?: boolean;
+        children?: Array<{
+          label: string;
+          href: string;
+          active?: boolean;
+        }>;
       }>;
     }>;
   };
@@ -37,8 +42,6 @@ export async function SiteShell({ locale, sidebar, children }: SiteShellProps) {
           <span className="brand-text">{sidebar.brandLabel}</span>
         </Link>
 
-        <DocSearch items={searchItems} label={sidebar.searchLabel} locale={locale} />
-
         <LanguageSwitcher
           currentLocale={locale}
           label={sidebar.localeLabel}
@@ -50,13 +53,29 @@ export async function SiteShell({ locale, sidebar, children }: SiteShellProps) {
             <div className="nav-group" key={group.title}>
               <p className="nav-title">{group.title}</p>
               {group.items.map((item) => (
-                <Link
-                  className={`nav-item${item.active ? " is-active" : ""}`}
-                  href={item.href}
-                  key={item.href}
-                >
-                  {item.label}
-                </Link>
+                <div className="nav-node" key={item.href}>
+                  <Link
+                    className={`nav-item${item.active ? " is-active" : ""}${
+                      item.children?.some((child) => child.active) ? " is-parent-active" : ""
+                    }`}
+                    href={item.href}
+                  >
+                    {item.label}
+                  </Link>
+                  {item.children?.length ? (
+                    <div className="nav-subitems">
+                      {item.children.map((child) => (
+                        <Link
+                          className={`nav-subitem${child.active ? " is-active" : ""}`}
+                          href={child.href}
+                          key={child.href}
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
               ))}
             </div>
           ))}
@@ -67,6 +86,8 @@ export async function SiteShell({ locale, sidebar, children }: SiteShellProps) {
           <span>{sidebar.footerText}</span>
         </div>
       </aside>
+
+      <DocSearch items={searchItems} label={sidebar.searchLabel} locale={locale} />
 
       <main className="content">{children}</main>
     </div>

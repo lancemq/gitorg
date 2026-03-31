@@ -120,6 +120,11 @@ export async function getAllDocs(locale: Locale) {
   return docs.sort((a, b) => a.metadata.title.localeCompare(b.metadata.title));
 }
 
+export async function getCommandDocs(locale: Locale) {
+  const docs = await getAllDocs(locale);
+  return docs.filter((doc) => doc.metadata.section === "commands");
+}
+
 export function getDocHref(locale: Locale, docPath: DocPath) {
   if (docPath.startsWith("commands/")) {
     return `/${locale}/commands/${docPath.replace("commands/", "")}`;

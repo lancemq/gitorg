@@ -46,7 +46,7 @@ export default async function CommandPage({ params }: Props) {
       <nav className="breadcrumbs" aria-label="Breadcrumb">
         <a href={`/${locale}`}>{dict.commandPage.breadcrumbs.docs}</a>
         <span>/</span>
-        <a href={`/${locale}#reference`}>{dict.commandPage.breadcrumbs.commands}</a>
+        <a href={`/${locale}/commands`}>{dict.commandPage.breadcrumbs.commands}</a>
         <span>/</span>
         <strong>{doc.metadata.title}</strong>
       </nav>

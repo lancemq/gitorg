@@ -25,6 +25,7 @@ type NavItem = {
   label: string;
   href: string;
   active?: boolean;
+  children?: NavItem[];
 };
 
 type NavGroup = {
@@ -60,6 +61,11 @@ type Dictionary = {
     docs: (activePath?: string) => SidebarContent;
     command: (activeSlug: CommandSlug) => SidebarContent;
     faq: SidebarContent;
+  };
+  commandIndex: {
+    eyebrow: string;
+    title: string;
+    description: string;
   };
   home: {
     hero: {
@@ -137,6 +143,7 @@ type Dictionary = {
     sourcesTitle: string;
     sections: ReadonlyArray<{
       id: DocsSectionId;
+      sourceIds?: ReadonlyArray<DocsSectionId>;
       eyebrow: string;
       title: string;
       description: string;
@@ -191,14 +198,36 @@ const zhDictionary: Dictionary = {
           { label: "总览", href: "/zh#overview", active: true },
           { label: "快速开始", href: "/zh#quick-start" },
           { label: "最佳实践", href: "/zh/best-practices" },
+          {
+            label: "Git 命令",
+            href: "/zh/commands",
+            children: [
+              { label: "git fetch", href: "/zh/commands/git-fetch" },
+              { label: "git switch", href: "/zh/commands/git-switch" },
+              { label: "git branch", href: "/zh/commands/git-branch" },
+              { label: "git restore", href: "/zh/commands/git-restore" },
+              { label: "git stash", href: "/zh/commands/git-stash" },
+              { label: "git checkout", href: "/zh/commands/git-checkout" },
+              { label: "git rebase", href: "/zh/commands/git-rebase" },
+              { label: "git merge", href: "/zh/commands/git-merge" },
+              { label: "git cherry-pick", href: "/zh/commands/git-cherry-pick" },
+              { label: "git reset", href: "/zh/commands/git-reset" },
+              { label: "git revert", href: "/zh/commands/git-revert" },
+            ],
+          },
+        ],
+      },
+      {
+        title: "Special Topics",
+        items: [
           { label: "Git 原理", href: "/zh/internals" },
+          { label: "Git 历史", href: "/zh/history" },
         ],
       },
       {
         title: "Resources",
         items: [
           { label: "文档库", href: "/zh/docs" },
-          { label: "Git 历史", href: "/zh/history" },
           { label: "常见问题", href: "/zh/faq" },
         ],
       },
@@ -206,7 +235,7 @@ const zhDictionary: Dictionary = {
     docs: (activePath) =>
       baseSidebar("zh", [
         {
-          title: "Docs",
+          title: "Learning Path",
           items: [
             { label: "全部文档", href: "/zh/docs", active: activePath === "index" },
             {
@@ -220,70 +249,92 @@ const zhDictionary: Dictionary = {
               active: activePath === "workflows/git-best-practices",
             },
             {
-              label: "git rebase",
-              href: "/zh/commands/git-rebase",
-              active: activePath === "commands/git-rebase",
+              label: "Git 命令",
+              href: "/zh/commands",
+              active: activePath === "commands-index",
+              children: [
+                {
+                  label: "git fetch",
+                  href: "/zh/commands/git-fetch",
+                  active: activePath === "commands/git-fetch",
+                },
+                {
+                  label: "git switch",
+                  href: "/zh/commands/git-switch",
+                  active: activePath === "commands/git-switch",
+                },
+                {
+                  label: "git branch",
+                  href: "/zh/commands/git-branch",
+                  active: activePath === "commands/git-branch",
+                },
+                {
+                  label: "git restore",
+                  href: "/zh/commands/git-restore",
+                  active: activePath === "commands/git-restore",
+                },
+                {
+                  label: "git stash",
+                  href: "/zh/commands/git-stash",
+                  active: activePath === "commands/git-stash",
+                },
+                {
+                  label: "git checkout",
+                  href: "/zh/commands/git-checkout",
+                  active: activePath === "commands/git-checkout",
+                },
+                {
+                  label: "git rebase",
+                  href: "/zh/commands/git-rebase",
+                  active: activePath === "commands/git-rebase",
+                },
+                {
+                  label: "git merge",
+                  href: "/zh/commands/git-merge",
+                  active: activePath === "commands/git-merge",
+                },
+                {
+                  label: "git cherry-pick",
+                  href: "/zh/commands/git-cherry-pick",
+                  active: activePath === "commands/git-cherry-pick",
+                },
+                {
+                  label: "git reset",
+                  href: "/zh/commands/git-reset",
+                  active: activePath === "commands/git-reset",
+                },
+                {
+                  label: "git revert",
+                  href: "/zh/commands/git-revert",
+                  active: activePath === "commands/git-revert",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          title: "Concepts",
+          items: [
+            {
+              label: "Git 历史",
+              href: "/zh/history",
+              active: activePath === "concepts/git-history",
             },
             {
-              label: "git merge",
-              href: "/zh/commands/git-merge",
-              active: activePath === "commands/git-merge",
-            },
-            {
-              label: "git cherry-pick",
-              href: "/zh/commands/git-cherry-pick",
-              active: activePath === "commands/git-cherry-pick",
-            },
-            {
-              label: "git reset",
-              href: "/zh/commands/git-reset",
-              active: activePath === "commands/git-reset",
-            },
-            {
-              label: "git stash",
-              href: "/zh/commands/git-stash",
-              active: activePath === "commands/git-stash",
-            },
-            {
-              label: "git fetch",
-              href: "/zh/commands/git-fetch",
-              active: activePath === "commands/git-fetch",
-            },
-            {
-              label: "git restore",
-              href: "/zh/commands/git-restore",
-              active: activePath === "commands/git-restore",
-            },
-            {
-              label: "git revert",
-              href: "/zh/commands/git-revert",
-              active: activePath === "commands/git-revert",
-            },
-            {
-              label: "git switch",
-              href: "/zh/commands/git-switch",
-              active: activePath === "commands/git-switch",
-            },
-            {
-              label: "git branch",
-              href: "/zh/commands/git-branch",
-              active: activePath === "commands/git-branch",
-            },
-            {
-              label: "git checkout",
-              href: "/zh/commands/git-checkout",
-              active: activePath === "commands/git-checkout",
+              label: "引用与 HEAD",
+              href: "/zh/docs/concepts/refs-and-head",
+              active: activePath === "concepts/refs-and-head",
             },
             {
               label: "Git 原理",
               href: "/zh/internals",
               active: activePath === "concepts/git-internals",
             },
-            {
-              label: "Git 历史",
-              href: "/zh/history",
-              active: activePath === "concepts/git-history",
-            },
+          ],
+        },
+        {
+          title: "Recovery",
+          items: [
             {
               label: "恢复手册",
               href: "/zh/docs/recovery/reflog-recovery",
@@ -313,69 +364,44 @@ const zhDictionary: Dictionary = {
     command: (activeSlug) =>
       baseSidebar("zh", [
         {
-          title: "Command Docs",
+          title: "Learning Path",
           items: [
             { label: "全部文档", href: "/zh/docs" },
+            { label: "快速上手", href: "/zh/docs/learning-path/quick-start" },
+            { label: "最佳实践", href: "/zh/best-practices" },
             {
-              label: "git rebase",
-              href: "/zh/commands/git-rebase",
-              active: activeSlug === "git-rebase",
+              label: "Git 命令",
+              href: "/zh/commands",
+              children: [
+                { label: "git fetch", href: "/zh/commands/git-fetch", active: activeSlug === "git-fetch" },
+                { label: "git switch", href: "/zh/commands/git-switch", active: activeSlug === "git-switch" },
+                { label: "git branch", href: "/zh/commands/git-branch", active: activeSlug === "git-branch" },
+                { label: "git restore", href: "/zh/commands/git-restore", active: activeSlug === "git-restore" },
+                { label: "git stash", href: "/zh/commands/git-stash", active: activeSlug === "git-stash" },
+                { label: "git checkout", href: "/zh/commands/git-checkout", active: activeSlug === "git-checkout" },
+                { label: "git rebase", href: "/zh/commands/git-rebase", active: activeSlug === "git-rebase" },
+                { label: "git merge", href: "/zh/commands/git-merge", active: activeSlug === "git-merge" },
+                { label: "git cherry-pick", href: "/zh/commands/git-cherry-pick", active: activeSlug === "git-cherry-pick" },
+                { label: "git reset", href: "/zh/commands/git-reset", active: activeSlug === "git-reset" },
+                { label: "git revert", href: "/zh/commands/git-revert", active: activeSlug === "git-revert" },
+              ],
             },
-            {
-              label: "git merge",
-              href: "/zh/commands/git-merge",
-              active: activeSlug === "git-merge",
-            },
-            {
-              label: "git cherry-pick",
-              href: "/zh/commands/git-cherry-pick",
-              active: activeSlug === "git-cherry-pick",
-            },
-            {
-              label: "git reset",
-              href: "/zh/commands/git-reset",
-              active: activeSlug === "git-reset",
-            },
-            {
-              label: "git stash",
-              href: "/zh/commands/git-stash",
-              active: activeSlug === "git-stash",
-            },
-            {
-              label: "git fetch",
-              href: "/zh/commands/git-fetch",
-              active: activeSlug === "git-fetch",
-            },
-            {
-              label: "git restore",
-              href: "/zh/commands/git-restore",
-              active: activeSlug === "git-restore",
-            },
-            {
-              label: "git revert",
-              href: "/zh/commands/git-revert",
-              active: activeSlug === "git-revert",
-            },
-            {
-              label: "git switch",
-              href: "/zh/commands/git-switch",
-              active: activeSlug === "git-switch",
-            },
-            {
-              label: "git branch",
-              href: "/zh/commands/git-branch",
-              active: activeSlug === "git-branch",
-            },
-            {
-              label: "git checkout",
-              href: "/zh/commands/git-checkout",
-              active: activeSlug === "git-checkout",
-            },
+          ],
+        },
+        {
+          title: "Related Topics",
+          items: [
+            { label: "最佳实践", href: "/zh/best-practices" },
             { label: "fetch vs pull", href: "/zh/docs/workflows/fetch-vs-pull" },
-            { label: "reflog 恢复", href: "/zh/docs/recovery/reflog-recovery" },
+            { label: "恢复手册", href: "/zh/docs/recovery/reflog-recovery" },
           ],
         },
       ]),
+  },
+  commandIndex: {
+    eyebrow: "Command Hub",
+    title: "Git 命令专题",
+    description: "先进入命令聚合页，再按学习路径选择具体命令详情，避免在左侧菜单里直接平铺过长列表。",
   },
   home: {
     hero: {
@@ -644,14 +670,36 @@ const enDictionary: Dictionary = {
           { label: "Overview", href: "/en#overview", active: true },
           { label: "Quick Start", href: "/en#quick-start" },
           { label: "Best Practices", href: "/en/best-practices" },
+          {
+            label: "Git Commands",
+            href: "/en/commands",
+            children: [
+              { label: "git fetch", href: "/en/commands/git-fetch" },
+              { label: "git switch", href: "/en/commands/git-switch" },
+              { label: "git branch", href: "/en/commands/git-branch" },
+              { label: "git restore", href: "/en/commands/git-restore" },
+              { label: "git stash", href: "/en/commands/git-stash" },
+              { label: "git checkout", href: "/en/commands/git-checkout" },
+              { label: "git rebase", href: "/en/commands/git-rebase" },
+              { label: "git merge", href: "/en/commands/git-merge" },
+              { label: "git cherry-pick", href: "/en/commands/git-cherry-pick" },
+              { label: "git reset", href: "/en/commands/git-reset" },
+              { label: "git revert", href: "/en/commands/git-revert" },
+            ],
+          },
+        ],
+      },
+      {
+        title: "Special Topics",
+        items: [
           { label: "Git Internals", href: "/en/internals" },
+          { label: "Git History", href: "/en/history" },
         ],
       },
       {
         title: "Resources",
         items: [
           { label: "Docs Library", href: "/en/docs" },
-          { label: "Git History", href: "/en/history" },
           { label: "FAQ", href: "/en/faq" },
         ],
       },
@@ -659,7 +707,7 @@ const enDictionary: Dictionary = {
     docs: (activePath) =>
       baseSidebar("en", [
         {
-          title: "Docs",
+          title: "Learning Path",
           items: [
             { label: "All Docs", href: "/en/docs", active: activePath === "index" },
             {
@@ -673,70 +721,48 @@ const enDictionary: Dictionary = {
               active: activePath === "workflows/git-best-practices",
             },
             {
-              label: "git rebase",
-              href: "/en/commands/git-rebase",
-              active: activePath === "commands/git-rebase",
+              label: "Git Commands",
+              href: "/en/commands",
+              active: activePath === "commands-index",
+              children: [
+                { label: "git fetch", href: "/en/commands/git-fetch", active: activePath === "commands/git-fetch" },
+                { label: "git switch", href: "/en/commands/git-switch", active: activePath === "commands/git-switch" },
+                { label: "git branch", href: "/en/commands/git-branch", active: activePath === "commands/git-branch" },
+                { label: "git restore", href: "/en/commands/git-restore", active: activePath === "commands/git-restore" },
+                { label: "git stash", href: "/en/commands/git-stash", active: activePath === "commands/git-stash" },
+                { label: "git checkout", href: "/en/commands/git-checkout", active: activePath === "commands/git-checkout" },
+                { label: "git rebase", href: "/en/commands/git-rebase", active: activePath === "commands/git-rebase" },
+                { label: "git merge", href: "/en/commands/git-merge", active: activePath === "commands/git-merge" },
+                { label: "git cherry-pick", href: "/en/commands/git-cherry-pick", active: activePath === "commands/git-cherry-pick" },
+                { label: "git reset", href: "/en/commands/git-reset", active: activePath === "commands/git-reset" },
+                { label: "git revert", href: "/en/commands/git-revert", active: activePath === "commands/git-revert" },
+              ],
+            },
+          ],
+        },
+        {
+          title: "Concepts",
+          items: [
+            {
+              label: "Git History",
+              href: "/en/history",
+              active: activePath === "concepts/git-history",
             },
             {
-              label: "git merge",
-              href: "/en/commands/git-merge",
-              active: activePath === "commands/git-merge",
-            },
-            {
-              label: "git cherry-pick",
-              href: "/en/commands/git-cherry-pick",
-              active: activePath === "commands/git-cherry-pick",
-            },
-            {
-              label: "git reset",
-              href: "/en/commands/git-reset",
-              active: activePath === "commands/git-reset",
-            },
-            {
-              label: "git stash",
-              href: "/en/commands/git-stash",
-              active: activePath === "commands/git-stash",
-            },
-            {
-              label: "git fetch",
-              href: "/en/commands/git-fetch",
-              active: activePath === "commands/git-fetch",
-            },
-            {
-              label: "git restore",
-              href: "/en/commands/git-restore",
-              active: activePath === "commands/git-restore",
-            },
-            {
-              label: "git revert",
-              href: "/en/commands/git-revert",
-              active: activePath === "commands/git-revert",
-            },
-            {
-              label: "git switch",
-              href: "/en/commands/git-switch",
-              active: activePath === "commands/git-switch",
-            },
-            {
-              label: "git branch",
-              href: "/en/commands/git-branch",
-              active: activePath === "commands/git-branch",
-            },
-            {
-              label: "git checkout",
-              href: "/en/commands/git-checkout",
-              active: activePath === "commands/git-checkout",
+              label: "References and HEAD",
+              href: "/en/docs/concepts/refs-and-head",
+              active: activePath === "concepts/refs-and-head",
             },
             {
               label: "Git Internals",
               href: "/en/internals",
               active: activePath === "concepts/git-internals",
             },
-            {
-              label: "Git History",
-              href: "/en/history",
-              active: activePath === "concepts/git-history",
-            },
+          ],
+        },
+        {
+          title: "Recovery",
+          items: [
             {
               label: "Reflog Recovery",
               href: "/en/docs/recovery/reflog-recovery",
@@ -766,69 +792,44 @@ const enDictionary: Dictionary = {
     command: (activeSlug) =>
       baseSidebar("en", [
         {
-          title: "Command Docs",
+          title: "Learning Path",
           items: [
             { label: "All Docs", href: "/en/docs" },
+            { label: "Quick Start", href: "/en/docs/learning-path/quick-start" },
+            { label: "Best Practices", href: "/en/best-practices" },
             {
-              label: "git rebase",
-              href: "/en/commands/git-rebase",
-              active: activeSlug === "git-rebase",
+              label: "Git Commands",
+              href: "/en/commands",
+              children: [
+                { label: "git fetch", href: "/en/commands/git-fetch", active: activeSlug === "git-fetch" },
+                { label: "git switch", href: "/en/commands/git-switch", active: activeSlug === "git-switch" },
+                { label: "git branch", href: "/en/commands/git-branch", active: activeSlug === "git-branch" },
+                { label: "git restore", href: "/en/commands/git-restore", active: activeSlug === "git-restore" },
+                { label: "git stash", href: "/en/commands/git-stash", active: activeSlug === "git-stash" },
+                { label: "git checkout", href: "/en/commands/git-checkout", active: activeSlug === "git-checkout" },
+                { label: "git rebase", href: "/en/commands/git-rebase", active: activeSlug === "git-rebase" },
+                { label: "git merge", href: "/en/commands/git-merge", active: activeSlug === "git-merge" },
+                { label: "git cherry-pick", href: "/en/commands/git-cherry-pick", active: activeSlug === "git-cherry-pick" },
+                { label: "git reset", href: "/en/commands/git-reset", active: activeSlug === "git-reset" },
+                { label: "git revert", href: "/en/commands/git-revert", active: activeSlug === "git-revert" },
+              ],
             },
-            {
-              label: "git merge",
-              href: "/en/commands/git-merge",
-              active: activeSlug === "git-merge",
-            },
-            {
-              label: "git cherry-pick",
-              href: "/en/commands/git-cherry-pick",
-              active: activeSlug === "git-cherry-pick",
-            },
-            {
-              label: "git reset",
-              href: "/en/commands/git-reset",
-              active: activeSlug === "git-reset",
-            },
-            {
-              label: "git stash",
-              href: "/en/commands/git-stash",
-              active: activeSlug === "git-stash",
-            },
-            {
-              label: "git fetch",
-              href: "/en/commands/git-fetch",
-              active: activeSlug === "git-fetch",
-            },
-            {
-              label: "git restore",
-              href: "/en/commands/git-restore",
-              active: activeSlug === "git-restore",
-            },
-            {
-              label: "git revert",
-              href: "/en/commands/git-revert",
-              active: activeSlug === "git-revert",
-            },
-            {
-              label: "git switch",
-              href: "/en/commands/git-switch",
-              active: activeSlug === "git-switch",
-            },
-            {
-              label: "git branch",
-              href: "/en/commands/git-branch",
-              active: activeSlug === "git-branch",
-            },
-            {
-              label: "git checkout",
-              href: "/en/commands/git-checkout",
-              active: activeSlug === "git-checkout",
-            },
+          ],
+        },
+        {
+          title: "Related Topics",
+          items: [
+            { label: "Best Practices", href: "/en/best-practices" },
             { label: "fetch vs pull", href: "/en/docs/workflows/fetch-vs-pull" },
             { label: "reflog recovery", href: "/en/docs/recovery/reflog-recovery" },
           ],
         },
       ]),
+  },
+  commandIndex: {
+    eyebrow: "Command Hub",
+    title: "Git Command Topics",
+    description: "Enter a dedicated command hub first, then move from the grouped overview into each command detail page.",
   },
   home: {
     hero: {
