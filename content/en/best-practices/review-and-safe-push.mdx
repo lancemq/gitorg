@@ -1,0 +1,86 @@
+export const metadata = {
+  title: "Review-Ready History and Safe Push",
+  slug: "review-and-safe-push",
+  locale: "en",
+  section: "best-practices",
+  summary: "Before review or push, clean up the commit stack, inspect the actual diff range, and prefer safer push defaults so you publish history intentionally.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-push",
+    "https://git-scm.com/docs/git-commit",
+    "https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History.html",
+  ],
+};
+
+# Review-Ready History and Safe Push
+
+## Why a push checklist reduces incidents
+
+A lot of Git problems do not come from lacking commands. They come from publishing history too early, without a final inspection. Review-ready history is just a lightweight quality gate before that history leaves your branch.
+
+## 1. Clean up the stack before review
+
+Before opening a pull request or merge request, ask:
+
+1. does the commit order tell a coherent story
+2. are there noisy fixup commits that should be cleaned up
+3. can a reviewer understand the decision process from the history itself
+
+Helpful local cleanup tools include:
+
+- `git commit --amend`
+- `git rebase -i`
+- `git restore --staged`
+
+The goal is not cosmetic perfection. The goal is readable, reviewable history.
+
+## 2. A minimal pre-push checklist
+
+```bash
+git status
+git log --oneline --decorate -5
+git diff --stat origin/main...
+```
+
+This confirms:
+
+- your working tree is actually clean
+- the latest commits are the ones you intend to publish
+- the size of the change still matches your expectations
+
+If you want a stronger scope check:
+
+```bash
+git diff --name-only origin/main...
+```
+
+## 3. Why reviewers care about history shape
+
+Reviewers do not only care whether the code runs. They also care whether:
+
+- commit boundaries are clear
+- unrelated work is mixed together
+- the history is readable enough to comment on
+
+So cleanup before review is also a review-efficiency practice.
+
+## 4. Prefer safer push defaults
+
+If you truly need to overwrite remote history, prefer:
+
+```bash
+git push --force-with-lease
+```
+
+It is safer than raw `--force` because it refuses to overwrite remote state that has changed unexpectedly.
+
+## 5. “Able to push” is not the same as “ready to push”
+
+Pause if:
+
+- the stack still contains noisy commits
+- you rebased recently but did not re-check the diff
+- you are not sure whether someone updated the remote branch
+- you plan to force-push and have not communicated that
+
+That short pause usually saves much larger cleanup later.
+

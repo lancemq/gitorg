@@ -1,0 +1,44 @@
+export const metadata = {
+  title: "Sync Before Review",
+  slug: "sync-before-review",
+  locale: "en",
+  section: "workflows",
+  summary: "Sync your branch with main before opening review so reviewers see current, focused diffs instead of stale base noise.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Branching-Rebasing.html",
+    "https://git-scm.com/docs/git-fetch",
+    "https://git-scm.com/docs/git-pull.html",
+  ],
+};
+
+# Sync Before Review
+
+## Why this step matters
+
+When a branch drifts too far from main, review gets noisier:
+
+- already-resolved upstream changes reappear as local context
+- stale base conflicts confuse the review
+- the stack becomes harder to interpret
+
+## Recommended flow
+
+```bash
+git fetch origin
+git rebase origin/main
+git diff --stat origin/main...
+```
+
+If your team prefers not to rewrite branch history:
+
+```bash
+git fetch origin
+git merge origin/main
+```
+
+## What to confirm before review
+
+1. your branch includes the latest mainline state
+2. the diff still matches the intended scope
+3. the latest commits are clean enough for reviewers to follow
+

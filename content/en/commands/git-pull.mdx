@@ -1,0 +1,27 @@
+export const metadata = {
+  title: "git pull Tutorial",
+  slug: "git-pull",
+  locale: "en",
+  section: "commands",
+  summary: "Explains git pull as fetch plus integration, and why many teams prefer fetch-first or ff-only synchronization habits.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-pull",
+    "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
+  ],
+};
+
+# git pull Tutorial
+
+## The short version
+
+`git pull` fetches remote updates and then integrates them into the current branch.
+
+## Common forms
+
+```bash
+git pull
+git pull --rebase
+git pull --ff-only
+```
+
+If you want maximum control, fetch first and choose the integration strategy explicitly.

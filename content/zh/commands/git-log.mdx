@@ -1,0 +1,37 @@
+export const metadata = {
+  title: "git log 教程",
+  slug: "git-log",
+  locale: "zh",
+  section: "commands",
+  summary: "说明 git log 如何查看提交历史、图结构和作者信息，以及哪些参数最适合日常排查和阅读历史。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-log",
+    "https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History",
+  ],
+};
+
+# git log 教程
+
+## 一句话理解
+
+`git log` 是查看提交历史的核心命令，既能看简单列表，也能看图结构、作者、时间和差异摘要。
+
+## 日常最常用写法
+
+```bash
+git log --oneline --graph --decorate --all
+```
+
+这能更直观地展示分支和 merge 关系。
+
+## 常见筛选
+
+```bash
+git log -5
+git log --author="Alice"
+git log -- path/to/file
+```
+
+## 为什么 log 很重要
+
+它不只是“看过去发生了什么”，也是理解分支状态、回滚目标和 review 边界的重要工具。

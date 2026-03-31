@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { FaqList } from "@/components/faq-list";
 import { SiteShell } from "@/components/site-shell";
-import { getDictionary, isValidLocale, locales, type Locale } from "@/lib/i18n";
+import { getDictionary, getSidebarContent, isValidLocale, locales, type Locale } from "@/lib/i18n";
+import { buildPageMetadata } from "@/lib/seo";
 
 type Props = {
   params: Promise<{
@@ -12,6 +15,24 @@ type Props = {
 
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { lang } = await params;
+
+  if (!isValidLocale(lang)) {
+    return {};
+  }
+
+  const locale = lang as Locale;
+  const dict = getDictionary(locale);
+
+  return buildPageMetadata({
+    locale,
+    pathname: "/faq",
+    title: dict.faqPage.title,
+    description: dict.faqPage.description,
+  });
 }
 
 export default async function FaqPage({ params }: Props) {
@@ -25,12 +46,12 @@ export default async function FaqPage({ params }: Props) {
   const dict = getDictionary(locale);
 
   return (
-    <SiteShell locale={locale} sidebar={dict.sidebar.faq}>
+    <SiteShell locale={locale} sidebar={getSidebarContent(locale, { kind: "docs", activePath: "faq" })}>
       <article className="doc-page">
         <nav className="breadcrumbs" aria-label="Breadcrumb">
-          <a href={`/${locale}`}>{dict.commandPage.breadcrumbs.docs}</a>
+          <Link href={`/${locale}`}>{dict.commandPage.breadcrumbs.overview}</Link>
           <span>/</span>
-          <strong>{dict.home.faq.title}</strong>
+          <strong>{dict.commandPage.breadcrumbs.faq}</strong>
         </nav>
 
         <header className="panel doc-hero faq-hero">

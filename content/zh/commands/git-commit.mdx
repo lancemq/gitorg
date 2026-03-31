@@ -1,0 +1,41 @@
+export const metadata = {
+  title: "git commit 教程",
+  slug: "git-commit",
+  locale: "zh",
+  section: "commands",
+  summary: "解释 git commit 如何生成新历史节点、写好提交信息，以及 amend 与普通提交的边界。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-commit",
+    "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+  ],
+};
+
+# git commit 教程
+
+## 一句话理解
+
+`git commit` 会把暂存区中的内容固定成一个新的提交节点，接到当前分支历史后面。
+
+## 基本用法
+
+```bash
+git commit -m "feat: add search dialog"
+```
+
+## 提交前要确认什么
+
+- 暂存区是否只包含你想提交的改动
+- 提交信息是否能说明改动意图
+- 是否混入了不相关文件
+
+## amend 是什么
+
+```bash
+git commit --amend
+```
+
+它会修改最近一次提交的表达方式，适合修正刚刚提交的信息或补进遗漏的小改动。
+
+## 一个团队建议
+
+如果这次改动还没有共享给别人，`amend` 是整理历史的好工具；如果已经共享，就要更谨慎。

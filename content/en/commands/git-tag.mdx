@@ -1,0 +1,25 @@
+export const metadata = {
+  title: "git tag Tutorial",
+  slug: "git-tag",
+  locale: "en",
+  section: "commands",
+  summary: "Introduces git tag for release points, explains lightweight versus annotated tags, and covers basic tag publishing.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-tag",
+    "https://git-scm.com/book/en/v2/Git-Basics-Tagging",
+  ],
+};
+
+# git tag Tutorial
+
+## The short version
+
+`git tag` gives a stable name to a specific commit, most often for releases.
+
+## Common forms
+
+```bash
+git tag v1.0.0
+git tag -a v1.0.0 -m "Release v1.0.0"
+git push origin --tags
+```

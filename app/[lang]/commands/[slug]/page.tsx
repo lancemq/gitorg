@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { SiteShell } from "@/components/site-shell";
@@ -5,11 +7,13 @@ import { getCommandDoc } from "@/lib/content";
 import {
   commandSlugs,
   getDictionary,
+  getSidebarContent,
   isValidLocale,
   locales,
   type CommandSlug,
   type Locale,
 } from "@/lib/i18n";
+import { buildPageMetadata } from "@/lib/seo";
 
 type Props = {
   params: Promise<{
@@ -22,6 +26,28 @@ export async function generateStaticParams() {
   return locales.flatMap((lang) =>
     commandSlugs.map((slug) => ({ lang, slug })),
   ) as Array<{ lang: Locale; slug: CommandSlug }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { lang, slug } = await params;
+
+  if (!isValidLocale(lang)) {
+    return {};
+  }
+
+  const locale = lang as Locale;
+  if (!commandSlugs.includes(slug as CommandSlug)) {
+    return {};
+  }
+
+  const doc = await getCommandDoc(locale, slug as CommandSlug);
+
+  return buildPageMetadata({
+    locale,
+    pathname: `/commands/${slug}`,
+    title: doc.metadata.title,
+    description: doc.metadata.summary,
+  });
 }
 
 export default async function CommandPage({ params }: Props) {
@@ -42,11 +68,11 @@ export default async function CommandPage({ params }: Props) {
   const DocBody = doc.Component;
 
   return (
-    <SiteShell locale={locale} sidebar={dict.sidebar.command(commandSlug)}>
+    <SiteShell locale={locale} sidebar={getSidebarContent(locale, { kind: "docs", activePath: `commands/${commandSlug}` })}>
       <nav className="breadcrumbs" aria-label="Breadcrumb">
-        <a href={`/${locale}`}>{dict.commandPage.breadcrumbs.docs}</a>
+        <Link href={`/${locale}`}>{dict.commandPage.breadcrumbs.overview}</Link>
         <span>/</span>
-        <a href={`/${locale}/commands`}>{dict.commandPage.breadcrumbs.commands}</a>
+        <Link href={`/${locale}/commands`}>{dict.commandPage.breadcrumbs.commands}</Link>
         <span>/</span>
         <strong>{doc.metadata.title}</strong>
       </nav>

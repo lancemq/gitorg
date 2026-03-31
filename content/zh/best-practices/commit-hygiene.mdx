@@ -1,0 +1,137 @@
+export const metadata = {
+  title: "提交卫生与提交信息",
+  slug: "commit-hygiene",
+  locale: "zh",
+  section: "best-practices",
+  summary: "把提交拆成逻辑独立的 changeset，并用可读的提交信息表达意图、动机和边界，让 review、revert 和 cherry-pick 都更轻。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project.html",
+    "https://git-scm.com/docs/git-commit",
+  ],
+};
+
+# 提交卫生与提交信息
+
+## 为什么这一篇应该先读
+
+很多团队表面上会用 Git，但协作成本仍然很高，问题常常就出在“提交质量”上。一个过大的提交会让 review 变慢、回滚变难、定位问题更痛苦；一条模糊的提交信息则会让未来的人根本不知道你当时在修什么。
+
+官方书里长期强调一个朴素原则：每次提交都应该尽量是一个逻辑独立的 changeset。这个原则比任何花哨的流程都更重要。
+
+## 1. 一个提交只表达一个意图
+
+更稳的经验法则是：
+
+- 一个提交只做一件事
+- 不把多个无关问题揉到一起
+- 如果同一文件里混入了两类修改，也尽量拆开暂存
+
+常见反例包括：
+
+- 一次提交同时改 UI、修接口错误、顺手重排格式
+- 一次提交既包含 bugfix，也包含重命名和清理噪声
+- 先做功能，再用同一个提交顺便补一堆无关的小修
+
+更好的做法是先分块暂存：
+
+```bash
+git add --patch
+git commit -m "fix: handle empty email input"
+```
+
+`git add --patch` 的价值不只是“高级”，而是它迫使你在提交之前先思考边界。
+
+## 2. 判断提交是否够干净的三个问题
+
+在提交前先问自己：
+
+1. 我能不能用一句话概括这次改动？
+2. 如果要回滚，只回滚这一提交会不会安全？
+3. 如果 reviewer 只看这一个提交，能不能看懂我的意图？
+
+如果这三个问题里有两个回答不上来，通常就说明这次提交还不够聚焦。
+
+## 3. 提交信息先写“做了什么”，再补“为什么”
+
+官方 `git commit` 文档和官方书都推荐把提交说明写成两层：
+
+- 第一行：简洁说明动作
+- 正文：解释背景、动机或约束
+
+一个可复用的模板：
+
+```text
+Add validation for empty email input
+
+Prevent the login form from submitting when the email field is blank.
+This keeps client-side behavior aligned with server-side validation.
+```
+
+这类结构的好处是：
+
+- `git log --oneline` 里先看得懂动作
+- 打开完整提交时还能看到决策背景
+- 将来做 release note 或事故回溯时更容易复用
+
+## 4. 提交标题尽量写成动作，而不是结果描述
+
+更推荐：
+
+- `Add login retry guard`
+- `Fix empty state alignment`
+- `Remove legacy auth flag`
+
+尽量少用：
+
+- `login page changes`
+- `some fixes`
+- `update code`
+
+原因不是“格式正确”这么简单，而是动词会直接暴露意图，模糊词不会。
+
+## 5. 什么时候需要正文
+
+不是每个提交都要写很长正文，但以下情况很值得补一句：
+
+- 这个改动不是直观 bugfix
+- 你在多个可选方案里做了取舍
+- 有兼容性、性能或安全边界
+- reviewer 如果只看 diff 很难明白原因
+
+很实用的一条底线是：如果你觉得未来的自己三周后可能会忘记“为什么这样做”，那现在就值得补一段正文。
+
+## 6. 提交卫生会直接影响三个后续动作
+
+### Review
+
+小而明确的提交能让 reviewer 快速判断：
+
+- 这次改动在解决什么
+- 有没有越界
+- 是否值得单独讨论
+
+### Revert
+
+如果一次提交只表达一个意图，撤销时就更接近“外科手术”，而不是整块回退。
+
+### Cherry-pick
+
+当某个修复需要挑到别的分支时，小提交也更容易被精确复用。
+
+## 7. 一个适合团队落地的最低标准
+
+如果团队还没有统一规范，可以先从这四条开始：
+
+1. 每个提交只做一件事
+2. 标题行必须能描述动作
+3. 非直观改动补一句“为什么”
+4. 提交前先用 `git diff --staged` 再看一遍
+
+最后一个动作经常被忽略，但很有价值：
+
+```bash
+git diff --staged
+```
+
+它能帮你在真正生成提交对象之前，最后确认一次这次提交到底装进去了什么。
+

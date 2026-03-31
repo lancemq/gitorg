@@ -1,0 +1,55 @@
+export const metadata = {
+  title: "功能分支协作流",
+  slug: "feature-branch-collaboration",
+  locale: "zh",
+  section: "workflows",
+  summary: "围绕 feature branch 的日常协作流程，整理从切分支、同步主线、提交整理到发起评审的稳定做法。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project.html",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+    "https://git-scm.com/docs/git-switch",
+  ],
+};
+
+# 功能分支协作流
+
+## 适用场景
+
+这是最常见的一种团队协作场景：从主线拉出功能分支，独立开发一段时间，在发起评审前同步主线并整理提交，最后再合并回主线。
+
+## 一条更稳的流程
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c feature/login-validation
+```
+
+在开发期间：
+
+- 定期 `git fetch origin`
+- 视团队习惯选择 `merge` 或 `rebase` 同步主线
+- 把功能相关的提交尽量保持清晰
+
+在发起评审前：
+
+```bash
+git fetch origin
+git rebase origin/main
+git log --oneline --decorate -5
+```
+
+## 这条流程的核心价值
+
+- 功能边界清晰
+- review 对象明确
+- 回滚和 cherry-pick 更容易
+- 主线不被半成品污染
+
+## 常见失误
+
+- 在主分支上直接开发
+- 功能分支长期不和主线同步
+- 发评审前不整理噪声提交
+- 一个功能分支里混入多个不相关主题
+

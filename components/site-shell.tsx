@@ -3,31 +3,11 @@ import Link from "next/link";
 import { DocSearch } from "@/components/doc-search";
 import { getSearchDocs } from "@/lib/content";
 import { LanguageSwitcher } from "@/components/language-switcher";
-import type { Locale } from "@/lib/i18n";
+import type { Locale, SidebarContent } from "@/lib/i18n";
 
 type SiteShellProps = {
   locale: Locale;
-  sidebar: {
-    brandLabel: string;
-    searchLabel: string;
-    footerTitle: string;
-    footerText: string;
-    localeLabel: string;
-    localeNames: Record<Locale, string>;
-    groups: Array<{
-      title: string;
-      items: Array<{
-        label: string;
-        href: string;
-        active?: boolean;
-        children?: Array<{
-          label: string;
-          href: string;
-          active?: boolean;
-        }>;
-      }>;
-    }>;
-  };
+  sidebar: SidebarContent;
   children: React.ReactNode;
 };
 
@@ -62,7 +42,26 @@ export async function SiteShell({ locale, sidebar, children }: SiteShellProps) {
                   >
                     {item.label}
                   </Link>
-                  {item.children?.length ? (
+                  {item.childGroups?.length ? (
+                    <div className="nav-subgroups">
+                      {item.childGroups.map((group) => (
+                        <div className="nav-subgroup" key={group.title}>
+                          <p className="nav-subtitle">{group.title}</p>
+                          <div className="nav-subitems">
+                            {group.items.map((child) => (
+                              <Link
+                                className={`nav-subitem${child.active ? " is-active" : ""}`}
+                                href={child.href}
+                                key={child.href}
+                              >
+                                {child.label}
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : item.children?.length ? (
                     <div className="nav-subitems">
                       {item.children.map((child) => (
                         <Link

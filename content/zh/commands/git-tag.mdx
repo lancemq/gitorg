@@ -1,0 +1,38 @@
+export const metadata = {
+  title: "git tag 教程",
+  slug: "git-tag",
+  locale: "zh",
+  section: "commands",
+  summary: "介绍 git tag 如何标记发布点、轻量标签和附注标签的区别，以及标签推送的基本方式。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-tag",
+    "https://git-scm.com/book/en/v2/Git-Basics-Tagging",
+  ],
+};
+
+# git tag 教程
+
+## 一句话理解
+
+`git tag` 用来给某个提交打上稳定名字，最常见的场景是版本发布。
+
+## 常见类型
+
+- 轻量标签
+- 附注标签
+
+附注标签更适合正式发布，因为它包含更多元数据。
+
+## 基本用法
+
+```bash
+git tag v1.0.0
+git tag -a v1.0.0 -m "Release v1.0.0"
+```
+
+## 推送标签
+
+```bash
+git push origin v1.0.0
+git push origin --tags
+```

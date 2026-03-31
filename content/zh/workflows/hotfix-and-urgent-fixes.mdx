@@ -1,0 +1,45 @@
+export const metadata = {
+  title: "紧急修复工作流",
+  slug: "hotfix-and-urgent-fixes",
+  locale: "zh",
+  section: "workflows",
+  summary: "当线上或发布链路出现高优先级问题时，如何从稳定分支切出 hotfix，快速修复并有序回流主线。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+    "https://git-scm.com/book/en/v2/Distributed-Git-Maintaining-a-Project",
+    "https://git-scm.com/docs/git-branch",
+  ],
+};
+
+# 紧急修复工作流
+
+## 适用场景
+
+线上故障、发布阻塞、严重回归，都是典型的 hotfix 场景。此时目标不是“顺便清理很多历史”，而是尽快在稳定基底上做出最小修复，并把修复安全带回主线。
+
+## 推荐顺序
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c hotfix/login-timeout
+```
+
+修复完成后：
+
+1. 单独测试 hotfix 分支
+2. 合并或提交到稳定分支
+3. 再把修复回流到主线或其他仍在维护的分支
+
+## 为什么 hotfix 要避免顺手带功能改动
+
+因为紧急修复的核心是缩小变更面：
+
+- diff 越小，验证越快
+- 回滚越容易
+- 事故定位越清楚
+
+## 很实用的一条经验
+
+如果某个“顺手改动”不是为了让 hotfix 生效，它通常就不应该出现在 hotfix 里。
+

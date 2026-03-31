@@ -1,0 +1,30 @@
+export const metadata = {
+  title: "git clone Tutorial",
+  slug: "git-clone",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how git clone copies a repository, what origin means by default, and what local branch setup usually looks like after cloning.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-clone",
+    "https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository",
+  ],
+};
+
+# git clone Tutorial
+
+## The short version
+
+`git clone` copies an existing repository locally, including its history, objects, refs, and default remote configuration.
+
+## Basic usage
+
+```bash
+git clone https://example.com/repo.git
+git clone https://example.com/repo.git my-project
+```
+
+## What clone sets up
+
+- a full local repository
+- a default remote usually named `origin`
+- an initial checkout of the default branch

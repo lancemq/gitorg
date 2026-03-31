@@ -1,0 +1,36 @@
+export const metadata = {
+  title: "git push 教程",
+  slug: "git-push",
+  locale: "zh",
+  section: "commands",
+  summary: "说明 git push 如何发布本地分支、设置上游分支，以及 force-with-lease 为什么比裸 force 更安全。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-push",
+    "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
+  ],
+};
+
+# git push 教程
+
+## 一句话理解
+
+`git push` 会把本地引用和对象发布到远端，让其他协作者可以看到你的分支更新。
+
+## 基本用法
+
+```bash
+git push origin main
+git push -u origin feature/login
+```
+
+## `-u` 的作用
+
+它会把当前本地分支与远端上游分支关联起来，后续再 push / pull 会更方便。
+
+## 强推时为什么更推荐 `--force-with-lease`
+
+因为它会先检查远端是否仍然处于你预期的状态，能减少误覆盖别人新提交的风险。
+
+## 一个实践建议
+
+共享分支默认不要随便强推；如果确实要改写，优先用 `--force-with-lease`。

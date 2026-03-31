@@ -1,0 +1,25 @@
+export const metadata = {
+  title: "git log Tutorial",
+  slug: "git-log",
+  locale: "en",
+  section: "commands",
+  summary: "Shows how git log inspects commit history, graph structure, authorship, and filtered history for debugging and review.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-log",
+    "https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History",
+  ],
+};
+
+# git log Tutorial
+
+## The short version
+
+`git log` is the main command for reading commit history.
+
+## High-value daily form
+
+```bash
+git log --oneline --graph --decorate --all
+```
+
+This makes branch structure and merge points much easier to read.

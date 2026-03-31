@@ -1,0 +1,83 @@
+export const metadata = {
+  title: "Shared History Boundaries",
+  slug: "shared-history-boundaries",
+  locale: "en",
+  section: "best-practices",
+  summary: "Know which history can still be cleaned up freely and which history should be treated as shared, so rebase, amend, reset, and force-push do not break other people.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History.html",
+    "https://git-scm.com/book/en/v2/Git-Branching-Rebasing.html",
+    "https://git-scm.com/docs/git-push",
+  ],
+};
+
+# Shared History Boundaries
+
+## Why this matters more than memorizing commands
+
+The biggest danger is rarely a single command. The bigger issue is using a history-rewriting command on the wrong kind of history. `commit --amend`, `rebase -i`, `reset --soft`, and force-push can all be useful, but the risk changes completely once others may depend on that history.
+
+## 1. A practical classification
+
+Think in three rough buckets:
+
+- local-only history: safe to clean up
+- pushed but not clearly shared: clean up carefully
+- shared history others may depend on: avoid rewriting by default
+
+If you are not sure which bucket applies, treat it as shared history.
+
+## 2. Which commands change the shape of history
+
+These commands all affect how other people understand the branch history:
+
+- `git commit --amend`
+- `git rebase -i`
+- `git reset`
+- `git push --force`
+
+They are not bad commands. They just require boundary awareness.
+
+## 3. Why local branches are the right place to clean up
+
+On a personal branch it is often reasonable to:
+
+- squash noisy commits
+- reorder work
+- fold a fix into the previous commit
+- remove temporary cleanup commits
+
+Because at that point the main consumer of that history is still you.
+
+## 4. Why shared branches should default to append, not rewrite
+
+Once history is shared, rewriting can:
+
+- invalidate someone else’s branch base
+- confuse review context
+- make rollback and incident analysis harder
+
+That is why the official Git book repeatedly warns against rebasing public commits that others may have based work on.
+
+## 5. Prefer new history over erased history
+
+Inside shared history, safer tools are usually:
+
+- `git revert`
+- follow-up fix commits
+- merge commits that preserve structure
+
+The mindset changes from “rewrite the past” to “add a clearer future”.
+
+## 6. Force-push is mostly a coordination problem
+
+`git push --force` is dangerous not just because it overwrites the remote. It also invalidates other people’s local understanding of that branch.
+
+If a force-push is truly necessary, prefer:
+
+```bash
+git push --force-with-lease
+```
+
+That adds a guardrail by checking that the remote ref is still where you expect it to be.
+

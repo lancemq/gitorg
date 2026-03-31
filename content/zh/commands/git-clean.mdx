@@ -1,0 +1,42 @@
+export const metadata = {
+  title: "git clean 教程",
+  slug: "git-clean",
+  locale: "zh",
+  section: "commands",
+  summary: "解释 git clean 如何删除未跟踪文件和目录，以及为什么 dry-run 和 force 标志在这里非常重要。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-clean",
+    "https://git-scm.com/book/en/v2/Git-Tools-Stashing-and-Cleaning",
+  ],
+};
+
+# git clean 教程
+
+## 一句话理解
+
+`git clean` 用来删除未跟踪文件和目录，它不会作用于已经被 Git 跟踪的文件内容。
+
+## 为什么它是高风险命令
+
+因为被删除的未跟踪文件通常不在 Git 历史里，删掉后不容易恢复。
+
+## 最重要的习惯
+
+先 dry-run：
+
+```bash
+git clean -n
+```
+
+确认无误后再真正执行：
+
+```bash
+git clean -f
+git clean -fd
+```
+
+## 常见误区
+
+### 误区 1：clean 和 reset --hard 一样
+
+不一样。`reset --hard` 主要处理已跟踪文件的工作区状态，`clean` 则处理未跟踪文件和目录。

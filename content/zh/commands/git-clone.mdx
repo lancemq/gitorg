@@ -1,0 +1,49 @@
+export const metadata = {
+  title: "git clone 教程",
+  slug: "git-clone",
+  locale: "zh",
+  section: "commands",
+  summary: "说明 git clone 如何复制仓库、默认远端 origin 的作用，以及克隆后本地分支与远端分支的基本关系。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-clone",
+    "https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository",
+  ],
+};
+
+# git clone 教程
+
+## 一句话理解
+
+`git clone` 会把一个已有仓库完整复制到本地，包括历史、对象、引用和默认远端配置。
+
+## 基本用法
+
+```bash
+git clone https://example.com/repo.git
+```
+
+## clone 之后会发生什么
+
+- 本地得到完整历史
+- 默认远端通常命名为 `origin`
+- Git 会尝试检出默认分支
+
+## 指定目录名
+
+```bash
+git clone https://example.com/repo.git my-project
+```
+
+## 为什么 clone 比下载 ZIP 更适合开发
+
+因为 clone 不只是拿到文件快照，而是拿到完整仓库历史和协作能力。
+
+## 常见误区
+
+### 误区 1：clone 只适合第一次使用仓库
+
+虽然它最常用于第一次拉取，但在多副本实验、临时调试和独立备份场景里也很常见。
+
+### 误区 2：clone 下来后还不算 Git 仓库
+
+其实 clone 之后本地已经是完整仓库，不只是远端的“工作副本”。

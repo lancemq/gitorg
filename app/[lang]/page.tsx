@@ -1,8 +1,17 @@
+import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { FaqList } from "@/components/faq-list";
 import { SiteShell } from "@/components/site-shell";
-import { getDictionary, isValidLocale, locales, type Locale } from "@/lib/i18n";
+import {
+  getDictionary,
+  getSidebarContent,
+  isValidLocale,
+  locales,
+  type Locale,
+} from "@/lib/i18n";
+import { buildPageMetadata } from "@/lib/seo";
 
 type Props = {
   params: Promise<{
@@ -12,6 +21,24 @@ type Props = {
 
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { lang } = await params;
+
+  if (!isValidLocale(lang)) {
+    return {};
+  }
+
+  const locale = lang as Locale;
+  const dict = getDictionary(locale);
+
+  return buildPageMetadata({
+    locale,
+    pathname: "",
+    title: dict.home.hero.title,
+    description: dict.home.hero.description,
+  });
 }
 
 export default async function LocalizedHomePage({ params }: Props) {
@@ -25,19 +52,19 @@ export default async function LocalizedHomePage({ params }: Props) {
   const dict = getDictionary(locale);
 
   return (
-    <SiteShell locale={locale} sidebar={dict.sidebar.home}>
+    <SiteShell locale={locale} sidebar={getSidebarContent(locale, { kind: "home" })}>
       <section className="hero panel" id="overview">
         <div className="hero-copy">
           <p className="eyebrow">{dict.home.hero.eyebrow}</p>
           <h1>{dict.home.hero.title}</h1>
           <p className="lead">{dict.home.hero.description}</p>
           <div className="hero-actions">
-            <a className="button button-primary" href={`/${locale}/docs/learning-path/quick-start`}>
+            <Link className="button button-primary" href={`/${locale}/docs/learning-path/quick-start`}>
               {dict.home.hero.primaryAction}
-            </a>
-            <a className="button button-secondary" href={`/${locale}/docs`}>
+            </Link>
+            <Link className="button button-secondary" href={`/${locale}/commands`}>
               {dict.home.hero.secondaryAction}
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -142,9 +169,9 @@ export default async function LocalizedHomePage({ params }: Props) {
         <FaqList items={dict.home.faq.items.slice(0, 3)} />
 
         <div className="section-actions">
-          <a className="button button-secondary" href={`/${locale}/faq`}>
+          <Link className="button button-secondary" href={`/${locale}/faq`}>
             {dict.home.faq.action}
-          </a>
+          </Link>
         </div>
       </section>
 
@@ -154,9 +181,9 @@ export default async function LocalizedHomePage({ params }: Props) {
           <h2>{dict.home.cta.title}</h2>
           <p>{dict.home.cta.description}</p>
         </div>
-        <a className="button button-primary" href={`/${locale}/docs`}>
+        <Link className="button button-primary" href={`/${locale}/commands`}>
           {dict.home.cta.action}
-        </a>
+        </Link>
       </section>
     </SiteShell>
   );

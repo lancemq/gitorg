@@ -1,0 +1,37 @@
+export const metadata = {
+  title: "git remote 教程",
+  slug: "git-remote",
+  locale: "zh",
+  section: "commands",
+  summary: "讲清 git remote 如何查看、添加、修改和删除远端仓库定义，以及 origin 在协作中的典型角色。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-remote",
+    "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
+  ],
+};
+
+# git remote 教程
+
+## 一句话理解
+
+`git remote` 用来管理远端仓库定义，比如查看已有远端、添加新远端或修改 URL。
+
+## 常见用法
+
+```bash
+git remote -v
+git remote add origin https://example.com/repo.git
+git remote rename origin upstream
+git remote remove upstream
+```
+
+## origin 一定存在吗
+
+不是。`origin` 只是最常见的默认名字，不是 Git 的强制规则。
+
+## 一个常见场景
+
+在 fork 工作流里，本地往往同时配置：
+
+- `origin`：你自己的 fork
+- `upstream`：原始上游仓库

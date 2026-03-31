@@ -1,0 +1,31 @@
+export const metadata = {
+  title: "git clean Tutorial",
+  slug: "git-clean",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how git clean removes untracked files and directories, and why dry-run and force flags are essential here.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-clean",
+    "https://git-scm.com/book/en/v2/Git-Tools-Stashing-and-Cleaning",
+  ],
+};
+
+# git clean Tutorial
+
+## The short version
+
+`git clean` removes untracked files and directories.
+
+## Why it is risky
+
+Those files are usually not part of Git history, which means accidental deletion is harder to recover from.
+
+## Safe pattern
+
+```bash
+git clean -n
+git clean -f
+git clean -fd
+```
+
+Always preview first with `-n`.

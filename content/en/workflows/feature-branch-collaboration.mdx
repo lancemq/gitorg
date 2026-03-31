@@ -1,0 +1,48 @@
+export const metadata = {
+  title: "Feature Branch Collaboration",
+  slug: "feature-branch-collaboration",
+  locale: "en",
+  section: "workflows",
+  summary: "A practical feature-branch workflow for day-to-day teamwork, from cutting the branch and syncing main to cleaning the stack before review.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project.html",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+    "https://git-scm.com/docs/git-switch",
+  ],
+};
+
+# Feature Branch Collaboration
+
+## Where this workflow fits
+
+This is the most common collaboration path: branch from main, develop in isolation, keep the branch reasonably current, clean up the history, and open review.
+
+## A safer baseline flow
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c feature/login-validation
+```
+
+During development:
+
+- run `git fetch origin` regularly
+- choose `merge` or `rebase` consciously
+- keep commits readable and scoped
+
+Before review:
+
+```bash
+git fetch origin
+git rebase origin/main
+git log --oneline --decorate -5
+```
+
+## Why this workflow holds up well
+
+- branch boundaries stay clear
+- review scope is obvious
+- rollback and cherry-pick stay easier
+- half-finished work does not leak into main
+

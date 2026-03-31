@@ -1,0 +1,41 @@
+export const metadata = {
+  title: "git add 教程",
+  slug: "git-add",
+  locale: "zh",
+  section: "commands",
+  summary: "说明 git add 如何把工作区改动加入暂存区，以及为什么理解暂存区是学会提交质量的关键。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-add",
+    "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+  ],
+};
+
+# git add 教程
+
+## 一句话理解
+
+`git add` 会把你选中的改动放进暂存区，供下一次提交使用。
+
+## 为什么暂存区很关键
+
+Git 不是“改完文件就直接提交”，而是先把要提交的内容放进 index，然后再生成 commit。这也是为什么提交可以做到更干净、更有边界。
+
+## 基本用法
+
+```bash
+git add README.md
+git add src/
+git add .
+```
+
+## 精细暂存
+
+```bash
+git add --patch
+```
+
+这能让你按 hunk 选择改动，是拆小提交非常重要的能力。
+
+## 一个实用判断
+
+如果你发现 `git add .` 总把不相干的改动一起带进去，就说明你应该更多使用按文件或按 patch 的暂存方式。

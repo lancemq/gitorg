@@ -1,0 +1,28 @@
+export const metadata = {
+  title: "git add Tutorial",
+  slug: "git-add",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how git add stages changes for the next commit, and why the index is central to creating cleaner history.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-add",
+    "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+  ],
+};
+
+# git add Tutorial
+
+## The short version
+
+`git add` moves selected changes into the staging area so they can become part of the next commit.
+
+## Common forms
+
+```bash
+git add README.md
+git add src/
+git add .
+git add --patch
+```
+
+`--patch` is especially important when you want clean, focused commits.

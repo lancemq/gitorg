@@ -1,0 +1,34 @@
+export const metadata = {
+  title: "git init Tutorial",
+  slug: "git-init",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how git init creates a repository, how the initial branch is defined, and how it is used for both new and existing directories.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-init",
+    "https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository",
+  ],
+};
+
+# git init Tutorial
+
+## The short version
+
+`git init` creates a new Git repository structure in the current directory so version control can begin there.
+
+## Common use cases
+
+- starting a new project under Git
+- bringing an existing directory under version control
+- creating a local experiment repository quickly
+
+## Basic usage
+
+```bash
+git init
+git init -b main
+```
+
+## Important note
+
+`git init` does not create the first commit. It only creates the repository metadata. The real history starts with your first `commit`.

@@ -1,0 +1,37 @@
+export const metadata = {
+  title: "git pull 教程",
+  slug: "git-pull",
+  locale: "zh",
+  section: "commands",
+  summary: "解释 git pull 是 fetch 加整合的组合命令，以及为何很多团队更推荐 fetch-first 或 ff-only 的保守策略。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-pull",
+    "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
+  ],
+};
+
+# git pull 教程
+
+## 一句话理解
+
+`git pull` 会先抓取远端更新，再把它们整合进当前分支。
+
+## 为什么它容易让人误解
+
+因为它把“同步信息”和“修改当前分支”合在了一起，所以很多人会忽略整合策略本身。
+
+## 常见写法
+
+```bash
+git pull
+git pull --rebase
+git pull --ff-only
+```
+
+## 一个更稳的习惯
+
+如果你不想把判断交给默认行为，先 `fetch` 再决定 merge 还是 rebase，会更可控。
+
+## 什么时候用 ff-only
+
+当你希望分叉时直接失败，而不是隐式产生 merge commit，`--ff-only` 是很好的保守策略。

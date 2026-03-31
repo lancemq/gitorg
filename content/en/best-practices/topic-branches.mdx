@@ -1,0 +1,96 @@
+export const metadata = {
+  title: "Topic Branch Strategy",
+  slug: "topic-branches",
+  locale: "en",
+  section: "best-practices",
+  summary: "Use topic branches to isolate units of work so parallel development, review, rollback, and history cleanup all stay easier to manage.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project.html",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+    "https://git-scm.com/docs/git-switch",
+  ],
+};
+
+# Topic Branch Strategy
+
+## Why long-lived work branches create friction
+
+Topic branches are not about creating more branches for the sake of ceremony. They make work boundaries and history boundaries line up. A login fix, a navbar bug, and a docs update should usually be three separate histories, not one mixed stream.
+
+## 1. Use one branch per unit of work
+
+Start with:
+
+```bash
+git switch -c feature/login-validation
+```
+
+That gives you a cleaner workflow because:
+
+- abandoned work can be dropped cleanly
+- review can focus on one topic
+- rebase, merge, and cherry-pick all get clearer boundaries
+
+## 2. Topic branches work best when the topic is real
+
+Good units:
+
+- one feature
+- one bugfix
+- one docs update
+- one release-prep task
+
+Weaker units:
+
+- everything I touched this week
+- several unrelated fixes bundled together
+- work I plan to separate later
+
+If you already expect that separation to hurt later, that is usually the signal to branch now.
+
+## 3. Branch naming is part of collaboration
+
+Helpful names:
+
+- `feature/login-validation`
+- `fix/navbar-overlap`
+- `docs/release-notes`
+
+Weak names:
+
+- `test`
+- `new-branch`
+- `my-work`
+
+Readable branch names reduce confusion in review, CI, and team conversation.
+
+## 4. Topic branches make parallel work easier
+
+If one feature branch is waiting for review and an urgent bug arrives, topic branches keep the workflow clean:
+
+1. leave the feature branch where it is
+2. cut a fresh bugfix branch from main
+3. land the fix independently
+4. return to the original feature branch later
+
+That is much safer than piling multiple concerns into a shared branch.
+
+## 5. Why topic branches pair well with rebase
+
+The official Git book often discusses rebase alongside focused branch work because rebase is much easier when the branch carries one coherent topic.
+
+Clear branch scope makes it easier to:
+
+- decide whether rebasing is worth it
+- interpret conflicts
+- clean up commit order without touching unrelated work
+
+## 6. A lightweight team rule set
+
+Start with these:
+
+1. one topic branch per task
+2. branch names should describe the work
+3. avoid doing active work directly on shared branches
+4. sync the topic branch with the mainline before review
+

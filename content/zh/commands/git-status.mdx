@@ -1,0 +1,58 @@
+export const metadata = {
+  title: "git status 教程",
+  slug: "git-status",
+  locale: "zh",
+  section: "commands",
+  summary: "讲清 git status 如何查看工作区、暂存区和分支状态，以及它为什么是日常最应该频繁使用的命令之一。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-status",
+    "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+  ],
+};
+
+# git status 教程
+
+## 一句话理解
+
+`git status` 是你了解当前仓库状态的第一入口，用来查看哪些文件被修改、哪些已经暂存、当前分支是否领先或落后。
+
+## 为什么它很重要
+
+很多 Git 误操作不是因为命令不会，而是因为操作前没有先看一眼当前状态。
+
+## 最常见输出内容
+
+- 当前分支名
+- 是否有未暂存改动
+- 是否有已暂存改动
+- 是否存在未跟踪文件
+- 是否和上游分支有差异
+
+## 基本用法
+
+```bash
+git status
+```
+
+## 紧凑模式
+
+```bash
+git status --short
+```
+
+这更适合频繁查看。
+
+## 一个好习惯
+
+在这些操作前先跑一次 `git status`：
+
+- `commit`
+- `pull`
+- `rebase`
+- `reset`
+
+## 常见误区
+
+### 误区 1：status 只是给新手用的
+
+不是。它对经验丰富的开发者同样重要，因为它是最低风险但最高价值的检查命令之一。

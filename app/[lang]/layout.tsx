@@ -1,6 +1,8 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { isValidLocale, type Locale } from "@/lib/i18n";
+import { buildLocaleHomeMetadata, getLocaleLang } from "@/lib/seo";
 
 type Props = {
   children: React.ReactNode;
@@ -9,6 +11,16 @@ type Props = {
   }>;
 };
 
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { lang } = await params;
+
+  if (!isValidLocale(lang)) {
+    return {};
+  }
+
+  return buildLocaleHomeMetadata(lang as Locale);
+}
+
 export default async function LocaleLayout({ children, params }: Props) {
   const { lang } = await params;
 
@@ -16,5 +28,11 @@ export default async function LocaleLayout({ children, params }: Props) {
     notFound();
   }
 
-  return <div data-locale={lang as Locale}>{children}</div>;
+  const locale = lang as Locale;
+
+  return (
+    <div data-locale={locale} lang={getLocaleLang(locale)}>
+      {children}
+    </div>
+  );
 }

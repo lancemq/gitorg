@@ -1,0 +1,90 @@
+export const metadata = {
+  title: "Fetch-First Sync",
+  slug: "fetch-first-sync",
+  locale: "en",
+  section: "best-practices",
+  summary: "Separate observing remote state from mutating your local branch so integration choices stay explicit instead of being hidden inside default pull behavior.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-fetch",
+    "https://git-scm.com/docs/git-pull.html",
+    "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
+  ],
+};
+
+# Fetch-First Sync
+
+## Why this habit is worth standardizing
+
+Many teams are not confused by `git pull` itself. They are confused because pull combines “observe the remote” and “mutate the current branch” in one step. That is fast, but it reduces control.
+
+A safer default is:
+
+```bash
+git fetch origin
+```
+
+Then choose explicitly between:
+
+- `git merge origin/main`
+- `git rebase origin/main`
+- `git pull --ff-only`
+
+## 1. Observe first, mutate second
+
+The real value of fetch is that it breaks sync into two stages:
+
+1. update your remote-tracking refs
+2. decide how your local branch should integrate
+
+That makes it much easier to answer:
+
+- what changed upstream
+- how far your branch has diverged
+- whether merge, rebase, or pause is the right next step
+
+## 2. Pull is not wrong, but it is easy to leave implicit
+
+The official `git pull` docs are explicit: pull fetches and then applies an integration strategy. The practical problem is that teams often leave that second step to defaults and local config.
+
+A healthier habit is:
+
+- fetch first by default
+- when using pull, make the strategy explicit
+
+## 3. A conservative team default
+
+If the team wants a safer pull mode, this is a strong option:
+
+```bash
+git pull --ff-only
+```
+
+That means:
+
+- fast-forward when possible
+- fail on divergence
+- avoid silently creating a merge commit you did not intend
+
+## 4. Fetch-first also improves conflict handling
+
+When you fetch first and then choose your integration path, conflicts feel like a deliberate action instead of a surprise side effect of a default command.
+
+That alone removes a lot of beginner anxiety around pull.
+
+## 5. A practical sync loop
+
+```bash
+git fetch origin
+git log --oneline --decorate --graph HEAD..origin/main
+git rebase origin/main
+```
+
+Or:
+
+```bash
+git fetch origin
+git merge origin/main
+```
+
+The core idea is not one exact command sequence. It is making the integration decision visible.
+

@@ -1,0 +1,26 @@
+export const metadata = {
+  title: "git diff Tutorial",
+  slug: "git-diff",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how git diff compares working tree, index, and commit states, and which forms are most useful day to day.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-diff",
+    "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+  ],
+};
+
+# git diff Tutorial
+
+## The short version
+
+`git diff` compares two states, whether that means the working tree, the staging area, or commits in history.
+
+## Most common forms
+
+```bash
+git diff
+git diff --staged
+git diff HEAD
+git diff main...feature/login
+```

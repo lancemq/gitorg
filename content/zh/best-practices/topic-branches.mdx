@@ -1,0 +1,107 @@
+export const metadata = {
+  title: "主题分支策略",
+  slug: "topic-branches",
+  locale: "zh",
+  section: "best-practices",
+  summary: "用 topic branch 隔离单项工作，让并行开发、回滚、rebase、review 和发布边界都更清楚。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project.html",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+    "https://git-scm.com/docs/git-switch",
+  ],
+};
+
+# 主题分支策略
+
+## 为什么不要把所有工作都堆在一个长期分支上
+
+主题分支的核心价值不是“分支多一点更专业”，而是把工作边界和历史边界对齐。你在做登录校验、导航修复、发布文档时，其实应该拥有三段不同的历史，而不是一条混在一起的提交串。
+
+## 1. 每项工作一个分支
+
+最稳的起手动作是：
+
+```bash
+git switch -c feature/login-validation
+```
+
+这样做以后：
+
+- 被取消的工作可以整段丢弃
+- review 可以围绕一个清晰主题进行
+- rebase、merge、cherry-pick 的边界都会更清楚
+
+## 2. 主题分支最适合表达“一个工作单元”
+
+常见的工作单元包括：
+
+- 一个功能
+- 一个 bugfix
+- 一组文档更新
+- 一次发布准备
+
+不太适合的情况是：
+
+- “我这一周所有零碎改动”
+- “顺手一起做的几件事”
+- “先堆在这，后面再拆”
+
+如果你已经预感“后面再拆”会很痛，那通常说明现在就该分支。
+
+## 3. 分支命名也属于协作成本
+
+更好的分支名通常直接表达主题：
+
+- `feature/login-validation`
+- `fix/navbar-overlap`
+- `docs/release-notes`
+
+不太好的分支名通常是：
+
+- `test`
+- `new-branch`
+- `maqi-work`
+
+一个清晰名字的意义在于，CI、review、回滚和口头沟通时都更省力。
+
+## 4. 主题分支让并行工作更自然
+
+假设你正在做一个功能分支，但 review 还没结束，这时突然又来了线上 bug。主题分支策略会让这类场景变得非常自然：
+
+1. 保留当前功能分支等待 review
+2. 从主线再切一个 bugfix 分支
+3. 修完后单独合并
+4. 再回到原来的功能分支继续
+
+这比把所有事情都堆在一个共享分支上安全得多。
+
+## 5. 为什么 topic branch 对 rebase 更友好
+
+官方书里长期把 rebase 和小而独立的分支一起讨论，因为 rebase 最适合处理边界清晰的历史。
+
+一个主题分支如果只承载一件事，那么：
+
+- 你更容易判断是否值得 rebase
+- 冲突更容易理解
+- 整理提交顺序时不容易误伤无关工作
+
+## 6. 主题分支也降低了回滚难度
+
+如果一项工作出了问题，理想状态是你可以：
+
+- revert 这一组提交
+- 或者直接关闭、舍弃这条分支
+
+而不是从一条混合分支里一边辨认、一边手动拆弹。
+
+## 7. 一个适合团队的最低规则
+
+如果你要给团队定义轻量规则，可以先从这几条开始：
+
+1. 一项任务一个主题分支
+2. 分支名必须表达工作主题
+3. 非紧急共享分支不直接开发
+4. 发起评审前先把分支同步到最新主线
+
+最后这条很关键，因为它会把主题分支从“只是分开”推进到“可以顺利合并”。
+

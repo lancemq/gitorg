@@ -24,6 +24,7 @@ const sectionLabels: Record<Locale, Record<SearchDoc["section"], string>> = {
   zh: {
     "learning-path": "学习路径",
     commands: "命令专题",
+    "best-practices": "最佳实践",
     workflows: "工作流",
     recovery: "恢复手册",
     concepts: "核心概念",
@@ -31,6 +32,7 @@ const sectionLabels: Record<Locale, Record<SearchDoc["section"], string>> = {
   en: {
     "learning-path": "Learning Path",
     commands: "Commands",
+    "best-practices": "Best Practices",
     workflows: "Workflows",
     recovery: "Recovery",
     concepts: "Concepts",

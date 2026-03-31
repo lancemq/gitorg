@@ -1,0 +1,41 @@
+export const metadata = {
+  title: "git diff 教程",
+  slug: "git-diff",
+  locale: "zh",
+  section: "commands",
+  summary: "讲清 git diff 如何比较工作区、暂存区和提交之间的差异，以及最常见的几种比较方式。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-diff",
+    "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+  ],
+};
+
+# git diff 教程
+
+## 一句话理解
+
+`git diff` 用来比较两个状态之间的差异，它既可以看工作区，也可以看暂存区和历史提交。
+
+## 最常见三种比较
+
+```bash
+git diff
+git diff --staged
+git diff HEAD
+```
+
+- `git diff`：工作区 vs 暂存区
+- `git diff --staged`：暂存区 vs HEAD
+- `git diff HEAD`：工作区 + 暂存区 vs HEAD
+
+## 比较分支
+
+```bash
+git diff main...feature/login
+```
+
+适合在 review 前快速确认分支差异。
+
+## 一个常见误区
+
+`git diff` 没输出不一定表示“没改动”，有可能是因为改动已经进了暂存区，所以这时要看 `git diff --staged`。

@@ -1,0 +1,104 @@
+export const metadata = {
+  title: "先 fetch 再同步",
+  slug: "fetch-first-sync",
+  locale: "zh",
+  section: "best-practices",
+  summary: "把观察远端状态和真正改写本地分支分开，避免把同步决策完全交给默认 pull 行为。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-fetch",
+    "https://git-scm.com/docs/git-pull.html",
+    "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
+  ],
+};
+
+# 先 fetch 再同步
+
+## 为什么这是一个值得固定下来的习惯
+
+很多团队并不是不会 `git pull`，而是默认让 `pull` 同时完成“观察远端”和“改写本地”这两件事。这样做虽然快，但可控性差。
+
+更保守也更清楚的习惯是：
+
+```bash
+git fetch origin
+```
+
+然后再决定下一步到底是：
+
+- `git merge origin/main`
+- `git rebase origin/main`
+- `git pull --ff-only`
+
+## 1. 先观察，再变更
+
+`fetch` 的最大价值不是“更高级”，而是它把同步拆成两个阶段：
+
+1. 获取远端最新引用
+2. 再决定本地分支如何整合
+
+这会让你更容易回答三个问题：
+
+- 远端到底发生了什么
+- 我当前分支和主线分叉到了什么程度
+- 我现在该 merge、rebase，还是先停一下
+
+## 2. `pull` 的问题不是错，而是默认太隐式
+
+官方 `git pull` 文档本身就说明了：pull 会先 fetch，再按配置或参数做整合。真正的问题在于，如果团队没有统一策略，默认行为很容易变成“有人 merge，有人 rebase，有人甚至不知道发生了什么”。
+
+所以更稳的实践不是“禁止 pull”，而是：
+
+- 默认先 fetch
+- 需要 pull 时尽量显式加策略
+
+## 3. 一个非常保守的团队默认值
+
+如果团队希望更保守，可以考虑：
+
+```bash
+git pull --ff-only
+```
+
+它的意义在于：
+
+- 可以快进时就更新
+- 不能快进时直接失败
+- 不会默默帮你生成一个你并没有计划要的 merge commit
+
+这比“直接 pull，看结果再说”要稳很多。
+
+## 4. fetch-first 对冲突处理也更友好
+
+如果你在 fetch 之后先看清楚分叉情况，再决定 merge 或 rebase，那么冲突会更像“主动处理”，而不是“被默认行为突然打断”。
+
+这一点对新人尤其重要，因为很多 Git 恐惧都来自不理解 pull 之后为什么突然一堆冲突。
+
+## 5. 一个简化的同步流程
+
+日常开发里很实用的一套顺序是：
+
+```bash
+git fetch origin
+git log --oneline --decorate --graph HEAD..origin/main
+git rebase origin/main
+```
+
+或者：
+
+```bash
+git fetch origin
+git merge origin/main
+```
+
+关键不是命令本身，而是你已经先把远端状态看清楚了。
+
+## 6. 什么时候适合 merge，什么时候适合 rebase
+
+非常粗略但实用的经验法则：
+
+- 本地清理历史：优先 rebase
+- 已共享或高风险分支：优先 merge
+- 团队想严格避免额外 merge commit：优先 `--ff-only`
+
+这个判断比“永远只用一种方式”更现实。
+

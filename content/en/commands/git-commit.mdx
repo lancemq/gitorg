@@ -1,0 +1,26 @@
+export const metadata = {
+  title: "git commit Tutorial",
+  slug: "git-commit",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how git commit creates new history nodes, how to write useful messages, and when amend is appropriate.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-commit",
+    "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+  ],
+};
+
+# git commit Tutorial
+
+## The short version
+
+`git commit` turns staged content into a new commit object at the tip of the current branch.
+
+## Common usage
+
+```bash
+git commit -m "feat: add search dialog"
+git commit --amend
+```
+
+Use `--amend` mainly for local cleanup before the history is shared.

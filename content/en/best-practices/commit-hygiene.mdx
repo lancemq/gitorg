@@ -1,0 +1,117 @@
+export const metadata = {
+  title: "Commit Hygiene and Messages",
+  slug: "commit-hygiene",
+  locale: "en",
+  section: "best-practices",
+  summary: "Keep commits as logically separate changesets and write messages that explain intent and motivation, so review, revert, and cherry-pick stay lightweight.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project.html",
+    "https://git-scm.com/docs/git-commit",
+  ],
+};
+
+# Commit Hygiene and Messages
+
+## Why this topic comes first
+
+Many teams know how to use Git and still suffer from collaboration drag because the commits themselves are weak. Oversized commits slow review, make rollback harder, and blur responsibility. Weak messages make future readers guess what actually happened.
+
+The long-running official guidance is simple: each commit should be a logically separate changeset.
+
+## 1. One commit, one intent
+
+A practical baseline:
+
+- one clear purpose per commit
+- avoid mixing unrelated fixes together
+- split staging when one file contains multiple concerns
+
+A useful pattern is:
+
+```bash
+git add --patch
+git commit -m "fix: handle empty email input"
+```
+
+`git add --patch` matters because it forces you to define the boundary before the commit exists.
+
+## 2. Three quick questions before you commit
+
+Ask:
+
+1. Can I summarize this commit in one sentence?
+2. Would reverting only this commit be safe?
+3. Could a reviewer understand the intent from this commit alone?
+
+If two of those answers are unclear, the commit is usually still too broad.
+
+## 3. Say what changed first, then explain why
+
+The official `git commit` guidance is still practical:
+
+- keep the first line short and descriptive
+- use the body for motivation and context
+
+A reusable structure:
+
+```text
+Add validation for empty email input
+
+Prevent the login form from submitting when the email field is blank.
+This keeps client-side behavior aligned with server-side validation.
+```
+
+## 4. Prefer action-oriented subjects
+
+Better:
+
+- `Add login retry guard`
+- `Fix empty state alignment`
+- `Remove legacy auth flag`
+
+Weaker:
+
+- `login page changes`
+- `some fixes`
+- `update code`
+
+Action verbs expose intent. Vague nouns do not.
+
+## 5. When a commit body is worth it
+
+A body is especially helpful when:
+
+- the change is not self-explanatory
+- you chose between multiple approaches
+- the change affects safety, compatibility, or performance
+- the diff alone does not explain the decision
+
+## 6. Strong commit hygiene improves three downstream workflows
+
+### Review
+
+Smaller commits make it easier to see scope and intent.
+
+### Revert
+
+One-intent commits are much safer to undo.
+
+### Cherry-pick
+
+Small focused fixes are much easier to transplant to another branch.
+
+## 7. A lightweight team baseline
+
+If your team has no standard yet, start here:
+
+1. one commit, one intent
+2. subject line must describe an action
+3. non-obvious changes get one line of motivation
+4. review staged changes before committing
+
+That last step is often enough to catch accidental noise:
+
+```bash
+git diff --staged
+```
+

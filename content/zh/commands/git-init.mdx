@@ -1,0 +1,57 @@
+export const metadata = {
+  title: "git init 教程",
+  slug: "git-init",
+  locale: "zh",
+  section: "commands",
+  summary: "解释 git init 如何初始化仓库、默认分支如何产生，以及它在新项目和已有目录中的常见用法。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-init",
+    "https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository",
+  ],
+};
+
+# git init 教程
+
+## 一句话理解
+
+`git init` 会在当前目录下创建一个新的 Git 仓库元数据结构，让这个目录开始具备版本管理能力。
+
+## 最常见场景
+
+- 新项目从零开始接入 Git
+- 已有代码目录想纳入版本管理
+- 临时实验目录需要快速建立本地仓库
+
+## 基本用法
+
+```bash
+git init
+```
+
+执行后会生成 `.git` 目录，其中保存对象数据库、引用和配置。
+
+## 指定默认分支
+
+```bash
+git init -b main
+```
+
+如果你想明确初始化后的主分支名称，这种写法更直接。
+
+## 一个常见工作流
+
+```bash
+git init
+git add .
+git commit -m "chore: initial commit"
+```
+
+## 常见误区
+
+### 误区 1：init 会自动产生首个提交
+
+不会。`git init` 只是初始化仓库，真正的历史起点来自你的第一次 `commit`。
+
+### 误区 2：已有目录不能再 init
+
+可以。对已有项目执行 `git init` 很常见，只要你清楚它会把当前目录作为一个新仓库开始管理。

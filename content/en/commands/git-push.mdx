@@ -1,0 +1,27 @@
+export const metadata = {
+  title: "git push Tutorial",
+  slug: "git-push",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how git push publishes local branches, how upstream tracking works, and why force-with-lease is safer than raw force push.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-push",
+    "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
+  ],
+};
+
+# git push Tutorial
+
+## The short version
+
+`git push` publishes local refs and objects to a remote repository.
+
+## Common forms
+
+```bash
+git push origin main
+git push -u origin feature/login
+git push --force-with-lease
+```
+
+`--force-with-lease` is the safer force option for collaborative work.

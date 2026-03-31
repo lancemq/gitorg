@@ -1,0 +1,41 @@
+export const metadata = {
+  title: "Hotfix and Urgent Fixes",
+  slug: "hotfix-and-urgent-fixes",
+  locale: "en",
+  section: "workflows",
+  summary: "Handle urgent fixes on a stable base, ship the smallest repair possible, and then flow that repair back into the branches that still need it.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+    "https://git-scm.com/book/en/v2/Distributed-Git-Maintaining-a-Project",
+    "https://git-scm.com/docs/git-branch",
+  ],
+};
+
+# Hotfix and Urgent Fixes
+
+## Where this workflow fits
+
+Production incidents, release blockers, and severe regressions are classic hotfix situations. The goal is not to clean up everything. The goal is to repair one critical issue on the safest possible base and flow that fix back cleanly.
+
+## Recommended sequence
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c hotfix/login-timeout
+```
+
+After the fix:
+
+1. validate the hotfix branch in isolation
+2. land it on the stable branch
+3. propagate the fix back into main or any maintained branches that still need it
+
+## Why hotfixes should avoid “while we are here” changes
+
+Urgent fixes work best when the change surface stays small:
+
+- smaller diffs validate faster
+- rollback is simpler
+- incident analysis stays clearer
+

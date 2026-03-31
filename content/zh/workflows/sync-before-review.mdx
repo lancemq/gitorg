@@ -1,0 +1,52 @@
+export const metadata = {
+  title: "评审前同步主线",
+  slug: "sync-before-review",
+  locale: "zh",
+  section: "workflows",
+  summary: "在发起评审前先同步主线并检查差异范围，减少 reviewer 面对过期基底、重复冲突和历史噪声的成本。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Branching-Rebasing.html",
+    "https://git-scm.com/docs/git-fetch",
+    "https://git-scm.com/docs/git-pull.html",
+  ],
+};
+
+# 评审前同步主线
+
+## 为什么评审前一定要做这一步
+
+如果一个分支已经和主线分叉太久，reviewer 看到的内容会混入：
+
+- 已经被主线解决的差异
+- 基底落后导致的噪声冲突
+- 不必要的 merge 噪声
+
+## 推荐流程
+
+```bash
+git fetch origin
+git rebase origin/main
+git diff --stat origin/main...
+```
+
+如果团队不希望改写个人分支，也可以：
+
+```bash
+git fetch origin
+git merge origin/main
+```
+
+## 关键检查点
+
+在真正发起评审前，至少确认：
+
+1. 最近主线更新已经纳入
+2. diff 范围仍然是你预期的那部分改动
+3. 最近几个提交没有明显噪声
+
+## 这一步能帮 reviewer 省什么
+
+- 少看无关差异
+- 少处理已经过期的冲突上下文
+- 更容易聚焦真正的业务改动
+

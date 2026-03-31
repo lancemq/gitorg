@@ -1,8 +1,10 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { SiteShell } from "@/components/site-shell";
+import { DocTemplate } from "@/components/doc-template";
 import { getDocByPath } from "@/lib/content";
-import { getDictionary, isValidLocale, locales, type Locale } from "@/lib/i18n";
+import { getDictionary, getSidebarContent, isValidLocale, locales, type Locale } from "@/lib/i18n";
+import { buildPageMetadata } from "@/lib/seo";
 
 type Props = {
   params: Promise<{
@@ -12,6 +14,24 @@ type Props = {
 
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { lang } = await params;
+
+  if (!isValidLocale(lang)) {
+    return {};
+  }
+
+  const locale = lang as Locale;
+  const doc = await getDocByPath(locale, "concepts/git-history");
+
+  return buildPageMetadata({
+    locale,
+    pathname: "/history",
+    title: doc.metadata.title,
+    description: doc.metadata.summary,
+  });
 }
 
 export default async function GitHistoryPage({ params }: Props) {
@@ -27,41 +47,19 @@ export default async function GitHistoryPage({ params }: Props) {
   const DocBody = doc.Component;
 
   return (
-    <SiteShell locale={locale} sidebar={dict.sidebar.docs("concepts/git-history")}>
-      <article className="doc-page">
-        <nav className="breadcrumbs" aria-label="Breadcrumb">
-          <a href={`/${locale}`}>{dict.commandPage.breadcrumbs.docs}</a>
-          <span>/</span>
-          <a href={`/${locale}/docs`}>{dict.docsIndex.title}</a>
-          <span>/</span>
-          <strong>{doc.metadata.title}</strong>
-        </nav>
-
-        <header className="panel doc-hero">
-          <p className="eyebrow">{dict.docsIndex.eyebrow}</p>
-          <h1>{doc.metadata.title}</h1>
-          <p className="lead">{doc.metadata.summary}</p>
-        </header>
-
-        <section className="panel doc-content">
-          <div className="mdx-content">
-            <DocBody />
-          </div>
-        </section>
-
-        <section className="panel doc-sources">
-          <h2>{dict.docsIndex.sourcesTitle}</h2>
-          <ul>
-            {doc.metadata.sourceUrls.map((url: string) => (
-              <li key={url}>
-                <a href={url} target="_blank" rel="noreferrer">
-                  {url}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-      </article>
-    </SiteShell>
+    <DocTemplate
+      locale={locale}
+      sidebar={getSidebarContent(locale, { kind: "docs", activePath: "concepts/git-history" })}
+      breadcrumbs={[
+        { label: dict.commandPage.breadcrumbs.overview, href: `/${locale}` },
+        { label: doc.metadata.title },
+      ]}
+      eyebrow={dict.docsIndex.eyebrow}
+      title={doc.metadata.title}
+      summary={doc.metadata.summary}
+      sourcesTitle={dict.docsIndex.sourcesTitle}
+      sourceUrls={doc.metadata.sourceUrls}
+      Body={DocBody}
+    />
   );
 }
