@@ -1,0 +1,30 @@
+export const metadata = {
+  title: "Blob 对象与内容寻址教程",
+  slug: "blob-objects-and-content-addressing",
+  locale: "zh",
+  section: "internals",
+  summary: "解释 blob 如何只按内容存储，以及哈希为什么成为对象身份。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Internals-Git-Objects",
+  ],
+};
+
+# Blob 对象与内容寻址教程
+
+## 一句话理解
+
+解释 blob 如何只按内容存储，以及哈希为什么成为对象身份。
+
+## 关键点
+
+- blob 只关心文件内容本身
+- 对象 ID 来自内容和头部
+- 相同内容会指向相同 blob
+
+## 为什么这有助于理解命令
+
+很多看起来难记的命令差异，本质上只是它们在操作对象、引用、索引或可达性时触发了不同规则。
+
+## 建议连着看
+
+建议把这篇内容和 git show、git log --graph、git cat-file、git rev-parse 或 git fetch 放在一起看。

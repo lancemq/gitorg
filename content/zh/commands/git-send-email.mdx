@@ -1,0 +1,47 @@
+export const metadata = {
+  title: "git-send-email 教程",
+  slug: "git-send-email",
+  locale: "zh",
+  section: "commands",
+  summary: "解释如何用 git-send-email 把补丁邮件发送到邮件列表或评审流程。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-send-email",
+    "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project",
+  ],
+};
+
+# git-send-email 教程
+
+## 一句话理解
+
+git-send-email 用于把补丁邮件发送到邮件列表或评审流程。
+
+## 什么时候适合用
+
+- 当你需要把补丁邮件发送到邮件列表或评审流程
+- 当你想把这类操作做成稳定流程而不是手工重复
+- 当你需要更准确地理解 Git 在这一步到底记录了什么
+
+## 基本示例
+
+```bash
+git send-email *.patch
+```
+
+## 读这条命令时最该注意什么
+
+补丁工作流最怕上下文不一致，所以应用前最好先确认基线、工作区状态和回退动作。
+
+## 一个更稳的实践建议
+
+在真正应用前先阅读补丁内容，并准备 abort、continue 或备用分支。
+
+## 补充理解角度
+
+- 处理补丁邮件或补丁文件
+- 在仓库外部交换变更
+- 保留提交边界而不是手工复制改动
+
+## 延伸阅读
+
+继续搭配 git status、git log、git show 一起看，通常更容易判断这条命令对历史、索引和工作区分别造成了什么影响。

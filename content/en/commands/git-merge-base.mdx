@@ -1,0 +1,47 @@
+export const metadata = {
+  title: "git-merge-base Tutorial",
+  slug: "git-merge-base",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how to use git-merge-base to find the best common ancestor between histories.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-merge-base",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+  ],
+};
+
+# git-merge-base Tutorial
+
+## The short version
+
+git-merge-base is used to find the best common ancestor between histories.
+
+## When it is a good fit
+
+- when you need to find the best common ancestor between histories
+- when you want this step to be repeatable instead of ad hoc
+- when you need a clearer mental model of what Git is recording or updating
+
+## Basic example
+
+```bash
+git merge-base main feature/login
+```
+
+## What to watch most closely
+
+Plumbing commands are closer to Git internals, so check whether a safer high-level command already solves the problem.
+
+## A safer working habit
+
+Treat it as a read-only inspection tool first, then move to write-oriented usage only when necessary.
+
+## Useful angles for understanding it
+
+- Inspect lower-level objects and refs
+- Write scripts or debug advanced issues
+- Verify internal repository state
+
+## Related reading
+
+Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.

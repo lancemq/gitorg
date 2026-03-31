@@ -1,0 +1,46 @@
+export const metadata = {
+  title: "git-update-ref 教程",
+  slug: "git-update-ref",
+  locale: "zh",
+  section: "commands",
+  summary: "解释如何用 git-update-ref 以更底层的方式更新引用。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-update-ref",
+  ],
+};
+
+# git-update-ref 教程
+
+## 一句话理解
+
+git-update-ref 用于以更底层的方式更新引用。
+
+## 什么时候适合用
+
+- 当你需要以更底层的方式更新引用
+- 当你想把这类操作做成稳定流程而不是手工重复
+- 当你需要更准确地理解 Git 在这一步到底记录了什么
+
+## 基本示例
+
+```bash
+git update-ref refs/heads/feature HEAD
+```
+
+## 读这条命令时最该注意什么
+
+底层命令更接近实现细节，读写前要先确认自己是不是只需要一个更安全的高层命令。
+
+## 一个更稳的实践建议
+
+先把它当作只读检查工具理解，再决定是否进入修改引用或索引的用法。
+
+## 补充理解角度
+
+- 理解底层对象和引用
+- 写脚本或排查高级问题
+- 验证 Git 内部状态
+
+## 延伸阅读
+
+继续搭配 git status、git log、git show 一起看，通常更容易判断这条命令对历史、索引和工作区分别造成了什么影响。

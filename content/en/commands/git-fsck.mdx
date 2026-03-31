@@ -1,0 +1,46 @@
+export const metadata = {
+  title: "git-fsck Tutorial",
+  slug: "git-fsck",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how to use git-fsck to verify the integrity of objects and refs.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-fsck",
+  ],
+};
+
+# git-fsck Tutorial
+
+## The short version
+
+git-fsck is used to verify the integrity of objects and refs.
+
+## When it is a good fit
+
+- when you need to verify the integrity of objects and refs
+- when you want this step to be repeatable instead of ad hoc
+- when you need a clearer mental model of what Git is recording or updating
+
+## Basic example
+
+```bash
+git fsck --full
+```
+
+## What to watch most closely
+
+Advanced commands are not always part of the daily path, but mistakes with them usually cost more to recover from.
+
+## A safer working habit
+
+Rehearse the flow on a small reproducible history before running it in a production repository.
+
+## Useful angles for understanding it
+
+- Handle more complex collaboration or history-analysis tasks
+- Turn one-off steps into repeatable routines
+- Reduce the risk of advanced operations
+
+## Related reading
+
+Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.

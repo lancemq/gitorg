@@ -1,0 +1,47 @@
+export const metadata = {
+  title: "git-grep 教程",
+  slug: "git-grep",
+  locale: "zh",
+  section: "commands",
+  summary: "解释如何用 git-grep 在仓库内容中搜索文本。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-grep",
+    "https://git-scm.com/book/en/v2/Git-Tools-Searching",
+  ],
+};
+
+# git-grep 教程
+
+## 一句话理解
+
+git-grep 用于在仓库内容中搜索文本。
+
+## 什么时候适合用
+
+- 当你需要在仓库内容中搜索文本
+- 当你想把这类操作做成稳定流程而不是手工重复
+- 当你需要更准确地理解 Git 在这一步到底记录了什么
+
+## 基本示例
+
+```bash
+git grep "TODO"
+```
+
+## 读这条命令时最该注意什么
+
+先把默认行为弄清楚，再去组合更多参数，通常能少踩很多隐藏规则。
+
+## 一个更稳的实践建议
+
+把它和 status、log、diff 一起看，更容易确认到底改了什么。
+
+## 补充理解角度
+
+- 理解这条命令的默认行为
+- 把它放进日常提交或排查流程
+- 在脚本或团队习惯里稳定复用
+
+## 延伸阅读
+
+继续搭配 git status、git log、git show 一起看，通常更容易判断这条命令对历史、索引和工作区分别造成了什么影响。

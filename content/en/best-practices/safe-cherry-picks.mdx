@@ -1,0 +1,31 @@
+export const metadata = {
+  title: "Safe Cherry-picks",
+  slug: "safe-cherry-picks",
+  locale: "en",
+  section: "best-practices",
+  summary: "Use cherry-pick safely when backporting fixes or selectively reusing commits.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-cherry-pick",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+  ],
+};
+
+# Safe Cherry-picks
+
+## Core guidance
+
+Use cherry-pick safely when backporting fixes or selectively reusing commits.
+
+## Why it matters
+
+Good Git practice is less about looking clever with commands and more about keeping history readable, collaboration predictable, and recovery paths clear.
+
+## Checklist
+
+- Confirm the target branch really needs the commit
+- Review the resulting diff and tests
+- Record where the backport came from
+
+## Commands to review alongside it
+
+It usually helps to review this topic alongside git status, git log, and git diff, then add git rebase, git merge, or force-with-lease where appropriate.

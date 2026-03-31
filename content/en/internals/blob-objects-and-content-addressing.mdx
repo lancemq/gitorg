@@ -1,0 +1,30 @@
+export const metadata = {
+  title: "Blob Objects and Content Addressing",
+  slug: "blob-objects-and-content-addressing",
+  locale: "en",
+  section: "internals",
+  summary: "Explain how blobs store raw content and why hashes become the identity of Git objects.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Internals-Git-Objects",
+  ],
+};
+
+# Blob Objects and Content Addressing
+
+## The short version
+
+Explain how blobs store raw content and why hashes become the identity of Git objects.
+
+## Key ideas
+
+- A blob stores file content without path context
+- Object IDs come from headers plus content
+- Identical content maps to the same blob
+
+## Why this helps you understand commands
+
+Many command differences that feel arbitrary become easier once you see how Git is updating objects, refs, the index, or reachability.
+
+## Suggested follow-up
+
+It pairs well with git show, git log --graph, git cat-file, git rev-parse, or git fetch.

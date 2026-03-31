@@ -1,0 +1,47 @@
+export const metadata = {
+  title: "git-submodule Tutorial",
+  slug: "git-submodule",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how to use git-submodule to manage nested repositories as submodules.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-submodule",
+    "https://git-scm.com/book/en/v2/Git-Tools-Submodules",
+  ],
+};
+
+# git-submodule Tutorial
+
+## The short version
+
+git-submodule is used to manage nested repositories as submodules.
+
+## When it is a good fit
+
+- when you need to manage nested repositories as submodules
+- when you want this step to be repeatable instead of ad hoc
+- when you need a clearer mental model of what Git is recording or updating
+
+## Basic example
+
+```bash
+git submodule update --init --recursive
+```
+
+## What to watch most closely
+
+These commands often change repository layout or collaboration patterns, so align on conventions first.
+
+## A safer working habit
+
+Test the flow in a small sandbox repository before rolling it into the main repo or automation.
+
+## Useful angles for understanding it
+
+- Distribute code or history
+- Reduce clone or checkout scope
+- Coordinate multi-repo or multi-worktree setups
+
+## Related reading
+
+Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.

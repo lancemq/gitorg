@@ -1,0 +1,31 @@
+export const metadata = {
+  title: "提交对象、父提交与提交说明教程",
+  slug: "commit-message-and-parents",
+  locale: "zh",
+  section: "internals",
+  summary: "说明提交对象如何把 tree、父提交和说明文本连接成历史图。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Internals-Git-Objects",
+    "https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History",
+  ],
+};
+
+# 提交对象、父提交与提交说明教程
+
+## 一句话理解
+
+说明提交对象如何把 tree、父提交和说明文本连接成历史图。
+
+## 关键点
+
+- 提交对象至少包含 tree、parent、author、message
+- 父提交关系决定历史图结构
+- 提交说明是对象内容的一部分
+
+## 为什么这有助于理解命令
+
+很多看起来难记的命令差异，本质上只是它们在操作对象、引用、索引或可达性时触发了不同规则。
+
+## 建议连着看
+
+建议把这篇内容和 git show、git log --graph、git cat-file、git rev-parse 或 git fetch 放在一起看。

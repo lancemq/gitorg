@@ -1,0 +1,47 @@
+export const metadata = {
+  title: "git-config Tutorial",
+  slug: "git-config",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how to use git-config to inspect and edit Git configuration.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-config",
+    "https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration",
+  ],
+};
+
+# git-config Tutorial
+
+## The short version
+
+git-config is used to inspect and edit Git configuration.
+
+## When it is a good fit
+
+- when you need to inspect and edit Git configuration
+- when you want this step to be repeatable instead of ad hoc
+- when you need a clearer mental model of what Git is recording or updating
+
+## Basic example
+
+```bash
+git config --global user.name "Maqi"
+```
+
+## What to watch most closely
+
+Learn the default behavior first. Many surprises come from adding flags before the base behavior is clear.
+
+## A safer working habit
+
+Pair it with status, log, or diff so you can confirm what actually changed.
+
+## Useful angles for understanding it
+
+- Understand the default behavior clearly
+- Use it in day-to-day Git routines
+- Reuse it safely in scripts or team habits
+
+## Related reading
+
+Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.

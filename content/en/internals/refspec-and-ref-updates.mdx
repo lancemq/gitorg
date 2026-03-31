@@ -1,0 +1,31 @@
+export const metadata = {
+  title: "Refspecs and Ref Updates",
+  slug: "refspec-and-ref-updates",
+  locale: "en",
+  section: "internals",
+  summary: "Explain how refspecs determine which refs are mapped and updated during fetch and push.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Internals-The-Refspec",
+    "https://git-scm.com/docs/git-fetch",
+  ],
+};
+
+# Refspecs and Ref Updates
+
+## The short version
+
+Explain how refspecs determine which refs are mapped and updated during fetch and push.
+
+## Key ideas
+
+- A refspec maps source refs to destination refs
+- Both fetch and push rely on it to decide what gets updated
+- Understanding refspecs clarifies remote-tracking branches
+
+## Why this helps you understand commands
+
+Many command differences that feel arbitrary become easier once you see how Git is updating objects, refs, the index, or reachability.
+
+## Suggested follow-up
+
+It pairs well with git show, git log --graph, git cat-file, git rev-parse, or git fetch.

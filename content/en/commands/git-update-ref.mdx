@@ -1,0 +1,46 @@
+export const metadata = {
+  title: "git-update-ref Tutorial",
+  slug: "git-update-ref",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how to use git-update-ref to update refs through a lower-level interface.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-update-ref",
+  ],
+};
+
+# git-update-ref Tutorial
+
+## The short version
+
+git-update-ref is used to update refs through a lower-level interface.
+
+## When it is a good fit
+
+- when you need to update refs through a lower-level interface
+- when you want this step to be repeatable instead of ad hoc
+- when you need a clearer mental model of what Git is recording or updating
+
+## Basic example
+
+```bash
+git update-ref refs/heads/feature HEAD
+```
+
+## What to watch most closely
+
+Plumbing commands are closer to Git internals, so check whether a safer high-level command already solves the problem.
+
+## A safer working habit
+
+Treat it as a read-only inspection tool first, then move to write-oriented usage only when necessary.
+
+## Useful angles for understanding it
+
+- Inspect lower-level objects and refs
+- Write scripts or debug advanced issues
+- Verify internal repository state
+
+## Related reading
+
+Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.

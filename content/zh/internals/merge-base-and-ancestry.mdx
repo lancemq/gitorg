@@ -1,0 +1,31 @@
+export const metadata = {
+  title: "共同祖先与历史祖先关系教程",
+  slug: "merge-base-and-ancestry",
+  locale: "zh",
+  section: "internals",
+  summary: "解释 Git 如何基于共同祖先判断分支差异、合并基础和历史可达性。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-merge-base",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+  ],
+};
+
+# 共同祖先与历史祖先关系教程
+
+## 一句话理解
+
+解释 Git 如何基于共同祖先判断分支差异、合并基础和历史可达性。
+
+## 关键点
+
+- 共同祖先决定比较起点
+- merge-base 直接影响 merge 和 rebase 的判断
+- 可达性是很多 Git 查询的基础
+
+## 为什么这有助于理解命令
+
+很多看起来难记的命令差异，本质上只是它们在操作对象、引用、索引或可达性时触发了不同规则。
+
+## 建议连着看
+
+建议把这篇内容和 git show、git log --graph、git cat-file、git rev-parse 或 git fetch 放在一起看。

@@ -15,38 +15,86 @@ export type CommandSlug =
   | "git-log"
   | "git-rm"
   | "git-mv"
+  | "git-fetch"
   | "git-pull"
   | "git-push"
+  | "git-switch"
+  | "git-branch"
   | "git-tag"
   | "git-remote"
-  | "git-clean"
   | "git-rebase"
   | "git-merge"
   | "git-cherry-pick"
   | "git-reset"
   | "git-stash"
-  | "git-fetch"
   | "git-restore"
   | "git-revert"
-  | "git-switch"
-  | "git-branch"
-  | "git-checkout"
   | "git-reflog"
   | "git-bisect"
-  | "git-blame";
+  | "git-blame"
+  | "git-checkout"
+  | "git-clean"
+  | "git-config"
+  | "git-help"
+  | "git-describe"
+  | "git-grep"
+  | "git-shortlog"
+  | "git-show-ref"
+  | "git-rev-parse"
+  | "git-am"
+  | "git-apply"
+  | "git-format-patch"
+  | "git-send-email"
+  | "git-request-pull"
+  | "git-archive"
+  | "git-bundle"
+  | "git-worktree"
+  | "git-submodule"
+  | "git-sparse-checkout"
+  | "git-cat-file"
+  | "git-ls-files"
+  | "git-ls-tree"
+  | "git-read-tree"
+  | "git-update-index"
+  | "git-update-ref"
+  | "git-symbolic-ref"
+  | "git-rev-list"
+  | "git-merge-base"
+  | "git-notes"
+  | "git-range-diff"
+  | "git-cherry"
+  | "git-mergetool"
+  | "git-fsck"
+  | "git-gc"
+  | "git-count-objects"
+  | "git-verify-pack"
+  | "git-verify-tag";
 
 export type BestPracticeSlug =
   | "commit-hygiene"
   | "topic-branches"
   | "fetch-first-sync"
   | "shared-history-boundaries"
-  | "review-and-safe-push";
+  | "review-and-safe-push"
+  | "atomic-commits"
+  | "branch-naming"
+  | "pull-request-prep"
+  | "conflict-resolution-routine"
+  | "release-hygiene"
+  | "safe-cherry-picks"
+  | "small-batch-review";
 
 export type WorkflowSlug =
   | "fetch-vs-pull"
   | "feature-branch-collaboration"
   | "sync-before-review"
-  | "hotfix-and-urgent-fixes";
+  | "hotfix-and-urgent-fixes"
+  | "release-branch-workflow"
+  | "backport-with-cherry-pick"
+  | "fork-upstream-sync"
+  | "squash-vs-rebase-merge"
+  | "long-lived-branch-maintenance"
+  | "submodule-update-flow";
 
 export type InternalsSlug =
   | "object-database"
@@ -55,7 +103,12 @@ export type InternalsSlug =
   | "remote-tracking-refs"
   | "commit-graph"
   | "packfiles-and-storage"
-  | "reachability-and-garbage-collection";
+  | "reachability-and-garbage-collection"
+  | "merge-base-and-ancestry"
+  | "tree-objects-and-snapshots"
+  | "blob-objects-and-content-addressing"
+  | "commit-message-and-parents"
+  | "refspec-and-ref-updates";
 
 export function isValidLocale(value: string): value is Locale {
   return locales.includes(value as Locale);
@@ -319,6 +372,41 @@ export const commandSlugs = [
   "git-blame",
   "git-checkout",
   "git-clean",
+  "git-config",
+  "git-help",
+  "git-describe",
+  "git-grep",
+  "git-shortlog",
+  "git-show-ref",
+  "git-rev-parse",
+  "git-am",
+  "git-apply",
+  "git-format-patch",
+  "git-send-email",
+  "git-request-pull",
+  "git-archive",
+  "git-bundle",
+  "git-worktree",
+  "git-submodule",
+  "git-sparse-checkout",
+  "git-cat-file",
+  "git-ls-files",
+  "git-ls-tree",
+  "git-read-tree",
+  "git-update-index",
+  "git-update-ref",
+  "git-symbolic-ref",
+  "git-rev-list",
+  "git-merge-base",
+  "git-notes",
+  "git-range-diff",
+  "git-cherry",
+  "git-mergetool",
+  "git-fsck",
+  "git-gc",
+  "git-count-objects",
+  "git-verify-pack",
+  "git-verify-tag",
 ] as const;
 
 export const basicCommandSlugs = [
@@ -339,21 +427,56 @@ export const basicCommandSlugs = [
   "git-branch",
   "git-tag",
   "git-remote",
+  "git-config",
+  "git-help",
+  "git-describe",
+  "git-grep",
+  "git-shortlog",
+  "git-show-ref",
+  "git-rev-parse",
 ] as const satisfies readonly CommandSlug[];
 
 export const advancedCommandSlugs = [
-  "git-restore",
-  "git-stash",
-  "git-checkout",
   "git-rebase",
   "git-merge",
   "git-cherry-pick",
   "git-reset",
+  "git-stash",
+  "git-restore",
   "git-revert",
   "git-reflog",
   "git-bisect",
   "git-blame",
+  "git-checkout",
   "git-clean",
+  "git-am",
+  "git-apply",
+  "git-format-patch",
+  "git-send-email",
+  "git-request-pull",
+  "git-archive",
+  "git-bundle",
+  "git-worktree",
+  "git-submodule",
+  "git-sparse-checkout",
+  "git-cat-file",
+  "git-ls-files",
+  "git-ls-tree",
+  "git-read-tree",
+  "git-update-index",
+  "git-update-ref",
+  "git-symbolic-ref",
+  "git-rev-list",
+  "git-merge-base",
+  "git-notes",
+  "git-range-diff",
+  "git-cherry",
+  "git-mergetool",
+  "git-fsck",
+  "git-gc",
+  "git-count-objects",
+  "git-verify-pack",
+  "git-verify-tag",
 ] as const satisfies readonly CommandSlug[];
 
 export const bestPracticeSlugs = [
@@ -362,6 +485,13 @@ export const bestPracticeSlugs = [
   "fetch-first-sync",
   "shared-history-boundaries",
   "review-and-safe-push",
+  "atomic-commits",
+  "branch-naming",
+  "pull-request-prep",
+  "conflict-resolution-routine",
+  "release-hygiene",
+  "safe-cherry-picks",
+  "small-batch-review",
 ] as const satisfies readonly BestPracticeSlug[];
 
 export const workflowSlugs = [
@@ -369,6 +499,12 @@ export const workflowSlugs = [
   "feature-branch-collaboration",
   "sync-before-review",
   "hotfix-and-urgent-fixes",
+  "release-branch-workflow",
+  "backport-with-cherry-pick",
+  "fork-upstream-sync",
+  "squash-vs-rebase-merge",
+  "long-lived-branch-maintenance",
+  "submodule-update-flow",
 ] as const satisfies readonly WorkflowSlug[];
 
 export const internalsSlugs = [
@@ -379,6 +515,11 @@ export const internalsSlugs = [
   "commit-graph",
   "packfiles-and-storage",
   "reachability-and-garbage-collection",
+  "merge-base-and-ancestry",
+  "tree-objects-and-snapshots",
+  "blob-objects-and-content-addressing",
+  "commit-message-and-parents",
+  "refspec-and-ref-updates",
 ] as const satisfies readonly InternalsSlug[];
 
 const zhDictionary: Dictionary = {
@@ -448,7 +589,7 @@ const zhDictionary: Dictionary = {
   home: {
     hero: {
       eyebrow: "Source Control Learning Lab",
-      title: "从提交、commit 到理解对象模型，系统学习 Git 的使用与原理。",
+      title: "学会 Git，写出更好的历史。",
       description:
         "面向协作开发者的 Git 文档站，覆盖快速上手、常见工作流、风险操作恢复，以及 rebase、merge、reflog 等核心命令的实战说明。",
       primaryAction: "开始学习",
@@ -652,62 +793,6 @@ const zhDictionary: Dictionary = {
   },
   commandSlugs,
   commandMeta: {
-    "git-rebase": [
-      { label: "复杂度", value: "中等偏高" },
-      { label: "常见场景", value: "同步主分支、整理提交" },
-    ],
-    "git-merge": [
-      { label: "复杂度", value: "中等" },
-      { label: "常见场景", value: "整合分支历史" },
-    ],
-    "git-cherry-pick": [
-      { label: "复杂度", value: "中等偏高" },
-      { label: "常见场景", value: "挑选特定提交" },
-    ],
-    "git-reset": [
-      { label: "复杂度", value: "高" },
-      { label: "常见场景", value: "撤销、回退、取消暂存" },
-    ],
-    "git-stash": [
-      { label: "复杂度", value: "中等" },
-      { label: "常见场景", value: "临时保存未提交改动" },
-    ],
-    "git-fetch": [
-      { label: "复杂度", value: "基础" },
-      { label: "常见场景", value: "同步远端引用，不改动工作区" },
-    ],
-    "git-restore": [
-      { label: "复杂度", value: "中等" },
-      { label: "常见场景", value: "恢复工作区或暂存区文件" },
-    ],
-    "git-revert": [
-      { label: "复杂度", value: "中等偏高" },
-      { label: "常见场景", value: "通过新提交安全撤销变更" },
-    ],
-    "git-reflog": [
-      { label: "复杂度", value: "高" },
-      { label: "常见场景", value: "定位引用移动历史并恢复位置" },
-    ],
-    "git-bisect": [
-      { label: "复杂度", value: "高" },
-      { label: "常见场景", value: "二分查找引入问题的提交" },
-    ],
-    "git-blame": [
-      { label: "复杂度", value: "中等" },
-      { label: "常见场景", value: "追踪某行代码来自哪个提交" },
-    ],
-    "git-switch": [
-      { label: "复杂度", value: "基础" },
-      { label: "常见场景", value: "切换或创建分支" },
-    ],
-    "git-branch": [
-      { label: "复杂度", value: "基础到中等" },
-      { label: "常见场景", value: "查看、创建、重命名分支" },
-    ],
-    "git-checkout": [
-      { label: "复杂度", value: "中等" },
-      { label: "常见场景", value: "旧式切分支或恢复路径" },
-    ],
     "git-init": [
       { label: "复杂度", value: "基础" },
       { label: "常见场景", value: "初始化新仓库" },
@@ -748,6 +833,10 @@ const zhDictionary: Dictionary = {
       { label: "复杂度", value: "基础到中等" },
       { label: "常见场景", value: "重命名或移动已跟踪文件" },
     ],
+    "git-fetch": [
+      { label: "复杂度", value: "基础" },
+      { label: "常见场景", value: "同步远端引用，不改动工作区" },
+    ],
     "git-pull": [
       { label: "复杂度", value: "基础到中等" },
       { label: "常见场景", value: "抓取并整合远端更新" },
@@ -756,17 +845,209 @@ const zhDictionary: Dictionary = {
       { label: "复杂度", value: "基础到中等" },
       { label: "常见场景", value: "推送本地分支到远端" },
     ],
+    "git-switch": [
+      { label: "复杂度", value: "基础" },
+      { label: "常见场景", value: "切换或创建分支" },
+    ],
+    "git-branch": [
+      { label: "复杂度", value: "基础到中等" },
+      { label: "常见场景", value: "查看、创建、重命名分支" },
+    ],
     "git-tag": [
       { label: "复杂度", value: "基础到中等" },
-      { label: "常见场景", value: "标记版本或发布点" },
+      { label: "常见场景", value: "标记版本或重要里程碑" },
     ],
     "git-remote": [
       { label: "复杂度", value: "基础到中等" },
-      { label: "常见场景", value: "管理远端仓库地址" },
+      { label: "常见场景", value: "管理远端仓库别名和地址" },
+    ],
+    "git-rebase": [
+      { label: "复杂度", value: "中等偏高" },
+      { label: "常见场景", value: "同步主分支、整理提交" },
+    ],
+    "git-merge": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "整合分支历史" },
+    ],
+    "git-cherry-pick": [
+      { label: "复杂度", value: "中等偏高" },
+      { label: "常见场景", value: "挑选特定提交" },
+    ],
+    "git-reset": [
+      { label: "复杂度", value: "高" },
+      { label: "常见场景", value: "撤销、回退、取消暂存" },
+    ],
+    "git-stash": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "临时保存未提交改动" },
+    ],
+    "git-restore": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "恢复工作区或暂存区文件" },
+    ],
+    "git-revert": [
+      { label: "复杂度", value: "中等偏高" },
+      { label: "常见场景", value: "通过新提交安全撤销变更" },
+    ],
+    "git-reflog": [
+      { label: "复杂度", value: "高" },
+      { label: "常见场景", value: "定位引用移动历史并恢复位置" },
+    ],
+    "git-bisect": [
+      { label: "复杂度", value: "高" },
+      { label: "常见场景", value: "二分查找引入问题的提交" },
+    ],
+    "git-blame": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "追踪某行代码来自哪个提交" },
+    ],
+    "git-checkout": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "旧式切分支或恢复路径" },
     ],
     "git-clean": [
+      { label: "复杂度", value: "中等偏高" },
+      { label: "常见场景", value: "清理未跟踪文件" },
+    ],
+    "git-config": [
+      { label: "复杂度", value: "基础到中等" },
+      { label: "常见场景", value: "管理仓库和全局配置" },
+    ],
+    "git-help": [
+      { label: "复杂度", value: "基础" },
+      { label: "常见场景", value: "查阅参数和官方说明" },
+    ],
+    "git-describe": [
+      { label: "复杂度", value: "基础到中等" },
+      { label: "常见场景", value: "生成人类可读版本标识" },
+    ],
+    "git-grep": [
+      { label: "复杂度", value: "基础到中等" },
+      { label: "常见场景", value: "在 Git 管理的内容中检索代码" },
+    ],
+    "git-shortlog": [
+      { label: "复杂度", value: "基础到中等" },
+      { label: "常见场景", value: "统计贡献与整理发布说明" },
+    ],
+    "git-show-ref": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "查看分支和标签引用" },
+    ],
+    "git-rev-parse": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "脚本里解析引用和路径" },
+    ],
+    "git-am": [
+      { label: "复杂度", value: "中等偏高" },
+      { label: "常见场景", value: "应用补丁邮件序列" },
+    ],
+    "git-apply": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "预演或应用补丁" },
+    ],
+    "git-format-patch": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "生成补丁系列" },
+    ],
+    "git-send-email": [
       { label: "复杂度", value: "高" },
-      { label: "常见场景", value: "清理未跟踪文件和目录" },
+      { label: "常见场景", value: "发送补丁邮件" },
+    ],
+    "git-request-pull": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "整理交付说明" },
+    ],
+    "git-archive": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "导出源码快照" },
+    ],
+    "git-bundle": [
+      { label: "复杂度", value: "中等偏高" },
+      { label: "常见场景", value: "离线传输历史" },
+    ],
+    "git-worktree": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "并行处理多个分支" },
+    ],
+    "git-submodule": [
+      { label: "复杂度", value: "高" },
+      { label: "常见场景", value: "管理子模块仓库" },
+    ],
+    "git-sparse-checkout": [
+      { label: "复杂度", value: "中等偏高" },
+      { label: "常见场景", value: "缩小工作区范围" },
+    ],
+    "git-cat-file": [
+      { label: "复杂度", value: "高" },
+      { label: "常见场景", value: "查看对象数据库内容" },
+    ],
+    "git-ls-files": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "检查索引中的路径" },
+    ],
+    "git-ls-tree": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "查看提交快照结构" },
+    ],
+    "git-read-tree": [
+      { label: "复杂度", value: "高" },
+      { label: "常见场景", value: "底层索引操作" },
+    ],
+    "git-update-index": [
+      { label: "复杂度", value: "高" },
+      { label: "常见场景", value: "直接控制索引状态" },
+    ],
+    "git-update-ref": [
+      { label: "复杂度", value: "高" },
+      { label: "常见场景", value: "脚本化更新引用" },
+    ],
+    "git-symbolic-ref": [
+      { label: "复杂度", value: "高" },
+      { label: "常见场景", value: "理解和操作符号引用" },
+    ],
+    "git-rev-list": [
+      { label: "复杂度", value: "高" },
+      { label: "常见场景", value: "遍历和筛选提交集合" },
+    ],
+    "git-merge-base": [
+      { label: "复杂度", value: "中等偏高" },
+      { label: "常见场景", value: "分析分支共同祖先" },
+    ],
+    "git-notes": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "给提交附加元信息" },
+    ],
+    "git-range-diff": [
+      { label: "复杂度", value: "高" },
+      { label: "常见场景", value: "比较补丁序列版本" },
+    ],
+    "git-cherry": [
+      { label: "复杂度", value: "中等偏高" },
+      { label: "常见场景", value: "判断提交是否已被吸收" },
+    ],
+    "git-mergetool": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "用图形工具处理冲突" },
+    ],
+    "git-fsck": [
+      { label: "复杂度", value: "高" },
+      { label: "常见场景", value: "检查仓库一致性" },
+    ],
+    "git-gc": [
+      { label: "复杂度", value: "高" },
+      { label: "常见场景", value: "整理仓库存储" },
+    ],
+    "git-count-objects": [
+      { label: "复杂度", value: "中等偏高" },
+      { label: "常见场景", value: "检查对象数量和包体积" },
+    ],
+    "git-verify-pack": [
+      { label: "复杂度", value: "高" },
+      { label: "常见场景", value: "分析 pack 文件内容" },
+    ],
+    "git-verify-tag": [
+      { label: "复杂度", value: "中等偏高" },
+      { label: "常见场景", value: "验证签名标签" },
     ],
   },
 };
@@ -818,27 +1099,27 @@ const enDictionary: Dictionary = {
   commandIndex: {
     eyebrow: "Command Hub",
     title: "Git Command Topics",
-    description: "Enter a dedicated command hub first, then move from the grouped overview into each command detail page.",
+    description: "Start from the command hub, then move into focused command details without overloading the sidebar with a flat list.",
   },
   bestPracticeIndex: {
     eyebrow: "Best Practices",
-    title: "Git Best Practices Channel",
-    description: "Split collaboration habits into standalone reads covering commit quality, topic branches, sync strategy, shared-history boundaries, and safer push flows.",
+    title: "Best Practices Channel",
+    description: "Study team-friendly Git habits as focused topics, from commit hygiene and topic branches to safe pushes and shared-history boundaries.",
   },
   workflowIndex: {
     eyebrow: "Workflows",
     title: "Git Workflows Channel",
-    description: "Break collaboration flows into dedicated reads covering sync strategy, feature-branch teamwork, pre-review sync, and urgent-fix workflows.",
+    description: "Break common collaboration routines into reusable flows, including sync strategy, feature-branch teamwork, review prep, and urgent fixes.",
   },
   internalsIndex: {
     eyebrow: "Git Internals",
     title: "Git Internals Channel",
-    description: "Break Git internals into focused topics spanning the object database, refs and HEAD, commit graphs, and packfiles so the model stays practical.",
+    description: "Learn Git internals as separate topics, from the object database and refs to commit graphs and packfiles.",
   },
   home: {
     hero: {
       eyebrow: "Source Control Learning Lab",
-      title: "Learn Git from commits to the object model, with both workflow and internals.",
+      title: "Master Git. Build Better History.",
       description:
         "A Git documentation site for collaborative developers, covering quick start, common workflows, recovery strategies, and hands-on guidance for rebase, merge, and reflog.",
       primaryAction: "Start learning",
@@ -1042,62 +1323,6 @@ const enDictionary: Dictionary = {
   },
   commandSlugs,
   commandMeta: {
-    "git-rebase": [
-      { label: "Complexity", value: "Medium to high" },
-      { label: "Typical use", value: "Sync main branch, clean up commits" },
-    ],
-    "git-merge": [
-      { label: "Complexity", value: "Medium" },
-      { label: "Typical use", value: "Join branch histories" },
-    ],
-    "git-cherry-pick": [
-      { label: "Complexity", value: "Medium to high" },
-      { label: "Typical use", value: "Apply selected commits" },
-    ],
-    "git-reset": [
-      { label: "Complexity", value: "High" },
-      { label: "Typical use", value: "Undo, move HEAD, unstage changes" },
-    ],
-    "git-stash": [
-      { label: "Complexity", value: "Medium" },
-      { label: "Typical use", value: "Temporarily shelve local changes" },
-    ],
-    "git-fetch": [
-      { label: "Complexity", value: "Basic" },
-      { label: "Typical use", value: "Update remote refs without touching files" },
-    ],
-    "git-restore": [
-      { label: "Complexity", value: "Medium" },
-      { label: "Typical use", value: "Restore working tree or index state" },
-    ],
-    "git-revert": [
-      { label: "Complexity", value: "Medium to high" },
-      { label: "Typical use", value: "Undo safely with a new commit" },
-    ],
-    "git-reflog": [
-      { label: "Complexity", value: "High" },
-      { label: "Typical use", value: "Trace ref movement and recover positions" },
-    ],
-    "git-bisect": [
-      { label: "Complexity", value: "High" },
-      { label: "Typical use", value: "Binary-search the commit that introduced a bug" },
-    ],
-    "git-blame": [
-      { label: "Complexity", value: "Medium" },
-      { label: "Typical use", value: "Trace which commit last changed a line" },
-    ],
-    "git-switch": [
-      { label: "Complexity", value: "Basic" },
-      { label: "Typical use", value: "Switch or create branches" },
-    ],
-    "git-branch": [
-      { label: "Complexity", value: "Basic to medium" },
-      { label: "Typical use", value: "List, create, rename, and delete branches" },
-    ],
-    "git-checkout": [
-      { label: "Complexity", value: "Medium" },
-      { label: "Typical use", value: "Legacy branch switching and path restore" },
-    ],
     "git-init": [
       { label: "Complexity", value: "Basic" },
       { label: "Typical use", value: "Initialize a new repository" },
@@ -1138,25 +1363,221 @@ const enDictionary: Dictionary = {
       { label: "Complexity", value: "Basic to medium" },
       { label: "Typical use", value: "Rename or move tracked files" },
     ],
+    "git-fetch": [
+      { label: "Complexity", value: "Basic" },
+      { label: "Typical use", value: "Update remote refs without touching files" },
+    ],
     "git-pull": [
       { label: "Complexity", value: "Basic to medium" },
       { label: "Typical use", value: "Fetch and integrate remote updates" },
     ],
     "git-push": [
       { label: "Complexity", value: "Basic to medium" },
-      { label: "Typical use", value: "Publish local branches to a remote" },
+      { label: "Typical use", value: "Push local branches to a remote" },
+    ],
+    "git-switch": [
+      { label: "Complexity", value: "Basic" },
+      { label: "Typical use", value: "Switch or create branches" },
+    ],
+    "git-branch": [
+      { label: "Complexity", value: "Basic to medium" },
+      { label: "Typical use", value: "List, create, rename, and delete branches" },
     ],
     "git-tag": [
       { label: "Complexity", value: "Basic to medium" },
-      { label: "Typical use", value: "Mark releases or named points in history" },
+      { label: "Typical use", value: "Mark releases and important milestones" },
     ],
     "git-remote": [
       { label: "Complexity", value: "Basic to medium" },
-      { label: "Typical use", value: "Manage remote repository definitions" },
+      { label: "Typical use", value: "Manage remotes and repository URLs" },
+    ],
+    "git-rebase": [
+      { label: "Complexity", value: "Medium to high" },
+      { label: "Typical use", value: "Sync main branch, clean up commits" },
+    ],
+    "git-merge": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Join branch histories" },
+    ],
+    "git-cherry-pick": [
+      { label: "Complexity", value: "Medium to high" },
+      { label: "Typical use", value: "Apply selected commits" },
+    ],
+    "git-reset": [
+      { label: "Complexity", value: "High" },
+      { label: "Typical use", value: "Undo, move HEAD, unstage changes" },
+    ],
+    "git-stash": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Temporarily shelve local changes" },
+    ],
+    "git-restore": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Restore working tree or index state" },
+    ],
+    "git-revert": [
+      { label: "Complexity", value: "Medium to high" },
+      { label: "Typical use", value: "Undo safely with a new commit" },
+    ],
+    "git-reflog": [
+      { label: "Complexity", value: "High" },
+      { label: "Typical use", value: "Trace ref movement and recover positions" },
+    ],
+    "git-bisect": [
+      { label: "Complexity", value: "High" },
+      { label: "Typical use", value: "Binary-search the commit that introduced a bug" },
+    ],
+    "git-blame": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Trace which commit last changed a line" },
+    ],
+    "git-checkout": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Legacy branch switching and path restore" },
     ],
     "git-clean": [
+      { label: "Complexity", value: "Medium to high" },
+      { label: "Typical use", value: "Remove untracked files" },
+    ],
+    "git-config": [
+      { label: "Complexity", value: "Basic to medium" },
+      { label: "Typical use", value: "Manage repository and global configuration" },
+    ],
+    "git-help": [
+      { label: "Complexity", value: "Basic" },
+      { label: "Typical use", value: "Read arguments and official guidance" },
+    ],
+    "git-describe": [
+      { label: "Complexity", value: "Basic to medium" },
+      { label: "Typical use", value: "Generate human-readable version labels" },
+    ],
+    "git-grep": [
+      { label: "Complexity", value: "Basic to medium" },
+      { label: "Typical use", value: "Search code tracked by Git" },
+    ],
+    "git-shortlog": [
+      { label: "Complexity", value: "Basic to medium" },
+      { label: "Typical use", value: "Summarize contributors and release notes" },
+    ],
+    "git-show-ref": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Inspect branch and tag refs" },
+    ],
+    "git-rev-parse": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Parse refs and paths in scripts" },
+    ],
+    "git-am": [
+      { label: "Complexity", value: "Medium to high" },
+      { label: "Typical use", value: "Apply mailbox patch series" },
+    ],
+    "git-apply": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Preview or apply patch files" },
+    ],
+    "git-format-patch": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Generate patch series" },
+    ],
+    "git-send-email": [
       { label: "Complexity", value: "High" },
-      { label: "Typical use", value: "Remove untracked files and directories" },
+      { label: "Typical use", value: "Send patch emails" },
+    ],
+    "git-request-pull": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Prepare maintainer pull summaries" },
+    ],
+    "git-archive": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Export source snapshots" },
+    ],
+    "git-bundle": [
+      { label: "Complexity", value: "Medium to high" },
+      { label: "Typical use", value: "Transfer history offline" },
+    ],
+    "git-worktree": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Work on multiple branches in parallel" },
+    ],
+    "git-submodule": [
+      { label: "Complexity", value: "High" },
+      { label: "Typical use", value: "Manage submodule repositories" },
+    ],
+    "git-sparse-checkout": [
+      { label: "Complexity", value: "Medium to high" },
+      { label: "Typical use", value: "Narrow the working tree footprint" },
+    ],
+    "git-cat-file": [
+      { label: "Complexity", value: "High" },
+      { label: "Typical use", value: "Inspect the object database" },
+    ],
+    "git-ls-files": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Inspect tracked paths in the index" },
+    ],
+    "git-ls-tree": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Inspect a commit snapshot structure" },
+    ],
+    "git-read-tree": [
+      { label: "Complexity", value: "High" },
+      { label: "Typical use", value: "Perform lower-level index operations" },
+    ],
+    "git-update-index": [
+      { label: "Complexity", value: "High" },
+      { label: "Typical use", value: "Control index state directly" },
+    ],
+    "git-update-ref": [
+      { label: "Complexity", value: "High" },
+      { label: "Typical use", value: "Script ref updates" },
+    ],
+    "git-symbolic-ref": [
+      { label: "Complexity", value: "High" },
+      { label: "Typical use", value: "Inspect and manage symbolic refs" },
+    ],
+    "git-rev-list": [
+      { label: "Complexity", value: "High" },
+      { label: "Typical use", value: "Traverse and filter commit sets" },
+    ],
+    "git-merge-base": [
+      { label: "Complexity", value: "Medium to high" },
+      { label: "Typical use", value: "Find common ancestry for branches" },
+    ],
+    "git-notes": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Attach metadata to commits" },
+    ],
+    "git-range-diff": [
+      { label: "Complexity", value: "High" },
+      { label: "Typical use", value: "Compare patch series revisions" },
+    ],
+    "git-cherry": [
+      { label: "Complexity", value: "Medium to high" },
+      { label: "Typical use", value: "Check whether commits were already integrated" },
+    ],
+    "git-mergetool": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Resolve conflicts with external tools" },
+    ],
+    "git-fsck": [
+      { label: "Complexity", value: "High" },
+      { label: "Typical use", value: "Check repository integrity" },
+    ],
+    "git-gc": [
+      { label: "Complexity", value: "High" },
+      { label: "Typical use", value: "Housekeep repository storage" },
+    ],
+    "git-count-objects": [
+      { label: "Complexity", value: "Medium to high" },
+      { label: "Typical use", value: "Inspect object and pack counts" },
+    ],
+    "git-verify-pack": [
+      { label: "Complexity", value: "High" },
+      { label: "Typical use", value: "Inspect pack file contents" },
+    ],
+    "git-verify-tag": [
+      { label: "Complexity", value: "Medium to high" },
+      { label: "Typical use", value: "Verify signed tags" },
     ],
   },
 };

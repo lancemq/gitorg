@@ -1,0 +1,31 @@
+export const metadata = {
+  title: "Choosing Squash Merge vs Rebase Merge",
+  slug: "squash-vs-rebase-merge",
+  locale: "en",
+  section: "workflows",
+  summary: "Compare how squash merge and rebase merge affect readability, traceability, and rollback options.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Branching-Rebasing",
+    "https://git-scm.com/docs/git-merge",
+  ],
+};
+
+# Choosing Squash Merge vs Rebase Merge
+
+## Scenario
+
+Compare how squash merge and rebase merge affect readability, traceability, and rollback options.
+
+## Suggested sequence
+
+1. Check whether the team needs original commit granularity
+2. Consider whether release or debugging flows depend on merge structure
+3. Standardize the platform default
+
+## Why this order is safer
+
+The value of a workflow usually comes less from a single command and more from fixing the order of observation, action, and recovery.
+
+## Related commands
+
+This topic makes more sense alongside commands such as git fetch, git log, git diff, git merge, git rebase, or git cherry-pick.

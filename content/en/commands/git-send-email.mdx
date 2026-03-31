@@ -1,0 +1,47 @@
+export const metadata = {
+  title: "git-send-email Tutorial",
+  slug: "git-send-email",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how to use git-send-email to send patch emails to a mailing list or review flow.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-send-email",
+    "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project",
+  ],
+};
+
+# git-send-email Tutorial
+
+## The short version
+
+git-send-email is used to send patch emails to a mailing list or review flow.
+
+## When it is a good fit
+
+- when you need to send patch emails to a mailing list or review flow
+- when you want this step to be repeatable instead of ad hoc
+- when you need a clearer mental model of what Git is recording or updating
+
+## Basic example
+
+```bash
+git send-email *.patch
+```
+
+## What to watch most closely
+
+Patch-based workflows are sensitive to context drift, so confirm the base state and the recovery path first.
+
+## A safer working habit
+
+Read the patch series first and keep abort, continue, or a backup branch ready.
+
+## Useful angles for understanding it
+
+- Handle mailbox patches or patch files
+- Exchange changes outside direct repository access
+- Preserve commit boundaries instead of copying edits manually
+
+## Related reading
+
+Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.

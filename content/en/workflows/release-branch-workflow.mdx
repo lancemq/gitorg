@@ -1,0 +1,31 @@
+export const metadata = {
+  title: "Release Branch Workflow",
+  slug: "release-branch-workflow",
+  locale: "en",
+  section: "workflows",
+  summary: "Explain when to cut a release branch, when to freeze features, and how to flow fixes back to main.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows",
+    "https://git-scm.com/docs/git-merge",
+  ],
+};
+
+# Release Branch Workflow
+
+## Scenario
+
+Explain when to cut a release branch, when to freeze features, and how to flow fixes back to main.
+
+## Suggested sequence
+
+1. Cut a release branch from a stable mainline
+2. Accept only release-related fixes
+3. Merge final fixes back into the mainline
+
+## Why this order is safer
+
+The value of a workflow usually comes less from a single command and more from fixing the order of observation, action, and recovery.
+
+## Related commands
+
+This topic makes more sense alongside commands such as git fetch, git log, git diff, git merge, git rebase, or git cherry-pick.

@@ -1,0 +1,31 @@
+export const metadata = {
+  title: "Merge Bases and Ancestry",
+  slug: "merge-base-and-ancestry",
+  locale: "en",
+  section: "internals",
+  summary: "Explain how Git uses common ancestors to reason about branch differences, merge inputs, and reachability.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-merge-base",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+  ],
+};
+
+# Merge Bases and Ancestry
+
+## The short version
+
+Explain how Git uses common ancestors to reason about branch differences, merge inputs, and reachability.
+
+## Key ideas
+
+- The common ancestor defines the comparison starting point
+- merge-base directly shapes merge and rebase decisions
+- Reachability underlies many Git queries
+
+## Why this helps you understand commands
+
+Many command differences that feel arbitrary become easier once you see how Git is updating objects, refs, the index, or reachability.
+
+## Suggested follow-up
+
+It pairs well with git show, git log --graph, git cat-file, git rev-parse, or git fetch.

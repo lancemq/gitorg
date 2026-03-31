@@ -1,0 +1,46 @@
+export const metadata = {
+  title: "git-worktree Tutorial",
+  slug: "git-worktree",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how to use git-worktree to manage multiple working trees for the same repository.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-worktree",
+  ],
+};
+
+# git-worktree Tutorial
+
+## The short version
+
+git-worktree is used to manage multiple working trees for the same repository.
+
+## When it is a good fit
+
+- when you need to manage multiple working trees for the same repository
+- when you want this step to be repeatable instead of ad hoc
+- when you need a clearer mental model of what Git is recording or updating
+
+## Basic example
+
+```bash
+git worktree add ../repo-hotfix hotfix
+```
+
+## What to watch most closely
+
+These commands often change repository layout or collaboration patterns, so align on conventions first.
+
+## A safer working habit
+
+Test the flow in a small sandbox repository before rolling it into the main repo or automation.
+
+## Useful angles for understanding it
+
+- Distribute code or history
+- Reduce clone or checkout scope
+- Coordinate multi-repo or multi-worktree setups
+
+## Related reading
+
+Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.

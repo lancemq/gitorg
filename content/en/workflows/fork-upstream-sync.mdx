@@ -1,0 +1,31 @@
+export const metadata = {
+  title: "Fork and Upstream Sync",
+  slug: "fork-upstream-sync",
+  locale: "en",
+  section: "workflows",
+  summary: "Keep origin and upstream roles clear when collaborating through a fork workflow.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes",
+    "https://git-scm.com/docs/git-fetch",
+  ],
+};
+
+# Fork and Upstream Sync
+
+## Scenario
+
+Keep origin and upstream roles clear when collaborating through a fork workflow.
+
+## Suggested sequence
+
+1. Use your fork as origin
+2. Add the canonical repository as upstream
+3. Fetch upstream regularly and sync your local main branch
+
+## Why this order is safer
+
+The value of a workflow usually comes less from a single command and more from fixing the order of observation, action, and recovery.
+
+## Related commands
+
+This topic makes more sense alongside commands such as git fetch, git log, git diff, git merge, git rebase, or git cherry-pick.

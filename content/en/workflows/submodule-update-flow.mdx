@@ -1,0 +1,31 @@
+export const metadata = {
+  title: "Submodule Update Flow",
+  slug: "submodule-update-flow",
+  locale: "en",
+  section: "workflows",
+  summary: "Outline a safe routine for updating submodules, locking revisions, and syncing the parent repository.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Tools-Submodules",
+    "https://git-scm.com/docs/git-submodule",
+  ],
+};
+
+# Submodule Update Flow
+
+## Scenario
+
+Outline a safe routine for updating submodules, locking revisions, and syncing the parent repository.
+
+## Suggested sequence
+
+1. Move the submodule to the intended commit
+2. Commit the pointer change in the parent repo
+3. Verify init and recursive update flows
+
+## Why this order is safer
+
+The value of a workflow usually comes less from a single command and more from fixing the order of observation, action, and recovery.
+
+## Related commands
+
+This topic makes more sense alongside commands such as git fetch, git log, git diff, git merge, git rebase, or git cherry-pick.

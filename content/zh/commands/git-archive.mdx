@@ -1,0 +1,46 @@
+export const metadata = {
+  title: "git-archive 教程",
+  slug: "git-archive",
+  locale: "zh",
+  section: "commands",
+  summary: "解释如何用 git-archive 从某个提交或树对象导出归档包。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-archive",
+  ],
+};
+
+# git-archive 教程
+
+## 一句话理解
+
+git-archive 用于从某个提交或树对象导出归档包。
+
+## 什么时候适合用
+
+- 当你需要从某个提交或树对象导出归档包
+- 当你想把这类操作做成稳定流程而不是手工重复
+- 当你需要更准确地理解 Git 在这一步到底记录了什么
+
+## 基本示例
+
+```bash
+git archive --format=zip HEAD > source.zip
+```
+
+## 读这条命令时最该注意什么
+
+这类命令通常会改变仓库布局或协作方式，团队内最好先统一约定。
+
+## 一个更稳的实践建议
+
+先用小范围实验仓库验证流程，再推广到主仓库或自动化。
+
+## 补充理解角度
+
+- 分发代码或历史
+- 降低克隆和检出范围
+- 在多仓库或多工作树场景下协作
+
+## 延伸阅读
+
+继续搭配 git status、git log、git show 一起看，通常更容易判断这条命令对历史、索引和工作区分别造成了什么影响。

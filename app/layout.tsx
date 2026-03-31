@@ -5,7 +5,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Git Org Academy",
-  description: "基于 Pencil 设计稿重构的 Git 文档站。",
+  description: "学会 Git，写出更好的历史。Master Git. Build Better History.",
 };
 
 export default function RootLayout({

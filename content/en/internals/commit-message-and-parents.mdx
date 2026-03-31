@@ -1,0 +1,31 @@
+export const metadata = {
+  title: "Commit Objects, Parents, and Messages",
+  slug: "commit-message-and-parents",
+  locale: "en",
+  section: "internals",
+  summary: "Show how commit objects connect trees, parent commits, and messages into the history graph.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Internals-Git-Objects",
+    "https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History",
+  ],
+};
+
+# Commit Objects, Parents, and Messages
+
+## The short version
+
+Show how commit objects connect trees, parent commits, and messages into the history graph.
+
+## Key ideas
+
+- Commit objects contain tree, parent, author, and message data
+- Parent links shape the commit graph
+- The commit message is part of the object content
+
+## Why this helps you understand commands
+
+Many command differences that feel arbitrary become easier once you see how Git is updating objects, refs, the index, or reachability.
+
+## Suggested follow-up
+
+It pairs well with git show, git log --graph, git cat-file, git rev-parse, or git fetch.

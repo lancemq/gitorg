@@ -1,0 +1,31 @@
+export const metadata = {
+  title: "Release Hygiene",
+  slug: "release-hygiene",
+  locale: "en",
+  section: "best-practices",
+  summary: "Use a small set of Git checks before release to reduce mistakes around tags, branches, and version state.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-tag",
+    "https://git-scm.com/book/en/v2/Distributed-Git-Maintaining-a-Project",
+  ],
+};
+
+# Release Hygiene
+
+## Core guidance
+
+Use a small set of Git checks before release to reduce mistakes around tags, branches, and version state.
+
+## Why it matters
+
+Good Git practice is less about looking clever with commands and more about keeping history readable, collaboration predictable, and recovery paths clear.
+
+## Checklist
+
+- Confirm the release tag points to the right commit
+- Check working tree and branch state
+- Verify the diff against release notes
+
+## Commands to review alongside it
+
+It usually helps to review this topic alongside git status, git log, and git diff, then add git rebase, git merge, or force-with-lease where appropriate.

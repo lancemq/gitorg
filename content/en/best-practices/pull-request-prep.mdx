@@ -1,0 +1,31 @@
+export const metadata = {
+  title: "Preparing a Branch for Review",
+  slug: "pull-request-prep",
+  locale: "en",
+  section: "best-practices",
+  summary: "Clean up commits, sync with the latest base, and remove noise before asking for review.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project",
+    "https://git-scm.com/docs/git-rebase",
+  ],
+};
+
+# Preparing a Branch for Review
+
+## Core guidance
+
+Clean up commits, sync with the latest base, and remove noise before asking for review.
+
+## Why it matters
+
+Good Git practice is less about looking clever with commands and more about keeping history readable, collaboration predictable, and recovery paths clear.
+
+## Checklist
+
+- Sync with the latest base branch
+- Make commit messages readable
+- Re-check history with log and diff
+
+## Commands to review alongside it
+
+It usually helps to review this topic alongside git status, git log, and git diff, then add git rebase, git merge, or force-with-lease where appropriate.

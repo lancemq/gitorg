@@ -1,0 +1,46 @@
+export const metadata = {
+  title: "git-bundle Tutorial",
+  slug: "git-bundle",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how to use git-bundle to package repository history into an offline-transfer bundle.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-bundle",
+  ],
+};
+
+# git-bundle Tutorial
+
+## The short version
+
+git-bundle is used to package repository history into an offline-transfer bundle.
+
+## When it is a good fit
+
+- when you need to package repository history into an offline-transfer bundle
+- when you want this step to be repeatable instead of ad hoc
+- when you need a clearer mental model of what Git is recording or updating
+
+## Basic example
+
+```bash
+git bundle create repo.bundle --all
+```
+
+## What to watch most closely
+
+These commands often change repository layout or collaboration patterns, so align on conventions first.
+
+## A safer working habit
+
+Test the flow in a small sandbox repository before rolling it into the main repo or automation.
+
+## Useful angles for understanding it
+
+- Distribute code or history
+- Reduce clone or checkout scope
+- Coordinate multi-repo or multi-worktree setups
+
+## Related reading
+
+Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.

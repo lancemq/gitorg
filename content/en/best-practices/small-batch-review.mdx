@@ -1,0 +1,31 @@
+export const metadata = {
+  title: "Small-batch Review",
+  slug: "small-batch-review",
+  locale: "en",
+  section: "best-practices",
+  summary: "Use smaller commit batches and shorter branch lifecycles to keep review fast and clear.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project",
+    "https://git-scm.com/docs/git-range-diff",
+  ],
+};
+
+# Small-batch Review
+
+## Core guidance
+
+Use smaller commit batches and shorter branch lifecycles to keep review fast and clear.
+
+## Why it matters
+
+Good Git practice is less about looking clever with commands and more about keeping history readable, collaboration predictable, and recovery paths clear.
+
+## Checklist
+
+- Keep branch lifetimes short
+- Limit the scope of a single review
+- Split work into multiple PRs when needed
+
+## Commands to review alongside it
+
+It usually helps to review this topic alongside git status, git log, and git diff, then add git rebase, git merge, or force-with-lease where appropriate.

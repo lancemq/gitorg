@@ -1,0 +1,46 @@
+export const metadata = {
+  title: "git-help Tutorial",
+  slug: "git-help",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how to use git-help to open command help and man pages.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-help",
+  ],
+};
+
+# git-help Tutorial
+
+## The short version
+
+git-help is used to open command help and man pages.
+
+## When it is a good fit
+
+- when you need to open command help and man pages
+- when you want this step to be repeatable instead of ad hoc
+- when you need a clearer mental model of what Git is recording or updating
+
+## Basic example
+
+```bash
+git help rebase
+```
+
+## What to watch most closely
+
+Learn the default behavior first. Many surprises come from adding flags before the base behavior is clear.
+
+## A safer working habit
+
+Pair it with status, log, or diff so you can confirm what actually changed.
+
+## Useful angles for understanding it
+
+- Understand the default behavior clearly
+- Use it in day-to-day Git routines
+- Reuse it safely in scripts or team habits
+
+## Related reading
+
+Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.

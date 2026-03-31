@@ -1,0 +1,31 @@
+export const metadata = {
+  title: "Backporting with Cherry-pick",
+  slug: "backport-with-cherry-pick",
+  locale: "en",
+  section: "workflows",
+  summary: "Backport precise fixes onto maintenance branches without merging an entire feature branch.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-cherry-pick",
+    "https://git-scm.com/docs/git-branch",
+  ],
+};
+
+# Backporting with Cherry-pick
+
+## Scenario
+
+Backport precise fixes onto maintenance branches without merging an entire feature branch.
+
+## Suggested sequence
+
+1. Identify the exact commit to backport
+2. Switch to the maintenance branch and cherry-pick
+3. Validate the resulting diff and tests
+
+## Why this order is safer
+
+The value of a workflow usually comes less from a single command and more from fixing the order of observation, action, and recovery.
+
+## Related commands
+
+This topic makes more sense alongside commands such as git fetch, git log, git diff, git merge, git rebase, or git cherry-pick.

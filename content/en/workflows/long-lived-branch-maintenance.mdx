@@ -1,0 +1,31 @@
+export const metadata = {
+  title: "Maintaining Long-lived Branches",
+  slug: "long-lived-branch-maintenance",
+  locale: "en",
+  section: "workflows",
+  summary: "Show how long-lived branches can stay aligned with main and avoid painful late merges.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows",
+    "https://git-scm.com/docs/git-rebase",
+  ],
+};
+
+# Maintaining Long-lived Branches
+
+## Scenario
+
+Show how long-lived branches can stay aligned with main and avoid painful late merges.
+
+## Suggested sequence
+
+1. Set a regular sync cadence
+2. Keep each integration batch small
+3. Pay down conflict debt regularly
+
+## Why this order is safer
+
+The value of a workflow usually comes less from a single command and more from fixing the order of observation, action, and recovery.
+
+## Related commands
+
+This topic makes more sense alongside commands such as git fetch, git log, git diff, git merge, git rebase, or git cherry-pick.

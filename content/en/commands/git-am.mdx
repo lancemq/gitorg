@@ -1,0 +1,46 @@
+export const metadata = {
+  title: "git-am Tutorial",
+  slug: "git-am",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how to use git-am to apply a mailbox patch series onto the current branch.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-am",
+  ],
+};
+
+# git-am Tutorial
+
+## The short version
+
+git-am is used to apply a mailbox patch series onto the current branch.
+
+## When it is a good fit
+
+- when you need to apply a mailbox patch series onto the current branch
+- when you want this step to be repeatable instead of ad hoc
+- when you need a clearer mental model of what Git is recording or updating
+
+## Basic example
+
+```bash
+git am 0001-fix-login.patch
+```
+
+## What to watch most closely
+
+Patch-based workflows are sensitive to context drift, so confirm the base state and the recovery path first.
+
+## A safer working habit
+
+Read the patch series first and keep abort, continue, or a backup branch ready.
+
+## Useful angles for understanding it
+
+- Handle mailbox patches or patch files
+- Exchange changes outside direct repository access
+- Preserve commit boundaries instead of copying edits manually
+
+## Related reading
+
+Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.

@@ -1,0 +1,31 @@
+export const metadata = {
+  title: "安全使用 cherry-pick专题",
+  slug: "safe-cherry-picks",
+  locale: "zh",
+  section: "best-practices",
+  summary: "在回移修复或选择性复用提交时，避免重复、漏拣和上下文错配。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-cherry-pick",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+  ],
+};
+
+# 安全使用 cherry-pick专题
+
+## 核心建议
+
+在回移修复或选择性复用提交时，避免重复、漏拣和上下文错配。
+
+## 为什么这件事重要
+
+好的 Git 实践不是让命令看起来更熟练，而是让历史更可读、协作更稳定、恢复路径更明确。
+
+## 执行清单
+
+- 先确认目标分支是否真的缺这次提交
+- pick 之后看 diff 和测试
+- 记录回移来源
+
+## 适合一起看的命令
+
+通常建议同时回看 git status、git log、git diff，必要时再补上 git rebase、git merge 或 force-with-lease 相关知识。

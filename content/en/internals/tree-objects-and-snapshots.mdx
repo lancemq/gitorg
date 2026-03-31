@@ -1,0 +1,30 @@
+export const metadata = {
+  title: "Tree Objects and Snapshots",
+  slug: "tree-objects-and-snapshots",
+  locale: "en",
+  section: "internals",
+  summary: "Explain how tree objects encode directory structure and why commits represent full snapshot trees.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Internals-Git-Objects",
+  ],
+};
+
+# Tree Objects and Snapshots
+
+## The short version
+
+Explain how tree objects encode directory structure and why commits represent full snapshot trees.
+
+## Key ideas
+
+- A tree records paths, modes, and child objects
+- A commit points to a root tree
+- Snapshot thinking is closer to how Git really works than a patch-only mental model
+
+## Why this helps you understand commands
+
+Many command differences that feel arbitrary become easier once you see how Git is updating objects, refs, the index, or reachability.
+
+## Suggested follow-up
+
+It pairs well with git show, git log --graph, git cat-file, git rev-parse, or git fetch.

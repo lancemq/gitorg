@@ -1,0 +1,47 @@
+export const metadata = {
+  title: "git-rev-parse Tutorial",
+  slug: "git-rev-parse",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how to use git-rev-parse to parse revision expressions and repository path details.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rev-parse",
+    "https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection",
+  ],
+};
+
+# git-rev-parse Tutorial
+
+## The short version
+
+git-rev-parse is used to parse revision expressions and repository path details.
+
+## When it is a good fit
+
+- when you need to parse revision expressions and repository path details
+- when you want this step to be repeatable instead of ad hoc
+- when you need a clearer mental model of what Git is recording or updating
+
+## Basic example
+
+```bash
+git rev-parse --show-toplevel
+```
+
+## What to watch most closely
+
+Learn the default behavior first. Many surprises come from adding flags before the base behavior is clear.
+
+## A safer working habit
+
+Pair it with status, log, or diff so you can confirm what actually changed.
+
+## Useful angles for understanding it
+
+- Understand the default behavior clearly
+- Use it in day-to-day Git routines
+- Reuse it safely in scripts or team habits
+
+## Related reading
+
+Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.
