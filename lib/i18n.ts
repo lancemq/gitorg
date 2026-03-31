@@ -51,7 +51,7 @@ type DocsSectionId =
 type Dictionary = {
   sidebar: {
     home: SidebarContent;
-    docs: SidebarContent;
+    docs: (activePath?: string) => SidebarContent;
     command: (activeSlug: CommandSlug) => SidebarContent;
   };
   home: {
@@ -183,21 +183,55 @@ const zhDictionary: Dictionary = {
           ],
       },
     ]),
-    docs: baseSidebar("zh", [
-      {
-        title: "Docs",
-        items: [
-          { label: "全部文档", href: "/zh/docs", active: true },
-          { label: "快速上手", href: "/zh/docs/learning-path/quick-start" },
-          { label: "git rebase", href: "/zh/commands/git-rebase" },
-          { label: "git merge", href: "/zh/commands/git-merge" },
-          { label: "git cherry-pick", href: "/zh/commands/git-cherry-pick" },
-          { label: "git reset", href: "/zh/commands/git-reset" },
-          { label: "git stash", href: "/zh/commands/git-stash" },
-          { label: "恢复手册", href: "/zh/docs/recovery/reflog-recovery" },
-        ],
-      },
-    ]),
+    docs: (activePath) =>
+      baseSidebar("zh", [
+        {
+          title: "Docs",
+          items: [
+            { label: "全部文档", href: "/zh/docs", active: activePath === "index" },
+            {
+              label: "快速上手",
+              href: "/zh/docs/learning-path/quick-start",
+              active: activePath === "learning-path/quick-start",
+            },
+            {
+              label: "最佳实践",
+              href: "/zh/docs/workflows/git-best-practices",
+              active: activePath === "workflows/git-best-practices",
+            },
+            {
+              label: "git rebase",
+              href: "/zh/commands/git-rebase",
+              active: activePath === "commands/git-rebase",
+            },
+            {
+              label: "git merge",
+              href: "/zh/commands/git-merge",
+              active: activePath === "commands/git-merge",
+            },
+            {
+              label: "git cherry-pick",
+              href: "/zh/commands/git-cherry-pick",
+              active: activePath === "commands/git-cherry-pick",
+            },
+            {
+              label: "git reset",
+              href: "/zh/commands/git-reset",
+              active: activePath === "commands/git-reset",
+            },
+            {
+              label: "git stash",
+              href: "/zh/commands/git-stash",
+              active: activePath === "commands/git-stash",
+            },
+            {
+              label: "恢复手册",
+              href: "/zh/docs/recovery/reflog-recovery",
+              active: activePath === "recovery/reflog-recovery",
+            },
+          ],
+        },
+      ]),
     command: (activeSlug) =>
       baseSidebar("zh", [
         {
@@ -336,16 +370,42 @@ const zhDictionary: Dictionary = {
     faq: {
       eyebrow: "FAQ",
       title: "常见问题",
-      description: "把最容易踩坑的 Git 问题讲清楚。",
+      description: "基于 Git 官方文档与官方书中的高频问题整理出一组上手最常见的答疑。",
       items: [
         {
-          question: "`git pull` 为什么会产生我不想要的 merge commit？",
+          question: "`git pull` 到底做了什么，为什么结果有时和我预期不同？",
           answer:
-            "因为 pull 默认会在 fetch 之后直接 merge。你可以先 fetch，再显式选择 merge 或 rebase。",
+            "`git pull` 会先执行 fetch，再把上游分支整合进当前分支。官方文档说明它可以走 `--ff-only`、`--rebase`、`--no-rebase` 或 `--squash` 等不同路径，所以结果取决于你的命令参数和 `pull.rebase`、`pull.ff` 等配置。想减少意外，最稳妥的习惯仍然是先 fetch，再明确决定是 merge 还是 rebase。",
         },
         {
-          question: "误删分支或 reset 之后还能找回吗？",
-          answer: "多数情况下可以。只要对象还没被清理，git reflog 往往能帮你定位历史引用并恢复。",
+          question: "`git reset --soft`、`--mixed`、`--hard` 有什么本质区别？",
+          answer:
+            "官方手册把区别讲得很明确：`--soft` 只移动 HEAD，保留暂存区和工作区；`--mixed` 会把暂存区重置到目标提交，但保留工作区改动；`--hard` 会同时改写 HEAD、暂存区和工作区。也就是说，真正危险的是 `--hard`，因为它会直接覆盖当前文件状态。",
+        },
+        {
+          question: "误删分支、reset 过头，或者 pull 之后后悔了，还能找回吗？",
+          answer:
+            "很多时候可以。Git 官方在 `git reset` 文档里专门说明了 `ORIG_HEAD` 和 reflog 的用途：reset、merge、pull 这类操作通常会留下可回溯的引用。只要对象还没被垃圾回收清理掉，通常都能先通过 reflog 找到原来的提交，再决定是新建分支还是回退引用。",
+        },
+        {
+          question: "为什么 `git stash` 没有把我的新文件一起存起来？",
+          answer:
+            "因为 stash 默认保存的是已跟踪文件在工作区和暂存区中的改动。官方文档说明，如果你还想把未跟踪文件一起收进去，需要用 `git stash push -u`；如果连忽略文件也要一起处理，则使用 `-a`。另外，`git stash apply` 会保留 stash，而 `git stash pop` 会在成功应用后尝试把它移出列表。",
+        },
+        {
+          question: "什么是 detached HEAD，遇到它是不是就出问题了？",
+          answer:
+            "不一定。官方 `git switch` 文档把 detached HEAD 描述成一种用于检查历史提交或做临时实验的状态，此时 HEAD 指向的是某个提交而不是分支名。它本身不是错误；如果你在这个状态下做出的提交值得保留，只要立刻新建一个分支把它接住就可以。",
+        },
+        {
+          question: "我到底该用 merge 还是 rebase？",
+          answer:
+            "Git 官方书把两者都视为整合历史的正常方式：merge 会保留分叉结构，rebase 会把你的提交重新放到新的基底上，让历史更线性。但官方书也特别强调，不要 rebase 那些已经离开你本地仓库、并且别人可能已经基于它继续工作的提交。简单说，个人本地整理历史常用 rebase，已共享历史默认更安全的是 merge。",
+        },
+        {
+          question: "为什么切换分支时 Git 拒绝我继续操作？",
+          answer:
+            "官方 `git switch` 文档说明，当切换分支会导致本地改动丢失时，Git 会直接中止操作。这不是故障，而是保护机制。通常你有三种稳妥处理方式：先提交、先 stash，或者在你确认可以丢弃本地改动时再显式使用 `--discard-changes`。",
         },
       ],
     },
@@ -451,21 +511,55 @@ const enDictionary: Dictionary = {
         ],
       },
     ]),
-    docs: baseSidebar("en", [
-      {
-        title: "Docs",
-        items: [
-          { label: "All Docs", href: "/en/docs", active: true },
-          { label: "Quick Start", href: "/en/docs/learning-path/quick-start" },
-          { label: "git rebase", href: "/en/commands/git-rebase" },
-          { label: "git merge", href: "/en/commands/git-merge" },
-          { label: "git cherry-pick", href: "/en/commands/git-cherry-pick" },
-          { label: "git reset", href: "/en/commands/git-reset" },
-          { label: "git stash", href: "/en/commands/git-stash" },
-          { label: "Reflog Recovery", href: "/en/docs/recovery/reflog-recovery" },
-        ],
-      },
-    ]),
+    docs: (activePath) =>
+      baseSidebar("en", [
+        {
+          title: "Docs",
+          items: [
+            { label: "All Docs", href: "/en/docs", active: activePath === "index" },
+            {
+              label: "Quick Start",
+              href: "/en/docs/learning-path/quick-start",
+              active: activePath === "learning-path/quick-start",
+            },
+            {
+              label: "Best Practices",
+              href: "/en/docs/workflows/git-best-practices",
+              active: activePath === "workflows/git-best-practices",
+            },
+            {
+              label: "git rebase",
+              href: "/en/commands/git-rebase",
+              active: activePath === "commands/git-rebase",
+            },
+            {
+              label: "git merge",
+              href: "/en/commands/git-merge",
+              active: activePath === "commands/git-merge",
+            },
+            {
+              label: "git cherry-pick",
+              href: "/en/commands/git-cherry-pick",
+              active: activePath === "commands/git-cherry-pick",
+            },
+            {
+              label: "git reset",
+              href: "/en/commands/git-reset",
+              active: activePath === "commands/git-reset",
+            },
+            {
+              label: "git stash",
+              href: "/en/commands/git-stash",
+              active: activePath === "commands/git-stash",
+            },
+            {
+              label: "Reflog Recovery",
+              href: "/en/docs/recovery/reflog-recovery",
+              active: activePath === "recovery/reflog-recovery",
+            },
+          ],
+        },
+      ]),
     command: (activeSlug) =>
       baseSidebar("en", [
         {
@@ -604,15 +698,42 @@ const enDictionary: Dictionary = {
     faq: {
       eyebrow: "FAQ",
       title: "Common Questions",
-      description: "Explain the Git pitfalls that confuse people most often.",
+      description: "A practical FAQ built from the Git official docs and the Pro Git book, focused on the questions people hit most often.",
       items: [
         {
-          question: "Why does `git pull` create a merge commit I did not want?",
-          answer: "Because pull defaults to fetch plus merge. Fetch first if you want to decide the integration strategy explicitly.",
+          question: "What does `git pull` actually do, and why can the result surprise me?",
+          answer:
+            "`git pull` first runs fetch, then integrates the upstream branch into your current branch. The official documentation describes several integration modes, including `--ff-only`, `--rebase`, `--no-rebase`, and `--squash`, so the outcome depends on your flags and config such as `pull.rebase` and `pull.ff`. If you want fewer surprises, fetch first and choose the integration strategy explicitly.",
         },
         {
-          question: "Can I recover after deleting a branch or running reset?",
-          answer: "Often yes. If the objects have not been cleaned up yet, git reflog can usually help you recover the previous reference.",
+          question: "What is the real difference between `git reset --soft`, `--mixed`, and `--hard`?",
+          answer:
+            "The official `git reset` manual separates them cleanly: `--soft` moves HEAD only, `--mixed` resets the index but keeps working tree changes, and `--hard` resets HEAD, the index, and the working tree together. In practice, `--hard` is the one to treat as destructive because it overwrites your current file state.",
+        },
+        {
+          question: "Can I recover after deleting a branch, resetting too far, or regretting a pull?",
+          answer:
+            "Often yes. The official `git reset` documentation explicitly points to `ORIG_HEAD` and related recovery flows after reset, merge, and pull. As long as the underlying objects have not been cleaned up yet, reflog is usually the first place to look before you decide whether to create a new branch or move a ref back.",
+        },
+        {
+          question: "Why did `git stash` not include my new files?",
+          answer:
+            "Because stash normally records changes from tracked files in the working tree and index. The official `git stash` docs say you need `git stash push -u` to include untracked files, and `-a` if you also want ignored files. It also helps to remember that `apply` keeps the stash entry, while `pop` tries to remove it after a successful apply.",
+        },
+        {
+          question: "What is detached HEAD, and does it mean something is broken?",
+          answer:
+            "Not necessarily. The official `git switch` docs describe detached HEAD as a valid state for inspecting a commit or doing temporary experiments, where HEAD points to a commit instead of a branch name. If the work you do there is worth keeping, create a branch right away so those commits have a stable name.",
+        },
+        {
+          question: "Should I use merge or rebase?",
+          answer:
+            "The Pro Git book treats both as normal integration tools: merge preserves the branching structure, while rebase rewrites your commits onto a new base for a cleaner linear history. The important warning from the official book is not to rebase commits that have already left your repository and may be the basis of someone else’s work. A practical rule is rebase for local cleanup, merge for already-shared history.",
+        },
+        {
+          question: "Why does Git block me when I try to switch branches?",
+          answer:
+            "The official `git switch` docs say Git aborts the operation if switching would lead to the loss of local changes. That is a safety feature, not an error condition. The usual safe options are to commit, stash, or only use `--discard-changes` when you intentionally want to throw those local changes away.",
         },
       ],
     },

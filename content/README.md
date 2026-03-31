@@ -33,6 +33,7 @@
 - `zh/commands/git-reset.mdx`
 - `zh/commands/git-stash.mdx`
 - `zh/workflows/fetch-vs-pull.mdx`
+- `zh/workflows/git-best-practices.mdx`
 - `zh/recovery/reflog-recovery.mdx`
 - `zh/concepts/refs-and-head.mdx`
 - `en/learning-path/quick-start.mdx`
@@ -42,5 +43,6 @@
 - `en/commands/git-reset.mdx`
 - `en/commands/git-stash.mdx`
 - `en/workflows/fetch-vs-pull.mdx`
+- `en/workflows/git-best-practices.mdx`
 - `en/recovery/reflog-recovery.mdx`
 - `en/concepts/refs-and-head.mdx`

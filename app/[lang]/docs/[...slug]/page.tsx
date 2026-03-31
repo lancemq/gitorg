@@ -39,7 +39,7 @@ export default async function DocDetailPage({ params }: Props) {
   const DocBody = doc.Component;
 
   return (
-    <SiteShell locale={locale} sidebar={dict.sidebar.docs}>
+    <SiteShell locale={locale} sidebar={dict.sidebar.docs(docPath)}>
       <article className="doc-page">
         <nav className="breadcrumbs" aria-label="Breadcrumb">
           <a href={`/${locale}`}>{dict.commandPage.breadcrumbs.docs}</a>

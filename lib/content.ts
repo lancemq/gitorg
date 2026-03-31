@@ -35,6 +35,8 @@ const contentModules = {
       import("@/content/zh/commands/git-cherry-pick.mdx"),
     "commands/git-reset": () => import("@/content/zh/commands/git-reset.mdx"),
     "commands/git-stash": () => import("@/content/zh/commands/git-stash.mdx"),
+    "workflows/git-best-practices": () =>
+      import("@/content/zh/workflows/git-best-practices.mdx"),
     "workflows/fetch-vs-pull": () =>
       import("@/content/zh/workflows/fetch-vs-pull.mdx"),
     "recovery/reflog-recovery": () =>
@@ -51,6 +53,8 @@ const contentModules = {
       import("@/content/en/commands/git-cherry-pick.mdx"),
     "commands/git-reset": () => import("@/content/en/commands/git-reset.mdx"),
     "commands/git-stash": () => import("@/content/en/commands/git-stash.mdx"),
+    "workflows/git-best-practices": () =>
+      import("@/content/en/workflows/git-best-practices.mdx"),
     "workflows/fetch-vs-pull": () =>
       import("@/content/en/workflows/fetch-vs-pull.mdx"),
     "recovery/reflog-recovery": () =>
@@ -61,6 +65,15 @@ const contentModules = {
 } satisfies Record<Locale, Record<string, ContentLoader>>;
 
 export type DocPath = keyof (typeof contentModules)["zh"];
+
+export type SearchDoc = {
+  href: string;
+  path: DocPath;
+  section: DocSection;
+  slug: string;
+  title: string;
+  summary: string;
+};
 
 export function getDocPaths(locale: Locale) {
   return Object.keys(contentModules[locale]) as DocPath[];
@@ -81,6 +94,27 @@ export async function getAllDocs(locale: Locale) {
   );
 
   return docs.sort((a, b) => a.metadata.title.localeCompare(b.metadata.title));
+}
+
+export function getDocHref(locale: Locale, docPath: DocPath) {
+  if (docPath.startsWith("commands/")) {
+    return `/${locale}/commands/${docPath.replace("commands/", "")}`;
+  }
+
+  return `/${locale}/docs/${docPath}`;
+}
+
+export async function getSearchDocs(locale: Locale): Promise<SearchDoc[]> {
+  const docs = await getAllDocs(locale);
+
+  return docs.map((doc) => ({
+    href: getDocHref(locale, doc.path),
+    path: doc.path,
+    section: doc.metadata.section,
+    slug: doc.metadata.slug,
+    title: doc.metadata.title,
+    summary: doc.metadata.summary,
+  }));
 }
 
 export async function getCommandDoc(locale: Locale, slug: CommandSlug) {

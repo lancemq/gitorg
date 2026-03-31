@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { SiteShell } from "@/components/site-shell";
-import { getAllDocs } from "@/lib/content";
+import { getAllDocs, getDocHref } from "@/lib/content";
 import { getDictionary, isValidLocale, type Locale } from "@/lib/i18n";
 
 type Props = {
@@ -33,7 +33,7 @@ export default async function DocsIndexPage({ params }: Props) {
   }, {});
 
   return (
-    <SiteShell locale={locale} sidebar={dict.sidebar.docs}>
+    <SiteShell locale={locale} sidebar={dict.sidebar.docs("index")}>
       <section className="docs-landing">
         <div className="section-head">
           <div>
@@ -59,7 +59,7 @@ export default async function DocsIndexPage({ params }: Props) {
                   {items.map((doc) => (
                     <a
                       className="docs-card"
-                      href={`/${locale}/docs/${doc.path}`}
+                      href={getDocHref(locale, doc.path)}
                       key={doc.path}
                     >
                       <h3>{doc.metadata.title}</h3>

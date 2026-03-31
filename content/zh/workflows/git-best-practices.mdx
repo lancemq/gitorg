@@ -1,0 +1,176 @@
+export const metadata = {
+  title: "Git 协作最佳实践",
+  slug: "git-best-practices",
+  locale: "zh",
+  section: "workflows",
+  summary: "整理更适合团队协作的 Git 使用习惯，包括小提交、topic branch、fetch-first、共享历史边界和提交信息规范。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project.html",
+    "https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History.html",
+    "https://git-scm.com/docs/git-pull.html",
+  ],
+};
+
+# Git 协作最佳实践
+
+## 为什么“最佳实践”很重要
+
+Git 的灵活性很高，但团队协作的成本也往往来自这种灵活性。如果大家都能完成提交、合并和推送，不代表协作就一定顺畅。真正影响效率的，往往是这些细节：
+
+- 提交是不是够小、够清晰
+- 分支是不是够独立
+- 同步远端时是不是足够可控
+- 历史改写是否踩到了共享边界
+- 提交信息能不能被未来的人读懂
+
+## 1. 保持提交小而明确
+
+Pro Git 在协作章节里明确建议，把每个提交做成“逻辑上独立的 changeset”。
+
+这意味着：
+
+- 一个提交尽量只表达一个清晰意图
+- 不要把多个无关问题糅在一个大提交里
+- 如果同一文件里混入了多种变更，优先拆开暂存再提交
+
+典型做法：
+
+```bash
+git add --patch
+git commit -m "fix: handle empty email input"
+```
+
+这样做的好处：
+
+1. review 更轻
+2. revert 更安全
+3. cherry-pick 更精确
+
+## 2. 用 topic branch 隔离工作主题
+
+当你在做一项具体工作时，优先新建一个明确的主题分支，而不是在长期分支上直接堆积改动。
+
+```bash
+git switch -c feature/login-validation
+```
+
+好处有三个：
+
+1. 被拒绝或暂缓的工作可以直接丢弃，不污染主分支
+2. 在等待 review 期间，可以继续从主线拉出别的分支并行开发
+3. 后续做 rebase、merge、cherry-pick 时边界更清晰
+
+## 3. 先 fetch，再决定 merge 或 rebase
+
+官方 `git pull` 文档已经把整合结果拆得很清楚：pull 会先 fetch，再进入具体整合策略。
+
+更稳妥的习惯通常是：
+
+```bash
+git fetch origin
+```
+
+然后再决定：
+
+- `git merge origin/main`
+- `git rebase origin/main`
+- `git pull --ff-only`
+
+这样做的核心价值是“把观察和改动分开”。你先确认远端状态，再决定如何整合，而不是把判断交给默认行为。
+
+## 4. 共享历史要保守，未共享历史才大胆整理
+
+重写历史在本地分支上非常有用，比如：
+
+- `git commit --amend`
+- `git rebase -i`
+- `git reset --soft`
+
+但 Pro Git 也明确强调：一旦历史已经推送并被别人基于它继续开发，就要把它看得更“接近最终状态”。
+
+一个很实用的经验法则是：
+
+- 个人分支：可以整理
+- 共享分支：谨慎改写
+- 主分支：默认不要改写
+
+## 5. 提交信息要让别人愿意读
+
+官方书里对提交信息给了非常实用的建议：
+
+- 第一行简洁概括改动
+- 正文解释动机和背景
+- 用祈使句表达，如 `Fix bug` 而不是 `Fixed bug`
+
+一个简单模板：
+
+```text
+Add validation for empty email input
+
+Prevent the login form from submitting when the email field is blank.
+This keeps client-side feedback aligned with server-side validation.
+```
+
+## 6. push 前先做一次最小自检
+
+在推送前，至少做下面几步中的大部分：
+
+```bash
+git status
+git log --oneline --decorate -5
+git diff --stat origin/main...
+```
+
+这能帮助你快速确认：
+
+- 工作区是否真的干净
+- 最近几个提交是否是你想发出的内容
+- 变更量是否超出预期
+
+## 7. 危险操作之前先想恢复路径
+
+在执行这些命令前，先暂停一下：
+
+- `git reset --hard`
+- `git rebase`
+- `git push --force`
+
+更稳的做法：
+
+1. 先看 `git status`
+2. 先看 `git reflog`
+3. 必要时先建救援分支
+
+## 8. 默认用更保守的推送和同步方式
+
+如果确实要强推，优先：
+
+```bash
+git push --force-with-lease
+```
+
+如果只是想更新当前分支但不想隐式产生 merge：
+
+```bash
+git pull --ff-only
+```
+
+这两个习惯都属于“默认更保守”的策略，能显著减少误操作的范围。
+
+## 一个适合团队落地的最小规则集
+
+如果你要为团队写一版轻量规范，可以先从下面 5 条开始：
+
+1. 每个提交只做一件事
+2. 每项工作使用 topic branch
+3. 同步远端优先 fetch-first
+4. 已共享历史默认不改写
+5. 强推时默认使用 `--force-with-lease`
+
+## 下一步建议
+
+这篇读完后，建议继续配套阅读：
+
+1. `fetch vs pull`
+2. `git rebase`
+3. `git reflog`

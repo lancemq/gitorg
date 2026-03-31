@@ -1,0 +1,174 @@
+export const metadata = {
+  title: "Git Collaboration Best Practices",
+  slug: "git-best-practices",
+  locale: "en",
+  section: "workflows",
+  summary: "A practical guide to safer Git collaboration habits, including small commits, topic branches, fetch-first synchronization, history boundaries, and commit message quality.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project.html",
+    "https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History.html",
+    "https://git-scm.com/docs/git-pull.html",
+  ],
+};
+
+# Git Collaboration Best Practices
+
+## Why best practices matter
+
+Git is powerful partly because it is flexible, but collaboration friction often comes from that same flexibility. A team can know how to commit and merge and still struggle if the day-to-day habits are weak.
+
+The biggest differences usually come from:
+
+- whether commits are small and readable
+- whether work is isolated cleanly in branches
+- whether syncing is explicit and controlled
+- whether history rewriting stays within safe boundaries
+- whether commit messages help future readers
+
+## 1. Keep commits small and intentional
+
+Pro Git explicitly recommends crafting each commit as a logically separate changeset.
+
+That usually means:
+
+- one clear intent per commit
+- avoid bundling unrelated fixes together
+- split staging when one file contains multiple concerns
+
+A practical pattern:
+
+```bash
+git add --patch
+git commit -m "fix: handle empty email input"
+```
+
+This makes review, revert, and cherry-pick all easier.
+
+## 2. Use topic branches to isolate work
+
+When you start a focused task, create a dedicated branch instead of piling changes into a long-lived branch.
+
+```bash
+git switch -c feature/login-validation
+```
+
+Why this helps:
+
+1. rejected work can be discarded cleanly
+2. other work can continue in parallel
+3. rebase, merge, and cherry-pick boundaries stay clearer
+
+## 3. Fetch first, then choose merge or rebase
+
+The official `git pull` documentation makes it clear that pull first fetches and then applies an integration strategy.
+
+A more controllable habit is:
+
+```bash
+git fetch origin
+```
+
+Then decide explicitly between:
+
+- `git merge origin/main`
+- `git rebase origin/main`
+- `git pull --ff-only`
+
+This keeps observation separate from branch mutation.
+
+## 4. Be conservative with shared history
+
+History rewriting is useful on local branches:
+
+- `git commit --amend`
+- `git rebase -i`
+- `git reset --soft`
+
+But Pro Git also emphasizes an important boundary: once work has been pushed and others may depend on it, treat that history much more carefully.
+
+A practical rule of thumb:
+
+- personal branches: rewrite freely when needed
+- shared branches: rewrite carefully
+- main branch: avoid rewriting by default
+
+## 5. Write commit messages people can actually use
+
+The official guidance is still strong:
+
+- keep the first line short and descriptive
+- use the body to explain motivation and context
+- prefer imperative voice, such as `Fix bug`
+
+A simple template:
+
+```text
+Add validation for empty email input
+
+Prevent the login form from submitting when the email field is blank.
+This keeps client-side feedback aligned with server-side validation.
+```
+
+## 6. Do a quick self-check before pushing
+
+Before you push, run a lightweight review loop:
+
+```bash
+git status
+git log --oneline --decorate -5
+git diff --stat origin/main...
+```
+
+That helps confirm:
+
+- the working tree is really clean
+- the latest commits are the ones you intend to publish
+- the change size still matches your expectations
+
+## 7. Think about recovery before risky commands
+
+Pause before commands like:
+
+- `git reset --hard`
+- `git rebase`
+- `git push --force`
+
+A safer pattern is:
+
+1. inspect `git status`
+2. inspect `git reflog`
+3. create a rescue branch if needed
+
+## 8. Prefer safer defaults for sync and force-push
+
+If you truly need to force-push, prefer:
+
+```bash
+git push --force-with-lease
+```
+
+If you want to update your branch without implicitly creating a merge:
+
+```bash
+git pull --ff-only
+```
+
+Both habits shrink the blast radius of mistakes.
+
+## A practical minimal team rule set
+
+If you want a lightweight team policy, start with these five:
+
+1. one commit, one intent
+2. one topic branch per task
+3. fetch first before integration
+4. avoid rewriting shared history by default
+5. use `--force-with-lease` instead of raw force push
+
+## What to read next
+
+After this guide, the best follow-up topics are:
+
+1. `fetch vs pull`
+2. `git rebase`
+3. `git reflog`
