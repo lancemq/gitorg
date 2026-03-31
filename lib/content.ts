@@ -78,20 +78,107 @@ const docPathRegistry = [
 ] as const;
 
 export type DocPath = (typeof docPathRegistry)[number];
-
-function createContentLoader(locale: Locale, docPath: DocPath): ContentLoader {
-  return () => import(`@/content/${locale}/${docPath}.mdx`) as Promise<MdxModule>;
-}
-
-function buildLocaleContentModules(locale: Locale) {
-  return Object.fromEntries(
-    docPathRegistry.map((docPath) => [docPath, createContentLoader(locale, docPath)]),
-  ) as Record<DocPath, ContentLoader>;
-}
-
 const contentModules = {
-  zh: buildLocaleContentModules("zh"),
-  en: buildLocaleContentModules("en"),
+  zh: {
+    "learning-path/quick-start": () => import("@/content/zh/learning-path/quick-start.mdx"),
+    "commands/git-init": () => import("@/content/zh/commands/git-init.mdx"),
+    "commands/git-clone": () => import("@/content/zh/commands/git-clone.mdx"),
+    "commands/git-status": () => import("@/content/zh/commands/git-status.mdx"),
+    "commands/git-add": () => import("@/content/zh/commands/git-add.mdx"),
+    "commands/git-commit": () => import("@/content/zh/commands/git-commit.mdx"),
+    "commands/git-diff": () => import("@/content/zh/commands/git-diff.mdx"),
+    "commands/git-show": () => import("@/content/zh/commands/git-show.mdx"),
+    "commands/git-log": () => import("@/content/zh/commands/git-log.mdx"),
+    "commands/git-rm": () => import("@/content/zh/commands/git-rm.mdx"),
+    "commands/git-mv": () => import("@/content/zh/commands/git-mv.mdx"),
+    "commands/git-pull": () => import("@/content/zh/commands/git-pull.mdx"),
+    "commands/git-push": () => import("@/content/zh/commands/git-push.mdx"),
+    "commands/git-tag": () => import("@/content/zh/commands/git-tag.mdx"),
+    "commands/git-remote": () => import("@/content/zh/commands/git-remote.mdx"),
+    "commands/git-clean": () => import("@/content/zh/commands/git-clean.mdx"),
+    "commands/git-rebase": () => import("@/content/zh/commands/git-rebase.mdx"),
+    "commands/git-merge": () => import("@/content/zh/commands/git-merge.mdx"),
+    "commands/git-cherry-pick": () => import("@/content/zh/commands/git-cherry-pick.mdx"),
+    "commands/git-reset": () => import("@/content/zh/commands/git-reset.mdx"),
+    "commands/git-stash": () => import("@/content/zh/commands/git-stash.mdx"),
+    "commands/git-fetch": () => import("@/content/zh/commands/git-fetch.mdx"),
+    "commands/git-restore": () => import("@/content/zh/commands/git-restore.mdx"),
+    "commands/git-revert": () => import("@/content/zh/commands/git-revert.mdx"),
+    "commands/git-switch": () => import("@/content/zh/commands/git-switch.mdx"),
+    "commands/git-branch": () => import("@/content/zh/commands/git-branch.mdx"),
+    "commands/git-reflog": () => import("@/content/zh/commands/git-reflog.mdx"),
+    "commands/git-bisect": () => import("@/content/zh/commands/git-bisect.mdx"),
+    "commands/git-blame": () => import("@/content/zh/commands/git-blame.mdx"),
+    "commands/git-checkout": () => import("@/content/zh/commands/git-checkout.mdx"),
+    "best-practices/commit-hygiene": () => import("@/content/zh/best-practices/commit-hygiene.mdx"),
+    "best-practices/topic-branches": () => import("@/content/zh/best-practices/topic-branches.mdx"),
+    "best-practices/fetch-first-sync": () => import("@/content/zh/best-practices/fetch-first-sync.mdx"),
+    "best-practices/shared-history-boundaries": () => import("@/content/zh/best-practices/shared-history-boundaries.mdx"),
+    "best-practices/review-and-safe-push": () => import("@/content/zh/best-practices/review-and-safe-push.mdx"),
+    "workflows/fetch-vs-pull": () => import("@/content/zh/workflows/fetch-vs-pull.mdx"),
+    "workflows/feature-branch-collaboration": () => import("@/content/zh/workflows/feature-branch-collaboration.mdx"),
+    "workflows/sync-before-review": () => import("@/content/zh/workflows/sync-before-review.mdx"),
+    "workflows/hotfix-and-urgent-fixes": () => import("@/content/zh/workflows/hotfix-and-urgent-fixes.mdx"),
+    "internals/object-database": () => import("@/content/zh/internals/object-database.mdx"),
+    "internals/index-and-working-tree": () => import("@/content/zh/internals/index-and-working-tree.mdx"),
+    "internals/refs-and-head": () => import("@/content/zh/internals/refs-and-head.mdx"),
+    "internals/remote-tracking-refs": () => import("@/content/zh/internals/remote-tracking-refs.mdx"),
+    "internals/commit-graph": () => import("@/content/zh/internals/commit-graph.mdx"),
+    "internals/packfiles-and-storage": () => import("@/content/zh/internals/packfiles-and-storage.mdx"),
+    "internals/reachability-and-garbage-collection": () => import("@/content/zh/internals/reachability-and-garbage-collection.mdx"),
+    "recovery/reflog-recovery": () => import("@/content/zh/recovery/reflog-recovery.mdx"),
+    "concepts/git-history": () => import("@/content/zh/concepts/git-history.mdx"),
+  },
+  en: {
+    "learning-path/quick-start": () => import("@/content/en/learning-path/quick-start.mdx"),
+    "commands/git-init": () => import("@/content/en/commands/git-init.mdx"),
+    "commands/git-clone": () => import("@/content/en/commands/git-clone.mdx"),
+    "commands/git-status": () => import("@/content/en/commands/git-status.mdx"),
+    "commands/git-add": () => import("@/content/en/commands/git-add.mdx"),
+    "commands/git-commit": () => import("@/content/en/commands/git-commit.mdx"),
+    "commands/git-diff": () => import("@/content/en/commands/git-diff.mdx"),
+    "commands/git-show": () => import("@/content/en/commands/git-show.mdx"),
+    "commands/git-log": () => import("@/content/en/commands/git-log.mdx"),
+    "commands/git-rm": () => import("@/content/en/commands/git-rm.mdx"),
+    "commands/git-mv": () => import("@/content/en/commands/git-mv.mdx"),
+    "commands/git-pull": () => import("@/content/en/commands/git-pull.mdx"),
+    "commands/git-push": () => import("@/content/en/commands/git-push.mdx"),
+    "commands/git-tag": () => import("@/content/en/commands/git-tag.mdx"),
+    "commands/git-remote": () => import("@/content/en/commands/git-remote.mdx"),
+    "commands/git-clean": () => import("@/content/en/commands/git-clean.mdx"),
+    "commands/git-rebase": () => import("@/content/en/commands/git-rebase.mdx"),
+    "commands/git-merge": () => import("@/content/en/commands/git-merge.mdx"),
+    "commands/git-cherry-pick": () => import("@/content/en/commands/git-cherry-pick.mdx"),
+    "commands/git-reset": () => import("@/content/en/commands/git-reset.mdx"),
+    "commands/git-stash": () => import("@/content/en/commands/git-stash.mdx"),
+    "commands/git-fetch": () => import("@/content/en/commands/git-fetch.mdx"),
+    "commands/git-restore": () => import("@/content/en/commands/git-restore.mdx"),
+    "commands/git-revert": () => import("@/content/en/commands/git-revert.mdx"),
+    "commands/git-switch": () => import("@/content/en/commands/git-switch.mdx"),
+    "commands/git-branch": () => import("@/content/en/commands/git-branch.mdx"),
+    "commands/git-reflog": () => import("@/content/en/commands/git-reflog.mdx"),
+    "commands/git-bisect": () => import("@/content/en/commands/git-bisect.mdx"),
+    "commands/git-blame": () => import("@/content/en/commands/git-blame.mdx"),
+    "commands/git-checkout": () => import("@/content/en/commands/git-checkout.mdx"),
+    "best-practices/commit-hygiene": () => import("@/content/en/best-practices/commit-hygiene.mdx"),
+    "best-practices/topic-branches": () => import("@/content/en/best-practices/topic-branches.mdx"),
+    "best-practices/fetch-first-sync": () => import("@/content/en/best-practices/fetch-first-sync.mdx"),
+    "best-practices/shared-history-boundaries": () => import("@/content/en/best-practices/shared-history-boundaries.mdx"),
+    "best-practices/review-and-safe-push": () => import("@/content/en/best-practices/review-and-safe-push.mdx"),
+    "workflows/fetch-vs-pull": () => import("@/content/en/workflows/fetch-vs-pull.mdx"),
+    "workflows/feature-branch-collaboration": () => import("@/content/en/workflows/feature-branch-collaboration.mdx"),
+    "workflows/sync-before-review": () => import("@/content/en/workflows/sync-before-review.mdx"),
+    "workflows/hotfix-and-urgent-fixes": () => import("@/content/en/workflows/hotfix-and-urgent-fixes.mdx"),
+    "internals/object-database": () => import("@/content/en/internals/object-database.mdx"),
+    "internals/index-and-working-tree": () => import("@/content/en/internals/index-and-working-tree.mdx"),
+    "internals/refs-and-head": () => import("@/content/en/internals/refs-and-head.mdx"),
+    "internals/remote-tracking-refs": () => import("@/content/en/internals/remote-tracking-refs.mdx"),
+    "internals/commit-graph": () => import("@/content/en/internals/commit-graph.mdx"),
+    "internals/packfiles-and-storage": () => import("@/content/en/internals/packfiles-and-storage.mdx"),
+    "internals/reachability-and-garbage-collection": () => import("@/content/en/internals/reachability-and-garbage-collection.mdx"),
+    "recovery/reflog-recovery": () => import("@/content/en/recovery/reflog-recovery.mdx"),
+    "concepts/git-history": () => import("@/content/en/concepts/git-history.mdx"),
+  },
 } satisfies Record<Locale, Record<DocPath, ContentLoader>>;
 
 export type SearchDoc = {
@@ -109,16 +196,17 @@ export type ContentStats = {
   sectionCounts: Record<DocSection, number>;
 };
 
-export function getDocPaths(locale: Locale) {
-  return Object.keys(contentModules[locale]) as DocPath[];
+export function getDocPaths(_locale: Locale) {
+  void _locale;
+  return [...docPathRegistry] as DocPath[];
 }
 
 export async function getDocByPath(locale: Locale, docPath: DocPath) {
-  const module = await contentModules[locale][docPath]();
+  const mdxModule = await contentModules[locale][docPath]();
   return {
     path: docPath,
-    Component: module.default,
-    metadata: module.metadata,
+    Component: mdxModule.default,
+    metadata: mdxModule.metadata,
   };
 }
 

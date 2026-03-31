@@ -242,37 +242,6 @@ function baseSidebar(locale: Locale, groups: NavGroup[]): SidebarContent {
   };
 }
 
-function commandLabelFromSlug(slug: CommandSlug) {
-  return slug.replace("-", " ");
-}
-
-function bestPracticeLabelFromSlug(locale: Locale, slug: BestPracticeSlug) {
-  const labels: Record<BestPracticeSlug, { zh: string; en: string }> = {
-    "commit-hygiene": {
-      zh: "提交卫生与提交信息",
-      en: "Commit Hygiene and Messages",
-    },
-    "topic-branches": {
-      zh: "主题分支策略",
-      en: "Topic Branch Strategy",
-    },
-    "fetch-first-sync": {
-      zh: "先 fetch 再同步",
-      en: "Fetch-First Sync",
-    },
-    "shared-history-boundaries": {
-      zh: "共享历史的改写边界",
-      en: "Shared History Boundaries",
-    },
-    "review-and-safe-push": {
-      zh: "评审前整理与安全推送",
-      en: "Review-Ready History and Safe Push",
-    },
-  };
-
-  return labels[slug][locale];
-}
-
 function buildBestPracticeNavItem(locale: Locale, activePath?: string): NavItem {
   const parentActive =
     activePath === "best-practices-index" ||
@@ -283,29 +252,6 @@ function buildBestPracticeNavItem(locale: Locale, activePath?: string): NavItem 
     href: `/${locale}/best-practices`,
     active: parentActive,
   };
-}
-
-function workflowLabelFromSlug(locale: Locale, slug: WorkflowSlug) {
-  const labels: Record<WorkflowSlug, { zh: string; en: string }> = {
-    "fetch-vs-pull": {
-      zh: "fetch vs pull",
-      en: "fetch vs pull",
-    },
-    "feature-branch-collaboration": {
-      zh: "功能分支协作流",
-      en: "Feature Branch Collaboration",
-    },
-    "sync-before-review": {
-      zh: "评审前同步主线",
-      en: "Sync Before Review",
-    },
-    "hotfix-and-urgent-fixes": {
-      zh: "紧急修复工作流",
-      en: "Hotfix and Urgent Fixes",
-    },
-  };
-
-  return labels[slug][locale];
 }
 
 function buildWorkflowNavItem(locale: Locale, activePath?: string): NavItem {

@@ -104,11 +104,6 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
   }, [items, normalizedQuery]);
 
   useEffect(() => {
-    setIsOpen(false);
-    setQuery("");
-  }, [pathname]);
-
-  useEffect(() => {
     if (!isOpen) {
       return;
     }
@@ -192,7 +187,6 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
 
             <input
               aria-controls={`doc-search-results-${locale}`}
-              aria-expanded={isOpen}
               className="search-input"
               id={`doc-search-${locale}`}
               onChange={(event) => setQuery(event.target.value)}

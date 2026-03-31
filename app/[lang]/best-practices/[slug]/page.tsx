@@ -6,7 +6,6 @@ import { getDocByPath, getDocPaths, type DocPath } from "@/lib/content";
 import {
   bestPracticeSlugs,
   getDictionary,
-  getDocsSectionTitle,
   getSidebarContent,
   isValidLocale,
   locales,
