@@ -25,7 +25,6 @@ export async function SiteShell({ locale, sidebar, children }: SiteShellProps) {
         <LanguageSwitcher
           currentLocale={locale}
           label={sidebar.localeLabel}
-          localeNames={sidebar.localeNames}
         />
 
         <nav className="side-nav">

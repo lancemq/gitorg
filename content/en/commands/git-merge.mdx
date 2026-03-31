@@ -32,6 +32,16 @@ If the current branch has not diverged, Git can simply move the branch pointer f
 
 If both branches moved forward independently, Git creates a merge commit that records where the histories joined.
 
+<MergeFigure
+  title="How merge expresses history"
+  caption="Merge keeps the original commits and adds a new merge commit that records the point where the two branches were joined."
+  beforeLabel="Before merge"
+  afterLabel="After merge"
+  modeLabel="merge"
+/>
+
+If you compare this picture with the rebase diagram, the key difference is that merge preserves the branch shape and adds a new integration point instead of replaying commits into a new linear sequence.
+
 ## Basic workflow
 
 ```bash

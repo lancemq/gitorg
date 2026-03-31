@@ -24,6 +24,17 @@ export const metadata = {
 
 Understanding reset means understanding which layers are affected.
 
+<ResetFigure
+  title="The three-layer impact of reset"
+  caption="All three reset modes move HEAD first. The real difference is whether the index and working tree are also forced to match the target commit."
+  layersLabel="Layer"
+  softLabel="--soft"
+  mixedLabel="--mixed"
+  hardLabel="--hard"
+/>
+
+Use this diagram as a quick pre-flight check. The moment you move from the first two columns to `--hard`, you are no longer just rewriting history expression, you are allowing the working tree to be overwritten.
+
 ## The three modes that matter most
 
 ### `--soft`
@@ -75,6 +86,8 @@ Before a risky reset, a better sequence is:
 3. `git reflog`
 4. create a backup branch if needed
 5. only then run reset
+
+If you still feel unsure about hard reset, compare the command you want with the figure above. If what you really want is “undo the commit but keep my file changes,” then `--hard` is probably not the right choice.
 
 ## Common examples
 

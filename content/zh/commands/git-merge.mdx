@@ -32,6 +32,16 @@ export const metadata = {
 
 如果两个分支都各自向前发展，Git 会创建一个新的 merge commit 来表达“历史在这里汇合了”。
 
+<MergeFigure
+  title="merge commit 的历史表达"
+  caption="merge 不会重写原有提交，而是在两条分支都继续发展的情况下，用一个新的合并提交把它们接起来。"
+  beforeLabel="合并前"
+  afterLabel="合并后"
+  modeLabel="merge"
+/>
+
+如果你把这张图和 rebase 那张图放在一起看，会发现 merge 更强调“保留两条线最后在这里汇合”，而不是把一条线重新改写成线性历史。
+
 ## 基本流程
 
 ```bash

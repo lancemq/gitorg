@@ -17,6 +17,16 @@ export const metadata = {
 
 `git rebase` reapplies a set of commits onto a new base, so you often end up with similar content but different commit IDs.
 
+<RebaseFigure
+  title="How rebase changes history"
+  caption="The original feature commits E and F are replayed on top of the newer main branch, which is why the content survives while the commit IDs change."
+  beforeLabel="Before rebase"
+  afterLabel="After rebase"
+  modeLabel="re-apply commits"
+/>
+
+It helps to think of rebase as “re-queueing your work.” The key visual signal is that `E/F` become `E'/F'`, which is exactly why rebase is considered history rewriting.
+
 ## When it is a good fit
 
 - Bring a feature branch up to date with `main`
@@ -92,6 +102,12 @@ Fetch-then-rebase is still easier to reason about because it separates:
 1. learning upstream state
 2. choosing to rewrite local history
 3. recovering when something goes wrong
+
+## Using the picture as a decision aid
+
+If your situation looks like “my own feature branch is behind main, and these commits have not been shared yet,” the rebase model above is usually a good fit.
+
+If what you really mean is “this branch is already part of review, CI, or someone else’s work,” then the safer question is no longer “can I make the history cleaner,” but “can I still rewrite it safely.”
 
 ## Additional caution
 

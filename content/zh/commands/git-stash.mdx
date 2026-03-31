@@ -16,6 +16,18 @@ export const metadata = {
 
 `git stash` 用于把当前未提交的工作状态临时搁置起来，让你先切换任务，再回来继续。
 
+<StashFigure
+  title="stash 的典型工作流"
+  caption="最常见的节奏不是长期堆积 stash，而是把当前改动先放进临时栈，切任务，处理完之后再有意识地 apply 或 pop 回来。"
+  workingLabel="当前工作区"
+  stashLabel="stash 栈"
+  restoreLabel="恢复后继续"
+  saveLabel="stash push"
+  applyLabel="apply / pop"
+/>
+
+把 stash 想成“临时寄存处”会更准确。它的价值在于帮你处理中断，而不是替代分支或长期保存重要状态。
+
 ## 适合什么场景
 
 - 正在写一半，需要紧急切到别的分支
@@ -76,6 +88,8 @@ git stash push src/checkout.ts
 - `pop`：恢复，并在成功后删除 stash 记录
 
 如果你还不确定恢复结果是否正确，优先用 `apply` 更稳。
+
+图里这一步之所以特别标成 `apply / pop`，就是因为很多误用都发生在这里。`pop` 很方便，但它会把“恢复”和“尝试删除 stash”绑在一起，所以对重要改动更稳的顺序通常还是先 `apply`。
 
 ## 一个更稳的恢复顺序
 

@@ -24,6 +24,17 @@ export const metadata = {
 
 理解 reset 的关键，就是看它影响到哪一层。
 
+<ResetFigure
+  title="reset 的三层影响"
+  caption="不管 soft、mixed 还是 hard，都会先移动 HEAD。区别在于暂存区和工作区是否继续跟着目标提交一起重置。"
+  layersLabel="影响层"
+  softLabel="--soft"
+  mixedLabel="--mixed"
+  hardLabel="--hard"
+/>
+
+这张图可以当成一个最快速的判断器：只要你准备动 `--hard`，就等于你允许工作区也被覆盖，那就应该先停一下，确认恢复路径。
+
 ## 三种最常见模式
 
 ### `--soft`
@@ -84,6 +95,8 @@ git reset --hard <commit>
 git branch backup/before-reset
 git reset --hard HEAD~1
 ```
+
+如果你对 hard reset 还有点没底，可以把它和图里的第三列对照一下看。只要你发现自己真正想要的是“撤销提交但保留文件改动”，那通常就不该走 `--hard`。
 
 ## 基本示例
 

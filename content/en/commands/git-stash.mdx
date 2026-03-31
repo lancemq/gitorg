@@ -16,6 +16,18 @@ export const metadata = {
 
 `git stash` temporarily shelves your uncommitted work so you can switch tasks and come back later.
 
+<StashFigure
+  title="The typical stash cycle"
+  caption="The best use of stash is usually short-lived interruption handling: save the current state, switch context, then deliberately re-apply the work when you are ready."
+  workingLabel="Working tree"
+  stashLabel="Stash stack"
+  restoreLabel="Resume work"
+  saveLabel="stash push"
+  applyLabel="apply / pop"
+/>
+
+The most useful framing is to treat stash as a short-term holding area, not as a long-term archive or branch replacement.
+
 ## Good use cases
 
 - you need to jump to another branch quickly
@@ -74,6 +86,8 @@ git stash push src/checkout.ts
 - `pop`: restore and delete it if successful
 
 If you are not fully sure yet, `apply` is usually the safer option.
+
+That is why the diagram highlights `apply / pop` as a separate step. Many stash mistakes happen there: `pop` is convenient, but it bundles “restore the changes” with “try to remove the stash entry,” while `apply` keeps the recovery path more conservative.
 
 ## A safer restore workflow
 
