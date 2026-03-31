@@ -1,0 +1,192 @@
+export const metadata = {
+  title: "暂存与 commit",
+  slug: "stage-and-commit",
+  locale: "zh",
+  section: "learning-path",
+  summary: "理解工作区、暂存区和提交历史三层模型，并把文件修改稳定地变成清晰、可复用的本地提交。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-add",
+    "https://git-scm.com/docs/git-commit",
+    "https://git-scm.com/docs/git-status",
+  ],
+};
+
+# 暂存与 commit
+
+## 这一步最重要的心智模型
+
+Git 初学阶段最值得建立的模型，就是三层：
+
+1. 工作区：你正在编辑的文件
+2. 暂存区：你准备放进下一次提交的内容
+3. 提交历史：已经保存下来的快照
+
+如果这三层一直混着看，很多基础命令都会显得模糊。
+
+这一页的目标不是让你背出更多参数，而是让你形成一个稳定动作：
+
+修改文件 -> 检查状态 -> 选择暂存 -> 创建提交 -> 回头验证历史
+
+<CommandFlowFigure
+  title="修改如何变成提交"
+  caption="初学阶段最关键的不是把命令背熟，而是知道文件改动是怎样一步步进入提交历史的。"
+  inputsLabel="当前层"
+  inputs="工作区改动|暂存区快照|历史提交"
+  commandLabel="git add → git commit"
+  outputsLabel="变化"
+  outputs="选中的改动|新的提交|更清晰的历史"
+  note="如果你不确定自己现在改的是哪一层，先停下来跑一次 git status。"
+/>
+
+## 第一步：先修改一个小文件
+
+建议从最简单的练习开始，比如改 README 或文档文件。
+
+改完以后先看：
+
+```bash
+git status
+```
+
+这时候你看到的是工作区里的变化，还不是即将提交的内容。
+
+如果你想更明确一点，可以顺手看：
+
+```bash
+git diff
+```
+
+这条命令看到的是“工作区相对暂存区”的变化。
+
+## 第二步：把改动加入暂存区
+
+```bash
+git add .
+git status
+```
+
+这里最重要的不是写 `.`，而是理解：
+
+- `add` 不是提交
+- `add` 是在选择下一次提交要包含什么
+- 你可以一次只暂存一部分内容
+
+为了看清这一点，推荐再跑一次：
+
+```bash
+git status
+git diff --cached
+```
+
+这样你能同时看到：
+
+- 工作区里还有什么没进暂存区
+- 暂存区里到底准备提交什么
+
+## 第三步：生成提交
+
+```bash
+git commit -m "docs: update quick start notes"
+```
+
+这一步会把“暂存区里的快照”保存成一个新的提交。
+
+推荐你提交后马上看：
+
+```bash
+git log --oneline --decorate -5
+git show --stat --oneline HEAD
+```
+
+这一步很关键，因为很多初学者提交完就走了，不会回头确认自己刚刚到底提交了什么。
+
+## 一个最值得反复练的微型闭环
+
+```bash
+# 修改文件
+git status
+git add .
+git diff --cached
+git status
+git commit -m "docs: refine guide"
+git log --oneline --decorate -3
+```
+
+如果这条小闭环已经顺了，后面同步远端会轻松很多。
+
+## 一个更真实的小场景
+
+假设你刚 clone 完仓库，现在要修正一个 README 标题：
+
+1. 打开 `README.md` 改一行标题
+2. 跑 `git status` 确认只有这个文件变了
+3. 跑 `git add README.md`
+4. 跑 `git diff --cached` 检查暂存内容
+5. 跑 `git commit -m "docs: fix README title"`
+6. 跑 `git log --oneline -3` 确认新提交已经出现
+
+这个练习的价值在于：你会体验到“提交不是一个按钮，而是一组有边界的动作”。
+
+## 提交信息怎么写更稳
+
+初学阶段先做到两件事就够了：
+
+- 一次提交表达一个明确意图
+- 提交信息让未来的自己也看得懂
+
+比如：
+
+```bash
+git commit -m "feat: add login form validation"
+git commit -m "docs: clarify clone workflow"
+git commit -m "fix: handle empty remote response"
+```
+
+如果你还拿不准，就先遵守这个最小规则：
+
+- 动词尽量清楚
+- 范围尽量单一
+- 不要写成“update code”“fix stuff”这种以后看不懂的话
+
+## 常见误区
+
+### 误区 1：把 `git add` 当成提交
+
+不是。它只是准备提交内容。
+
+### 误区 2：一次改很多东西，一次全提
+
+这会让后面 review、回滚和排障都更难。
+
+### 误区 3：提交前不看 `git status`
+
+这样很容易把无关文件也一起带进去。
+
+### 误区 4：一看到文件改了就直接 `git add .`
+
+`git add .` 并不是不能用，但在初学阶段更建议你优先学会按文件选择，比如：
+
+```bash
+git add README.md
+```
+
+这样更容易建立“提交边界”的意识。
+
+## 特殊情况
+
+- 如果 commit 报身份信息错误，先回到上一页配置 `user.name` 和 `user.email`
+- 如果你发现自己暂存错了文件，先不要慌，通常还可以重新调整暂存区
+- 如果工作区和暂存区都很乱，先不要硬 commit，先把提交边界想清楚
+- 如果一次修改里混进了格式化、重命名、功能修改等多种变化，更要分开提交
+
+## 这一页的练习清单
+
+建议至少完成下面 3 轮练习：
+
+1. 改 1 个文件并提交
+2. 改 2 个文件，但只暂存其中 1 个再提交
+3. 提交后用 `git log --oneline` 和 `git show --stat HEAD` 回看结果
+
+## 下一步
+
+暂存与 commit 稳了以后，就可以进入 [远端同步](/zh/docs/learning-path/sync-with-remote)。

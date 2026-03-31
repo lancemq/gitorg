@@ -74,6 +74,10 @@ export default async function DocDetailPage({ params }: Props) {
     redirect(`/${locale}/internals/refs-and-head`);
   }
 
+  if (rawDocPath === "learning-path/quick-start") {
+    redirect(`/${locale}/learning-path`);
+  }
+
   const sectionId = docPath.split("/")[0] as DocsSectionId;
 
   if (!getDocPaths(locale).includes(docPath)) {
@@ -96,7 +100,7 @@ export default async function DocDetailPage({ params }: Props) {
           { label: dict.commandPage.breadcrumbs.overview, href: `/${locale}` },
           {
             label: getDocsSectionTitle(locale, sectionId),
-            href: sectionId === "learning-path" ? `/${locale}/docs/learning-path/quick-start` : undefined,
+            href: sectionId === "learning-path" ? `/${locale}/learning-path` : undefined,
           },
           { label: doc.metadata.title },
         ];

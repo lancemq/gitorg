@@ -1,0 +1,168 @@
+export const metadata = {
+  title: "Remote Sync",
+  slug: "sync-with-remote",
+  locale: "en",
+  section: "learning-path",
+  summary: "Understand fetch, pull, and push as three different actions: observe upstream state, integrate changes, and publish local commits.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-fetch",
+    "https://git-scm.com/docs/git-pull",
+    "https://git-scm.com/docs/git-push",
+  ],
+};
+
+# Remote Sync
+
+## Why beginners often get stuck here
+
+Many beginners are not blocked by `add` or `commit`. They get stuck on questions like:
+
+- why did push fail?
+- why did pull change more than I expected?
+- why do local and remote still look different?
+
+That usually happens because `fetch`, `pull`, and `push` were treated as one blurry category.
+
+In practice they map to different intentions:
+
+- `fetch`: observe upstream state
+- `pull`: download and integrate upstream state
+- `push`: publish local commits
+
+Once those intentions separate in your head, sync commands become much easier to reason about.
+
+<CommandFlowFigure
+  title="Three remote-sync responsibilities"
+  caption="Once you separate observe, integrate, and publish, many sync surprises become easier to explain."
+  inputsLabel="State you are facing"
+  inputs="Local branch|Remote refs|Unpublished commits"
+  commandLabel="fetch / pull / push"
+  outputsLabel="Different results"
+  outputs="Updated remote view|Changed current branch|Updated remote history"
+  note="The most common mistake here is not syntax. It is using an integration or publication command before deciding which one you actually need."
+/>
+
+## Learn fetch first
+
+```bash
+git fetch origin
+```
+
+This is the safest first move whenever you are uncertain, because it updates information without directly rewriting your current branch.
+
+Useful companion commands:
+
+```bash
+git fetch origin
+git log --oneline --graph --decorate --all
+git branch -vv
+```
+
+That combination updates your view first, then shows you whether integration is even needed.
+
+## Then understand pull
+
+```bash
+git pull --ff-only
+```
+
+At the quick-start stage, `--ff-only` is a safer default because it reduces surprise merge commits.
+
+If branch state is still unclear, inspect first instead of pulling on reflex.
+
+A useful beginner question is:
+
+"Do I only need to see remote changes, or am I actually ready to integrate them into this branch?"
+
+The first usually starts with `fetch`. The second is when `pull` becomes relevant.
+
+## Finally understand push
+
+```bash
+git push origin main
+```
+
+Push publishes local commits. The most common reasons it fails are:
+
+- the remote is ahead of you
+- you are on the wrong branch
+- the upstream relationship is not what you assumed
+
+That is why force-pushing on reflex is such a bad beginner habit. The first job is to identify the mismatch.
+
+## A steadier sync rhythm
+
+For beginners, a safer order is usually:
+
+```bash
+git status
+git fetch origin
+git pull --ff-only
+git push origin main
+```
+
+If you already have local commits, it matters even more to separate inspection from integration.
+
+## A realistic morning-sync scenario
+
+1. run `git status` and confirm the working tree is clean
+2. run `git fetch origin`
+3. inspect `git branch -vv`
+4. if this is only a fast-forward update, run `git pull --ff-only`
+5. do your local work and commit it
+6. confirm the current branch again
+7. run `git push origin <branch-name>`
+
+The value of this sequence is simple: it separates observation from integration.
+
+## What to inspect before reacting to a push failure
+
+```bash
+git status
+git branch -vv
+git fetch origin
+```
+
+Most early push failures quickly reduce to one of these:
+
+- your local branch is behind
+- you are on the wrong branch
+- no upstream is configured
+- the team expects you to push to a feature branch rather than main
+
+## Common mistakes
+
+### Mistake 1: treating pull as download only
+
+It is not. It continues into integration.
+
+### Mistake 2: force-pushing the moment push fails
+
+That can turn a sync problem into a history-overwrite problem.
+
+### Mistake 3: starting new work without syncing
+
+That makes later divergence harder to explain.
+
+### Mistake 4: not knowing which branch is being synced
+
+Many sync errors are not syntax problems. They are target problems. Know which branch you are on, which branch it tracks, and which branch you intend to publish.
+
+## Special cases
+
+- If the working tree is dirty, decide whether changes should be committed or stashed before pull
+- If your team does not allow direct work on `main`, the push target may be a feature branch instead
+- If you do not understand a push failure, inspect `git branch -vv` and `git fetch origin` first
+- If the default branch is `master` or another name instead of `main`, adjust the target branch accordingly
+
+## Practice checklist
+
+Try to get comfortable with these three cases:
+
+1. fetch only, with no integration
+2. pull a pure fast-forward update
+3. push one local commit to a remote test branch
+
+## Next step
+
+Continue with [First Feature Branch](/en/docs/learning-path/first-feature-branch).

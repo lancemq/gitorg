@@ -27,7 +27,7 @@ const audiencePaths = {
     {
       title: "Git 新手入口",
       description: "从 clone、add、commit、fetch、pull、push 建立最小闭环。",
-      href: "/docs/learning-path/quick-start",
+      href: "/learning-path",
     },
     {
       title: "团队协作入口",
@@ -44,7 +44,7 @@ const audiencePaths = {
     {
       title: "Start with Git Basics",
       description: "Build a reliable loop around clone, add, commit, fetch, pull, and push.",
-      href: "/docs/learning-path/quick-start",
+      href: "/learning-path",
     },
     {
       title: "Team Collaboration Path",
@@ -137,7 +137,7 @@ export default async function LocalizedHomePage({ params }: Props) {
           <h1>{dict.home.hero.title}</h1>
           <p className="lead">{dict.home.hero.description}</p>
           <div className="hero-actions">
-            <Link className="button button-primary" href={`/${locale}/docs/learning-path/quick-start`}>
+            <Link className="button button-primary" href={`/${locale}/learning-path`}>
               {dict.home.hero.primaryAction}
             </Link>
             <Link className="button button-secondary" href={`/${locale}/commands`}>

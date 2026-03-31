@@ -1,322 +1,112 @@
 export const metadata = {
-  title: "Git Quick Start Learning Path",
+  title: "Git Quick Start Series",
   slug: "quick-start",
   locale: "en",
   section: "learning-path",
-  summary: "A beginner-friendly Git path that covers clone, add, commit, fetch, pull, and push as a minimum usable workflow.",
+  summary: "Turn Git quick start into a small guided series: prepare your environment, learn staging and commit, understand remote sync, and open your first feature branch.",
   sourceUrls: [
     "https://git-scm.com/book/en/v2/Git-Branching-Summary",
-    "https://git-scm.com/docs/git-fetch.html",
-    "https://git-scm.com/docs/git-pull.html",
+    "https://git-scm.com/docs/git-clone",
+    "https://git-scm.com/docs/git-commit",
+    "https://git-scm.com/docs/git-fetch",
+    "https://git-scm.com/docs/git-push",
   ],
 };
 
-# Git Quick Start Learning Path
+# Git Quick Start Series
 
-## What this guide helps with
+## What this series solves
 
-Many people first meet Git as a pile of commands to memorize. A better approach is to build one minimum closed loop first:
+When someone is new to Git, the real problem is usually not the number of commands. It is that the commands blur together and the sequence between them is unclear.
 
-1. Get the repository
-2. Change files
-3. Stage changes
-4. Create a commit
-5. Sync with the remote
+This series breaks “getting started with Git” into four smaller reads:
 
-Once that loop feels natural, topics like rebase, reflog, references, and the object model become much easier to learn.
+1. prepare the environment and get the repository
+2. learn staging and commit
+3. learn remote sync
+4. open your first feature branch
 
-## What you should be able to do after this guide
-
-If this page lands well, you should be able to do at least these four things:
-
-- explain what `clone`, `add`, `commit`, `fetch`, `pull`, and `push` each do
-- distinguish the working tree, the staging area, and commit history
-- turn a file change into a local commit and then publish it safely
-- treat `pull` and `push` failures as state questions to inspect, not reasons to panic
-
-For beginners, those abilities matter more than learning advanced history editing too early.
-
-## Build one minimal mental model first
-
-Before trying to memorize commands, reduce Git to three layers:
-
-1. Working tree: the files you are actively editing
-2. Staging area: the snapshot you want in the next commit
-3. Commit history: the saved snapshots and their relationships
-
-Most beginner confusion comes from mixing those layers together.
+You do not need all of Git at once. You need one stable loop first.
 
 <CommandFlowFigure
-  title="The minimum Git loop"
-  caption="At the quick-start stage, the goal is not to know every command. The goal is to make the loop of edit, stage, commit, and sync feel predictable."
-  inputsLabel="Current state"
-  inputs="Local files|Staging area|Current branch|Remote repo"
-  commandLabel="clone → add → commit → fetch / pull → push"
-  outputsLabel="Learning outcome"
-  outputs="Trackable changes|Clear commits|Synced branch|Safer rhythm"
-  note="If you keep only one principle, let it be this: inspect state first, then decide the next command."
+  title="Quick-start series route"
+  caption="Breaking the minimum Git loop into smaller pages makes it easier to see whether you are stuck on setup, commit flow, remote sync, or basic collaboration."
+  inputsLabel="Starting point"
+  inputs="Local environment|Practice repository|Basic commands"
+  commandLabel="Overview → lesson pages"
+  outputsLabel="Result"
+  outputs="Usable loop|Stable rhythm|Collaboration readiness"
+  note="If one step already feels easy, keep moving. If one step still feels shaky, stay there and repeat it."
 />
 
-## Setup before you start
+## Recommended reading order
 
-### 1. Configure your identity
+### 1. [Setup and Clone](/en/docs/learning-path/setup-and-clone)
 
-```bash
-git config --global user.name "Your Name"
-git config --global user.email "you@example.com"
-```
+Start with identity setup, repository access, and the first inspection steps after clone.
 
-Without this, your first commit will often fail immediately.
+### 2. [Staging and Commit](/en/docs/learning-path/stage-and-commit)
 
-### 2. Pick a low-risk practice repository
+Build the three-layer model of working tree, staging area, and commit history.
 
-For practice, avoid the highest-risk production repository first. Safer choices are:
+### 3. [Remote Sync](/en/docs/learning-path/sync-with-remote)
 
-- a small personal repository
-- a fork or clone created only for learning
-- a new local test directory initialized with `git init`
+Separate `fetch`, `pull`, and `push` into observe, integrate, and publish.
 
-### 3. Create a fixed inspection habit
+### 4. [First Feature Branch](/en/docs/learning-path/first-feature-branch)
 
-Before and after key actions, get used to checking:
+Move from a solo loop into the lightest form of collaboration flow.
+
+## Who this series is for
+
+- developers touching Git for the first time
+- people who know a few commands but not how they connect
+- anyone who still hesitates around `pull`, `push`, and `commit`
+- readers who want a stable base before touching rebase, reflog, or reset
+
+## Principles worth keeping while you learn
+
+### Inspect state before acting
+
+At key moments, get used to checking:
 
 ```bash
 git status
 git log --oneline --decorate -5
 ```
 
-The first command explains the working tree and staging area. The second tells you whether history changed the way you expected.
+### Stabilize the solo loop before deep collaboration topics
 
-## The first commands to learn
+If `edit -> add -> commit -> push` still feels shaky, advanced history tools can wait.
 
-### 1. `git clone`
+### Learn actions before memorizing syntax
 
-Use it to copy a remote repository locally and record the default remote as `origin`.
+For example:
 
-```bash
-git clone <repository-url>
-```
+- `clone` gets the repository
+- `add` prepares the next commit
+- `commit` saves local history
+- `fetch` updates your remote view
+- `pull` downloads and integrates
+- `push` publishes local commits
 
-Typical situations:
+## What can wait until later
 
-- joining a project and bringing the repository onto your machine for the first time
-- setting up a new machine or a fresh working directory
-- creating a clean local copy for experiments without polluting an older checkout
-
-### 2. `git add`
-
-Use it to move changes from the working tree into the staging area.
-
-```bash
-git add .
-```
-
-Typical situations:
-
-- you changed multiple files but want the next commit to include only part of that work
-- you want to separate “editing files” from “deciding what the commit means”
-- you want smaller, review-friendly commits instead of one oversized snapshot
-
-### 3. `git commit`
-
-Use it to turn the staged snapshot into a new commit.
-
-```bash
-git commit -m "feat: add login form"
-```
-
-Typical situations:
-
-- you finished one coherent change and want to save it safely
-- you want a checkpoint before starting another round of edits
-- you need a clean unit that can later be reviewed, reverted, or compared
-
-### 4. `git fetch`
-
-Use it to download new remote refs and objects without modifying your current branch directly.
-
-```bash
-git fetch origin
-```
-
-Typical situations:
-
-- you want to see what changed upstream before integrating it
-- your local work is still in progress and you do not want automatic integration yet
-- you want a fresh view of remote-tracking refs before choosing merge or rebase
-
-### 5. `git pull`
-
-Use it to fetch first and then integrate remote changes into your current branch.
-
-```bash
-git pull --ff-only
-```
-
-Typical situations:
-
-- you know the current branch should move forward with upstream
-- your working tree is already clean
-- you want the latest remote state locally before continuing work
-
-### 6. `git push`
-
-Use it to publish your local commits to the remote.
-
-```bash
-git push origin main
-```
-
-Typical situations:
-
-- you finished local commits and want them published remotely
-- you want to trigger CI, backup, review, or collaboration flow
-- you want teammates to see your branch on the remote
-
-## One basic flow worth repeating
-
-If you only practice one end-to-end sequence today, make it this one:
-
-```bash
-git clone <repository-url>
-cd <repository-name>
-git status
-
-# edit a file
-git add .
-git status
-git commit -m "docs: update quick start notes"
-git fetch origin
-git pull --ff-only
-git push origin main
-```
-
-This small loop teaches several things at once:
-
-- how a working-tree change enters the staging area
-- how staged content becomes a commit
-- why it helps to inspect state before syncing
-- how a local commit finally reaches the remote
-
-## A simple three-day practice rhythm
-
-### Day 1: complete the solo loop
-
-```bash
-git clone <url>
-git status
-git add .
-git commit -m "docs: update README"
-git push
-```
-
-Goal:
-
-- make one full pass from local edit to published result
-- focus on reading `git status` at every step
-
-### Day 2: separate fetch from pull
-
-```bash
-git fetch origin
-git log --oneline --graph --decorate --all
-git pull --ff-only
-```
-
-Goal:
-
-- see that fetch updates remote-tracking state first
-- feel that pull continues into integration
-- observe the difference between `origin/main` and local `main`
-
-### Day 3: add branch thinking
-
-- create a feature branch
-- make a commit
-- fetch to inspect upstream change
-- decide later whether merge or rebase should follow
-
-Goal:
-
-- move from “just save my work” toward “prepare for collaboration”
-- start seeing that sync strategy affects history shape
-
-## Four beginner questions that show up early
-
-### 1. Why is the file still in my directory after `git add`?
-
-Because `add` does not move the file away. It records the current file content into the staging area while the file still stays in the working tree.
-
-### 2. Why does `git commit` not change the remote?
-
-Because commit is local. The remote changes only after a `git push`.
-
-### 3. Why does `git push` fail?
-
-The most common causes are:
-
-- the remote has newer commits than you do
-- you are pushing the wrong branch
-- your branch does not have the upstream relationship you expected
-
-When that happens, do not jump straight to force-push. Inspect first:
-
-```bash
-git status
-git branch -vv
-git fetch origin
-```
-
-### 4. Why does `git pull` make beginners nervous?
-
-Because it is not “download only.” It downloads and then integrates. If you do not want immediate integration, fetch first.
-
-## Common beginner mistakes
-
-### Mistake 1: treating `git add` as the commit itself
-
-It is not the commit. It is a staging step that decides what the next commit will contain.
-
-### Mistake 2: assuming `git pull` is automatically safe
-
-It is not. It really changes the current branch, especially when history has diverged.
-
-### Mistake 3: committing without checking `git status`
-
-That is how unrelated files get dragged into a commit.
-
-### Mistake 4: force-pushing the moment `push` fails
-
-That turns “I have not synchronized correctly yet” into “I might have overwritten someone else’s history.”
-
-## The boundary of quick-start learning
-
-This guide intentionally does not try to teach every Git command at once. The quick-start stage is about stability first, not breadth first.
-
-At this stage, you usually do not need to rush into:
+This series intentionally does not rush you into:
 
 - `rebase`
 - `reset --hard`
 - `cherry-pick`
-- deep reflog recovery
+- deeper reflog recovery
 - plumbing commands
 
 Those topics matter, but they make more sense after the minimum loop already feels stable.
 
-## A safer learning rule
+## Suggested next steps after the series
 
-When you are unsure what to do next, ask three questions:
+Once the four pages here feel natural, continue with:
 
-1. Is this a working-tree problem, a staging problem, or a history problem?
-2. Do I want to inspect upstream first, or integrate upstream right now?
-3. Does this action affect only me, or could it affect a shared branch?
+1. fetch vs pull strategy boundaries
+2. git rebase usage boundaries
+3. feature-branch collaboration workflow
 
-Those three questions make a surprising amount of Git feel simpler.
-
-## What to learn next
-
-After this guide, the next three topics should usually be:
-
-1. The difference between `fetch` and `pull`
-2. The boundaries of `git rebase`
-3. Recovery with `git reflog`

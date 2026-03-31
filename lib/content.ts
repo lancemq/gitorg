@@ -7,6 +7,7 @@ import {
   bestPracticeSlugs,
   commandSlugs,
   internalsSlugs,
+  learningPathSlugs,
   workflowSlugs,
   type CommandSlug,
   type InternalsSlug,
@@ -39,6 +40,10 @@ type MdxModule = {
 type ContentLoader = () => Promise<MdxModule>;
 export const docPathRegistry = [
   "learning-path/quick-start",
+  "learning-path/setup-and-clone",
+  "learning-path/stage-and-commit",
+  "learning-path/sync-with-remote",
+  "learning-path/first-feature-branch",
   "commands/git-init",
   "commands/git-clone",
   "commands/git-status",
@@ -145,6 +150,10 @@ export type DocPath = (typeof docPathRegistry)[number];
 const contentModules = {
   zh: {
     "learning-path/quick-start": () => import("@/content/zh/learning-path/quick-start.mdx"),
+    "learning-path/setup-and-clone": () => import("@/content/zh/learning-path/setup-and-clone.mdx"),
+    "learning-path/stage-and-commit": () => import("@/content/zh/learning-path/stage-and-commit.mdx"),
+    "learning-path/sync-with-remote": () => import("@/content/zh/learning-path/sync-with-remote.mdx"),
+    "learning-path/first-feature-branch": () => import("@/content/zh/learning-path/first-feature-branch.mdx"),
     "commands/git-init": () => import("@/content/zh/commands/git-init.mdx"),
     "commands/git-clone": () => import("@/content/zh/commands/git-clone.mdx"),
     "commands/git-status": () => import("@/content/zh/commands/git-status.mdx"),
@@ -248,6 +257,10 @@ const contentModules = {
   },
   en: {
     "learning-path/quick-start": () => import("@/content/en/learning-path/quick-start.mdx"),
+    "learning-path/setup-and-clone": () => import("@/content/en/learning-path/setup-and-clone.mdx"),
+    "learning-path/stage-and-commit": () => import("@/content/en/learning-path/stage-and-commit.mdx"),
+    "learning-path/sync-with-remote": () => import("@/content/en/learning-path/sync-with-remote.mdx"),
+    "learning-path/first-feature-branch": () => import("@/content/en/learning-path/first-feature-branch.mdx"),
     "commands/git-init": () => import("@/content/en/commands/git-init.mdx"),
     "commands/git-clone": () => import("@/content/en/commands/git-clone.mdx"),
     "commands/git-status": () => import("@/content/en/commands/git-status.mdx"),
@@ -480,7 +493,7 @@ function getOrderedPathSeries(section: DocSection): DocPath[] {
     case "internals":
       return internalsSlugs.map((slug) => `internals/${slug}` as DocPath);
     case "learning-path":
-      return ["learning-path/quick-start"];
+      return learningPathSlugs.map((slug) => `learning-path/${slug}` as DocPath);
     case "recovery":
       return ["recovery/reflog-recovery"];
     case "concepts":
@@ -523,6 +536,11 @@ export async function getWorkflowDocs(locale: Locale) {
   return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("workflows/")));
 }
 
+export async function getLearningPathDocs(locale: Locale) {
+  const docs = await getIndexedDocs(locale);
+  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("learning-path/")));
+}
+
 export async function getInternalsDocs(locale: Locale) {
   const docs = await getIndexedDocs(locale);
   return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("internals/")));
@@ -547,6 +565,10 @@ export function getDocHref(locale: Locale, docPath: DocPath) {
 
   if (docPath.startsWith("internals/")) {
     return `/${locale}/internals/${docPath.replace("internals/", "")}`;
+  }
+
+  if (docPath === "learning-path/quick-start") {
+    return `/${locale}/learning-path`;
   }
 
   return `/${locale}/docs/${docPath}`;
@@ -590,9 +612,29 @@ export async function getDocNeighbors(locale: Locale, docPath: DocPath): Promise
 
 const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
   "learning-path/quick-start": [
-    "commands/git-fetch",
+    "learning-path/setup-and-clone",
+    "learning-path/stage-and-commit",
+    "learning-path/sync-with-remote",
+  ],
+  "learning-path/setup-and-clone": [
+    "commands/git-clone",
+    "commands/git-config",
+    "learning-path/stage-and-commit",
+  ],
+  "learning-path/stage-and-commit": [
+    "commands/git-add",
     "commands/git-commit",
-    "workflows/fetch-vs-pull",
+    "learning-path/sync-with-remote",
+  ],
+  "learning-path/sync-with-remote": [
+    "commands/git-fetch",
+    "commands/git-pull",
+    "commands/git-push",
+  ],
+  "learning-path/first-feature-branch": [
+    "commands/git-switch",
+    "commands/git-branch",
+    "workflows/feature-branch-collaboration",
   ],
   "concepts/git-history": [
     "internals/commit-graph",
@@ -628,11 +670,13 @@ export async function getRelatedDocs(
 
 export async function getFeaturedSectionDocs(
   locale: Locale,
-  section: Extract<DocSection, "commands" | "best-practices" | "workflows" | "internals">,
+  section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "internals">,
   limit = 3,
 ): Promise<DocCard[]> {
   const docs =
-    section === "commands"
+    section === "learning-path"
+      ? await getLearningPathDocs(locale)
+      : section === "commands"
       ? await getCommandDocs(locale)
       : section === "best-practices"
         ? await getBestPracticeDocs(locale)

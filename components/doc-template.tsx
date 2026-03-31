@@ -86,7 +86,9 @@ export function DocTemplate({
           </div>
         </section>
 
-        <DocSupport locale={locale} relatedDocs={relatedDocs} neighbors={neighbors} />
+        <div className="doc-support-stack">
+          <DocSupport locale={locale} relatedDocs={relatedDocs} neighbors={neighbors} />
+        </div>
 
         {showSources ? (
           <section className="panel doc-sources">

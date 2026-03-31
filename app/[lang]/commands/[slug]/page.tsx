@@ -127,7 +127,9 @@ export default async function CommandPage({ params }: Props) {
         </div>
       </section>
 
-      <DocSupport locale={locale} relatedDocs={relatedDocs} neighbors={neighbors} />
+      <div className="doc-support-stack">
+        <DocSupport locale={locale} relatedDocs={relatedDocs} neighbors={neighbors} />
+      </div>
     </SiteShell>
   );
 }

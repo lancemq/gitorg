@@ -1,0 +1,213 @@
+export const metadata = {
+  title: "环境与 clone",
+  slug: "setup-and-clone",
+  locale: "zh",
+  section: "learning-path",
+  summary: "完成 Git 初学阶段最基础的准备动作：配置身份、拿到仓库、看懂首次 clone 后本地到底多了什么。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-config",
+    "https://git-scm.com/docs/git-clone",
+    "https://git-scm.com/docs/git-status",
+  ],
+};
+
+# 环境与 clone
+
+## 这一步要完成什么
+
+在真正开始提交代码之前，你要先把“本地是谁、仓库从哪里来、clone 完以后该先看什么”弄清楚。
+
+很多初学者并不是不会 `git clone`，而是不知道 clone 完之后本地到底发生了什么，也不知道下一步该看哪里。
+
+这一页练完以后，你至少应该能稳定回答 4 个问题：
+
+- 这台电脑上的 Git 提交作者是谁
+- 这个仓库是从哪个远端地址拿下来的
+- 当前分支是不是干净的
+- 当前分支和远端分支之间是什么关系
+
+## 第一步：配置身份
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+```
+
+这一步的目的不是“填个资料”，而是让后续每个提交都带上可识别的作者信息。
+
+如果你跳过这一步，第一次 commit 时 Git 往往会直接报错。
+
+推荐你马上验证一下：
+
+```bash
+git config --global --list
+git config --global user.name
+git config --global user.email
+```
+
+如果团队要求不同仓库使用不同邮箱，也可以只在当前仓库内单独配置：
+
+```bash
+git config user.email "work@example.com"
+```
+
+## 第二步：拿到仓库
+
+```bash
+git clone <repository-url>
+cd <repository-name>
+```
+
+`clone` 完成后，本地拿到的不只是文件副本，还包括：
+
+- 提交历史
+- 默认分支引用
+- 默认远端 `origin`
+- 远端跟踪分支
+
+<CommandFlowFigure
+  title="clone 之后本地多了什么"
+  caption="clone 不只是把文件复制下来，它还把这个仓库的历史和远端关系一起建立起来。"
+  inputsLabel="输入"
+  inputs="远端仓库|仓库地址|本地目录"
+  commandLabel="git clone"
+  outputsLabel="本地结果"
+  outputs="工作目录|完整历史|origin 远端|默认分支"
+  note="初学阶段最容易忽略的一点是：你拿到的是一个完整 Git 仓库，不只是一个代码文件夹。"
+/>
+
+## clone 以后本地目录里会多出什么
+
+进入仓库目录后，你表面上看到的是项目文件，但真正重要的是这个目录已经变成了一个 Git 仓库。
+
+可以顺手确认：
+
+```bash
+pwd
+ls -a
+git rev-parse --show-toplevel
+```
+
+这里最值得建立的直觉是：
+
+- 项目文件所在的位置是工作区
+- `.git/` 目录里保存的是仓库元数据和对象
+- 你后续执行的大多数 Git 命令，都是围绕这两个区域工作
+
+## 第三步：clone 完先做一轮检查
+
+推荐马上跑下面这组命令：
+
+```bash
+git status
+git branch -vv
+git remote -v
+```
+
+它们能帮你确认：
+
+- 当前分支是什么
+- 工作区是否干净
+- 本地分支是否已经跟踪上游分支
+- `origin` 指向的是哪个地址
+
+如果你是第一次进团队仓库，这一步不要省。它能让你在“开始改代码之前”先确认自己所处的位置。
+
+## 一个完整的新电脑上手示例
+
+```bash
+git config --global user.name "Maqi"
+git config --global user.email "maqi@example.com"
+git clone git@github.com:example/team-repo.git
+cd team-repo
+git status
+git branch -vv
+git remote -v
+```
+
+如果这几步都顺了，说明你已经具备了开始本地开发的最小环境。
+
+## 典型练习
+
+### 练习 1：把一个测试仓库拉到本地
+
+```bash
+git clone <repository-url>
+cd <repository-name>
+git status
+```
+
+### 练习 2：确认当前分支和上游关系
+
+```bash
+git branch -vv
+git remote -v
+```
+
+### 练习 3：确认 `.git/` 和工作区是两个层次
+
+```bash
+ls -a
+git rev-parse --show-toplevel
+```
+
+### 练习 4：再开一个全新目录重新 clone 一次
+
+这样做的价值是让你感受到：clone 是“重新建立一份本地仓库”，不是把原目录修修补补。
+
+## 初学阶段最稳的检查清单
+
+每次刚拿到一个仓库，至少检查这 5 件事：
+
+1. 当前是不是在正确目录里
+2. `git status` 是否干净
+3. 当前分支是不是你以为的那个分支
+4. `origin` 地址是否正确
+5. 当前仓库身份配置是否符合团队要求
+
+## 常见误区
+
+### 误区 1：以为 clone 只是复制代码
+
+不是。它把仓库历史和远端关系也一起带到了本地。
+
+### 误区 2：把 `origin` 当成特殊关键字
+
+`origin` 只是默认远端名，不是 Git 的保留魔法词。
+
+### 误区 3：clone 完就立刻开始改文件
+
+更稳妥的做法是先看一眼 `git status` 和 `git branch -vv`，确认你现在到底站在哪个分支上。
+
+### 误区 4：拿到仓库后不知道自己是否有推送权限
+
+这不是 clone 的问题，而是远端权限问题。先确认你是否只读、是否通过 fork 工作流协作，再决定后续 push 目标。
+
+## 特殊情况
+
+- 如果你是在新电脑上开始工作，先确认 SSH key 或认证方式已经准备好
+- 如果仓库很大，clone 可能会慢，这不是 Git 出错，而是对象本身较多
+- 如果团队有 fork 工作流，clone 的对象可能是你自己的 fork，而不是上游主仓库
+- 如果仓库启用了子模块，clone 之后可能还需要额外初始化子模块
+
+## 这一页练完后的过关标准
+
+如果你能独立完成下面这组动作，就说明这一页已经基本掌握：
+
+```bash
+git clone <repository-url>
+cd <repository-name>
+git status
+git branch -vv
+git remote -v
+```
+
+并且你能用自己的话解释：
+
+- clone 到底复制了什么
+- `origin` 是什么
+- 为什么 clone 完先检查状态比直接改代码更稳
+
+## 下一步
+
+环境和 clone 稳了以后，下一步建议进入 [暂存与 commit](/zh/docs/learning-path/stage-and-commit)。

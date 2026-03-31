@@ -1,0 +1,197 @@
+export const metadata = {
+  title: "Setup and Clone",
+  slug: "setup-and-clone",
+  locale: "en",
+  section: "learning-path",
+  summary: "Handle the first low-risk setup tasks in Git: configure identity, clone a repository, and inspect what actually appears locally afterward.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-config",
+    "https://git-scm.com/docs/git-clone",
+    "https://git-scm.com/docs/git-status",
+  ],
+};
+
+# Setup and Clone
+
+## What this step should achieve
+
+Before you create commits, you want three things to feel clear:
+
+- who Git thinks you are
+- how the repository arrives on your machine
+- what to inspect right after clone
+
+Beginners often know the syntax of `git clone` but not what clone actually created locally.
+
+By the end of this page, you should be able to answer four basic questions without guessing:
+
+- who Git will record as the author on this machine
+- where this repository came from
+- whether the current branch is clean
+- what relationship exists between the current branch and its upstream
+
+## Step 1: configure identity
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+```
+
+This is not just profile setup. It gives later commits an identifiable author.
+
+You can verify immediately:
+
+```bash
+git config --global --list
+git config --global user.name
+git config --global user.email
+```
+
+If work repositories need a different email, configure it inside the repository instead of globally:
+
+```bash
+git config user.email "work@example.com"
+```
+
+## Step 2: clone the repository
+
+```bash
+git clone <repository-url>
+cd <repository-name>
+```
+
+After clone, local state now includes:
+
+- a working directory
+- full repository history
+- a default remote called `origin`
+- remote-tracking refs
+
+<CommandFlowFigure
+  title="What clone creates locally"
+  caption="Clone does more than copy files. It creates a real local repository with history and remote relationship already connected."
+  inputsLabel="Input"
+  inputs="Remote repo|Repository URL|Local directory"
+  commandLabel="git clone"
+  outputsLabel="Local result"
+  outputs="Working copy|Full history|origin remote|Default branch"
+  note="The key beginner insight is that clone gives you a Git repository, not just a folder of code."
+/>
+
+## What you should notice inside the cloned directory
+
+After entering the directory, the obvious part is the project files. The more important part is that `.git/` now exists.
+
+Check it with:
+
+```bash
+pwd
+ls -a
+git rev-parse --show-toplevel
+```
+
+The useful mental model is:
+
+- project files are your working tree
+- `.git/` stores repository metadata and objects
+- most later Git commands operate around those two areas
+
+## Step 3: run one inspection pass immediately after clone
+
+Run:
+
+```bash
+git status
+git branch -vv
+git remote -v
+```
+
+These commands tell you:
+
+- which branch you are on
+- whether the working tree is clean
+- whether the current branch tracks an upstream branch
+- which URL `origin` points to
+
+If this is your first time in a team repository, do not skip this pass. It tells you where you are before you start editing.
+
+## A complete first-machine example
+
+```bash
+git config --global user.name "Maqi"
+git config --global user.email "maqi@example.com"
+git clone git@github.com:example/team-repo.git
+cd team-repo
+git status
+git branch -vv
+git remote -v
+```
+
+If all of that works, you already have the minimum local setup for real work.
+
+## Typical exercises
+
+### Exercise 1: clone a small practice repository
+
+```bash
+git clone <repository-url>
+cd <repository-name>
+git status
+```
+
+### Exercise 2: inspect branch and remote relationship
+
+```bash
+git branch -vv
+git remote -v
+```
+
+### Exercise 3: confirm that `.git/` and the working tree are different layers
+
+```bash
+ls -a
+git rev-parse --show-toplevel
+```
+
+### Exercise 4: clone again into a fresh directory
+
+This helps reinforce that clone creates a new local repository rather than “repairing” an existing folder.
+
+## A safer beginner checklist
+
+Every time you first open a repository, confirm at least these five points:
+
+1. you are in the correct directory
+2. `git status` is clean
+3. the branch is the branch you think it is
+4. the `origin` URL is correct
+5. identity settings match the team expectation
+
+## Common mistakes
+
+### Mistake 1: thinking clone only copies files
+
+It also copies repository history and establishes remote relationship.
+
+### Mistake 2: treating `origin` like a magic keyword
+
+It is only the default remote name.
+
+### Mistake 3: editing files immediately without checking state
+
+A safer habit is to look at `git status` and `git branch -vv` first.
+
+### Mistake 4: assuming clone also proves you can push
+
+Clone only proves you can read the repository. Push permissions are a separate remote-side question.
+
+## Special cases
+
+- On a new machine, confirm SSH keys or auth flow first
+- Large repositories may clone slowly because the object set is large
+- In fork-based workflows, the repo you clone may be your fork rather than the upstream source
+- If the repository uses submodules, clone may be only the first step
+
+## Next step
+
+Continue with [Staging and Commit](/en/docs/learning-path/stage-and-commit).

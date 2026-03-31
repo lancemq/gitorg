@@ -1,0 +1,195 @@
+export const metadata = {
+  title: "First Feature Branch",
+  slug: "first-feature-branch",
+  locale: "en",
+  section: "learning-path",
+  summary: "Move from a solo Git loop into the simplest collaboration rhythm: create a feature branch, commit work there, and keep an eye on the main branch.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-switch",
+    "https://git-scm.com/docs/git-branch",
+    "https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell",
+  ],
+};
+
+# First Feature Branch
+
+## Why branches matter this early
+
+Once clone, add, commit, fetch, pull, and push feel stable, the next useful step is not advanced history editing. It is learning to work on a branch.
+
+Branches help you:
+
+- separate the mainline from the current task
+- keep experiments away from the primary branch
+- prepare for later review and merge flow
+
+The most practical way to think about a feature branch is: a separate workspace for one task.
+
+## The smallest useful branch workflow
+
+```bash
+git switch -c feature/login-form
+# edit files
+git add .
+git commit -m "feat: add login form"
+git fetch origin
+```
+
+That sequence is enough to enter a basic collaboration rhythm.
+
+<CommandFlowFigure
+  title="First feature-branch rhythm"
+  caption="The point of a feature branch is not to make history complicated. It is to give one task an isolated and safer workspace."
+  inputsLabel="Starting point"
+  inputs="Main branch|Current task|Local edits"
+  commandLabel="switch -c → commit → fetch"
+  outputsLabel="Result"
+  outputs="Independent branch|Task-focused commits|Ready-to-sync workflow"
+  note="At the quick-start stage, getting comfortable with branch-based work matters more than mastering history rewriting."
+/>
+
+## Naming the branch in a safer way
+
+You do not need a complex naming strategy yet, but at least make it:
+
+- descriptive
+- easy to distinguish from other tasks
+- less vague than names like `test`, `temp`, or `new`
+
+Common examples:
+
+```bash
+feature/login-form
+feature/update-readme
+fix/button-style
+docs/quick-start-notes
+```
+
+## Recommended practice steps
+
+### 1. create a branch from main
+
+```bash
+git switch -c feature/first-task
+```
+
+### 2. make one small change
+
+Choose something low risk, such as docs, a label, or a tiny UI adjustment.
+
+### 3. commit the change on that branch
+
+```bash
+git add .
+git commit -m "feat: finish first task"
+```
+
+### 4. inspect whether main changed upstream
+
+```bash
+git fetch origin
+git branch -vv
+```
+
+### 5. publish the branch to remote
+
+```bash
+git push -u origin feature/first-task
+```
+
+This matters because it teaches three useful things early:
+
+- a local branch can live independently
+- a remote branch can mirror it
+- later push and pull behavior becomes clearer once upstream is set
+
+## A full beginner branch loop
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c feature/first-task
+# edit files
+git status
+git add .
+git commit -m "feat: finish first task"
+git fetch origin
+git branch -vv
+git push -u origin feature/first-task
+```
+
+That loop is much closer to real team work than only knowing `git switch -c`.
+
+## What to understand first, and what can wait
+
+Understand first:
+
+- why you branch away from main
+- why task commits are safer on a feature branch
+- why syncing main should usually start with fetch
+
+Things that can wait:
+
+- interactive rebase
+- deep conflict resolution
+- advanced history-cleanup strategy
+
+## How to think about merge and rebase at this stage
+
+You do not need full mastery yet. Just hold onto the boundary:
+
+- merge joins histories
+- rebase reapplies your commits on a new base
+
+That is enough for now. First get comfortable doing real work on a feature branch.
+
+If merge and rebase still feel abstract, keep one steady habit:
+
+- fetch first
+- verify whether main moved
+- verify whether your branch has already been shared with others
+
+## Common mistakes
+
+### Mistake 1: continuing all work directly on main
+
+That makes later sync, undo, and collaboration harder.
+
+### Mistake 2: opening a branch but never checking what it tracks
+
+Get used to:
+
+```bash
+git branch -vv
+```
+
+### Mistake 3: pulling reflexively when main moved
+
+Fetch first, then decide.
+
+### Mistake 4: using a branch but keeping chaotic commits inside it
+
+A branch isolates the task. It does not automatically make the commits clean.
+
+## Special cases
+
+- If your team has branch naming rules, start following them early
+- If the branch is already pushed for review, be more careful with history rewriting later
+- If unrelated edits pile up on the branch, pause and clean commit boundaries before merging
+- In fork-and-PR workflows, the remote you publish to may be your fork rather than the canonical repository
+
+## Practice checklist
+
+Try to complete these three actions without looking things up:
+
+1. create a feature branch from main
+2. make and commit one small change on that branch
+3. publish that branch and set upstream with `-u`
+
+## What to learn next
+
+After this page, good next topics are:
+
+1. feature-branch collaboration workflow
+2. fetch vs pull
+3. git rebase

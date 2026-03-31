@@ -110,6 +110,13 @@ export type InternalsSlug =
   | "commit-message-and-parents"
   | "refspec-and-ref-updates";
 
+export type LearningPathSlug =
+  | "quick-start"
+  | "setup-and-clone"
+  | "stage-and-commit"
+  | "sync-with-remote"
+  | "first-feature-branch";
+
 export function isValidLocale(value: string): value is Locale {
   return locales.includes(value as Locale);
 }
@@ -169,6 +176,11 @@ type Dictionary = {
     description: string;
   };
   workflowIndex: {
+    eyebrow: string;
+    title: string;
+    description: string;
+  };
+  learningPathIndex: {
     eyebrow: string;
     title: string;
     description: string;
@@ -322,6 +334,24 @@ function buildInternalsNavItem(locale: Locale, activePath?: string): NavItem {
     label: locale === "zh" ? "Git 原理" : "Git Internals",
     href: `/${locale}/internals`,
     active: parentActive,
+  };
+}
+
+export const learningPathSlugs = [
+  "quick-start",
+  "setup-and-clone",
+  "stage-and-commit",
+  "sync-with-remote",
+  "first-feature-branch",
+] as const satisfies readonly LearningPathSlug[];
+
+function buildLearningPathNavItem(locale: Locale, activePath?: string): NavItem {
+  const parentActive = learningPathSlugs.some((slug) => activePath === `learning-path/${slug}`);
+
+  return {
+    label: locale === "zh" ? "快速上手" : "Quick Start",
+    href: `/${locale}/learning-path`,
+    active: parentActive || activePath === "learning-path-index",
   };
 }
 
@@ -533,11 +563,7 @@ const zhDictionary: Dictionary = {
         {
           title: "Learning Path",
           items: [
-            {
-              label: "快速上手",
-              href: "/zh/docs/learning-path/quick-start",
-              active: activePath === "learning-path/quick-start",
-            },
+            buildLearningPathNavItem("zh", activePath),
             buildBestPracticeNavItem("zh", activePath),
             buildWorkflowNavItem("zh", activePath),
             buildCommandNavItem("zh", activePath),
@@ -580,6 +606,11 @@ const zhDictionary: Dictionary = {
     eyebrow: "Workflows",
     title: "Git 工作流频道",
     description: "把日常协作中的关键流程拆成多个专题，包括同步策略、功能分支协作、评审前同步，以及紧急修复场景。",
+  },
+  learningPathIndex: {
+    eyebrow: "Quick Start",
+    title: "Git 快速上手专题",
+    description: "把快速上手拆成一组循序渐进的子页面，覆盖环境准备、暂存与提交、远端同步，以及第一次分支协作。",
   },
   internalsIndex: {
     eyebrow: "Git Internals",
@@ -1063,11 +1094,7 @@ const enDictionary: Dictionary = {
         {
           title: "Learning Path",
           items: [
-            {
-              label: "Quick Start",
-              href: "/en/docs/learning-path/quick-start",
-              active: activePath === "learning-path/quick-start",
-            },
+            buildLearningPathNavItem("en", activePath),
             buildBestPracticeNavItem("en", activePath),
             buildWorkflowNavItem("en", activePath),
             buildCommandNavItem("en", activePath),
@@ -1110,6 +1137,11 @@ const enDictionary: Dictionary = {
     eyebrow: "Workflows",
     title: "Git Workflows Channel",
     description: "Break common collaboration routines into reusable flows, including sync strategy, feature-branch teamwork, review prep, and urgent fixes.",
+  },
+  learningPathIndex: {
+    eyebrow: "Quick Start",
+    title: "Git Quick Start Series",
+    description: "Turn quick start into a progressive series that covers setup, staging, remote sync, and a first branch-based collaboration loop.",
   },
   internalsIndex: {
     eyebrow: "Git Internals",

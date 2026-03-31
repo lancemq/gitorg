@@ -1,0 +1,195 @@
+export const metadata = {
+  title: "第一个特性分支",
+  slug: "first-feature-branch",
+  locale: "zh",
+  section: "learning-path",
+  summary: "从单人闭环进入最简单的协作节奏：创建特性分支、提交改动、同步主分支，并理解 merge 与 rebase 的边界。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-switch",
+    "https://git-scm.com/docs/git-branch",
+    "https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell",
+  ],
+};
+
+# 第一个特性分支
+
+## 为什么要进入分支
+
+当你已经能稳定完成 clone、add、commit、fetch、pull、push 之后，下一步通常不是立刻研究复杂历史，而是先学会在分支上工作。
+
+分支的价值很直接：
+
+- 把主线和当前任务隔开
+- 让实验和正式改动分开
+- 为后面的 review、合并和协作做准备
+
+你可以把特性分支理解成：给当前任务单独开一个工作空间。
+
+## 最小分支工作流
+
+```bash
+git switch -c feature/login-form
+# 修改文件
+git add .
+git commit -m "feat: add login form"
+git fetch origin
+```
+
+这条流程已经足够让你进入最基础的团队协作节奏。
+
+<CommandFlowFigure
+  title="第一个特性分支的节奏"
+  caption="特性分支的目标不是把历史弄复杂，而是给你的任务一个更安全、更独立的工作空间。"
+  inputsLabel="起点"
+  inputs="主分支|当前任务|本地改动"
+  commandLabel="switch -c → commit → fetch"
+  outputsLabel="结果"
+  outputs="独立分支|清晰任务提交|可同步主线"
+  note="快速上手阶段，先把“开分支做事”练顺，比急着研究历史重写更重要。"
+/>
+
+## 分支名怎么起会更稳
+
+初学阶段不需要发明很复杂的命名规则，但至少要做到：
+
+- 能看出这是做什么的
+- 一眼能区分不同任务
+- 尽量不要用模糊名字比如 `test`、`temp`、`new`
+
+常见写法：
+
+```bash
+feature/login-form
+feature/update-readme
+fix/button-style
+docs/quick-start-notes
+```
+
+## 推荐练习步骤
+
+### 1. 从主分支切出一个新分支
+
+```bash
+git switch -c feature/first-task
+```
+
+### 2. 在分支上完成一小段修改
+
+尽量是很小的改动，比如 README、按钮文案或一个最简单的功能。
+
+### 3. 提交你的改动
+
+```bash
+git add .
+git commit -m "feat: finish first task"
+```
+
+### 4. 看看主分支有没有变化
+
+```bash
+git fetch origin
+git branch -vv
+```
+
+### 5. 把分支推到远端
+
+```bash
+git push -u origin feature/first-task
+```
+
+这一步的目的不是为了马上发起评审，而是让你理解：
+
+- 本地分支可以独立存在
+- 远端分支也可以和它建立对应关系
+- 后续 push / pull 时 Git 才更容易知道默认目标是谁
+
+## 一个完整的新手分支闭环
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c feature/first-task
+# 修改文件
+git status
+git add .
+git commit -m "feat: finish first task"
+git fetch origin
+git branch -vv
+git push -u origin feature/first-task
+```
+
+这套闭环比只会 `git switch -c` 更接近真实团队协作。
+
+## 这一步要先理解什么，不要急着深入什么
+
+先理解：
+
+- 为什么要从主分支切出去
+- 为什么任务提交放在特性分支上更安全
+- 为什么同步主分支前先 fetch 很重要
+
+先不要急着深入：
+
+- 交互式 rebase
+- 复杂冲突处理
+- 历史整理策略细节
+
+## merge 和 rebase 在这里怎么理解
+
+在快速上手阶段，你不需要立刻精通它们，只要先知道：
+
+- merge：把两边历史接起来
+- rebase：把你的提交接到新的基底上
+
+真正开始选策略之前，先把“在分支上做事”这件事练稳。
+
+如果你现在还分不清，就先记一个最稳的习惯：
+
+- 先 fetch
+- 先确认主分支有没有变化
+- 先搞清你的分支是不是已经发给别人用了
+
+## 常见误区
+
+### 误区 1：直接在主分支上连续改
+
+这会让后面同步、回滚和协作都更难。
+
+### 误区 2：开了分支但不看它跟谁同步
+
+推荐习惯性看：
+
+```bash
+git branch -vv
+```
+
+### 误区 3：一遇到主分支更新就直接乱 pull
+
+先 fetch，再判断下一步更稳。
+
+### 误区 4：分支开出来了，但提交仍然很乱
+
+分支能隔离任务，不代表它会自动帮你整理提交。一个分支里仍然要尽量保持改动围绕同一件事。
+
+## 特殊情况
+
+- 如果团队对分支命名有规范，尽量从第一天就遵守
+- 如果你的分支已经推到远端并进入评审，后续历史整理要更谨慎
+- 如果你在分支上堆了很多无关改动，先别急着合并，先整理提交边界
+- 如果团队使用 fork + PR 流程，你推送的目标可能是自己的 fork，而不是主仓库
+
+## 这一页的练习清单
+
+建议至少完成下面 3 件事：
+
+1. 从主分支切出一个特性分支
+2. 在分支上完成一次独立提交
+3. 把这个分支推到远端并建立上游关系
+
+## 接下来建议继续学什么
+
+这一页之后，通常最适合继续进入：
+
+1. `feature branch collaboration`
+2. `fetch vs pull`
+3. `git rebase`

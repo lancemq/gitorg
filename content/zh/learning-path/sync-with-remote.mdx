@@ -1,0 +1,168 @@
+export const metadata = {
+  title: "远端同步",
+  slug: "sync-with-remote",
+  locale: "zh",
+  section: "learning-path",
+  summary: "把 fetch、pull、push 拆成“观察、整合、发布”三个动作来理解，减少初学者对同步操作的误判。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-fetch",
+    "https://git-scm.com/docs/git-pull",
+    "https://git-scm.com/docs/git-push",
+  ],
+};
+
+# 远端同步
+
+## 为什么新手经常卡在这里
+
+很多人第一次学 Git，不是卡在 `add` 或 `commit`，而是卡在“为什么 push 失败”“为什么 pull 之后多了变化”“为什么我明明同步了却还不一样”。
+
+根本原因通常是：把 `fetch`、`pull`、`push` 当成了一类动作。
+
+其实它们分别对应三件不同的事：
+
+- `fetch`：先观察远端状态
+- `pull`：下载并整合远端变化
+- `push`：把本地提交发布到远端
+
+只要把这三件事分开，你对同步的判断就会稳很多。
+
+<CommandFlowFigure
+  title="同步动作的三种职责"
+  caption="把远端同步拆成观察、整合、发布之后，很多“为什么结果不一样”的问题会立刻清楚。"
+  inputsLabel="你面对的状态"
+  inputs="本地分支|远端引用|未发布提交"
+  commandLabel="fetch / pull / push"
+  outputsLabel="不同结果"
+  outputs="远端信息更新|当前分支变化|远端历史更新"
+  note="最容易出错的地方，不是不会敲命令，而是没有先判断自己现在要的是观察、整合还是发布。"
+/>
+
+## 先学 fetch
+
+```bash
+git fetch origin
+```
+
+这一步适合你在任何不确定的时候先做，因为它不会直接改你的当前分支。
+
+推荐搭配：
+
+```bash
+git fetch origin
+git log --oneline --graph --decorate --all
+git branch -vv
+```
+
+这套组合的价值是：先更新你对远端的认知，再决定要不要整合。
+
+## 再理解 pull
+
+```bash
+git pull --ff-only
+```
+
+快速上手阶段更推荐 `--ff-only`，因为它能减少你在不知情时得到一个新的 merge commit。
+
+如果你还没分清当前分支状态，就先不要着急 pull。
+
+对新手来说，一个更稳的判断问题是：
+
+“我现在只是想看看远端有没有更新，还是我已经准备好把这些更新整合进当前分支了？”
+
+前者通常先 `fetch`，后者才考虑 `pull`。
+
+## 最后理解 push
+
+```bash
+git push origin main
+```
+
+push 的本质是把本地提交发布出去。它失败时，最常见的原因通常是：
+
+- 远端比你更新
+- 你当前分支不对
+- 上游关系和你想的不一样
+
+这时候先不要条件反射去 `--force`。先搞清楚“为什么远端拒绝你”比立刻把命令敲过去更重要。
+
+## 一个更稳的同步节奏
+
+初学阶段建议尽量按下面的顺序：
+
+```bash
+git status
+git fetch origin
+git pull --ff-only
+git push origin main
+```
+
+如果你本地已经有新的提交，那就更应该先判断这次 pull 到底会不会引入整合动作。
+
+## 一个典型同步场景
+
+假设你早上打开项目准备继续开发：
+
+1. 先跑 `git status`，确认工作区是否干净
+2. 跑 `git fetch origin`
+3. 用 `git branch -vv` 看当前分支是否落后
+4. 如果只是快进更新，跑 `git pull --ff-only`
+5. 开始本地修改并提交
+6. 推送前再确认一次当前分支
+7. 跑 `git push origin <branch-name>`
+
+这套节奏最大的价值是：把“观察”和“整合”拆开。
+
+## push 失败时先查什么
+
+初学阶段最实用的不是背更多错误信息，而是先按顺序看：
+
+```bash
+git status
+git branch -vv
+git fetch origin
+```
+
+通常你会很快发现问题属于下面哪一种：
+
+- 本地分支落后于远端
+- 你站错了分支
+- 当前分支还没正确关联上游
+- 团队流程要求你推到特性分支而不是主分支
+
+## 常见误区
+
+### 误区 1：把 pull 当成“只下载”
+
+不是。它会继续整合远端变化。
+
+### 误区 2：push 失败就立刻强推
+
+这通常会把同步问题升级成历史覆盖问题。
+
+### 误区 3：不同步就直接开始新工作
+
+这样会让后续冲突和历史分叉更难解释。
+
+### 误区 4：不知道自己要同步的是哪个分支
+
+很多同步问题不是命令错了，而是对象错了。先看清“当前分支是谁、它跟踪谁、你准备推到谁”。
+
+## 特殊情况
+
+- 如果工作区不干净，pull 前先判断这些改动是否应该提交或暂存
+- 如果团队不允许直接在主分支开发，push 的目标分支可能不是 `main`
+- 如果你不确定为什么 push 失败，先看 `git branch -vv` 和 `git fetch origin`
+- 如果远端默认分支不是 `main` 而是 `master` 或别的名称，命令目标也要跟着调整
+
+## 这一页的练习清单
+
+建议至少练这 3 种情况：
+
+1. 只 fetch，不整合
+2. pull 一个纯快进更新
+3. 把自己本地的新提交 push 到远端测试分支
+
+## 下一步
+
+同步动作基本稳了以后，可以继续进入 [第一个特性分支](/zh/docs/learning-path/first-feature-branch)。

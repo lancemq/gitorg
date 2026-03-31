@@ -1,0 +1,182 @@
+export const metadata = {
+  title: "Staging and Commit",
+  slug: "stage-and-commit",
+  locale: "en",
+  section: "learning-path",
+  summary: "Understand the three-layer model of working tree, staging area, and commit history, then turn file edits into stable local commits.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-add",
+    "https://git-scm.com/docs/git-commit",
+    "https://git-scm.com/docs/git-status",
+  ],
+};
+
+# Staging and Commit
+
+## The one mental model that matters here
+
+At the quick-start stage, Git becomes much easier once you separate three layers:
+
+1. working tree
+2. staging area
+3. commit history
+
+If those layers blur together, even basic commands feel confusing.
+
+The goal of this page is not "learn more flags." It is to stabilize one repeatable sequence:
+
+edit files -> inspect state -> choose what to stage -> create commit -> verify history
+
+<CommandFlowFigure
+  title="How a file change becomes a commit"
+  caption="The real beginner skill is not memorizing syntax. It is seeing how changes move from files into the index and then into history."
+  inputsLabel="Current layer"
+  inputs="Working-tree edits|Staged snapshot|Commit history"
+  commandLabel="git add → git commit"
+  outputsLabel="Change"
+  outputs="Selected edits|New commit|Cleaner history"
+  note="Whenever you are unsure which layer changed, run git status before guessing."
+/>
+
+## Step 1: edit one small file
+
+Start with a low-risk file like README or docs.
+
+Then inspect:
+
+```bash
+git status
+```
+
+At this moment, you are still looking at working-tree change, not the next commit yet.
+
+If you want to make that even clearer, also run:
+
+```bash
+git diff
+```
+
+This shows the difference between the working tree and the staged snapshot.
+
+## Step 2: stage the change
+
+```bash
+git add .
+git status
+```
+
+The key idea is:
+
+- `add` is not the commit
+- `add` chooses what the next commit should contain
+- not every modified file has to go into the same commit
+
+Then inspect again:
+
+```bash
+git status
+git diff --cached
+```
+
+That helps you see:
+
+- what is still only in the working tree
+- what is already queued for the next commit
+
+## Step 3: create the commit
+
+```bash
+git commit -m "docs: update quick start notes"
+```
+
+After the commit, inspect history right away:
+
+```bash
+git log --oneline --decorate -5
+git show --stat --oneline HEAD
+```
+
+That follow-up matters because many beginners create a commit and never confirm what actually went into it.
+
+## One micro-loop worth repeating
+
+```bash
+# edit a file
+git status
+git add .
+git diff --cached
+git status
+git commit -m "docs: refine guide"
+git log --oneline --decorate -3
+```
+
+If this loop already feels stable, remote sync gets much easier.
+
+## One realistic mini-scenario
+
+Suppose you just cloned a repository and need to fix a README heading:
+
+1. edit one line in `README.md`
+2. run `git status` and confirm only that file changed
+3. run `git add README.md`
+4. run `git diff --cached`
+5. run `git commit -m "docs: fix README title"`
+6. run `git log --oneline -3`
+
+That exercise teaches the useful beginner lesson: a commit is not a button. It is a sequence with boundaries.
+
+## A safer way to think about commit messages
+
+At this stage, two rules are enough:
+
+- let one commit express one clear intention
+- write a message your future self can still understand
+
+Examples:
+
+```bash
+git commit -m "feat: add login form validation"
+git commit -m "docs: clarify clone workflow"
+git commit -m "fix: handle empty remote response"
+```
+
+## Common mistakes
+
+### Mistake 1: treating `git add` as the commit
+
+It is only the staging step.
+
+### Mistake 2: editing many unrelated things and committing them together
+
+That makes later review, revert, and debugging harder.
+
+### Mistake 3: skipping `git status` before commit
+
+That is how unrelated files get pulled into the commit.
+
+### Mistake 4: using `git add .` before you understand the boundary
+
+`git add .` is not forbidden, but beginners often learn commit boundaries faster by staging file-by-file first:
+
+```bash
+git add README.md
+```
+
+## Special cases
+
+- If commit fails because of author identity, go back and configure `user.name` and `user.email`
+- If you staged the wrong file, do not panic; the staging area can still be adjusted
+- If both working tree and index are messy, slow down and define the intended commit boundary first
+- If one change set mixes formatting, rename, and feature work, split them into separate commits
+
+## Practice checklist
+
+Try to complete at least these three rounds:
+
+1. edit one file and commit it cleanly
+2. edit two files but stage only one of them
+3. after each commit, inspect it with `git log --oneline` and `git show --stat HEAD`
+
+## Next step
+
+Continue with [Remote Sync](/en/docs/learning-path/sync-with-remote).
