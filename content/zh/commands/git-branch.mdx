@@ -1,0 +1,81 @@
+export const metadata = {
+  title: "git branch 教程",
+  slug: "git-branch",
+  locale: "zh",
+  section: "commands",
+  summary: "系统说明 git branch 如何查看、创建、重命名和删除分支，以及它与远端跟踪分支的关系。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-branch",
+    "https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell",
+    "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
+  ],
+};
+
+# git branch 教程
+
+## 一句话理解
+
+`git branch` 负责管理分支引用，本质上是在查看或移动那些“指向提交的名字”。
+
+## 查看分支
+
+```bash
+git branch
+```
+
+它会列出本地分支，当前分支前面会有 `*` 标记。
+
+### 查看远端跟踪分支
+
+```bash
+git branch -r
+```
+
+### 同时查看本地和远端
+
+```bash
+git branch -a
+```
+
+### 查看上游和最后一次提交
+
+```bash
+git branch -vv
+```
+
+这是日常排查“我这个分支追踪谁、落后了多少”的高频命令。
+
+## 创建分支
+
+```bash
+git branch feature/login
+```
+
+这只会创建分支，不会自动切换过去。想创建后直接进入，通常会搭配 `git switch -c`。
+
+## 重命名和删除
+
+```bash
+git branch -m old-name new-name
+git branch -d feature/login
+```
+
+其中 `-d` 只删除已经安全合并的分支；如果你明确要强制删除，才使用 `-D`。
+
+## 它和远端跟踪分支的关系
+
+很多人会把 `main` 和 `origin/main` 混在一起。其实前者是本地分支，后者是远端跟踪分支。fetch 更新的是后者，merge 或 rebase 才会把这些变化整合进前者。
+
+## 常见误区
+
+### 误区 1：branch 会帮我切过去
+
+不会。`git branch` 主要管理分支本身，切换通常交给 `git switch` 或旧式的 `checkout`。
+
+### 误区 2：删除分支等于删除提交
+
+不一定。只要还有别的引用指向这些提交，或者 reflog 还保留着它们，提交对象通常依然存在。
+
+## 一个团队建议
+
+把 `git branch -vv` 养成日常习惯，会大幅减少“我以为自己同步了主分支”这类误判。

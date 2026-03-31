@@ -1,0 +1,64 @@
+export const metadata = {
+  title: "git checkout 教程",
+  slug: "git-checkout",
+  locale: "zh",
+  section: "commands",
+  summary: "说明 git checkout 作为旧式多用途命令的两大职责，以及它与 switch、restore 的现代分工。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-checkout",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+    "https://git-scm.com/book/en/v2/Git-Basics-Undoing-Things",
+  ],
+};
+
+# git checkout 教程
+
+## 一句话理解
+
+`git checkout` 是 Git 里的经典多用途命令，既能切分支，也能把路径恢复到指定状态。
+
+## 为什么它现在看起来有点“重”
+
+正因为它承担了两类不同职责，所以新版本 Git 才引入了 `git switch` 和 `git restore` 来拆分语义。
+
+## 旧式但仍然常见的两种用法
+
+### 切换分支
+
+```bash
+git checkout main
+git checkout -b feature/login
+```
+
+### 恢复路径
+
+```bash
+git checkout -- README.md
+```
+
+这会把工作区里的该文件恢复到索引版本，效果上接近今天的 `git restore README.md`。
+
+## checkout 某个提交
+
+```bash
+git checkout <commit>
+```
+
+这样会让你进入 detached HEAD 状态，适合查看历史，但如果你继续提交并希望保留结果，就要尽快创建分支。
+
+## 什么时候还需要理解 checkout
+
+- 维护老项目或老脚本
+- 阅读旧教程和团队历史文档
+- 理解 `switch` / `restore` 是从哪里拆出来的
+
+## checkout 和新命令的关系
+
+- `git switch` 继承了“切分支”这部分职责
+- `git restore` 继承了“恢复路径”这部分职责
+
+所以今天你仍然应该会读懂 checkout，但在教学和日常表达上，通常优先用更明确的新命令。
+
+## 常见风险
+
+如果你用 checkout 恢复路径，本地改动可能被直接覆盖；如果你 checkout 到某个提交而忘记自己处在 detached HEAD，也容易在后面弄丢实验性提交。

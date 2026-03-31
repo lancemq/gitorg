@@ -9,7 +9,13 @@ export type CommandSlug =
   | "git-merge"
   | "git-cherry-pick"
   | "git-reset"
-  | "git-stash";
+  | "git-stash"
+  | "git-fetch"
+  | "git-restore"
+  | "git-revert"
+  | "git-switch"
+  | "git-branch"
+  | "git-checkout";
 
 export function isValidLocale(value: string): value is Locale {
   return locales.includes(value as Locale);
@@ -53,6 +59,7 @@ type Dictionary = {
     home: SidebarContent;
     docs: (activePath?: string) => SidebarContent;
     command: (activeSlug: CommandSlug) => SidebarContent;
+    faq: SidebarContent;
   };
   home: {
     hero: {
@@ -108,6 +115,7 @@ type Dictionary = {
       eyebrow: string;
       title: string;
       description: string;
+      action: string;
       items: ReadonlyArray<FaqItem>;
     };
     cta: {
@@ -116,6 +124,11 @@ type Dictionary = {
       description: string;
       action: string;
     };
+  };
+  faqPage: {
+    eyebrow: string;
+    title: string;
+    description: string;
   };
   docsIndex: {
     eyebrow: string;
@@ -142,7 +155,7 @@ type Dictionary = {
 
 function baseSidebar(locale: Locale, groups: NavGroup[]): SidebarContent {
   return {
-    brandLabel: "Git Academy",
+    brandLabel: "Git Org Academy",
     searchLabel: locale === "zh" ? "搜索文档" : "Search docs",
     footerTitle: "Auto Doc",
     footerText: locale === "zh" ? "内容驱动文档站" : "Content-driven docs",
@@ -161,6 +174,12 @@ export const commandSlugs = [
   "git-cherry-pick",
   "git-reset",
   "git-stash",
+  "git-fetch",
+  "git-restore",
+  "git-revert",
+  "git-switch",
+  "git-branch",
+  "git-checkout",
 ] as const;
 
 const zhDictionary: Dictionary = {
@@ -171,16 +190,17 @@ const zhDictionary: Dictionary = {
         items: [
           { label: "总览", href: "/zh#overview", active: true },
           { label: "快速开始", href: "/zh#quick-start" },
-          { label: "最佳实践", href: "/zh#best-practices" },
-          { label: "Git 原理", href: "/zh#internals" },
+          { label: "最佳实践", href: "/zh/best-practices" },
+          { label: "Git 原理", href: "/zh/internals" },
         ],
       },
       {
         title: "Resources",
         items: [
-            { label: "文档库", href: "/zh/docs" },
-            { label: "常见问题", href: "/zh#faq" },
-          ],
+          { label: "文档库", href: "/zh/docs" },
+          { label: "Git 历史", href: "/zh/history" },
+          { label: "常见问题", href: "/zh/faq" },
+        ],
       },
     ]),
     docs: (activePath) =>
@@ -196,7 +216,7 @@ const zhDictionary: Dictionary = {
             },
             {
               label: "最佳实践",
-              href: "/zh/docs/workflows/git-best-practices",
+              href: "/zh/best-practices",
               active: activePath === "workflows/git-best-practices",
             },
             {
@@ -225,6 +245,46 @@ const zhDictionary: Dictionary = {
               active: activePath === "commands/git-stash",
             },
             {
+              label: "git fetch",
+              href: "/zh/commands/git-fetch",
+              active: activePath === "commands/git-fetch",
+            },
+            {
+              label: "git restore",
+              href: "/zh/commands/git-restore",
+              active: activePath === "commands/git-restore",
+            },
+            {
+              label: "git revert",
+              href: "/zh/commands/git-revert",
+              active: activePath === "commands/git-revert",
+            },
+            {
+              label: "git switch",
+              href: "/zh/commands/git-switch",
+              active: activePath === "commands/git-switch",
+            },
+            {
+              label: "git branch",
+              href: "/zh/commands/git-branch",
+              active: activePath === "commands/git-branch",
+            },
+            {
+              label: "git checkout",
+              href: "/zh/commands/git-checkout",
+              active: activePath === "commands/git-checkout",
+            },
+            {
+              label: "Git 原理",
+              href: "/zh/internals",
+              active: activePath === "concepts/git-internals",
+            },
+            {
+              label: "Git 历史",
+              href: "/zh/history",
+              active: activePath === "concepts/git-history",
+            },
+            {
               label: "恢复手册",
               href: "/zh/docs/recovery/reflog-recovery",
               active: activePath === "recovery/reflog-recovery",
@@ -232,6 +292,24 @@ const zhDictionary: Dictionary = {
           ],
         },
       ]),
+    faq: baseSidebar("zh", [
+      {
+        title: "Resources",
+        items: [
+          { label: "文档库", href: "/zh/docs" },
+          { label: "Git 历史", href: "/zh/history" },
+          { label: "常见问题", href: "/zh/faq", active: true },
+        ],
+      },
+      {
+        title: "FAQ Topics",
+        items: [
+          { label: "pull 与同步", href: "/zh/faq#pull-sync" },
+          { label: "reset 与恢复", href: "/zh/faq#reset-recovery" },
+          { label: "stash 与切换", href: "/zh/faq#stash-switch" },
+        ],
+      },
+    ]),
     command: (activeSlug) =>
       baseSidebar("zh", [
         {
@@ -263,6 +341,36 @@ const zhDictionary: Dictionary = {
               href: "/zh/commands/git-stash",
               active: activeSlug === "git-stash",
             },
+            {
+              label: "git fetch",
+              href: "/zh/commands/git-fetch",
+              active: activeSlug === "git-fetch",
+            },
+            {
+              label: "git restore",
+              href: "/zh/commands/git-restore",
+              active: activeSlug === "git-restore",
+            },
+            {
+              label: "git revert",
+              href: "/zh/commands/git-revert",
+              active: activeSlug === "git-revert",
+            },
+            {
+              label: "git switch",
+              href: "/zh/commands/git-switch",
+              active: activeSlug === "git-switch",
+            },
+            {
+              label: "git branch",
+              href: "/zh/commands/git-branch",
+              active: activeSlug === "git-branch",
+            },
+            {
+              label: "git checkout",
+              href: "/zh/commands/git-checkout",
+              active: activeSlug === "git-checkout",
+            },
             { label: "fetch vs pull", href: "/zh/docs/workflows/fetch-vs-pull" },
             { label: "reflog 恢复", href: "/zh/docs/recovery/reflog-recovery" },
           ],
@@ -283,7 +391,7 @@ const zhDictionary: Dictionary = {
       modules: 5,
       modulesLabel: "从工作流到恢复手册",
       commandCardsTitle: "文档专题",
-      commandCards: 14,
+      commandCards: 16,
       exercisesTitle: "双语页面",
       exercises: 4,
       recommendedPathTitle: "Recommended path",
@@ -371,6 +479,7 @@ const zhDictionary: Dictionary = {
       eyebrow: "FAQ",
       title: "常见问题",
       description: "基于 Git 官方文档与官方书中的高频问题整理出一组上手最常见的答疑。",
+      action: "查看全部问题",
       items: [
         {
           question: "`git pull` 到底做了什么，为什么结果有时和我预期不同？",
@@ -415,6 +524,11 @@ const zhDictionary: Dictionary = {
       description: "继续浏览文档库，或者把更多 Git 主题接进同一套 MDX 渲染体系。",
       action: "浏览文档库",
     },
+  },
+  faqPage: {
+    eyebrow: "FAQ Library",
+    title: "全部常见问题",
+    description: "把首页里的高频问答整理成一页更完整的 Git FAQ，方便集中阅读和后续持续扩充。",
   },
   docsIndex: {
     eyebrow: "Docs Library",
@@ -488,6 +602,36 @@ const zhDictionary: Dictionary = {
       { label: "常见场景", value: "临时保存未提交改动" },
       { label: "内容来源", value: "MDX / 官方资料提炼" },
     ],
+    "git-fetch": [
+      { label: "复杂度", value: "基础" },
+      { label: "常见场景", value: "同步远端引用，不改动工作区" },
+      { label: "内容来源", value: "MDX / 官方资料提炼" },
+    ],
+    "git-restore": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "恢复工作区或暂存区文件" },
+      { label: "内容来源", value: "MDX / 官方资料提炼" },
+    ],
+    "git-revert": [
+      { label: "复杂度", value: "中等偏高" },
+      { label: "常见场景", value: "通过新提交安全撤销变更" },
+      { label: "内容来源", value: "MDX / 官方资料提炼" },
+    ],
+    "git-switch": [
+      { label: "复杂度", value: "基础" },
+      { label: "常见场景", value: "切换或创建分支" },
+      { label: "内容来源", value: "MDX / 官方资料提炼" },
+    ],
+    "git-branch": [
+      { label: "复杂度", value: "基础到中等" },
+      { label: "常见场景", value: "查看、创建、重命名分支" },
+      { label: "内容来源", value: "MDX / 官方资料提炼" },
+    ],
+    "git-checkout": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "旧式切分支或恢复路径" },
+      { label: "内容来源", value: "MDX / 官方资料提炼" },
+    ],
   },
 };
 
@@ -499,15 +643,16 @@ const enDictionary: Dictionary = {
         items: [
           { label: "Overview", href: "/en#overview", active: true },
           { label: "Quick Start", href: "/en#quick-start" },
-          { label: "Best Practices", href: "/en#best-practices" },
-          { label: "Git Internals", href: "/en#internals" },
+          { label: "Best Practices", href: "/en/best-practices" },
+          { label: "Git Internals", href: "/en/internals" },
         ],
       },
       {
         title: "Resources",
         items: [
           { label: "Docs Library", href: "/en/docs" },
-          { label: "FAQ", href: "/en#faq" },
+          { label: "Git History", href: "/en/history" },
+          { label: "FAQ", href: "/en/faq" },
         ],
       },
     ]),
@@ -524,7 +669,7 @@ const enDictionary: Dictionary = {
             },
             {
               label: "Best Practices",
-              href: "/en/docs/workflows/git-best-practices",
+              href: "/en/best-practices",
               active: activePath === "workflows/git-best-practices",
             },
             {
@@ -553,6 +698,46 @@ const enDictionary: Dictionary = {
               active: activePath === "commands/git-stash",
             },
             {
+              label: "git fetch",
+              href: "/en/commands/git-fetch",
+              active: activePath === "commands/git-fetch",
+            },
+            {
+              label: "git restore",
+              href: "/en/commands/git-restore",
+              active: activePath === "commands/git-restore",
+            },
+            {
+              label: "git revert",
+              href: "/en/commands/git-revert",
+              active: activePath === "commands/git-revert",
+            },
+            {
+              label: "git switch",
+              href: "/en/commands/git-switch",
+              active: activePath === "commands/git-switch",
+            },
+            {
+              label: "git branch",
+              href: "/en/commands/git-branch",
+              active: activePath === "commands/git-branch",
+            },
+            {
+              label: "git checkout",
+              href: "/en/commands/git-checkout",
+              active: activePath === "commands/git-checkout",
+            },
+            {
+              label: "Git Internals",
+              href: "/en/internals",
+              active: activePath === "concepts/git-internals",
+            },
+            {
+              label: "Git History",
+              href: "/en/history",
+              active: activePath === "concepts/git-history",
+            },
+            {
               label: "Reflog Recovery",
               href: "/en/docs/recovery/reflog-recovery",
               active: activePath === "recovery/reflog-recovery",
@@ -560,6 +745,24 @@ const enDictionary: Dictionary = {
           ],
         },
       ]),
+    faq: baseSidebar("en", [
+      {
+        title: "Resources",
+        items: [
+          { label: "Docs Library", href: "/en/docs" },
+          { label: "Git History", href: "/en/history" },
+          { label: "FAQ", href: "/en/faq", active: true },
+        ],
+      },
+      {
+        title: "FAQ Topics",
+        items: [
+          { label: "pull and sync", href: "/en/faq#pull-sync" },
+          { label: "reset and recovery", href: "/en/faq#reset-recovery" },
+          { label: "stash and switching", href: "/en/faq#stash-switch" },
+        ],
+      },
+    ]),
     command: (activeSlug) =>
       baseSidebar("en", [
         {
@@ -591,6 +794,36 @@ const enDictionary: Dictionary = {
               href: "/en/commands/git-stash",
               active: activeSlug === "git-stash",
             },
+            {
+              label: "git fetch",
+              href: "/en/commands/git-fetch",
+              active: activeSlug === "git-fetch",
+            },
+            {
+              label: "git restore",
+              href: "/en/commands/git-restore",
+              active: activeSlug === "git-restore",
+            },
+            {
+              label: "git revert",
+              href: "/en/commands/git-revert",
+              active: activeSlug === "git-revert",
+            },
+            {
+              label: "git switch",
+              href: "/en/commands/git-switch",
+              active: activeSlug === "git-switch",
+            },
+            {
+              label: "git branch",
+              href: "/en/commands/git-branch",
+              active: activeSlug === "git-branch",
+            },
+            {
+              label: "git checkout",
+              href: "/en/commands/git-checkout",
+              active: activeSlug === "git-checkout",
+            },
             { label: "fetch vs pull", href: "/en/docs/workflows/fetch-vs-pull" },
             { label: "reflog recovery", href: "/en/docs/recovery/reflog-recovery" },
           ],
@@ -611,7 +844,7 @@ const enDictionary: Dictionary = {
       modules: 5,
       modulesLabel: "From workflow to recovery",
       commandCardsTitle: "Doc Topics",
-      commandCards: 14,
+      commandCards: 16,
       exercisesTitle: "Bilingual Pages",
       exercises: 4,
       recommendedPathTitle: "Recommended path",
@@ -699,6 +932,7 @@ const enDictionary: Dictionary = {
       eyebrow: "FAQ",
       title: "Common Questions",
       description: "A practical FAQ built from the Git official docs and the Pro Git book, focused on the questions people hit most often.",
+      action: "View all questions",
       items: [
         {
           question: "What does `git pull` actually do, and why can the result surprise me?",
@@ -743,6 +977,11 @@ const enDictionary: Dictionary = {
       description: "Browse the docs library, or keep expanding the same content pipeline with more Git topics.",
       action: "Open docs library",
     },
+  },
+  faqPage: {
+    eyebrow: "FAQ Library",
+    title: "All Common Questions",
+    description: "A dedicated Git FAQ page that expands the homepage highlights into a fuller reading and maintenance surface.",
   },
   docsIndex: {
     eyebrow: "Docs Library",
@@ -814,6 +1053,36 @@ const enDictionary: Dictionary = {
     "git-stash": [
       { label: "Complexity", value: "Medium" },
       { label: "Typical use", value: "Temporarily shelve local changes" },
+      { label: "Content source", value: "MDX / distilled from official docs" },
+    ],
+    "git-fetch": [
+      { label: "Complexity", value: "Basic" },
+      { label: "Typical use", value: "Update remote refs without touching files" },
+      { label: "Content source", value: "MDX / distilled from official docs" },
+    ],
+    "git-restore": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Restore working tree or index state" },
+      { label: "Content source", value: "MDX / distilled from official docs" },
+    ],
+    "git-revert": [
+      { label: "Complexity", value: "Medium to high" },
+      { label: "Typical use", value: "Undo safely with a new commit" },
+      { label: "Content source", value: "MDX / distilled from official docs" },
+    ],
+    "git-switch": [
+      { label: "Complexity", value: "Basic" },
+      { label: "Typical use", value: "Switch or create branches" },
+      { label: "Content source", value: "MDX / distilled from official docs" },
+    ],
+    "git-branch": [
+      { label: "Complexity", value: "Basic to medium" },
+      { label: "Typical use", value: "List, create, rename, and delete branches" },
+      { label: "Content source", value: "MDX / distilled from official docs" },
+    ],
+    "git-checkout": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Legacy branch switching and path restore" },
       { label: "Content source", value: "MDX / distilled from official docs" },
     ],
   },

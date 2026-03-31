@@ -139,7 +139,13 @@ export default async function LocalizedHomePage({ params }: Props) {
           <p>{dict.home.faq.description}</p>
         </div>
 
-        <FaqList items={dict.home.faq.items} />
+        <FaqList items={dict.home.faq.items.slice(0, 3)} />
+
+        <div className="section-actions">
+          <a className="button button-secondary" href={`/${locale}/faq`}>
+            {dict.home.faq.action}
+          </a>
+        </div>
       </section>
 
       <section className="cta panel">

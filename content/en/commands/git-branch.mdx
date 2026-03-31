@@ -1,0 +1,50 @@
+export const metadata = {
+  title: "git branch Tutorial",
+  slug: "git-branch",
+  locale: "en",
+  section: "commands",
+  summary: "Covers how git branch lists, creates, renames, and deletes branches, and how it relates to remote-tracking branches.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-branch",
+    "https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell",
+    "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
+  ],
+};
+
+# git branch Tutorial
+
+## The short version
+
+`git branch` manages branch refs, which are names that point at commits.
+
+## Listing branches
+
+```bash
+git branch
+git branch -r
+git branch -a
+git branch -vv
+```
+
+`-vv` is especially useful because it shows upstream tracking information and the latest commit summary.
+
+## Creating a branch
+
+```bash
+git branch feature/login
+```
+
+This creates the branch but does not switch to it. For that, pair it with `git switch -c` or use the older checkout form.
+
+## Renaming and deleting
+
+```bash
+git branch -m old-name new-name
+git branch -d feature/login
+```
+
+Use `-D` only when you deliberately want a force delete.
+
+## Local vs remote-tracking refs
+
+People often confuse `main` with `origin/main`. The first is your local branch. The second is a remote-tracking ref updated by fetch. Understanding that distinction helps explain many sync workflows.

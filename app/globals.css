@@ -471,6 +471,12 @@ h3 {
   margin-top: 32px;
 }
 
+.section-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 8px;
+}
+
 .section-head {
   display: flex;
   align-items: end;
@@ -576,6 +582,19 @@ h3 {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.faq-page-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+}
+
+.faq-group {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .faq-item {

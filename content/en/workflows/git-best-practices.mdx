@@ -3,11 +3,13 @@ export const metadata = {
   slug: "git-best-practices",
   locale: "en",
   section: "workflows",
-  summary: "A practical guide to safer Git collaboration habits, including small commits, topic branches, fetch-first synchronization, history boundaries, and commit message quality.",
+  summary: "A practical guide to safer Git collaboration habits, including small commits, topic branches, fetch-first synchronization, history boundaries, commit quality, and safer push defaults.",
   sourceUrls: [
     "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project.html",
     "https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History.html",
     "https://git-scm.com/docs/git-pull.html",
+    "https://git-scm.com/docs/git-push",
+    "https://git-scm.com/docs/git-commit",
   ],
 };
 
@@ -44,6 +46,8 @@ git commit -m "fix: handle empty email input"
 
 This makes review, revert, and cherry-pick all easier.
 
+A useful extra rule is this: if you cannot summarize the commit in one clear sentence, it is often still too broad.
+
 ## 2. Use topic branches to isolate work
 
 When you start a focused task, create a dedicated branch instead of piling changes into a long-lived branch.
@@ -57,6 +61,12 @@ Why this helps:
 1. rejected work can be discarded cleanly
 2. other work can continue in parallel
 3. rebase, merge, and cherry-pick boundaries stay clearer
+
+It also helps when branch names express the work directly, for example:
+
+- `feature/login-validation`
+- `fix/navbar-overlap`
+- `docs/release-notes`
 
 ## 3. Fetch first, then choose merge or rebase
 
@@ -76,6 +86,8 @@ Then decide explicitly between:
 
 This keeps observation separate from branch mutation.
 
+If your team wants an even safer default, the official `git pull` docs also point to `--ff-only`, which fails on divergence instead of quietly creating a merge commit you did not intend.
+
 ## 4. Be conservative with shared history
 
 History rewriting is useful on local branches:
@@ -91,6 +103,8 @@ A practical rule of thumb:
 - personal branches: rewrite freely when needed
 - shared branches: rewrite carefully
 - main branch: avoid rewriting by default
+
+An important team habit is to treat uncertain history as shared history. If you are not sure whether someone else may depend on it, be conservative.
 
 ## 5. Write commit messages people can actually use
 
@@ -109,6 +123,12 @@ Prevent the login form from submitting when the email field is blank.
 This keeps client-side feedback aligned with server-side validation.
 ```
 
+If your team has no formal standard yet, these three minimum rules already help a lot:
+
+1. make the subject line action-oriented
+2. do not hide multiple unrelated changes behind one message
+3. add one line of motivation for non-trivial changes
+
 ## 6. Do a quick self-check before pushing
 
 Before you push, run a lightweight review loop:
@@ -125,6 +145,14 @@ That helps confirm:
 - the latest commits are the ones you intend to publish
 - the change size still matches your expectations
 
+For wider changes, it also helps to run:
+
+```bash
+git diff --name-only origin/main...
+```
+
+That gives you a fast check for unrelated files that slipped into the branch.
+
 ## 7. Think about recovery before risky commands
 
 Pause before commands like:
@@ -138,6 +166,14 @@ A safer pattern is:
 1. inspect `git status`
 2. inspect `git reflog`
 3. create a rescue branch if needed
+
+For example, before a complicated rebase:
+
+```bash
+git branch backup/pre-rebase
+```
+
+Tiny backup habits like this often pay for themselves immediately when something goes wrong.
 
 ## 8. Prefer safer defaults for sync and force-push
 
@@ -155,6 +191,50 @@ git pull --ff-only
 
 Both habits shrink the blast radius of mistakes.
 
+The official `git push` documentation has long retained `--force-with-lease` because it is much friendlier to team workflows than raw `--force`. It checks whether the remote ref is still in the state you expect before overwriting it.
+
+## 9. Make the commit stack review-friendly
+
+Before opening a merge request or pull request, ask:
+
+1. does the commit order tell a coherent story
+2. are there noisy fixup commits that should be cleaned up
+3. can a reviewer understand the decision process from the history itself
+
+Common local cleanup tools include:
+
+- `git commit --amend`
+- `git rebase -i`
+- `git restore --staged`
+
+These are most appropriate before the work becomes shared history.
+
+## 10. Treat Git commands as risk tiers, not trivia
+
+Many teams do not fail because they lack Git commands. They fail because they use commands without a risk model. A practical pattern is to classify common commands into three buckets:
+
+### Low risk
+
+- `git status`
+- `git log`
+- `git fetch`
+- `git diff`
+
+### Medium risk
+
+- `git merge`
+- `git stash`
+- `git restore`
+- `git revert`
+
+### High risk
+
+- `git reset --hard`
+- `git rebase`
+- `git push --force`
+
+This makes it easier to build the habit of pausing before high-risk operations.
+
 ## A practical minimal team rule set
 
 If you want a lightweight team policy, start with these five:
@@ -164,6 +244,22 @@ If you want a lightweight team policy, start with these five:
 3. fetch first before integration
 4. avoid rewriting shared history by default
 5. use `--force-with-lease` instead of raw force push
+
+If the team is ready to go one step further, extend it to eight:
+
+6. prefer `--ff-only` or fetch-first sync flows
+7. clean up noisy commits before review
+8. check reflog and create a backup branch before risky history edits
+
+## A practical onboarding order
+
+If you are teaching Git to new teammates, a healthy progression is:
+
+1. start with `status`, `add`, and `commit`
+2. then topic branches
+3. then fetch-first syncing
+4. then merge versus rebase boundaries
+5. only then move into reset, reflog, and force-push
 
 ## What to read next
 

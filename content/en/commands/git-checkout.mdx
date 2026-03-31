@@ -1,0 +1,53 @@
+export const metadata = {
+  title: "git checkout Tutorial",
+  slug: "git-checkout",
+  locale: "en",
+  section: "commands",
+  summary: "Explains git checkout as the older multi-purpose command for branch switching and path restoration, and how it relates to switch and restore.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-checkout",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+    "https://git-scm.com/book/en/v2/Git-Basics-Undoing-Things",
+  ],
+};
+
+# git checkout Tutorial
+
+## The short version
+
+`git checkout` is the classic multi-purpose Git command that can both switch branches and restore paths.
+
+## Why it feels overloaded
+
+Because it does two different jobs, newer Git versions introduced `git switch` for branch movement and `git restore` for path recovery.
+
+## Two common uses
+
+### Switch branches
+
+```bash
+git checkout main
+git checkout -b feature/login
+```
+
+### Restore a path
+
+```bash
+git checkout -- README.md
+```
+
+That restores the file in the working tree from the index, similar to what `git restore README.md` expresses more clearly today.
+
+## Checking out a commit
+
+```bash
+git checkout <commit>
+```
+
+This puts you into detached HEAD, which is useful for inspection but easy to misuse if you forget to create a branch for work you want to keep.
+
+## Why you still need to understand it
+
+- many older tutorials still teach it
+- old scripts and internal docs still use it
+- it helps explain where `switch` and `restore` came from

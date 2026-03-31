@@ -1,0 +1,127 @@
+export const metadata = {
+  title: "Git History Explained",
+  slug: "git-history",
+  locale: "en",
+  section: "concepts",
+  summary: "Explains how Git records history, why commit history is a graph, and what that means for collaboration, recovery, and code review.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History",
+    "https://git-scm.com/book/en/v2/Git-Internals-Git-Objects",
+    "https://git-scm.com/book/en/v2/Git-Internals-Git-References",
+  ],
+};
+
+# Git History Explained
+
+## The short version
+
+Git history is not just a text log. It is a directed graph of commit objects, where each commit records a project snapshot, author metadata, a message, and one or more parent commits.
+
+## Why this matters
+
+You do not really understand Git just by memorizing `add`, `commit`, and `push`. The important part is understanding how commands change the history graph. Once that clicks, many confusing behaviors become easier to reason about:
+
+- why `merge` creates a join point
+- why `rebase` changes commit IDs
+- why `revert` adds a new undo commit
+- why `reflog` can help recover after mistakes
+
+## What a commit contains
+
+In the Pro Git explanation of the object model, a commit includes these key ideas:
+
+- a reference to a tree object that represents the snapshot
+- one or more parent commits
+- author and committer metadata
+- a timestamp and commit message
+
+That means history is really a record of how project state evolves from one node to the next.
+
+## Why history is not strictly linear
+
+Many beginners picture Git history as a straight list, but Git really stores a graph.
+
+### Regular commits
+
+A normal commit usually has one parent, so it looks linear.
+
+### Merge commits
+
+When two lines of development are joined, the merge commit usually has two parents. That is why the graph branches and rejoins.
+
+### Root commit
+
+The first commit in a repository has no parent and acts as the graph origin.
+
+## Why branches are just names
+
+The official book repeatedly emphasizes that a branch is not a full copy of the repository. It is a movable reference that points to a commit.
+
+That explains several common Git behaviors:
+
+- creating a branch is fast
+- deleting a branch does not instantly erase the underlying commits
+- fetch updates remote-tracking refs such as `origin/main`
+
+Many Git operations are really about moving or creating names that point at commits.
+
+## What HEAD means
+
+`HEAD` tells Git where you are currently standing in history.
+
+- in the usual case, `HEAD` points to the current branch name
+- in detached HEAD, `HEAD` points directly to a commit
+
+That is why checking out a raw commit and then creating more commits can produce work that is easy to lose unless you create a branch for it.
+
+## How common commands affect history
+
+### `commit`
+
+Creates a new commit and extends the current branch.
+
+### `merge`
+
+Integrates another history line, often by creating a node with two parents.
+
+### `rebase`
+
+Does not “edit the old commits in place.” It re-applies the changes onto a new base, which creates new commit objects.
+
+### `reset`
+
+Primarily moves refs and sometimes changes index and working tree state. It changes where your branch points, but it does not instantly erase old objects from the database.
+
+### `revert`
+
+Adds a new commit that counteracts an earlier one instead of deleting the old commit.
+
+## Why history helps with recovery
+
+As long as the objects still exist and you still have references or reflog entries that lead back to them, Git can often help you recover. In many cases, “lost” work is not immediately gone. It has just lost an obvious name.
+
+That is why a good recovery sequence is often:
+
+1. stop running more destructive commands
+2. inspect `git reflog`
+3. identify the commit you want
+4. decide whether to branch, reset, or cherry-pick from there
+
+## A useful way to inspect history
+
+```bash
+git log --oneline --graph --decorate --all
+```
+
+That gives you a compact visual view of branches, merges, and commit relationships.
+
+## A practical decision rule
+
+When you are unsure whether a command is risky, ask:
+
+“Is this adding a new node to history, or rewriting how my branch points into history?”
+
+In practice:
+
+- node-adding commands are usually easier to audit and recover from
+- history-rewriting commands require more care around shared history

@@ -1,4 +1,4 @@
-# Git Academy
+# Git Org Academy
 
 基于 `gitorg.pen` 设计稿重构的 Next.js 文档站，使用 App Router、TypeScript，并内建中英文双语架构。
 

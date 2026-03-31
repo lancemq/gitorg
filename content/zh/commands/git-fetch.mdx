@@ -1,0 +1,89 @@
+export const metadata = {
+  title: "git fetch 教程",
+  slug: "git-fetch",
+  locale: "zh",
+  section: "commands",
+  summary: "解释 git fetch 如何更新远端引用、为何它比 pull 更可控，以及它在日常同步中的最佳位置。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-fetch",
+    "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
+  ],
+};
+
+# git fetch 教程
+
+## 一句话理解
+
+`git fetch` 会把远端仓库的新提交、标签和远端跟踪分支拉到本地，但它不会自动改写你当前分支的工作区和提交历史。
+
+## 什么时候最适合先用 fetch
+
+- 你想先看看远端发生了什么，再决定 merge 还是 rebase
+- 你正在处理本地改动，不想让 pull 直接触发整合
+- 你要刷新 `origin/main` 这类远端跟踪分支，供比较、审查或后续同步使用
+
+## 它到底更新了什么
+
+官方文档强调，fetch 主要更新的是远端跟踪引用，例如 `origin/main`、`origin/feature-x`。这意味着你可以先把“远端状态”带回来，再自己决定如何把这些提交整合到当前工作分支。
+
+## 最常见流程
+
+```bash
+git fetch origin
+git log --oneline HEAD..origin/main
+git rebase origin/main
+```
+
+这里的关键不是第三步必须是 `rebase`，而是 fetch 给了你一个先观察、再整合的机会。
+
+## 常见变体
+
+### 获取所有远端
+
+```bash
+git fetch --all
+```
+
+适合你在本地配置了多个远端，希望统一刷新它们的远端引用。
+
+### 同时清理已删除的远端分支引用
+
+```bash
+git fetch --prune origin
+```
+
+如果远端某个分支已经删除，而你的本地还保留着旧的远端跟踪引用，`--prune` 可以把这些陈旧引用清理掉。
+
+### 只取标签
+
+```bash
+git fetch --tags
+```
+
+当你需要同步发布标签或版本标记时很有用。
+
+## fetch 和 pull 的差别
+
+`git pull` = `git fetch` + “立刻整合”。而 `git fetch` 则只做第一步。所以 fetch 更像是“同步信息”，pull 更像是“同步信息并立刻改动当前分支”。
+
+## 一个团队中的好习惯
+
+很多团队会把“先 fetch，再比较，再整合”作为默认同步节奏，尤其是在主分支保护严格、rebase 使用频繁或本地改动较多的时候。
+
+## 常见误区
+
+### 误区 1：fetch 没有更新当前分支，所以它没做事
+
+其实它已经把远端最新状态取回来了，只是没有替你做最后一步整合。
+
+### 误区 2：fetch 一定比 pull 慢
+
+不一定。fetch 的网络工作并不比 pull 少，差别主要在于它是否自动修改你当前分支。
+
+## 继续学习建议
+
+下一步建议连着学习：
+
+1. `fetch vs pull` 的策略差异
+2. `git rebase` 如何接住 `origin/main`
+3. `git branch -vv` 如何查看本地分支与上游分支的对应关系

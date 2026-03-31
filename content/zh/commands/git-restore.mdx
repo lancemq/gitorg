@@ -1,0 +1,80 @@
+export const metadata = {
+  title: "git restore 教程",
+  slug: "git-restore",
+  locale: "zh",
+  section: "commands",
+  summary: "说明 git restore 如何恢复工作区和暂存区中的文件状态，以及它和 reset、checkout 的边界。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-restore",
+    "https://git-scm.com/book/en/v2/Git-Basics-Undoing-Things",
+  ],
+};
+
+# git restore 教程
+
+## 一句话理解
+
+`git restore` 用来把文件恢复成某个已知状态，重点是“恢复路径内容”，而不是移动分支指针。
+
+## 它解决了什么问题
+
+Git 早期很多“恢复文件”的动作都由 `git checkout -- <path>` 承担。官方后来引入 `git restore`，就是为了把“切分支”和“恢复文件”这两类动作拆开，让命令语义更清晰。
+
+## 两个核心目标
+
+### 恢复工作区
+
+```bash
+git restore README.md
+```
+
+这会丢弃工作区里尚未暂存的改动，把文件恢复到索引中的版本。
+
+### 从暂存区取消暂存
+
+```bash
+git restore --staged README.md
+```
+
+这会把文件从索引中恢复回 `HEAD` 的状态，本质上相当于“撤销 add”。
+
+## 同时恢复暂存区和工作区
+
+```bash
+git restore --staged --worktree README.md
+```
+
+如果你既想取消暂存，又想丢弃工作区中的对应修改，这是更明确的写法。
+
+## 从指定提交恢复文件
+
+```bash
+git restore --source=HEAD~1 src/app.ts
+```
+
+这会用 `HEAD~1` 中该文件的内容覆盖当前工作区版本。它常用于局部回看或只恢复某个路径，而不是整个仓库回退。
+
+## restore 和 reset 的区别
+
+- `restore` 聚焦在“文件内容”
+- `reset` 既可能作用于索引，也可能移动 HEAD，范围更大
+
+如果你的目标只是“把这个文件恢复回来”，优先想 `restore`；如果你的目标是“让分支指针回到某个提交”，那才更像 `reset`。
+
+## restore 和 checkout 的区别
+
+`checkout` 是旧式多用途命令，既能切分支，也能恢复路径。`restore` 则专门处理路径恢复，所以对于新手和文档站来说更容易讲清边界。
+
+## 常见误区
+
+### 误区 1：restore 很安全，所以可以随便用
+
+它不会移动分支，但依然可能覆盖工作区内容，所以仍然要清楚自己要保留什么。
+
+### 误区 2：restore 只能恢复到 HEAD
+
+不是。配合 `--source=<commit>`，它可以从任意可解析提交中取回文件版本。
+
+## 一个实践建议
+
+当你只想解决“这个文件改坏了”或“我只是想取消暂存”时，用 `restore` 往往比 `reset` 和 `checkout` 都更清晰。

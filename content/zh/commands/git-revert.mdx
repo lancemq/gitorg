@@ -1,0 +1,76 @@
+export const metadata = {
+  title: "git revert 教程",
+  slug: "git-revert",
+  locale: "zh",
+  section: "commands",
+  summary: "讲清 git revert 为什么适合撤销已共享提交，以及它和 reset 在历史表达上的关键区别。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-revert",
+    "https://git-scm.com/book/en/v2/Git-Basics-Undoing-Things",
+  ],
+};
+
+# git revert 教程
+
+## 一句话理解
+
+`git revert` 不会删掉旧提交，而是创建一个“反向提交”来抵消指定提交带来的变更。
+
+## 为什么它在团队里很重要
+
+如果一个错误提交已经推送到共享分支，直接 `reset` 往往会改写公共历史，影响其他协作者。`revert` 的好处是：历史保留、撤销明确、对共享分支更安全。
+
+## 基本用法
+
+```bash
+git revert <commit>
+```
+
+执行后 Git 会生成一个新提交，内容是把目标提交引入的差异反向应用一次。
+
+## 一次撤销多个提交
+
+```bash
+git revert older_commit^..newer_commit
+```
+
+这适合某一段连续提交整体有问题，但你仍然希望保留“这里曾发生过什么”的历史记录。
+
+## 先生成变更，不立刻提交
+
+```bash
+git revert --no-commit <commit>
+```
+
+如果你想把多个 revert 聚合成一次人工整理后的提交，`--no-commit` 会更灵活。
+
+## revert merge commit 要更谨慎
+
+官方文档特别提到，撤销 merge commit 时需要指定主线父提交：
+
+```bash
+git revert -m 1 <merge-commit>
+```
+
+这里的 `-m` 并不是写提交信息，而是告诉 Git 你要把哪个父提交当作主线来理解这次撤销。
+
+## revert 和 reset 的区别
+
+- `revert`：保留历史，新增一个撤销提交
+- `reset`：移动引用，可能改写历史
+
+如果提交已经共享，优先考虑 `revert`；如果提交只在你本地，还没人依赖这段历史，`reset` 才更常见。
+
+## 常见误区
+
+### 误区 1：revert 就等于“删除那个提交”
+
+不是。那个提交依然在历史里，只是被一个新提交抵消了效果。
+
+### 误区 2：revert 一定不会冲突
+
+不一定。如果后续提交已经继续修改了相同代码，revert 同样可能遇到冲突。
+
+## 一个使用判断
+
+你如果在问“我要不要把这段公开历史改写掉”，通常就应该先停一下，优先考虑 `revert` 而不是 `reset --hard`。

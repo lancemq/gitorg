@@ -1,0 +1,69 @@
+export const metadata = {
+  title: "git fetch Tutorial",
+  slug: "git-fetch",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how git fetch updates remote refs, why it is often safer than pull, and where it fits in a daily sync workflow.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-fetch",
+    "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
+  ],
+};
+
+# git fetch Tutorial
+
+## The short version
+
+`git fetch` downloads new commits, tags, and remote-tracking refs from a remote repository without automatically changing your current branch or working tree.
+
+## When fetch is the better first step
+
+- you want to inspect remote changes before integrating them
+- you have local work in progress and do not want pull to merge or rebase immediately
+- you want fresh `origin/main` style references for comparison, review, or later integration
+
+## What it actually updates
+
+The official documentation emphasizes that fetch updates remote-tracking refs such as `origin/main` and `origin/feature-x`. That means you get the latest remote state locally before deciding how to integrate it into your current branch.
+
+## A common workflow
+
+```bash
+git fetch origin
+git log --oneline HEAD..origin/main
+git rebase origin/main
+```
+
+The important idea is not that the third step must be `rebase`, but that fetch gives you a pause between “download” and “integrate”.
+
+## Useful variants
+
+### Fetch from all remotes
+
+```bash
+git fetch --all
+```
+
+### Prune deleted remote refs
+
+```bash
+git fetch --prune origin
+```
+
+This removes stale remote-tracking refs that no longer exist on the remote.
+
+### Fetch tags
+
+```bash
+git fetch --tags
+```
+
+Useful when you need release tags locally.
+
+## fetch vs pull
+
+`git pull` means `git fetch` plus immediate integration. `git fetch` alone only updates your view of the remote state, which is why it is often the more controlled starting point.
+
+## Practical habit
+
+Teams that care about clean history and predictable sync behavior often default to “fetch first, inspect second, integrate third.”

@@ -3,11 +3,13 @@ export const metadata = {
   slug: "git-best-practices",
   locale: "zh",
   section: "workflows",
-  summary: "整理更适合团队协作的 Git 使用习惯，包括小提交、topic branch、fetch-first、共享历史边界和提交信息规范。",
+  summary: "整理更适合团队协作的 Git 使用习惯，包括小提交、topic branch、fetch-first、共享历史边界、提交规范与安全推送策略。",
   sourceUrls: [
     "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project.html",
     "https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History.html",
     "https://git-scm.com/docs/git-pull.html",
+    "https://git-scm.com/docs/git-push",
+    "https://git-scm.com/docs/git-commit",
   ],
 };
 
@@ -46,6 +48,8 @@ git commit -m "fix: handle empty email input"
 2. revert 更安全
 3. cherry-pick 更精确
 
+一个更实用的补充判断是：如果你很难用一句话概括这次提交在做什么，往往就说明它还不够聚焦。
+
 ## 2. 用 topic branch 隔离工作主题
 
 当你在做一项具体工作时，优先新建一个明确的主题分支，而不是在长期分支上直接堆积改动。
@@ -59,6 +63,14 @@ git switch -c feature/login-validation
 1. 被拒绝或暂缓的工作可以直接丢弃，不污染主分支
 2. 在等待 review 期间，可以继续从主线拉出别的分支并行开发
 3. 后续做 rebase、merge、cherry-pick 时边界更清晰
+
+命名上也建议让分支名直接表达工作主题，例如：
+
+- `feature/login-validation`
+- `fix/navbar-overlap`
+- `docs/release-notes`
+
+这样在 review、CI 和回滚场景里都会更容易沟通。
 
 ## 3. 先 fetch，再决定 merge 或 rebase
 
@@ -78,6 +90,8 @@ git fetch origin
 
 这样做的核心价值是“把观察和改动分开”。你先确认远端状态，再决定如何整合，而不是把判断交给默认行为。
 
+如果团队希望进一步保守，官方 `git pull` 文档里提到的 `--ff-only` 也是一个很好的默认策略，因为它会在分叉时直接失败，而不是悄悄生成你并不想要的 merge commit。
+
 ## 4. 共享历史要保守，未共享历史才大胆整理
 
 重写历史在本地分支上非常有用，比如：
@@ -93,6 +107,8 @@ git fetch origin
 - 个人分支：可以整理
 - 共享分支：谨慎改写
 - 主分支：默认不要改写
+
+一个很重要的团队共识是：只要你不确定某段历史是否已经被别人基于它继续开发，就先把它当作“已共享历史”来处理。
 
 ## 5. 提交信息要让别人愿意读
 
@@ -111,6 +127,12 @@ Prevent the login form from submitting when the email field is blank.
 This keeps client-side feedback aligned with server-side validation.
 ```
 
+如果团队里还没有统一规范，至少可以先建立这三个最低要求：
+
+1. 标题行描述动作，不写模糊词
+2. 不把多个问题塞进同一个提交信息
+3. 复杂改动补一句“为什么”
+
 ## 6. push 前先做一次最小自检
 
 在推送前，至少做下面几步中的大部分：
@@ -127,6 +149,14 @@ git diff --stat origin/main...
 - 最近几个提交是否是你想发出的内容
 - 变更量是否超出预期
 
+如果这次提交会影响很多文件，建议再补一个动作：
+
+```bash
+git diff --name-only origin/main...
+```
+
+它能帮助你快速确认是否把不相关文件也带进来了。
+
 ## 7. 危险操作之前先想恢复路径
 
 在执行这些命令前，先暂停一下：
@@ -140,6 +170,14 @@ git diff --stat origin/main...
 1. 先看 `git status`
 2. 先看 `git reflog`
 3. 必要时先建救援分支
+
+例如在一次可能复杂的 rebase 前，先做一条临时保护分支：
+
+```bash
+git branch backup/pre-rebase
+```
+
+这类小动作的价值，在出问题时会非常大。
 
 ## 8. 默认用更保守的推送和同步方式
 
@@ -157,6 +195,50 @@ git pull --ff-only
 
 这两个习惯都属于“默认更保守”的策略，能显著减少误操作的范围。
 
+官方 `git push` 文档长期保留 `--force-with-lease`，就是因为它比裸 `--force` 更适合团队环境。它会先检查远端引用是否仍然处于你预期的状态，再决定是否允许覆盖。
+
+## 9. 用 review 友好的方式整理提交
+
+在发起合并请求前，可以先问自己三个问题：
+
+1. 这些提交的顺序是否讲得通
+2. 有没有“修修补补”的噪声提交需要整理
+3. reviewer 能不能从提交历史里看懂你的决策过程
+
+这时常见的本地整理工具包括：
+
+- `git commit --amend`
+- `git rebase -i`
+- `git restore --staged`
+
+但这类整理动作更适合发生在“还没共享之前”。
+
+## 10. 不要把 Git 命令当作记忆题，要把它们当作风险分级工具
+
+很多团队里真正的问题不是“不会 Git”，而是没有把命令按风险分级来使用。一个很实用的做法是把常见操作分成三类：
+
+### 低风险
+
+- `git status`
+- `git log`
+- `git fetch`
+- `git diff`
+
+### 中风险
+
+- `git merge`
+- `git stash`
+- `git restore`
+- `git revert`
+
+### 高风险
+
+- `git reset --hard`
+- `git rebase`
+- `git push --force`
+
+这样做的好处是，团队成员会更自然地形成“高风险命令前先停一下”的习惯。
+
 ## 一个适合团队落地的最小规则集
 
 如果你要为团队写一版轻量规范，可以先从下面 5 条开始：
@@ -166,6 +248,22 @@ git pull --ff-only
 3. 同步远端优先 fetch-first
 4. 已共享历史默认不改写
 5. 强推时默认使用 `--force-with-lease`
+
+如果团队愿意再向前走一步，可以把它扩展成 8 条：
+
+6. pull 默认优先 `--ff-only` 或 fetch-first
+7. 发起评审前整理噪声提交
+8. 危险操作前确认 reflog 和备份分支
+
+## 一个适合 onboarding 的实践顺序
+
+如果你要带新人上手 Git，可以按下面顺序建立习惯：
+
+1. 先学 `status`、`add`、`commit`
+2. 再学 topic branch
+3. 再学 fetch-first
+4. 再学 merge / rebase 的边界
+5. 最后学 reset、reflog、force push 这类高风险操作
 
 ## 下一步建议
 

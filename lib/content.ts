@@ -35,12 +35,24 @@ const contentModules = {
       import("@/content/zh/commands/git-cherry-pick.mdx"),
     "commands/git-reset": () => import("@/content/zh/commands/git-reset.mdx"),
     "commands/git-stash": () => import("@/content/zh/commands/git-stash.mdx"),
+    "commands/git-fetch": () => import("@/content/zh/commands/git-fetch.mdx"),
+    "commands/git-restore": () =>
+      import("@/content/zh/commands/git-restore.mdx"),
+    "commands/git-revert": () => import("@/content/zh/commands/git-revert.mdx"),
+    "commands/git-switch": () => import("@/content/zh/commands/git-switch.mdx"),
+    "commands/git-branch": () => import("@/content/zh/commands/git-branch.mdx"),
+    "commands/git-checkout": () =>
+      import("@/content/zh/commands/git-checkout.mdx"),
     "workflows/git-best-practices": () =>
       import("@/content/zh/workflows/git-best-practices.mdx"),
     "workflows/fetch-vs-pull": () =>
       import("@/content/zh/workflows/fetch-vs-pull.mdx"),
     "recovery/reflog-recovery": () =>
       import("@/content/zh/recovery/reflog-recovery.mdx"),
+    "concepts/git-internals": () =>
+      import("@/content/zh/concepts/git-internals.mdx"),
+    "concepts/git-history": () =>
+      import("@/content/zh/concepts/git-history.mdx"),
     "concepts/refs-and-head": () =>
       import("@/content/zh/concepts/refs-and-head.mdx"),
   },
@@ -53,12 +65,24 @@ const contentModules = {
       import("@/content/en/commands/git-cherry-pick.mdx"),
     "commands/git-reset": () => import("@/content/en/commands/git-reset.mdx"),
     "commands/git-stash": () => import("@/content/en/commands/git-stash.mdx"),
+    "commands/git-fetch": () => import("@/content/en/commands/git-fetch.mdx"),
+    "commands/git-restore": () =>
+      import("@/content/en/commands/git-restore.mdx"),
+    "commands/git-revert": () => import("@/content/en/commands/git-revert.mdx"),
+    "commands/git-switch": () => import("@/content/en/commands/git-switch.mdx"),
+    "commands/git-branch": () => import("@/content/en/commands/git-branch.mdx"),
+    "commands/git-checkout": () =>
+      import("@/content/en/commands/git-checkout.mdx"),
     "workflows/git-best-practices": () =>
       import("@/content/en/workflows/git-best-practices.mdx"),
     "workflows/fetch-vs-pull": () =>
       import("@/content/en/workflows/fetch-vs-pull.mdx"),
     "recovery/reflog-recovery": () =>
       import("@/content/en/recovery/reflog-recovery.mdx"),
+    "concepts/git-internals": () =>
+      import("@/content/en/concepts/git-internals.mdx"),
+    "concepts/git-history": () =>
+      import("@/content/en/concepts/git-history.mdx"),
     "concepts/refs-and-head": () =>
       import("@/content/en/concepts/refs-and-head.mdx"),
   },
@@ -99,6 +123,18 @@ export async function getAllDocs(locale: Locale) {
 export function getDocHref(locale: Locale, docPath: DocPath) {
   if (docPath.startsWith("commands/")) {
     return `/${locale}/commands/${docPath.replace("commands/", "")}`;
+  }
+
+  if (docPath === "concepts/git-history") {
+    return `/${locale}/history`;
+  }
+
+  if (docPath === "concepts/git-internals") {
+    return `/${locale}/internals`;
+  }
+
+  if (docPath === "workflows/git-best-practices") {
+    return `/${locale}/best-practices`;
   }
 
   return `/${locale}/docs/${docPath}`;

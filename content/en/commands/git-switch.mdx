@@ -1,0 +1,57 @@
+export const metadata = {
+  title: "git switch Tutorial",
+  slug: "git-switch",
+  locale: "en",
+  section: "commands",
+  summary: "Introduces git switch as the dedicated branch-switching command and clarifies how it differs from checkout.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-switch",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+  ],
+};
+
+# git switch Tutorial
+
+## The short version
+
+`git switch` is the dedicated command for moving between branches or creating a new branch and entering it immediately.
+
+## Why switch exists
+
+`git checkout` used to cover both branch switching and file restoration. Git later introduced `switch` and `restore` to make those two jobs easier to understand.
+
+## Common usage
+
+### Switch to an existing branch
+
+```bash
+git switch feature/login
+```
+
+### Create and switch in one step
+
+```bash
+git switch -c feature/login
+```
+
+This is the clearer modern form of `git checkout -b feature/login`.
+
+## Jump back to the previous branch
+
+```bash
+git switch -
+```
+
+This is very handy when you alternate between two branches during review or debugging.
+
+## When Git refuses to switch
+
+If local changes would be overwritten, Git aborts the operation as a safety feature. Your usual options are to commit, stash, or explicitly discard changes if that is really what you intend.
+
+## Detached HEAD is also possible
+
+```bash
+git switch --detach <commit>
+```
+
+That is valid for temporary inspection or experiments. If the resulting commits matter, create a branch right away so they are easy to keep.

@@ -1,0 +1,71 @@
+export const metadata = {
+  title: "git switch 教程",
+  slug: "git-switch",
+  locale: "zh",
+  section: "commands",
+  summary: "介绍 git switch 如何负责切换和创建分支，以及它相对 checkout 更清晰的职责边界。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-switch",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+  ],
+};
+
+# git switch 教程
+
+## 一句话理解
+
+`git switch` 是专门负责“切分支”的命令，它把这项职责从旧式的 `git checkout` 中拆了出来。
+
+## 为什么需要 switch
+
+`checkout` 既能切分支，也能恢复文件，语义过于宽。官方后来提供 `switch` 和 `restore`，就是为了让“切换分支”和“恢复路径”这两类操作更不容易混淆。
+
+## 最常见用法
+
+### 切到已有分支
+
+```bash
+git switch feature/login
+```
+
+### 创建并切换到新分支
+
+```bash
+git switch -c feature/login
+```
+
+这和旧写法 `git checkout -b feature/login` 的目的相同，但更容易理解。
+
+## 切回上一个分支
+
+```bash
+git switch -
+```
+
+在两个分支之间快速来回切换时非常高频。
+
+## 当 Git 拒绝切换时
+
+如果当前工作区改动会在切换时被覆盖，Git 会直接阻止操作。这是一种保护机制，不是故障。
+
+常见处理方式有三种：
+
+1. 先提交
+2. 先 stash
+3. 你明确知道可以丢弃时，使用 `--discard-changes`
+
+## detached HEAD 也可能通过 switch 进入
+
+```bash
+git switch --detach <commit>
+```
+
+这适合临时检查历史提交。只要你在这个状态下产生了值得保留的新提交，记得马上新建分支把它接住。
+
+## switch 和 checkout 的边界
+
+- `switch`：切分支
+- `restore`：恢复文件
+- `checkout`：旧式多用途命令
+
+对于新内容体系或团队培训材料，优先教 `switch` 往往更清晰。

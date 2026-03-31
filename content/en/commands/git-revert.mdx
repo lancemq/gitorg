@@ -1,0 +1,62 @@
+export const metadata = {
+  title: "git revert Tutorial",
+  slug: "git-revert",
+  locale: "en",
+  section: "commands",
+  summary: "Explains why git revert is the safe way to undo shared commits, and how it differs from reset at the history level.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-revert",
+    "https://git-scm.com/book/en/v2/Git-Basics-Undoing-Things",
+  ],
+};
+
+# git revert Tutorial
+
+## The short version
+
+`git revert` does not remove an old commit. Instead, it creates a new commit that reverses the effect of an earlier one.
+
+## Why this matters in teams
+
+If a bad commit has already been pushed to a shared branch, rewriting public history with reset can disrupt collaborators. Revert is safer because it preserves the history and records the undo explicitly.
+
+## Basic usage
+
+```bash
+git revert <commit>
+```
+
+Git creates a new commit whose diff cancels the target commit.
+
+## Revert several commits
+
+```bash
+git revert older_commit^..newer_commit
+```
+
+This is useful when a whole sequence needs to be backed out while still preserving the historical record.
+
+## Stage the reverse changes without committing yet
+
+```bash
+git revert --no-commit <commit>
+```
+
+That is useful when you want to combine several reverts into one reviewed commit.
+
+## Reverting a merge commit
+
+The official documentation calls out the need to choose a mainline parent:
+
+```bash
+git revert -m 1 <merge-commit>
+```
+
+Here, `-m` selects the parent Git should treat as the main line of history.
+
+## revert vs reset
+
+- `revert` keeps history and adds an undo commit
+- `reset` moves refs and may rewrite history
+
+As a practical rule, prefer `revert` when the commit is already shared.

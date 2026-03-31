@@ -1,0 +1,62 @@
+export const metadata = {
+  title: "git restore Tutorial",
+  slug: "git-restore",
+  locale: "en",
+  section: "commands",
+  summary: "Explains how git restore recovers file state in the working tree or index, and how it differs from reset and checkout.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-restore",
+    "https://git-scm.com/book/en/v2/Git-Basics-Undoing-Things",
+  ],
+};
+
+# git restore Tutorial
+
+## The short version
+
+`git restore` is for restoring file content to a known state. It focuses on paths, not on moving branch pointers.
+
+## Why restore exists
+
+Older Git workflows used `git checkout -- <path>` for many file-recovery tasks. Git later introduced `restore` so that “switch branches” and “restore file content” would be expressed by different commands.
+
+## Two main jobs
+
+### Restore the working tree
+
+```bash
+git restore README.md
+```
+
+This discards unstaged working tree changes and restores the file from the index.
+
+### Unstage a file
+
+```bash
+git restore --staged README.md
+```
+
+This resets the staged version back to `HEAD`, which makes it a clear way to undo `git add`.
+
+## Restore both index and working tree
+
+```bash
+git restore --staged --worktree README.md
+```
+
+Use this when you want to unstage and discard the local working copy together.
+
+## Restore from a specific commit
+
+```bash
+git restore --source=HEAD~1 src/app.ts
+```
+
+That lets you recover one path from another commit without moving the entire branch.
+
+## restore vs reset
+
+- `restore` focuses on file state
+- `reset` can affect the index and may also move HEAD
+
+If your real question is “How do I get this file back?”, start with `restore`.
