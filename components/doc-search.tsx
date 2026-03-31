@@ -19,6 +19,12 @@ type DocSearchProps = {
   locale: Locale;
 };
 
+type SearchGroup = {
+  id: string;
+  title: string;
+  items: SearchDoc[];
+};
+
 const sectionLabels: Record<Locale, Record<SearchDoc["section"], string>> = {
   zh: {
     "learning-path": "学习路径",
@@ -70,6 +76,27 @@ const allFilterLabels = {
   en: "All",
 };
 
+const quickLinkLabels = {
+  zh: "常用入口",
+  en: "Quick Links",
+};
+
+const recentLabels = {
+  zh: "最近访问",
+  en: "Recent Visits",
+};
+
+const recentStorageKey = "git-org-academy-recent-searches";
+const sectionOrder: SearchDoc["section"][] = [
+  "learning-path",
+  "commands",
+  "workflows",
+  "best-practices",
+  "internals",
+  "concepts",
+  "recovery",
+];
+
 export function DocSearch({ items, label, locale }: DocSearchProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -77,6 +104,18 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<SearchDoc["section"] | "all">("all");
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [recentHrefs, setRecentHrefs] = useState<string[]>(() => {
+    if (typeof window === "undefined") {
+      return [];
+    }
+
+    try {
+      const storedValue = window.localStorage.getItem(recentStorageKey);
+      return storedValue ? (JSON.parse(storedValue) as string[]) : [];
+    } catch {
+      return [];
+    }
+  });
   const deferredQuery = useDeferredValue(query);
   const normalizedQuery = deferredQuery.trim().toLowerCase();
   const availableSections = useMemo(
@@ -119,7 +158,65 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
       .sort((a, b) => b.score - a.score || a.title.localeCompare(b.title))
       .slice(0, 8);
   }, [activeSection, items, normalizedQuery]);
-  const highlightedResult = results[Math.min(selectedIndex, Math.max(results.length - 1, 0))];
+  const recentItems = useMemo(
+    () =>
+      recentHrefs
+        .map((href) => items.find((item) => item.href === href))
+        .filter((item): item is SearchDoc => Boolean(item))
+        .slice(0, 5),
+    [items, recentHrefs],
+  );
+  const quickLinkItems = useMemo(() => {
+    return sectionOrder
+      .map((section) => items.find((item) => item.section === section))
+      .filter((item): item is SearchDoc => Boolean(item))
+      .filter((item) => !recentItems.some((recentItem) => recentItem.href === item.href))
+      .slice(0, 6);
+  }, [items, recentItems]);
+  const displayGroups = useMemo<SearchGroup[]>(() => {
+    const isBrowsingState = !normalizedQuery && activeSection === "all";
+
+    if (isBrowsingState) {
+      return [
+        {
+          id: "recent",
+          title: recentLabels[locale],
+          items: recentItems,
+        },
+        {
+          id: "quick-links",
+          title: quickLinkLabels[locale],
+          items: quickLinkItems,
+        },
+      ].filter((group) => group.items.length > 0);
+    }
+
+    if (activeSection !== "all") {
+      return results.length
+        ? [
+            {
+              id: activeSection,
+              title: sectionLabels[locale][activeSection],
+              items: results,
+            },
+          ]
+        : [];
+    }
+
+    return availableSections
+      .map((section) => ({
+        id: section,
+        title: sectionLabels[locale][section],
+        items: results.filter((item) => item.section === section),
+      }))
+      .filter((group) => group.items.length > 0);
+  }, [activeSection, availableSections, locale, normalizedQuery, quickLinkItems, recentItems, results]);
+  const flatDisplayItems = useMemo(
+    () => displayGroups.flatMap((group) => group.items),
+    [displayGroups],
+  );
+  const highlightedResult =
+    flatDisplayItems[Math.min(selectedIndex, Math.max(flatDisplayItems.length - 1, 0))];
 
   useEffect(() => {
     if (!isOpen) {
@@ -157,7 +254,7 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
   }, []);
 
   function handleInputKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (!results.length) {
+    if (!flatDisplayItems.length) {
       if (event.key === "Escape") {
         setIsOpen(false);
       }
@@ -166,12 +263,12 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
 
     if (event.key === "ArrowDown") {
       event.preventDefault();
-      setSelectedIndex((current) => (current + 1) % results.length);
+      setSelectedIndex((current) => (current + 1) % flatDisplayItems.length);
     }
 
     if (event.key === "ArrowUp") {
       event.preventDefault();
-      setSelectedIndex((current) => (current - 1 + results.length) % results.length);
+      setSelectedIndex((current) => (current - 1 + flatDisplayItems.length) % flatDisplayItems.length);
     }
 
     if (event.key === "Enter") {
@@ -185,6 +282,15 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
 
     if (event.key === "Escape") {
       setIsOpen(false);
+    }
+  }
+
+  function rememberResult(href: string) {
+    const nextRecentHrefs = [href, ...recentHrefs.filter((entry) => entry !== href)].slice(0, 5);
+    setRecentHrefs(nextRecentHrefs);
+
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(recentStorageKey, JSON.stringify(nextRecentHrefs));
     }
   }
 
@@ -280,27 +386,41 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
               role="listbox"
               aria-label={shortcutLabels[locale]}
             >
-              {results.length > 0 ? (
-                results.map((item) => (
-                  <Link
-                    className={`search-result${pathname === item.href ? " is-active" : ""}${
-                      highlightedResult?.href === item.href ? " is-selected" : ""
-                    }`}
-                    href={item.href}
-                    key={item.href}
-                    onMouseEnter={() =>
-                      setSelectedIndex(results.findIndex((result) => result.href === item.href))
-                    }
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <div className="search-result-copy">
-                      <strong>{item.title}</strong>
-                      <p>{item.summary}</p>
+              {displayGroups.length > 0 ? (
+                displayGroups.map((group) => (
+                  <section className="search-group" key={group.id}>
+                    <header className="search-group-header">
+                      <h3>{group.title}</h3>
+                    </header>
+                    <div className="search-group-list">
+                      {group.items.map((item) => (
+                        <Link
+                          className={`search-result${pathname === item.href ? " is-active" : ""}${
+                            highlightedResult?.href === item.href ? " is-selected" : ""
+                          }`}
+                          href={item.href}
+                          key={item.href}
+                          onMouseEnter={() =>
+                            setSelectedIndex(
+                              flatDisplayItems.findIndex((result) => result.href === item.href),
+                            )
+                          }
+                          onClick={() => {
+                            rememberResult(item.href);
+                            setIsOpen(false);
+                          }}
+                        >
+                          <div className="search-result-copy">
+                            <strong>{item.title}</strong>
+                            <p>{item.summary}</p>
+                          </div>
+                          <span className="search-result-tag">
+                            {sectionLabels[locale][item.section]}
+                          </span>
+                        </Link>
+                      ))}
                     </div>
-                    <span className="search-result-tag">
-                      {sectionLabels[locale][item.section]}
-                    </span>
-                  </Link>
+                  </section>
                 ))
               ) : (
                 <p className="search-empty">{emptyStates[locale]}</p>

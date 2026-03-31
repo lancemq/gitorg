@@ -182,12 +182,6 @@ type Dictionary = {
       action: string;
       items: ReadonlyArray<FaqItem>;
     };
-    cta: {
-      eyebrow: string;
-      title: string;
-      description: string;
-      action: string;
-    };
   };
   faqPage: {
     eyebrow: string;
@@ -592,12 +586,6 @@ const zhDictionary: Dictionary = {
         },
       ],
     },
-    cta: {
-      eyebrow: "Git Docs",
-      title: "教程材料已经进入 content/ 内容源。",
-      description: "继续沿着首页的文档聚合区浏览内容，或者把更多 Git 主题接进同一套 MDX 渲染体系。",
-      action: "查看命令专题",
-    },
   },
   faqPage: {
     eyebrow: "FAQ Library",
@@ -987,12 +975,6 @@ const enDictionary: Dictionary = {
             "The official `git switch` docs say Git aborts the operation if switching would lead to the loss of local changes. That is a safety feature, not an error condition. The usual safe options are to commit, stash, or only use `--discard-changes` when you intentionally want to throw those local changes away.",
         },
       ],
-    },
-    cta: {
-      eyebrow: "Git Docs",
-      title: "The content library now renders directly from MDX.",
-      description: "Browse the integrated docs area directly on the homepage, or keep expanding the same MDX-based content pipeline with more Git topics.",
-      action: "Open command topics",
     },
   },
   faqPage: {

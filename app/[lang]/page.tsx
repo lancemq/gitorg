@@ -177,17 +177,6 @@ export default async function LocalizedHomePage({ params }: Props) {
           </Link>
         </div>
       </section>
-
-      <section className="cta panel">
-        <div>
-          <p className="eyebrow">{dict.home.cta.eyebrow}</p>
-          <h2>{dict.home.cta.title}</h2>
-          <p>{dict.home.cta.description}</p>
-        </div>
-        <Link className="button button-primary" href={`/${locale}/commands`}>
-          {dict.home.cta.action}
-        </Link>
-      </section>
     </SiteShell>
   );
 }

@@ -222,9 +222,34 @@ kbd {
 .search-results {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 14px;
   overflow: auto;
   padding: 4px;
+}
+
+.search-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.search-group-header {
+  padding: 0 4px;
+}
+
+.search-group-header h3 {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.search-group-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .search-result {
@@ -510,16 +535,16 @@ h3 {
 
 h1 {
   max-width: 100%;
-  font-size: clamp(2rem, 4vw, 3.25rem);
-  line-height: 1.08;
+  font-size: clamp(1.45rem, 2.8vw, 2.35rem);
+  line-height: 1.12;
 }
 
 h2 {
-  font-size: clamp(1.35rem, 2vw, 1.9rem);
+  font-size: clamp(1.05rem, 1.4vw, 1.38rem);
 }
 
 h3 {
-  font-size: 1rem;
+  font-size: 0.92rem;
 }
 
 .lead,
@@ -1137,10 +1162,10 @@ h3 {
   }
 
   h1 {
-    font-size: 1.75rem;
+    font-size: 1.38rem;
   }
 
   h2 {
-    font-size: 1.25rem;
+    font-size: 1.02rem;
   }
 }
