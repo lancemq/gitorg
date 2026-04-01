@@ -17,6 +17,15 @@ export const metadata = {
 
 Git 保存的是提交图。线性日志只是这张图的一种阅读方式，不是 Git 底层真正的唯一结构。
 
+<CommitGraphFigure
+  title="提交图如何表达分叉、汇合与重写"
+  caption="同样是“把改动整合起来”，merge 会保留汇合点，rebase 会把一段提交重新接到新父链后面。图结构不同，提交 ID 和阅读体验也会跟着不同。"
+  linearLabel="线性提交链"
+  mergeLabel="保留汇合点"
+  rewriteLabel="重写后的线性表达"
+  pointerLabel="当前引用"
+/>
+
 ## 1. 为什么“历史图”比“提交列表”更准确
 
 如果把 Git 历史只理解成列表，你会很难解释：

@@ -1,4 +1,4 @@
-# Git Org Academy 信息架构说明
+# GitOrg Atlas 信息架构说明
 
 ## 1. 架构目标
 
@@ -48,7 +48,7 @@
 - 工作流：`/{lang}/workflows/{slug}`
 - 原理：`/{lang}/internals/{slug}`
 - 学习路径详情：`/{lang}/docs/learning-path/{slug}`
-- 概念页：`/{lang}/history`
+- 历史页：`/{lang}/history`
 
 ## 3. 左侧导航结构
 
@@ -62,7 +62,7 @@
 
 - Overview
 - Learning Path
-- Concepts
+- Topics
 - Resources
 
 ### 3.2 Learning Path 分组
@@ -70,21 +70,22 @@
 当前包含：
 
 - Quick Start
-- Best Practices
 - Workflows
 - Git Commands
 
-### 3.3 Concepts 分组
+### 3.3 Topics 分组
 
 当前包含：
 
-- Git History
+- Best Practices
 - Git Internals
+- Recovery
 
 ### 3.4 Resources 分组
 
 当前包含：
 
+- Git History
 - FAQ
 
 ## 4. 搜索架构
@@ -115,8 +116,8 @@
 - Best Practices
 - Workflows
 - Internals
-- Concepts
 - Recovery
+- History resources
 
 ## 5. 内容分层
 
@@ -147,7 +148,7 @@
 当前面包屑遵循：
 
 - 频道详情页：`总览 > 频道 > 当前页`
-- 特殊概念页：`总览 > 当前页`
+- 特殊历史页：`总览 > 当前页`
 
 例如：
 
@@ -167,6 +168,7 @@
 - 上一篇 / 下一篇
 - 相关推荐
 - 频道精选内容
+- 内容质量分层（核心 / 推荐 / 延伸）
 
 ## 8. 后续架构方向
 

@@ -130,6 +130,21 @@ git cherry-pick --abort
 - 如果这次操作可能影响团队协作，先跑 `git status`、`git log --oneline --graph` 和 `git reflog`，再决定是否继续。
 - 一旦不确定，就先建一个备份分支，让自己保留“能回去”的选项。
 
+## 跟着做一遍
+
+<PracticeLab
+  title="练习：把一个补丁回带到发布分支"
+  intro="这组练习要观察的是“改动效果被转运过来了，但提交身份和父链已经变了”。"
+  setupLabel="准备环境"
+  setup={`git switch -c release/1.2\n# 另开一个 feature 分支做一条修复提交`}
+  stepsLabel="跟着做"
+  steps="记下 feature 分支上那条修复提交的 hash。|切回 release 分支执行 `git cherry-pick <hash>`。|用 `git log --oneline --graph --decorate --all` 看看新提交与原提交的关系。"
+  outcomesLabel="结果会怎样"
+  outcomes="目标分支会新增一个内容相近但 ID 不同的新提交。|原始父链不会被搬过来。|如果挑的是补丁而不是整条历史，这通常比 merge 更精确。"
+  mistakesLabel="常见错误判断"
+  mistakes="如果目标提交依赖前置提交，单独 pick 可能会留下不完整状态。|如果同类改动已经存在，重复 cherry-pick 会让历史更难读。|如果你真正需要的是整条分支历史，merge 通常更清楚。"
+/>
+
 
 ## 继续学习建议
 

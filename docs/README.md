@@ -1,4 +1,4 @@
-# Git Org Academy Docs
+# GitOrg Atlas Docs
 
 这个目录用于沉淀网站的产品需求、信息架构、页面设计原则与后续演进约定。
 
@@ -24,6 +24,7 @@
   - Best Practices
   - Workflows
   - Git Internals
+  - Recovery
   - Git History
   - FAQ
 

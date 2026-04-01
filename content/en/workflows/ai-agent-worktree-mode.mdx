@@ -1,0 +1,224 @@
+export const metadata = {
+  title: "Using git worktree as the default mode for AI coding agents",
+  slug: "ai-agent-worktree-mode",
+  locale: "en",
+  section: "workflows",
+  summary: "Turn git worktree into the default parallel-task mode for AI coding agents so implementation, review, validation, and hotfix work stay isolated and recoverable.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-worktree",
+    "https://git-scm.com/docs/git-switch",
+    "https://git-scm.com/book/en/v2/Git-Tools-Advanced-Merging",
+  ],
+};
+
+# Using git worktree as the default mode for AI coding agents
+
+## What this topic solves
+
+Once AI coding agents are doing real project work, the hard part is often no longer branch syntax. The harder part is task isolation:
+
+- one agent is building a feature and a hotfix suddenly appears
+- you want another agent to review or verify a branch without disturbing the current workspace
+- you need implementation, validation, and incident work to happen in parallel
+- you want each task to have its own directory, branch state, and recovery path
+
+At that point, `stash + switch` tends to become fragile. `git worktree` is usually a better default for agent-heavy workflows because it separates contexts at the directory level.
+
+## Why worktree fits AI agents especially well
+
+AI agents tend to:
+
+- switch tasks frequently
+- run implementation and verification in parallel
+- move quickly from writing code into comparison, cleanup, or rollback work
+
+If everything happens in one working directory, the most common problems are:
+
+- uncommitted changes block branch switching
+- the agent keeps falling back to stash / pop
+- later it becomes hard to explain which changes belonged to which task
+- recovery gets harder because task boundaries were never explicit
+
+Worktree helps because it gives you:
+
+1. one directory per task
+2. one shared repository object database instead of repeated full clones
+3. a clean split between implementation, verification, review, and hotfix work
+4. a simple cleanup path when the task is done
+
+## The best-fit scenarios
+
+### 1. Main feature plus one urgent fix
+
+Keep the main feature in the primary worktree and open a second worktree for the hotfix.
+
+### 2. One implementation worktree plus one verification worktree
+
+Let the agent change code in one place while another worktree compares against `main`, reproduces a bug, or runs validation.
+
+### 3. One feature worktree plus one PR-cleanup worktree
+
+If you need to reorganize commits, update docs, or prepare a cleaner patch stack, it is often safer not to do that inside the active implementation directory.
+
+### 4. Multiple agents in parallel
+
+Different agents mapped to different worktrees are usually much more stable than many agents sharing one directory.
+
+## A recommended minimal pattern
+
+### Main directory: primary task
+
+```bash
+git status
+git branch -vv
+```
+
+### Additional directory: parallel agent task
+
+```bash
+git worktree add ../repo-review review/fix-copy
+```
+
+or:
+
+```bash
+git worktree add ../repo-hotfix hotfix/login-timeout
+```
+
+That makes it easy to assign:
+
+- the main directory to an implementation agent
+- `../repo-review` to a verification or review agent
+- `../repo-hotfix` to a hotfix agent
+
+## The most important rules in agent collaboration
+
+### Rule 1: one worktree should serve one clear job
+
+Do not make one worktree handle feature implementation, hotfixing, and commit cleanup all at once.
+
+### Rule 2: encode task meaning in the directory and branch name
+
+For example:
+
+```bash
+git worktree add ../repo-agent-rebase-lab lab/rebase-cleanup
+git worktree add ../repo-agent-hotfix hotfix/login-timeout
+git worktree add ../repo-agent-review review/cart-empty-state
+```
+
+The naming is not cosmetic. It becomes operational metadata when you are juggling multiple agent contexts.
+
+### Rule 3: perform risky history work in a separate worktree
+
+Operations such as:
+
+- `rebase`
+- `reset`
+- `cherry-pick`
+- `range-diff`
+- pre-release commit cleanup
+
+are usually safer in a dedicated worktree. If the history experiment goes sideways, the main implementation workspace stays intact.
+
+### Rule 4: split implementation from verification
+
+If the agent keeps editing and validating in the same directory, the validation environment becomes harder to trust. Separate worktrees usually make the workflow calmer and easier to reason about.
+
+## Why this is better than a stash-first habit
+
+`stash` is still useful for:
+
+- very short interruptions
+- work you will resume almost immediately
+- temporarily parking the current scene
+
+But `worktree` is a better fit when:
+
+- the parallel task lasts more than a few minutes
+- you need multiple stable contexts
+- implementation, review, and incident response should stay visibly separate
+- you want agent work to remain auditable and recoverable
+
+In practice, `stash` is more like a temporary parking spot. `worktree` is more like giving each task its own desk.
+
+## A good operating order for multi-agent setups
+
+1. define the task boundaries first
+2. decide which tasks deserve their own worktree
+3. create clear directory names and branch names
+4. explicitly assign which worktree is for implementation and which is for validation
+5. remove the worktree when the task is complete
+
+## A typical team example
+
+Imagine three agents running in parallel:
+
+- Agent A continues `feature/copilot-sidebar`
+- Agent B verifies a UI regression on top of `main`
+- Agent C handles a production hotfix
+
+A steadier setup is:
+
+```bash
+git worktree add ../repo-agent-a feature/copilot-sidebar
+git worktree add ../repo-agent-b review/ui-regression
+git worktree add ../repo-agent-c hotfix/header-overlap
+```
+
+That makes `git status`, diffs, commits, and cleanup much easier to reason about afterward.
+
+## Common misconceptions
+
+### Mistake 1: the agent is fast, so one directory is fine
+
+The faster the agent moves, the more important explicit context boundaries become.
+
+### Mistake 2: worktree is an advanced trick, not a daily habit
+
+For teams using AI assistance, multiple parallel tasks, and frequent context switching, worktree should often be a normal option rather than a rare trick.
+
+### Mistake 3: worktree only exists to avoid stash
+
+That is only part of the story. Its bigger value is making task boundaries, directory state, branch ownership, and recovery paths explicit.
+
+## When you may not need it
+
+- the working tree is already clean
+- the interruption is truly tiny
+- you know you do not need a parallel context
+
+In those cases, a normal `git switch` is still enough.
+
+## Commands that fit agent workflows well
+
+```bash
+git worktree list
+git worktree add ../repo-agent-review review/fix-copy
+git worktree add ../repo-agent-hotfix hotfix/login-timeout
+git worktree remove ../repo-agent-review
+```
+
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: open separate worktrees for implementation, review, and hotfix"
+  intro="The value of this exercise is not memorizing the command. It is feeling how much calmer agent collaboration becomes when each task gets its own directory."
+  setupLabel="Setup"
+  setup={`git status\n# confirm the repository is healthy\n# assume you have feature, review, and hotfix style tasks`}
+  stepsLabel="Try it"
+  steps="Keep the current directory for the main task.|Run `git worktree add ../repo-agent-review review/fix-copy` for a review context.|Run `git worktree add ../repo-agent-hotfix hotfix/login-timeout` for an urgent-fix context.|Enter each directory and compare `git status` plus `git branch -vv`."
+  outcomesLabel="What happens next"
+  outcomes="You get multiple independent working directories backed by the same Git object database.|Each directory can stay attached to a different task and branch.|The main workspace no longer has to survive repeated stash and switch cycles."
+  mistakesLabel="Common mistake checks"
+  mistakes="Do not keep unrelated tasks inside one worktree just because it already exists.|Do not forget to remove finished worktrees.|If you are about to run a risky history rewrite, putting it in a separate worktree is often safer than experimenting in the main task directory."
+/>
+
+## What to read next
+
+Recommended follow-ups:
+
+1. `git worktree`
+2. `parallel work with worktree`
+3. `prepare commits before pull request`
+4. `hotfix and urgent fixes`

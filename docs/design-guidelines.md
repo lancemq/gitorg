@@ -1,4 +1,4 @@
-# Git Org Academy 设计与交互说明
+# GitOrg Atlas 设计与交互说明
 
 ## 1. 设计目标
 

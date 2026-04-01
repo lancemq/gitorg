@@ -206,6 +206,21 @@ git reset --hard <commit>
 - 一旦不确定，就先建一个备份分支，让自己保留“能回去”的选项。
 - 只要涉及 `--hard`，就应该先确认工作区里有没有还没备份的重要改动。
 
+## 跟着做一遍
+
+<PracticeLab
+  title="练习：比较 reset 三种模式"
+  intro="这一组练习最重要的是观察 HEAD、暂存区和工作区分别发生了什么，而不是只记住参数名字。"
+  setupLabel="准备环境"
+  setup={`git switch -c lab/reset-demo\n# 连续做两次提交\n# 再额外修改一个文件并执行 git add`}
+  stepsLabel="跟着做"
+  steps="先运行 `git reset --soft HEAD~1` 并观察 `git status`。|再重复实验，改用 `git reset --mixed HEAD~1`。|最后只在实验仓库中试一次 `git reset --hard HEAD~1`。"
+  outcomesLabel="结果会怎样"
+  outcomes="`--soft` 会保留暂存区和工作区内容。|`--mixed` 会把暂存内容退回工作区。|`--hard` 会让 HEAD、暂存区和工作区一起回到目标提交。"
+  mistakesLabel="常见错误判断"
+  mistakes="如果你真正想要的是撤回提交但保留改动，通常不该直接选 `--hard`。|如果旧提交已经共享给团队，应该优先评估 `revert`，而不是直接 reset 共享历史。|只要你不确定恢复路径，先跑 `git reflog` 再继续。"
+/>
+
 
 ## 继续学习建议
 

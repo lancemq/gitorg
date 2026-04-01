@@ -18,6 +18,17 @@ Git 的许多困惑都来自把这三层混在一起：
 - 暂存区：下一次提交准备写入的快照
 - 对象库：已经被 Git 固化下来的对象
 
+<ThreeLayersFigure
+  title="工作区、暂存区与对象库"
+  caption="大多数 Git 命令之所以让人混乱，不是因为语法复杂，而是因为它们分别落在不同层。先看清层次，再看命令，就容易很多。"
+  worktreeLabel="工作区"
+  indexLabel="暂存区"
+  objectsLabel="对象库"
+  addLabel="git add"
+  commitLabel="git commit"
+  restoreLabel="git restore / reset"
+/>
+
 ## 为什么这三层必须分开理解
 
 因为很多命令的区别就在于它们影响哪一层：

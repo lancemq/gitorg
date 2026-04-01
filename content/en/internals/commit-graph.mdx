@@ -17,6 +17,15 @@ export const metadata = {
 
 Git stores a commit graph. A linear log is just one way of reading that graph, not the only shape Git actually keeps underneath.
 
+<CommitGraphFigure
+  title="How the commit graph expresses branch history"
+  caption="Merge preserves a join point. Rebase rewrites a series onto a new parent chain. The structure changes, so the reading experience and commit IDs can change too."
+  linearLabel="Linear chain"
+  mergeLabel="Preserved join point"
+  rewriteLabel="Rewritten linear series"
+  pointerLabel="Current ref"
+/>
+
 ## 1. Why a graph is a better model than a list
 
 If history is treated as only a list, it becomes hard to explain:

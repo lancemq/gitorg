@@ -103,3 +103,18 @@ Cherry-pick is great for precise patch transfer, but heavy use across many branc
 - The most expensive failure mode in history commands is rewriting or moving commits that other people already depend on.
 - If the operation might affect team flow, run `git status`, `git log --oneline --graph`, and `git reflog` first so the recovery path is visible.
 - When in doubt, create a backup branch before continuing so you preserve an obvious way back.
+
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: backport one fix onto a release branch"
+  intro="This drill helps you see that cherry-pick transfers change intent, not the original commit identity or parent chain."
+  setupLabel="Setup"
+  setup={`git switch -c release/1.2\n# create a separate feature branch with one bug-fix commit`}
+  stepsLabel="Try it"
+  steps="Copy the hash of the fix commit from the feature branch.|Switch back to the release branch and run `git cherry-pick <hash>`.|Inspect the result with `git log --oneline --graph --decorate --all`."
+  outcomesLabel="What happens next"
+  outcomes="The target branch gets a new commit with similar content but a different ID.|The original parent chain is not copied over.|For patch-level backports, this is often more precise than a full merge."
+  mistakesLabel="Common mistake checks"
+  mistakes="If the picked commit depends on earlier commits, cherry-picking it alone may leave the target incomplete.|If equivalent changes already exist, repeated cherry-picks can make history noisy.|If the real need is the whole branch history, merge is usually clearer."
+/>

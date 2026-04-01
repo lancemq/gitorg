@@ -18,6 +18,17 @@ Many Git problems become easier once these three layers are separated:
 - index: the next snapshot being prepared
 - object store: durable Git objects already written
 
+<ThreeLayersFigure
+  title="Working tree, index, and object store"
+  caption="Most Git confusion is really layer confusion. Once you know which command touches which layer, the behavior becomes much easier to predict."
+  worktreeLabel="Working tree"
+  indexLabel="Index"
+  objectsLabel="Object store"
+  addLabel="git add"
+  commitLabel="git commit"
+  restoreLabel="git restore / reset"
+/>
+
 ## Why this matters
 
 The real difference between many commands is simply which layer they touch:

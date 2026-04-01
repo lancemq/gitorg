@@ -15,6 +15,16 @@ export const metadata = {
 
 Commits are history nodes. References are names pointing at those nodes. HEAD tells Git which name or commit you are currently standing on.
 
+<RefsHeadFigure
+  title="How HEAD, branches, and refs connect"
+  caption="In the normal case, HEAD points to a branch name first, and that branch name points to a commit. Only detached HEAD points directly at a commit."
+  headLabel="HEAD following a branch"
+  branchLabel="Local branch"
+  tagLabel="Tag"
+  remoteLabel="Remote-tracking ref"
+  detachedLabel="Detached HEAD"
+/>
+
 ## 1. Why refs matter more than memorizing commands
 
 Many Git commands are really about two actions:

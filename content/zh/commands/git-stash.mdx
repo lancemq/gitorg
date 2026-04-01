@@ -181,6 +181,21 @@ git stash push -m "wip: checkout flow"
 - 当命令同时影响多个目录或嵌套仓库时，最好把操作范围先缩到一个最小实验场景。
 - 如果你还想把未跟踪文件一起收进 stash，记得显式使用 `-u` 或 `-a`。
 
+## 跟着做一遍
+
+<PracticeLab
+  title="练习：先 apply，再决定要不要 drop"
+  intro="stash 最容易出问题的地方，不是保存，而是恢复。这个练习就是要把“先看、先 apply、再删除”的顺序变成肌肉记忆。"
+  setupLabel="准备环境"
+  setup={`git switch -c lab/stash-demo\n# 修改一个已跟踪文件，再新建一个未跟踪文件`}
+  stepsLabel="跟着做"
+  steps={`执行 \`git stash push -u -m "wip: stash demo"\`。|运行 \`git stash show -p stash@{0}\` 看清里面到底保存了什么。|先用 \`git stash apply stash@{0}\` 恢复，再确认无误后决定是否 \`git stash drop stash@{0}\`。`}
+  outcomesLabel="结果会怎样"
+  outcomes="你会看到未跟踪文件只有在 `-u` 时才会一起进入 stash。|`apply` 会恢复现场但保留 stash 记录。|确认无误后再 drop，比直接 pop 更保守。"
+  mistakesLabel="常见错误判断"
+  mistakes="如果这份工作会持续几小时甚至几天，通常应该建分支而不是长期堆 stash。|如果还没看过 `stash show -p`，就别急着 pop。|恢复后有冲突并不代表 stash 坏了，通常只是当前代码上下文变了。"
+/>
+
 
 ## 继续学习建议
 

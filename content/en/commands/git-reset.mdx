@@ -155,3 +155,17 @@ Reset does not always permanently destroy commits right away. Often the obvious 
 - When in doubt, create a backup branch before continuing so you preserve an obvious way back.
 - Any `--hard` reset should trigger a pause to verify whether the working tree still contains important unbacked-up changes.
 
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: compare the three reset modes"
+  intro="This drill is really about watching HEAD, the index, and the working tree change independently."
+  setupLabel="Setup"
+  setup={`git switch -c lab/reset-demo\n# make two commits\n# then edit a file and stage it with git add`}
+  stepsLabel="Try it"
+  steps="Run `git reset --soft HEAD~1` and inspect `git status`.|Repeat the experiment with `git reset --mixed HEAD~1`.|Only in a disposable repo, try `git reset --hard HEAD~1` once and compare the result."
+  outcomesLabel="What happens next"
+  outcomes="`--soft` keeps staged and working-tree changes in place.|`--mixed` moves staged changes back into the working tree.|`--hard` realigns HEAD, index, and working tree to the target commit."
+  mistakesLabel="Common mistake checks"
+  mistakes="If the real goal is “undo the commit but keep the changes,” `--hard` is usually the wrong choice.|If the commits are already shared, evaluate `revert` before rewriting with reset.|If you do not know the recovery path yet, inspect `git reflog` before continuing."
+/>

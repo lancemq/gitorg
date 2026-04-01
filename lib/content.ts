@@ -25,6 +25,8 @@ export type DocSection =
   | "recovery"
   | "concepts";
 
+export type DocTier = "core" | "recommended" | "extended";
+
 export type DocMetadata = {
   title: string;
   slug: string;
@@ -127,6 +129,7 @@ export const docPathRegistry = [
   "workflows/multi-person-sync-routine",
   "workflows/prepare-commits-before-pull-request",
   "workflows/parallel-work-with-worktree",
+  "workflows/ai-agent-worktree-mode",
   "workflows/monorepo-sparse-checkout-workflow",
   "workflows/rerere-for-recurring-conflicts",
   "workflows/shared-branch-sync-boundaries",
@@ -255,6 +258,7 @@ const contentModules = {
     "workflows/multi-person-sync-routine": () => import("@/content/zh/workflows/multi-person-sync-routine.mdx"),
     "workflows/prepare-commits-before-pull-request": () => import("@/content/zh/workflows/prepare-commits-before-pull-request.mdx"),
     "workflows/parallel-work-with-worktree": () => import("@/content/zh/workflows/parallel-work-with-worktree.mdx"),
+    "workflows/ai-agent-worktree-mode": () => import("@/content/zh/workflows/ai-agent-worktree-mode.mdx"),
     "workflows/monorepo-sparse-checkout-workflow": () => import("@/content/zh/workflows/monorepo-sparse-checkout-workflow.mdx"),
     "workflows/rerere-for-recurring-conflicts": () => import("@/content/zh/workflows/rerere-for-recurring-conflicts.mdx"),
     "workflows/shared-branch-sync-boundaries": () => import("@/content/zh/workflows/shared-branch-sync-boundaries.mdx"),
@@ -380,6 +384,7 @@ const contentModules = {
     "workflows/multi-person-sync-routine": () => import("@/content/en/workflows/multi-person-sync-routine.mdx"),
     "workflows/prepare-commits-before-pull-request": () => import("@/content/en/workflows/prepare-commits-before-pull-request.mdx"),
     "workflows/parallel-work-with-worktree": () => import("@/content/en/workflows/parallel-work-with-worktree.mdx"),
+    "workflows/ai-agent-worktree-mode": () => import("@/content/en/workflows/ai-agent-worktree-mode.mdx"),
     "workflows/monorepo-sparse-checkout-workflow": () => import("@/content/en/workflows/monorepo-sparse-checkout-workflow.mdx"),
     "workflows/rerere-for-recurring-conflicts": () => import("@/content/en/workflows/rerere-for-recurring-conflicts.mdx"),
     "workflows/shared-branch-sync-boundaries": () => import("@/content/en/workflows/shared-branch-sync-boundaries.mdx"),
@@ -424,15 +429,22 @@ export type SearchDoc = {
   href: string;
   path: DocPath;
   section: DocSection;
+  tier: DocTier;
   slug: string;
   title: string;
   summary: string;
+  suggestions: Array<{
+    type: "prerequisite" | "risk";
+    title: string;
+    href?: string;
+  }>;
 };
 
 export type DocCard = {
   href: string;
   path: DocPath;
   section: DocSection;
+  tier: DocTier;
   slug: string;
   title: string;
   summary: string;
@@ -459,6 +471,155 @@ export type ContentStats = {
   totalDocs: number;
   commandDocs: number;
   sectionCounts: Record<DocSection, number>;
+};
+
+const coreDocPaths = new Set<DocPath>([
+  "learning-path/quick-start",
+  "learning-path/setup-and-clone",
+  "learning-path/stage-and-commit",
+  "learning-path/sync-with-remote",
+  "learning-path/first-feature-branch",
+  "commands/git-init",
+  "commands/git-clone",
+  "commands/git-status",
+  "commands/git-add",
+  "commands/git-commit",
+  "commands/git-fetch",
+  "commands/git-pull",
+  "commands/git-push",
+  "commands/git-switch",
+  "commands/git-branch",
+  "commands/git-log",
+  "commands/git-rebase",
+  "commands/git-merge",
+  "commands/git-cherry-pick",
+  "commands/git-reset",
+  "commands/git-stash",
+  "commands/git-restore",
+  "commands/git-revert",
+  "commands/git-reflog",
+  "best-practices/commit-hygiene",
+  "best-practices/fetch-first-sync",
+  "best-practices/shared-history-boundaries",
+  "best-practices/review-and-safe-push",
+  "best-practices/atomic-commits",
+  "workflows/fetch-vs-pull",
+  "workflows/feature-branch-collaboration",
+  "workflows/multi-person-sync-routine",
+  "workflows/sync-before-review",
+  "workflows/release-branch-workflow",
+  "workflows/hotfix-and-urgent-fixes",
+  "internals/object-database",
+  "internals/index-and-working-tree",
+  "internals/refs-and-head",
+  "internals/commit-graph",
+  "internals/remote-tracking-refs",
+  "recovery/reflog-recovery",
+  "recovery/recover-after-reset",
+  "recovery/recover-after-rebase",
+  "recovery/detached-head-rescue",
+  "recovery/undo-after-pull",
+  "concepts/git-history",
+]);
+
+const recommendedDocPaths = new Set<DocPath>([
+  "commands/git-diff",
+  "commands/git-show",
+  "commands/git-remote",
+  "commands/git-tag",
+  "commands/git-checkout",
+  "commands/git-clean",
+  "commands/git-bisect",
+  "commands/git-blame",
+  "commands/git-worktree",
+  "commands/git-submodule",
+  "best-practices/topic-branches",
+  "best-practices/pull-request-prep",
+  "best-practices/conflict-resolution-routine",
+  "best-practices/branch-naming",
+  "workflows/prepare-commits-before-pull-request",
+  "workflows/ai-agent-worktree-mode",
+  "workflows/hotfix-rollback-after-release",
+  "workflows/backport-with-cherry-pick",
+  "workflows/shared-branch-sync-boundaries",
+  "workflows/submodule-update-flow",
+  "internals/merge-base-and-ancestry",
+  "internals/reachability-and-garbage-collection",
+  "internals/packfiles-and-storage",
+  "recovery/recover-deleted-branch",
+  "recovery/assess-force-push-impact",
+]);
+
+const tierRank: Record<DocTier, number> = {
+  core: 0,
+  recommended: 1,
+  extended: 2,
+};
+
+const sectionSearchSuggestionDefaults: Partial<
+  Record<DocSection, { prerequisite?: DocPath; risk?: DocPath }>
+> = {
+  commands: {
+    prerequisite: "internals/index-and-working-tree",
+    risk: "recovery/reflog-recovery",
+  },
+  workflows: {
+    prerequisite: "learning-path/sync-with-remote",
+    risk: "best-practices/shared-history-boundaries",
+  },
+  internals: {
+    prerequisite: "concepts/git-history",
+    risk: "recovery/reflog-recovery",
+  },
+  recovery: {
+    prerequisite: "commands/git-reflog",
+    risk: "best-practices/shared-history-boundaries",
+  },
+};
+
+const searchSuggestionOverrides: Partial<
+  Record<DocPath, { prerequisite?: DocPath; risk?: DocPath }>
+> = {
+  "commands/git-rebase": {
+    prerequisite: "internals/commit-graph",
+    risk: "recovery/recover-after-rebase",
+  },
+  "commands/git-reset": {
+    prerequisite: "internals/index-and-working-tree",
+    risk: "recovery/recover-after-reset",
+  },
+  "commands/git-reflog": {
+    prerequisite: "internals/refs-and-head",
+    risk: "recovery/reflog-recovery",
+  },
+  "commands/git-cherry-pick": {
+    prerequisite: "internals/commit-graph",
+    risk: "workflows/backport-with-cherry-pick",
+  },
+  "commands/git-merge": {
+    prerequisite: "internals/commit-graph",
+    risk: "workflows/pr-merge-strategy-and-platform-settings",
+  },
+  "commands/git-stash": {
+    prerequisite: "internals/index-and-working-tree",
+    risk: "recovery/detached-head-rescue",
+  },
+  "commands/git-pull": {
+    prerequisite: "workflows/fetch-vs-pull",
+    risk: "recovery/undo-after-pull",
+  },
+  "internals/refs-and-head": {
+    prerequisite: "concepts/git-history",
+    risk: "recovery/detached-head-rescue",
+  },
+  "internals/index-and-working-tree": {
+    prerequisite: "commands/git-status",
+    risk: "commands/git-reset",
+  },
+  "internals/commit-graph": {
+    prerequisite: "concepts/git-history",
+    risk: "commands/git-rebase",
+  },
 };
 
 const primerDefaults: Record<Locale, Record<DocSection, DocPrimerSeed>> = {
@@ -681,6 +842,7 @@ function toDocCard(locale: Locale, doc: Awaited<ReturnType<typeof getDocByPath>>
     href: getDocHref(locale, doc.path),
     path: doc.path,
     section: doc.metadata.section,
+    tier: getDocTier(doc.path),
     slug: doc.metadata.slug,
     title: doc.metadata.title,
     summary: doc.metadata.summary,
@@ -692,6 +854,7 @@ function toIndexedDocCard(locale: Locale, doc: IndexedDoc): DocCard {
     href: getDocHref(locale, doc.path),
     path: doc.path,
     section: doc.metadata.section,
+    tier: getDocTier(doc.path),
     slug: doc.metadata.slug,
     title: doc.metadata.title,
     summary: doc.metadata.summary,
@@ -707,13 +870,16 @@ function getOrderedPathSeries(section: DocSection): DocPath[] {
     case "workflows":
       return workflowSlugs.map((slug) => `workflows/${slug}` as DocPath);
     case "internals":
-      return internalsSlugs.map((slug) => `internals/${slug}` as DocPath);
+      return [
+        "concepts/git-history",
+        ...internalsSlugs.map((slug) => `internals/${slug}` as DocPath),
+      ];
     case "learning-path":
       return learningPathSlugs.map((slug) => `learning-path/${slug}` as DocPath);
     case "recovery":
       return recoverySlugs.map((slug) => `recovery/${slug}` as DocPath);
     case "concepts":
-      return ["concepts/git-history"];
+      return [];
     default:
       return [];
   }
@@ -734,6 +900,15 @@ function sortBySeriesOrder<T extends { path: DocPath }>(docs: T[]) {
 
   return [...docs].sort(
     (a, b) => (order.get(a.path) ?? Number.MAX_SAFE_INTEGER) - (order.get(b.path) ?? Number.MAX_SAFE_INTEGER),
+  );
+}
+
+function sortByTierAndSeriesOrder<T extends { path: DocPath }>(docs: T[]) {
+  const ordered = sortBySeriesOrder(docs);
+  return [...ordered].sort(
+    (a, b) =>
+      tierRank[getDocTier(a.path)] - tierRank[getDocTier(b.path)] ||
+      ordered.findIndex((doc) => doc.path === a.path) - ordered.findIndex((doc) => doc.path === b.path),
   );
 }
 
@@ -759,7 +934,7 @@ export async function getLearningPathDocs(locale: Locale) {
 
 export async function getInternalsDocs(locale: Locale) {
   const docs = await getIndexedDocs(locale);
-  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("internals/")));
+  return sortBySeriesOrder(docs.filter((doc) => doc.metadata.section === "internals"));
 }
 
 export async function getRecoveryDocs(locale: Locale) {
@@ -801,14 +976,17 @@ export function getDocHref(locale: Locale, docPath: DocPath) {
 
 export async function getSearchDocs(locale: Locale): Promise<SearchDoc[]> {
   const docs = await getIndexedDocs(locale);
+  const metadataByPath = new Map(docs.map((doc) => [doc.path, doc.metadata]));
 
   return docs.map((doc) => ({
     href: getDocHref(locale, doc.path),
     path: doc.path,
     section: doc.metadata.section,
+    tier: getDocTier(doc.path),
     slug: doc.metadata.slug,
     title: doc.metadata.title,
     summary: doc.metadata.summary,
+    suggestions: buildSearchSuggestions(locale, doc.path, metadataByPath),
   }));
 }
 
@@ -888,6 +1066,11 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
     "commands/git-worktree",
     "commands/git-switch",
     "workflows/hotfix-and-urgent-fixes",
+  ],
+  "workflows/ai-agent-worktree-mode": [
+    "workflows/parallel-work-with-worktree",
+    "commands/git-worktree",
+    "workflows/prepare-commits-before-pull-request",
   ],
   "workflows/multi-person-sync-routine": [
     "commands/git-fetch",
@@ -1057,7 +1240,7 @@ export async function getFeaturedSectionDocs(
             ? await getInternalsDocs(locale)
             : await getRecoveryDocs(locale);
 
-  return docs.slice(0, limit).map((doc) => toIndexedDocCard(locale, doc));
+  return sortByTierAndSeriesOrder(docs).slice(0, limit).map((doc) => toIndexedDocCard(locale, doc));
 }
 
 export async function getRepresentativeSectionDocs(
@@ -1124,4 +1307,65 @@ export function getDocPrimer(locale: Locale, docPath: DocPath): DocPrimer {
     prerequisites: Array.from(override?.prerequisites ?? defaults.prerequisites),
     risks: Array.from(override?.risks ?? defaults.risks),
   };
+}
+
+export function getDocTier(docPath: DocPath): DocTier {
+  if (coreDocPaths.has(docPath)) {
+    return "core";
+  }
+
+  if (recommendedDocPaths.has(docPath)) {
+    return "recommended";
+  }
+
+  return "extended";
+}
+
+function buildSearchSuggestions(
+  locale: Locale,
+  docPath: DocPath,
+  metadataByPath: Map<DocPath, DocMetadata>,
+) {
+  const section = docPath.split("/")[0] as DocSection;
+  const primer = getDocPrimer(locale, docPath);
+  const override = searchSuggestionOverrides[docPath];
+  const defaults = sectionSearchSuggestionDefaults[section];
+  const prerequisitePath = override?.prerequisite ?? defaults?.prerequisite;
+  const riskPath = override?.risk ?? defaults?.risk;
+
+  const suggestions: SearchDoc["suggestions"] = [];
+
+  if (prerequisitePath) {
+    const metadata = metadataByPath.get(prerequisitePath);
+    if (metadata) {
+      suggestions.push({
+        type: "prerequisite",
+        title: metadata.title,
+        href: getDocHref(locale, prerequisitePath),
+      });
+    }
+  } else if (primer.prerequisites[0]) {
+    suggestions.push({
+      type: "prerequisite",
+      title: primer.prerequisites[0],
+    });
+  }
+
+  if (riskPath) {
+    const metadata = metadataByPath.get(riskPath);
+    if (metadata) {
+      suggestions.push({
+        type: "risk",
+        title: metadata.title,
+        href: getDocHref(locale, riskPath),
+      });
+    }
+  } else if (primer.risks[0]) {
+    suggestions.push({
+      type: "risk",
+      title: primer.risks[0],
+    });
+  }
+
+  return suggestions.slice(0, 2);
 }

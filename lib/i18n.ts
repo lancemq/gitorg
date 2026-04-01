@@ -90,6 +90,7 @@ export type WorkflowSlug =
   | "multi-person-sync-routine"
   | "prepare-commits-before-pull-request"
   | "parallel-work-with-worktree"
+  | "ai-agent-worktree-mode"
   | "monorepo-sparse-checkout-workflow"
   | "rerere-for-recurring-conflicts"
   | "shared-branch-sync-boundaries"
@@ -574,6 +575,7 @@ export const workflowSlugs = [
   "multi-person-sync-routine",
   "prepare-commits-before-pull-request",
   "parallel-work-with-worktree",
+  "ai-agent-worktree-mode",
   "monorepo-sparse-checkout-workflow",
   "rerere-for-recurring-conflicts",
   "shared-branch-sync-boundaries",

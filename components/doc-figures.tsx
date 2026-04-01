@@ -428,3 +428,240 @@ export function CommandFlowFigure({
     </FigureFrame>
   );
 }
+
+type CommitGraphFigureProps = {
+  title: string;
+  caption: string;
+  linearLabel: string;
+  mergeLabel: string;
+  rewriteLabel: string;
+  pointerLabel: string;
+};
+
+export function CommitGraphFigure({
+  title,
+  caption,
+  linearLabel,
+  mergeLabel,
+  rewriteLabel,
+  pointerLabel,
+}: CommitGraphFigureProps) {
+  return (
+    <FigureFrame title={title} caption={caption}>
+      <div className="commit-graph-figure">
+        <section className="commit-graph-card">
+          <span className="commit-graph-label">{linearLabel}</span>
+          <div className="commit-graph-track">
+            <span className="history-node">A</span>
+            <span className="history-node">B</span>
+            <span className="history-node">C</span>
+            <span className="history-node">D</span>
+          </div>
+          <div className="commit-graph-pointer-row">
+            <span className="commit-graph-pointer">{pointerLabel}: main</span>
+          </div>
+        </section>
+
+        <section className="commit-graph-card">
+          <span className="commit-graph-label">{mergeLabel}</span>
+          <div className="commit-graph-merge">
+            <div className="commit-graph-track">
+              <span className="history-node">A</span>
+              <span className="history-node">B</span>
+              <span className="history-node">C</span>
+              <span className="history-node history-node-accent">M</span>
+            </div>
+            <div className="commit-graph-branch">
+              <span className="history-node">B</span>
+              <span className="history-node">E</span>
+              <span className="history-node">F</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="commit-graph-card">
+          <span className="commit-graph-label">{rewriteLabel}</span>
+          <div className="commit-graph-track">
+            <span className="history-node">A</span>
+            <span className="history-node">B</span>
+            <span className="history-node">C</span>
+            <span className="history-node history-node-accent">E&#39;</span>
+            <span className="history-node history-node-accent">F&#39;</span>
+          </div>
+          <div className="commit-graph-pointer-row">
+            <span className="commit-graph-pointer">{pointerLabel}: feature</span>
+          </div>
+        </section>
+      </div>
+    </FigureFrame>
+  );
+}
+
+type RefsHeadFigureProps = {
+  title: string;
+  caption: string;
+  headLabel: string;
+  branchLabel: string;
+  tagLabel: string;
+  remoteLabel: string;
+  detachedLabel: string;
+};
+
+export function RefsHeadFigure({
+  title,
+  caption,
+  headLabel,
+  branchLabel,
+  tagLabel,
+  remoteLabel,
+  detachedLabel,
+}: RefsHeadFigureProps) {
+  return (
+    <FigureFrame title={title} caption={caption}>
+      <div className="refs-figure">
+        <div className="refs-column">
+          <span className="refs-column-label">{headLabel}</span>
+          <div className="refs-pill refs-pill-accent">HEAD -&gt; refs/heads/feature/login</div>
+          <div className="refs-pill">{branchLabel}: feature/login -&gt; F</div>
+          <div className="refs-pill">{remoteLabel}: origin/main -&gt; D</div>
+          <div className="refs-pill">{tagLabel}: v2.0.0 -&gt; D</div>
+        </div>
+        <div className="refs-divider" aria-hidden="true">
+          →
+        </div>
+        <div className="refs-column">
+          <span className="refs-column-label">{detachedLabel}</span>
+          <div className="refs-pill refs-pill-warning">HEAD -&gt; F</div>
+          <div className="refs-track">
+            <span className="history-node">D</span>
+            <span className="history-node history-node-accent">F</span>
+            <span className="history-node">G</span>
+          </div>
+        </div>
+      </div>
+    </FigureFrame>
+  );
+}
+
+type ThreeLayersFigureProps = {
+  title: string;
+  caption: string;
+  worktreeLabel: string;
+  indexLabel: string;
+  objectsLabel: string;
+  addLabel: string;
+  commitLabel: string;
+  restoreLabel: string;
+};
+
+export function ThreeLayersFigure({
+  title,
+  caption,
+  worktreeLabel,
+  indexLabel,
+  objectsLabel,
+  addLabel,
+  commitLabel,
+  restoreLabel,
+}: ThreeLayersFigureProps) {
+  return (
+    <FigureFrame title={title} caption={caption}>
+      <div className="layers-figure">
+        <section className="layers-card">
+          <span className="layers-card-label">{worktreeLabel}</span>
+          <strong>checkout.ts</strong>
+          <span>edited and visible on disk</span>
+        </section>
+        <div className="layers-arrow-stack" aria-hidden="true">
+          <span>{addLabel}</span>
+          <div className="layers-arrow" />
+          <span>{restoreLabel}</span>
+        </div>
+        <section className="layers-card">
+          <span className="layers-card-label">{indexLabel}</span>
+          <strong>next snapshot</strong>
+          <span>staged content for the next commit</span>
+        </section>
+        <div className="layers-arrow-stack" aria-hidden="true">
+          <span>{commitLabel}</span>
+          <div className="layers-arrow" />
+        </div>
+        <section className="layers-card layers-card-accent">
+          <span className="layers-card-label">{objectsLabel}</span>
+          <strong>blob / tree / commit</strong>
+          <span>durable history recorded by Git</span>
+        </section>
+      </div>
+    </FigureFrame>
+  );
+}
+
+type PracticeLabProps = {
+  title: string;
+  intro: string;
+  setupLabel: string;
+  setup: string;
+  stepsLabel: string;
+  steps: string;
+  outcomesLabel: string;
+  outcomes: string;
+  mistakesLabel: string;
+  mistakes: string;
+};
+
+export function PracticeLab({
+  title,
+  intro,
+  setupLabel,
+  setup,
+  stepsLabel,
+  steps,
+  outcomesLabel,
+  outcomes,
+  mistakesLabel,
+  mistakes,
+}: PracticeLabProps) {
+  const stepItems = splitItems(steps);
+  const outcomeItems = splitItems(outcomes);
+  const mistakeItems = splitItems(mistakes);
+
+  return (
+    <section className="practice-lab">
+      <header className="practice-lab-header">
+        <strong>{title}</strong>
+        <p>{intro}</p>
+      </header>
+
+      <div className="practice-lab-grid">
+        <section className="practice-lab-card">
+          <span className="practice-lab-label">{setupLabel}</span>
+          <pre>{setup}</pre>
+          <span className="practice-lab-label">{stepsLabel}</span>
+          <ol>
+            {stepItems.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ol>
+        </section>
+
+        <section className="practice-lab-card">
+          <span className="practice-lab-label">{outcomesLabel}</span>
+          <ul>
+            {outcomeItems.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="practice-lab-card practice-lab-card-warning">
+          <span className="practice-lab-label">{mistakesLabel}</span>
+          <ul>
+            {mistakeItems.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </section>
+      </div>
+    </section>
+  );
+}

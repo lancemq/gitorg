@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import type { DocCard, DocNeighbors } from "@/lib/content";
+import type { DocCard, DocNeighbors, DocTier } from "@/lib/content";
 
 type DocSupportProps = {
   locale: "zh" | "en";
@@ -43,6 +43,14 @@ const labels = {
   },
 } as const;
 
+function getTierLabel(locale: "zh" | "en", tier: DocTier) {
+  if (locale === "zh") {
+    return tier === "core" ? "核心" : tier === "recommended" ? "推荐" : "延伸";
+  }
+
+  return tier === "core" ? "Core" : tier === "recommended" ? "Recommended" : "Extended";
+}
+
 function getSectionLabel(locale: "zh" | "en", section: DocCard["section"]) {
   const copy = labels[locale];
 
@@ -83,7 +91,10 @@ export function DocSupport({ locale, relatedDocs, neighbors }: DocSupportProps) 
           <div className="doc-related-grid">
             {relatedDocs.map((doc) => (
               <Link className="doc-related-card" href={doc.href} key={doc.href}>
-                <span className="doc-related-tag">{getSectionLabel(locale, doc.section)}</span>
+                <div className="doc-related-tags">
+                  <span className="doc-related-tag">{getSectionLabel(locale, doc.section)}</span>
+                  <span className={`doc-tier-badge doc-tier-${doc.tier}`}>{getTierLabel(locale, doc.tier)}</span>
+                </div>
                 <strong className="doc-related-title">{doc.title}</strong>
                 <span className="doc-related-arrow" aria-hidden="true">
                   →

@@ -1,4 +1,4 @@
-# Git Org Academy 后续路线图
+# GitOrg Atlas 后续路线图
 
 ## 1. 当前阶段判断
 

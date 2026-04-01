@@ -296,6 +296,43 @@ kbd {
   line-height: 1.55;
 }
 
+.search-result-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.search-suggestion {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+
+.search-suggestion em {
+  font-style: normal;
+  color: var(--text);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.search-suggestion-prerequisite {
+  background: rgba(241, 244, 255, 0.92);
+}
+
+.search-suggestion-risk {
+  background: rgba(255, 245, 236, 0.95);
+}
+
 .search-result-copy mark {
   padding: 0 2px;
   border-radius: 4px;
@@ -310,6 +347,23 @@ kbd {
   background: var(--surface-muted);
   color: var(--text-muted);
   font-size: 12px;
+}
+
+.search-result-tier {
+  background: rgba(255, 247, 238, 0.95);
+}
+
+.search-result-tier-core {
+  background: rgba(255, 239, 224, 0.98);
+  color: #8d4c00;
+}
+
+.search-result-tier-recommended {
+  background: rgba(241, 244, 255, 0.96);
+}
+
+.search-result-tier-extended {
+  background: rgba(245, 245, 242, 0.96);
 }
 
 .search-empty {
@@ -1498,6 +1552,43 @@ h3 {
   text-transform: uppercase;
 }
 
+.doc-related-tags,
+.channel-highlight-kickers {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.doc-tier-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  background: rgba(245, 245, 242, 0.96);
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.doc-tier-core {
+  border-color: rgba(255, 132, 0, 0.18);
+  background: rgba(255, 132, 0, 0.1);
+  color: #8d4c00;
+}
+
+.doc-tier-recommended {
+  background: rgba(241, 244, 255, 0.96);
+}
+
+.doc-tier-extended {
+  background: rgba(245, 245, 242, 0.96);
+}
+
 .doc-related-title {
   min-width: 0;
   font-size: 0.8rem;
@@ -1940,6 +2031,206 @@ h3 {
   line-height: 1.7;
 }
 
+.commit-graph-figure {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.commit-graph-card,
+.refs-column,
+.layers-card,
+.practice-lab-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #fff;
+}
+
+.commit-graph-label,
+.refs-column-label,
+.layers-card-label,
+.practice-lab-label {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.commit-graph-track,
+.commit-graph-branch,
+.refs-track {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.commit-graph-merge {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.commit-graph-branch {
+  padding-left: 22px;
+}
+
+.commit-graph-pointer-row {
+  display: flex;
+}
+
+.commit-graph-pointer,
+.refs-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-muted);
+  font-size: 0.8rem;
+}
+
+.refs-figure {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+}
+
+.refs-divider {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: var(--surface-muted);
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.refs-pill-accent {
+  border-color: rgba(255, 132, 0, 0.24);
+  background: rgba(255, 132, 0, 0.1);
+  color: #8d4c00;
+}
+
+.refs-pill-warning {
+  border-color: rgba(180, 64, 32, 0.18);
+  background: rgba(180, 64, 32, 0.08);
+  color: #8c3c2a;
+}
+
+.layers-figure {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.layers-card strong {
+  font-size: 0.92rem;
+}
+
+.layers-card span:last-child {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.layers-card-accent {
+  border-color: rgba(255, 132, 0, 0.24);
+  background: rgba(255, 132, 0, 0.08);
+}
+
+.layers-arrow-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.layers-arrow {
+  width: 36px;
+  height: 2px;
+  background: var(--border);
+  position: relative;
+}
+
+.layers-arrow::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  right: -1px;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 8px solid var(--border);
+}
+
+.practice-lab {
+  margin: 1.6rem 0;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 250, 244, 0.95), rgba(255, 255, 255, 0.98));
+}
+
+.practice-lab-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.practice-lab-header strong {
+  font-size: 0.95rem;
+}
+
+.practice-lab-header p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.practice-lab-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.practice-lab-card pre {
+  margin: 0;
+  overflow-x: auto;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid #e6e8ef;
+  background: #f6f7fb;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.practice-lab-card ol,
+.practice-lab-card ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text-muted);
+  line-height: 1.75;
+}
+
+.practice-lab-card-warning {
+  background: rgba(255, 245, 236, 0.9);
+}
+
 .mdx-content code {
   font-size: 0.95em;
 }
@@ -2124,17 +2415,26 @@ h3 {
 
   .history-figure,
   .stash-figure,
-  .command-flow-figure {
+  .command-flow-figure,
+  .refs-figure,
+  .layers-figure {
     grid-template-columns: 1fr;
   }
 
   .history-arrow,
   .stash-arrow-group,
-  .command-flow-center {
+  .command-flow-center,
+  .refs-divider,
+  .layers-arrow-stack {
     justify-self: start;
   }
 
   .reset-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .commit-graph-figure,
+  .practice-lab-grid {
     grid-template-columns: 1fr;
   }
 }

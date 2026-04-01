@@ -146,6 +146,21 @@ git merge --abort
 - 一旦不确定，就先建一个备份分支，让自己保留“能回去”的选项。
 - 遇到冲突时不要只盯着当前文件，要先确认这次 merge 到底想保留哪一侧的历史语义。
 
+## 跟着做一遍
+
+<PracticeLab
+  title="练习：区分 fast-forward 和 merge commit"
+  intro="这组练习最值钱的地方，是让你看到 merge 不只是“把代码拼起来”，而是在表达历史如何汇合。"
+  setupLabel="准备环境"
+  setup={`git switch -c lab/merge-demo\n# 从 main 切出 feature 并各自提交一次`}
+  stepsLabel="跟着做"
+  steps="先在没有分叉的情况下执行一次 `git merge --ff-only`。|再制造 main 和 feature 同时前进的分叉。|执行 `git merge feature/demo` 并用 `git log --oneline --graph --decorate -8` 观察汇合点。"
+  outcomesLabel="结果会怎样"
+  outcomes="没分叉时只会移动分支指针。|分叉后会出现一个新的 merge commit。|历史图会明确保留两条线在某处汇合。"
+  mistakesLabel="常见错误判断"
+  mistakes="如果你以为 merge commit 一定是“脏历史”，往往忽略了它保留协作过程的价值。|遇到冲突时不要只问“哪个文件该保留”，还要问“这次整合想保留哪种历史关系”。|如果团队已经要求线性历史，就要先确认平台合并策略。"
+/>
+
 
 ## 继续学习建议
 

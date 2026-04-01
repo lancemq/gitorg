@@ -105,6 +105,42 @@ const noResultHintTitles = {
   en: "No exact matches",
 };
 
+const searchSuggestionLabels = {
+  zh: {
+    prerequisite: "先读",
+    risk: "注意",
+  },
+  en: {
+    prerequisite: "Start with",
+    risk: "Watch",
+  },
+};
+
+const tierLabels = {
+  zh: {
+    core: "核心",
+    recommended: "推荐",
+    extended: "延伸",
+  },
+  en: {
+    core: "Core",
+    recommended: "Recommended",
+    extended: "Extended",
+  },
+} as const;
+
+const tierScoreBonus: Record<SearchDoc["tier"], number> = {
+  core: 5,
+  recommended: 2,
+  extended: 0,
+};
+
+const tierPriority: Record<SearchDoc["tier"], number> = {
+  core: 0,
+  recommended: 1,
+  extended: 2,
+};
+
 const searchSynonyms: Record<Locale, Record<string, string[]>> = {
   zh: {
     撤销: ["reset", "revert", "restore"],
@@ -237,7 +273,8 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
           (directTitleHit ? 6 : 0) +
           (directSlugHit ? 4 : 0) +
           (directPathHit ? 3 : 0) +
-          (directSummaryHit ? 2 : 0);
+          (directSummaryHit ? 2 : 0) +
+          tierScoreBonus[item.tier];
 
         return { ...item, score };
       })
@@ -255,7 +292,11 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
   );
   const quickLinkItems = useMemo(() => {
     return sectionOrder
-      .map((section) => items.find((item) => item.section === section))
+      .map((section) =>
+        items
+          .filter((item) => item.section === section)
+          .sort((a, b) => tierPriority[a.tier] - tierPriority[b.tier])[0],
+      )
       .filter((item): item is SearchDoc => Boolean(item))
       .filter((item) => !recentItems.some((recentItem) => recentItem.href === item.href))
       .slice(0, 6);
@@ -554,9 +595,22 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
                           <div className="search-result-copy">
                             <strong>{renderHighlightedText(item.title)}</strong>
                             <p>{renderHighlightedText(item.summary)}</p>
+                            {item.suggestions.length > 0 ? (
+                              <div className="search-result-suggestions">
+                                {item.suggestions.map((suggestion) => (
+                                  <span className={`search-suggestion search-suggestion-${suggestion.type}`} key={`${item.href}-${suggestion.type}-${suggestion.title}`}>
+                                    <em>{searchSuggestionLabels[locale][suggestion.type]}</em>
+                                    <span>{suggestion.title}</span>
+                                  </span>
+                                ))}
+                              </div>
+                            ) : null}
                           </div>
                           <span className="search-result-tag">
                             {sectionLabels[locale][item.section]}
+                          </span>
+                          <span className={`search-result-tag search-result-tier search-result-tier-${item.tier}`}>
+                            {tierLabels[locale][item.tier]}
                           </span>
                         </Link>
                       ))}
@@ -586,9 +640,22 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
                             <div className="search-result-copy">
                               <strong>{item.title}</strong>
                               <p>{item.summary}</p>
+                              {item.suggestions.length > 0 ? (
+                                <div className="search-result-suggestions">
+                                  {item.suggestions.map((suggestion) => (
+                                    <span className={`search-suggestion search-suggestion-${suggestion.type}`} key={`${item.href}-${suggestion.type}-${suggestion.title}`}>
+                                      <em>{searchSuggestionLabels[locale][suggestion.type]}</em>
+                                      <span>{suggestion.title}</span>
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : null}
                             </div>
                             <span className="search-result-tag">
                               {sectionLabels[locale][item.section]}
+                            </span>
+                            <span className={`search-result-tag search-result-tier search-result-tier-${item.tier}`}>
+                              {tierLabels[locale][item.tier]}
                             </span>
                           </Link>
                         ))}

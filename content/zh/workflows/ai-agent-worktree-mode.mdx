@@ -1,0 +1,224 @@
+export const metadata = {
+  title: "AI Coding Agent 下的 git worktree 模式",
+  slug: "ai-agent-worktree-mode",
+  locale: "zh",
+  section: "workflows",
+  summary: "把 git worktree 变成 AI coding agent 的默认并行工作模式，减少上下文污染、提升回滚安全性，并让多任务协作更清晰。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-worktree",
+    "https://git-scm.com/docs/git-switch",
+    "https://git-scm.com/book/en/v2/Git-Tools-Advanced-Merging",
+  ],
+};
+
+# AI Coding Agent 下的 git worktree 模式
+
+## 这个专题解决什么问题
+
+当你开始用 AI coding agent 真正写代码时，问题往往不再是“会不会切分支”，而是：
+
+- 一个 agent 正在改功能，另一个任务突然要求修 hotfix
+- 你想让 agent 评审另一个分支，但不想污染当前工作区
+- 你需要并行跑实验改动、回归验证、文档整理
+- 你希望每个任务都有自己独立目录、独立上下文、独立恢复路径
+
+这时只靠 `stash + switch` 往往越来越脆弱。`git worktree` 更适合作为 AI coding agent 的默认并行模式，因为它让“同一仓库、多个任务上下文”天然分开。
+
+## 为什么 worktree 特别适合 AI agent
+
+AI agent 和人类开发者的差异之一，是它会更频繁地：
+
+- 同时推进多个子任务
+- 在不同目标之间快速切换
+- 写完代码后立即进入验证、回滚、比较、补丁整理
+
+如果所有任务都挤在一个工作目录里，会很快出现这些问题：
+
+- 当前未提交改动阻塞分支切换
+- agent 不得不反复 stash / pop
+- 回头复盘时，很难说清哪个改动属于哪个任务
+- 一旦误操作，恢复边界不清楚
+
+而 worktree 模式的优势是：
+
+1. 每个任务一个目录，天然隔离上下文
+2. 同一对象库共享历史，不需要重复 clone 全仓
+3. 可以把“实现”“验证”“评审”“热修”拆成平行工作区
+4. 任务结束后直接清理 worktree，不必把临时现场堆在 stash 里
+
+## 最适合的几个场景
+
+### 1. 一个主任务 + 一个紧急修复
+
+主 worktree 继续让 agent 写功能，另一个 worktree 专门给 hotfix。
+
+### 2. 一个实现 worktree + 一个验证 worktree
+
+让 agent 在主目录改代码，同时在第二个 worktree 里跑回归、对比 `main`、复现 bug。
+
+### 3. 一个功能 worktree + 一个 PR 整理 worktree
+
+当你需要整理提交、压缩历史、补文档时，不必在当前开发目录里来回改上下文。
+
+### 4. 多 agent 并行
+
+不同 agent 分别绑定不同 worktree，比共享一个目录稳定得多。这样每个 agent 的文件改动、分支状态和实验结果都更可控。
+
+## 一个推荐的最小模式
+
+### 主目录：主任务
+
+```bash
+git status
+git branch -vv
+```
+
+### 新开目录：给 AI agent 的并行任务
+
+```bash
+git worktree add ../repo-review review/fix-copy
+```
+
+或者：
+
+```bash
+git worktree add ../repo-hotfix hotfix/login-timeout
+```
+
+此时你就可以明确指定：
+
+- 主目录给“实现 agent”
+- `../repo-review` 给“验证 / review agent”
+- `../repo-hotfix` 给“紧急修复 agent”
+
+## 在 AI agent 协作里最重要的规则
+
+### 规则 1：一个 worktree 只服务一个清晰任务
+
+不要让一个 agent 在同一个 worktree 里同时做功能开发、热修和提交流程整理。
+
+### 规则 2：把 worktree 名字写成任务语义
+
+比如：
+
+```bash
+git worktree add ../repo-agent-rebase-lab lab/rebase-cleanup
+git worktree add ../repo-agent-hotfix hotfix/login-timeout
+git worktree add ../repo-agent-review review/cart-empty-state
+```
+
+目录名和分支名都应带任务语义，后面复盘才不会混。
+
+### 规则 3：高风险历史操作优先放到独立 worktree
+
+像这些动作：
+
+- `rebase`
+- `reset`
+- `cherry-pick`
+- `range-diff`
+- 发布前整理提交
+
+都更适合放到独立 worktree 里做。这样即使做错了，也不会把当前主工作区一起带乱。
+
+### 规则 4：验证和实现分开
+
+如果 agent 一边改代码、一边就在同目录切回去验证，很容易把验证环境也搅乱。分成两个 worktree 通常更稳。
+
+## 和 stash 模式相比，worktree 模式好在哪里
+
+`stash` 更适合：
+
+- 短时间暂停
+- 很快要回来继续
+- 只是临时把现场放一放
+
+`worktree` 更适合：
+
+- 并行任务持续几十分钟到几小时
+- 需要多个稳定上下文
+- 需要把实现、验证、评审、修复拆开
+- 希望 AI agent 的任务边界非常清晰
+
+一句话说，`stash` 更像“短暂停车位”，`worktree` 更像“多个正式工位”。
+
+## 多 agent 下的推荐操作顺序
+
+1. 先定义任务边界
+2. 再决定每个任务是否单独给一个 worktree
+3. 给每个 worktree 配清晰的目录名和分支名
+4. 明确哪个 worktree 负责实现，哪个负责验证
+5. 任务完成后及时 remove，不要长期堆积
+
+## 一个典型团队用法
+
+假设你让 3 个 agent 并行：
+
+- Agent A：继续开发 `feature/copilot-sidebar`
+- Agent B：验证 `main` 上最近一个 UI 回归
+- Agent C：处理线上 hotfix
+
+更稳的做法是：
+
+```bash
+git worktree add ../repo-agent-a feature/copilot-sidebar
+git worktree add ../repo-agent-b review/ui-regression
+git worktree add ../repo-agent-c hotfix/header-overlap
+```
+
+这样每个 agent 都在自己目录里工作。你回头看 `git status`、看 diff、做 commit、关任务，都会更清楚。
+
+## 常见误区
+
+### 误区 1：AI agent 反正快，混在一个目录里也没关系
+
+恰恰相反。agent 越快，越需要上下文边界明确，否则一次误切换就会把多个任务状态混在一起。
+
+### 误区 2：worktree 只是高级技巧，不适合日常
+
+对于多任务、AI 辅助、高频切换的团队，worktree 反而应该成为日常默认选项之一。
+
+### 误区 3：worktree 只是为了避免 stash
+
+不止。更大的价值是让任务、目录、分支和恢复路径都变得显式。
+
+## 什么时候不一定要用
+
+- 当前工作区本来就很干净
+- 只是做一个 2 分钟的小切换
+- 你确认不会需要并行上下文
+
+这时普通 `git switch` 依然足够。
+
+## 一组很适合 agent 协作的命令
+
+```bash
+git worktree list
+git worktree add ../repo-agent-review review/fix-copy
+git worktree add ../repo-agent-hotfix hotfix/login-timeout
+git worktree remove ../repo-agent-review
+```
+
+## 练习建议
+
+<PracticeLab
+  title="练习：给实现、验证、热修各开一个 worktree"
+  intro="这个练习不是为了记命令，而是体会“一个任务一个目录”会让 AI agent 协作稳定多少。"
+  setupLabel="准备环境"
+  setup={`git status\n# 确认当前仓库正常\n# 假设你已经有 feature、review、hotfix 三类任务`}
+  stepsLabel="跟着做"
+  steps="先给主任务保留当前目录。|用 `git worktree add ../repo-agent-review review/fix-copy` 开一个验证目录。|再用 `git worktree add ../repo-agent-hotfix hotfix/login-timeout` 开一个热修目录。|分别进入目录执行 `git status` 和 `git branch -vv`，观察上下文如何被隔离。"
+  outcomesLabel="结果会怎样"
+  outcomes="你会拥有多个共享同一仓库对象库的独立工作目录。|每个目录都能绑定不同任务和分支。|主工作区不需要为了临时任务反复 stash 和切换。"
+  mistakesLabel="常见错误判断"
+  mistakes="不要把多个不相关任务继续塞进同一个 worktree。|不要忘记任务完成后清理不用的 worktree。|如果一个高风险历史整理动作会影响当前主目录，把它放到单独 worktree 更稳。"
+/>
+
+## 继续学习建议
+
+推荐继续阅读：
+
+1. `git worktree`
+2. `parallel work with worktree`
+3. `prepare commits before pull request`
+4. `hotfix and urgent fixes`

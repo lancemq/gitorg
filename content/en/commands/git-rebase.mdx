@@ -154,3 +154,17 @@ Anchor the old position before deciding whether to reset or replay work again.
 - When in doubt, create a backup branch before continuing so you preserve an obvious way back.
 - If the branch is already under review, CI, or someone else has based work on it, stop and check whether rewriting it is still safe.
 
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: rehearse a safe rebase on a throwaway branch"
+  intro="The goal is not just to remember the command. It is to watch the commit IDs change while the change content survives."
+  setupLabel="Setup"
+  setup={`git switch -c lab/rebase-demo\n# make two commits\n# switch to main and add one more commit`}
+  stepsLabel="Try it"
+  steps="Go back to the feature branch and run `git fetch`.|Run `git rebase origin/main` or rebase onto your updated local main.|Inspect the result with `git log --oneline --graph --decorate -6`."
+  outcomesLabel="What happens next"
+  outcomes="Your feature commits are replayed on top of the newer base.|The old commit IDs are replaced by new ones.|If no conflicts occur, the content usually survives while the history shape changes."
+  mistakesLabel="Common mistake checks"
+  mistakes="Do not rebase and force-push a branch that teammates already depend on without checking first.|If the rebase looks wrong midway through, stop and use `git rebase --abort` or `git reflog` instead of stacking more commands on top.|If your real goal is simple integration without history rewrite, merge may be the safer tool."
+/>

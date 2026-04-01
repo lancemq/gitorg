@@ -15,6 +15,16 @@ export const metadata = {
 
 提交对象是历史节点，而引用是指向这些节点的名字。HEAD 则表示你当前正站在哪个名字或哪个提交上。
 
+<RefsHeadFigure
+  title="HEAD、分支与引用的关系"
+  caption="正常状态下，HEAD 先指向当前分支名，再由分支名指向提交。只有在 detached HEAD 时，HEAD 才会直接落到某个提交对象上。"
+  headLabel="正常跟随分支"
+  branchLabel="本地分支"
+  tagLabel="标签"
+  remoteLabel="远端跟踪引用"
+  detachedLabel="detached HEAD"
+/>
+
 ## 1. 为什么“引用”比命令参数更值得先理解
 
 很多 Git 命令本质上都在做两件事：

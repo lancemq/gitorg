@@ -126,3 +126,17 @@ If your question is “Should I rewrite how my branch history is expressed?”, 
 - When in doubt, create a backup branch before continuing so you preserve an obvious way back.
 - During conflicts, do not only inspect files. Reconfirm which side of history the merge is supposed to preserve.
 
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: compare fast-forward with a merge commit"
+  intro="This is where merge stops being just a syntax choice and starts becoming a history-shape choice."
+  setupLabel="Setup"
+  setup={`git switch -c lab/merge-demo\n# create a feature branch and make one commit on each side`}
+  stepsLabel="Try it"
+  steps="First try `git merge --ff-only` when there is no divergence.|Then create divergence by adding commits on both main and feature.|Run `git merge feature/demo` and inspect the result with `git log --oneline --graph --decorate -8`."
+  outcomesLabel="What happens next"
+  outcomes="Without divergence, Git only moves the branch pointer forward.|With divergence, Git creates a new merge commit.|The graph explicitly records where two lines of work joined."
+  mistakesLabel="Common mistake checks"
+  mistakes="If you assume merge commits are automatically “messy,” you miss the value of preserving integration history.|During conflicts, ask which historical relationship you are trying to preserve, not only which file lines to keep.|If your platform enforces linear history, check that policy before choosing merge."
+/>

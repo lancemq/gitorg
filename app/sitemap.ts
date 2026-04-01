@@ -56,7 +56,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }))(),
       (async () => ({
         pathname: `/${locale}/history`,
-        lastModified: await getLatestDocLastModified(locale, "concepts"),
+        lastModified: await getDocLastModified(locale, "concepts/git-history"),
         changeFrequency: "monthly" as const,
         priority: 0.75,
       }))(),

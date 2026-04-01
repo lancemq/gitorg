@@ -154,3 +154,17 @@ Stash records a set of changes, but the surrounding code may have changed by the
 - When multiple directories or nested repositories are involved, validate the scope on a small example first.
 - Use `-u` or `-a` when you also need untracked or ignored files to travel with the stash entry.
 
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: apply first, then decide whether to drop"
+  intro="The fragile moment in stash is usually restore time, not save time. This drill turns the safer habit into a repeatable routine."
+  setupLabel="Setup"
+  setup={`git switch -c lab/stash-demo\n# edit one tracked file and create one untracked file`}
+  stepsLabel="Try it"
+  steps={`Run \`git stash push -u -m "wip: stash demo"\`.|Inspect the entry with \`git stash show -p stash@{0}\`.|Restore with \`git stash apply stash@{0}\` first, and only then decide whether to run \`git stash drop stash@{0}\`.`}
+  outcomesLabel="What happens next"
+  outcomes="You will see that untracked files only travel with stash when you use `-u`.|`apply` restores the work while keeping the stash entry as a safety net.|Dropping after inspection is more conservative than going straight to `pop`."
+  mistakesLabel="Common mistake checks"
+  mistakes="If the work will continue for hours or days, a branch is usually a better fit than a growing stash pile.|Do not jump to `pop` before checking what the stash actually contains.|A conflict during apply usually means the surrounding code changed, not that the stash is broken."
+/>
