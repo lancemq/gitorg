@@ -21,6 +21,8 @@ export const metadata = {
 - 基底落后导致的噪声冲突
 - 不必要的 merge 噪声
 
+评审前同步主线，本质上是在替 reviewer 先做一轮清理。
+
 ## 推荐流程
 
 ```bash
@@ -36,6 +38,14 @@ git fetch origin
 git merge origin/main
 ```
 
+## 为什么这套流程更稳
+
+因为它固定了一个关键顺序：
+
+1. 先更新你对主线的认知
+2. 再把主线变化整合进当前分支
+3. 最后重新检查 diff 是否还是你打算送审的那部分
+
 ## 关键检查点
 
 在真正发起评审前，至少确认：
@@ -44,9 +54,44 @@ git merge origin/main
 2. diff 范围仍然是你预期的那部分改动
 3. 最近几个提交没有明显噪声
 
+建议配合：
+
+```bash
+git branch -vv
+git diff --stat origin/main...
+git log --oneline --decorate -8
+```
+
 ## 这一步能帮 reviewer 省什么
 
 - 少看无关差异
 - 少处理已经过期的冲突上下文
 - 更容易聚焦真正的业务改动
 
+## 常见误区
+
+### 误区 1：等 reviewer 提出来再同步主线
+
+这会把本该自己解决的问题转嫁给 reviewer。
+
+### 误区 2：同步完主线后不再重新看 diff
+
+整合动作可能已经改变了 diff 结构，最好重新确认一次。
+
+### 误区 3：把评审前同步当成“顺手做一下”
+
+这一步其实是评审质量的一部分。
+
+## 特殊情况
+
+- 如果分支已经共享给多人，rebase 前先确认团队约定
+- 如果当前任务跨度很大，评审前同步可能暴露出“分支太大”的根本问题
+- 如果团队使用 squash merge，也仍然需要在评审前先控制 diff 噪声
+
+## 接下来建议继续学什么
+
+这一页之后，最适合继续看：
+
+1. `feature branch collaboration`
+2. `squash vs rebase merge`
+3. `fetch vs pull`

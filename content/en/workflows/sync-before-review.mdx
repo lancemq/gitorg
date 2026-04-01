@@ -36,9 +36,22 @@ git fetch origin
 git merge origin/main
 ```
 
+## Why this workflow is safer
+
+It fixes the order:
+
+1. update your view of main
+2. integrate main into your branch
+3. re-check whether the diff still matches the intended review scope
+
 ## What to confirm before review
 
 1. your branch includes the latest mainline state
 2. the diff still matches the intended scope
 3. the latest commits are clean enough for reviewers to follow
 
+## Common mistakes
+
+- waiting for reviewers to point out that the base is stale
+- syncing main but never re-checking the final diff
+- treating pre-review sync as optional cleanup instead of review preparation

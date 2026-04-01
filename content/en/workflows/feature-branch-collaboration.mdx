@@ -39,6 +39,19 @@ git rebase origin/main
 git log --oneline --decorate -5
 ```
 
+## A fuller day-to-day rhythm
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c feature/login-validation
+# work and commit
+git fetch origin
+git rebase origin/main
+git diff --stat origin/main...
+git push -u origin feature/login-validation
+```
+
 ## Why this workflow holds up well
 
 - branch boundaries stay clear
@@ -46,3 +59,23 @@ git log --oneline --decorate -5
 - rollback and cherry-pick stay easier
 - half-finished work does not leak into main
 
+## Key checks before review
+
+```bash
+git branch -vv
+git diff --stat origin/main...
+git log --oneline --decorate -8
+```
+
+Confirm:
+
+1. the branch is current enough
+2. the diff still matches the intended feature scope
+3. recent commits are understandable
+
+## Common mistakes
+
+- developing directly on main
+- letting the branch drift too far from main
+- opening review before cleaning noisy commits
+- mixing unrelated work into one feature branch

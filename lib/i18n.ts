@@ -87,6 +87,7 @@ export type BestPracticeSlug =
 export type WorkflowSlug =
   | "fetch-vs-pull"
   | "feature-branch-collaboration"
+  | "parallel-work-with-worktree"
   | "sync-before-review"
   | "hotfix-and-urgent-fixes"
   | "release-branch-workflow"
@@ -252,6 +253,12 @@ type Dictionary = {
     eyebrow: string;
     title: string;
     description: string;
+    groups: ReadonlyArray<{
+      id: string;
+      title: string;
+      description: string;
+      items: ReadonlyArray<FaqItem>;
+    }>;
   };
   docsIndex: {
     eyebrow: string;
@@ -527,6 +534,7 @@ export const bestPracticeSlugs = [
 export const workflowSlugs = [
   "fetch-vs-pull",
   "feature-branch-collaboration",
+  "parallel-work-with-worktree",
   "sync-before-review",
   "hotfix-and-urgent-fixes",
   "release-branch-workflow",
@@ -763,6 +771,104 @@ const zhDictionary: Dictionary = {
     eyebrow: "FAQ Library",
     title: "全部常见问题",
     description: "把首页里的高频问答整理成一页更完整的 Git FAQ，方便集中阅读和后续持续扩充。",
+    groups: [
+      {
+        id: "pull-sync",
+        title: "pull 与同步",
+        description: "围绕 fetch、pull、push 以及远端同步节奏，把最常见的理解偏差拆开说明。",
+        items: [
+          {
+            question: "`git pull` 到底做了什么，为什么结果有时和我预期不同？",
+            answer:
+              "`git pull` 会先执行 fetch，再把上游分支整合进当前分支。官方文档说明它可以走 `--ff-only`、`--rebase`、`--no-rebase` 或 `--squash` 等不同路径，所以结果取决于你的命令参数和 `pull.rebase`、`pull.ff` 等配置。想减少意外，最稳妥的习惯仍然是先 fetch，再明确决定是 merge 还是 rebase。",
+          },
+          {
+            question: "为什么我明明已经 pull 了，还是觉得本地和远端对不上？",
+            answer:
+              "因为 pull 解决的是“获取并整合上游变化”，但它不保证你对当前分支、跟踪关系和历史状态的理解一定正确。更稳的排查顺序通常是先看 `git branch -vv`，确认当前分支跟踪谁，再看 `git log --oneline --graph --decorate --all`，确认分叉位置。很多“pull 了还是不一样”的问题，本质上是站错了分支，或者在错误的远端关系上做了同步。",
+          },
+          {
+            question: "为什么 push 会失败，Git 说远端比我更新？",
+            answer:
+              "最常见的原因是远端分支已经有了你本地没有的新提交，Git 不允许你直接把历史覆盖掉。通常更稳的动作不是立刻强推，而是先 `git fetch origin`，再判断应该 merge、rebase，还是只是站错了分支。只有在你完全明确历史覆盖风险的情况下，才考虑 force push，而且这通常不应该发生在共享分支上。",
+          },
+          {
+            question: "什么情况下适合 `pull --ff-only`？",
+            answer:
+              "`--ff-only` 最适合你希望“只接受快进更新，不做额外整合动作”的场景。它的价值在于：如果当前分支已经和远端分叉，它会直接失败，而不是替你创建 merge commit 或触发其他整合路径。所以在稳定主分支、发布分支或你想强制保持同步动作可解释的时候，这个参数特别有用。",
+          },
+          {
+            question: "为什么很多团队强调先 fetch 再决定下一步？",
+            answer:
+              "因为 fetch 把“观察远端状态”和“改动当前分支”拆成了两步。你可以先看清远端有没有变化、当前分支有没有分叉、接下来更适合 merge、rebase 还是继续等待。对于初学者和团队协作来说，这种先观察再整合的节奏通常比直接 pull 更容易控制风险。",
+          },
+        ],
+      },
+      {
+        id: "reset-recovery",
+        title: "reset 与恢复",
+        description: "围绕 reset、reflog、回滚与找回，把常见误操作后的判断路径说明清楚。",
+        items: [
+          {
+            question: "`git reset --soft`、`--mixed`、`--hard` 有什么本质区别？",
+            answer:
+              "官方手册把区别讲得很明确：`--soft` 只移动 HEAD，保留暂存区和工作区；`--mixed` 会把暂存区重置到目标提交，但保留工作区改动；`--hard` 会同时改写 HEAD、暂存区和工作区。也就是说，真正危险的是 `--hard`，因为它会直接覆盖当前文件状态。",
+          },
+          {
+            question: "误删分支、reset 过头，或者 pull 之后后悔了，还能找回吗？",
+            answer:
+              "很多时候可以。Git 官方在 `git reset` 文档里专门说明了 `ORIG_HEAD` 和 reflog 的用途：reset、merge、pull 这类操作通常会留下可回溯的引用。只要对象还没被垃圾回收清理掉，通常都能先通过 reflog 找到原来的提交，再决定是新建分支还是回退引用。",
+          },
+          {
+            question: "`git revert` 和 `git reset` 应该怎么选？",
+            answer:
+              "可以简单理解为：`revert` 是通过新提交“抵消旧提交”，更适合已经共享出去的历史；`reset` 是直接移动分支引用，更适合你还在本地整理、撤销或重排历史的时候。高风险点在于，如果一段历史已经被别人拉走了，再用 reset 改写它，往往会把自己的整理动作变成团队同步问题。",
+          },
+          {
+            question: "reflog 到底记录的是什么，为什么它经常能救命？",
+            answer:
+              "reflog 记录的是引用移动历史，而不是“你做过的全部事情”。像 HEAD、分支、merge、reset、rebase 这类会移动引用的位置，通常都会留下 reflog 记录。它之所以常常能救命，是因为你哪怕把分支指针挪走了，Git 仍然可能暂时记得它曾经指向哪里，从而让你重新找到那个提交。",
+          },
+          {
+            question: "为什么有时候我明明看到过的提交，后来却真的找不回来了？",
+            answer:
+              "因为 reflog 和底层对象都不是永久保存的。只要对象不再被任何引用保留，而且超过了垃圾回收窗口，就可能被 Git 清理掉。所以恢复动作通常越早越好；一旦你意识到自己可能误删或误 reset，最好先停止继续折腾仓库，先把 reflog、log 和当前引用位置看清楚。",
+          },
+        ],
+      },
+      {
+        id: "stash-switch",
+        title: "stash、切换与历史边界",
+        description: "围绕 stash、切换分支、detached HEAD 以及 merge/rebase 选择，补齐最常见的判断边界。",
+        items: [
+          {
+            question: "为什么 `git stash` 没有把我的新文件一起存起来？",
+            answer:
+              "因为 stash 默认保存的是已跟踪文件在工作区和暂存区中的改动。官方文档说明，如果你还想把未跟踪文件一起收进去，需要用 `git stash push -u`；如果连忽略文件也要一起处理，则使用 `-a`。另外，`git stash apply` 会保留 stash，而 `git stash pop` 会在成功应用后尝试把它移出列表。",
+          },
+          {
+            question: "什么是 detached HEAD，遇到它是不是就出问题了？",
+            answer:
+              "不一定。官方 `git switch` 文档把 detached HEAD 描述成一种用于检查历史提交或做临时实验的状态，此时 HEAD 指向的是某个提交而不是分支名。它本身不是错误；如果你在这个状态下做出的提交值得保留，只要立刻新建一个分支把它接住就可以。",
+          },
+          {
+            question: "我到底该用 merge 还是 rebase？",
+            answer:
+              "Git 官方书把两者都视为整合历史的正常方式：merge 会保留分叉结构，rebase 会把你的提交重新放到新的基底上，让历史更线性。但官方书也特别强调，不要 rebase 那些已经离开你本地仓库、并且别人可能已经基于它继续工作的提交。简单说，个人本地整理历史常用 rebase，已共享历史默认更安全的是 merge。",
+          },
+          {
+            question: "为什么切换分支时 Git 拒绝我继续操作？",
+            answer:
+              "官方 `git switch` 文档说明，当切换分支会导致本地改动丢失时，Git 会直接中止操作。这不是故障，而是保护机制。通常你有三种稳妥处理方式：先提交、先 stash，或者在你确认可以丢弃本地改动时再显式使用 `--discard-changes`。",
+          },
+          {
+            question: "stash、commit、临时分支，这三种临时保存方式该怎么选？",
+            answer:
+              "如果你只是短时间切任务、且当前改动还不适合形成提交，stash 往往最方便；如果这些改动已经具备明确边界，而且你希望保留上下文，直接 commit 到当前分支通常更清晰；如果改动既不适合进正式分支、又可能需要较长时间保留，切一个临时分支往往比长期堆 stash 更容易追踪。核心判断标准不是命令偏好，而是这些改动值不值得被长期命名和保留。",
+          },
+        ],
+      },
+    ],
   },
   docsIndex: {
     eyebrow: "Docs Library",
@@ -1294,6 +1400,104 @@ const enDictionary: Dictionary = {
     eyebrow: "FAQ Library",
     title: "All Common Questions",
     description: "A dedicated Git FAQ page that expands the homepage highlights into a fuller reading and maintenance surface.",
+    groups: [
+      {
+        id: "pull-sync",
+        title: "pull and sync",
+        description: "Separate fetch, pull, push, and remote-sync expectations so the most common surprises become easier to reason about.",
+        items: [
+          {
+            question: "What does `git pull` actually do, and why can the result surprise me?",
+            answer:
+              "`git pull` first runs fetch, then integrates the upstream branch into your current branch. The official documentation describes several integration modes, including `--ff-only`, `--rebase`, `--no-rebase`, and `--squash`, so the outcome depends on your flags and config such as `pull.rebase` and `pull.ff`. If you want fewer surprises, fetch first and choose the integration strategy explicitly.",
+          },
+          {
+            question: "Why can local and remote still feel out of sync even after I pulled?",
+            answer:
+              "Because pull solves only one part of the problem: fetching and integrating an upstream branch. It does not guarantee that you are on the branch you think you are on, that the upstream relationship is configured the way you assume, or that the resulting history shape matches your expectation. A steadier debugging path is to inspect `git branch -vv`, then `git log --oneline --graph --decorate --all`, and only then decide whether the mismatch is really about sync or about branch context.",
+          },
+          {
+            question: "Why does push fail when Git says the remote is ahead of me?",
+            answer:
+              "The usual reason is that the remote branch already contains commits that your local branch does not. Git blocks a direct update because it would overwrite history from your point of view. The safe response is usually not to force-push immediately, but to fetch first, inspect divergence, and decide whether you need merge, rebase, or whether you are on the wrong branch entirely. Force push on a shared branch is almost never the right first move.",
+          },
+          {
+            question: "When is `pull --ff-only` the better choice?",
+            answer:
+              "`--ff-only` is useful when you want one strict rule: only fast-forward this branch, and fail if real integration would be required. That makes it valuable on stable shared branches, release lines, or anywhere you want sync operations to stay explicit and unsurprising. Instead of silently creating a merge commit or taking another integration path, it stops and forces you to make the next decision consciously.",
+          },
+          {
+            question: "Why do many teams insist on fetch-first workflows?",
+            answer:
+              "Because fetch separates observation from integration. You get to update your view of upstream without mutating the current branch yet. That pause gives you room to inspect whether the branch diverged, whether main moved, and whether merge, rebase, or ff-only is the right next step. For both beginners and teams, that separation usually lowers sync risk and reduces accidental history changes.",
+          },
+        ],
+      },
+      {
+        id: "reset-recovery",
+        title: "reset and recovery",
+        description: "Clarify reset, reflog, rollback, and recovery so accidental history moves are easier to diagnose and undo.",
+        items: [
+          {
+            question: "What is the real difference between `git reset --soft`, `--mixed`, and `--hard`?",
+            answer:
+              "The official `git reset` manual separates them cleanly: `--soft` moves HEAD only, `--mixed` resets the index but keeps working tree changes, and `--hard` resets HEAD, the index, and the working tree together. In practice, `--hard` is the one to treat as destructive because it overwrites your current file state.",
+          },
+          {
+            question: "Can I recover after deleting a branch, resetting too far, or regretting a pull?",
+            answer:
+              "Often yes. The official `git reset` documentation explicitly points to `ORIG_HEAD` and related recovery flows after reset, merge, and pull. As long as the underlying objects have not been cleaned up yet, reflog is usually the first place to look before you decide whether to create a new branch or move a ref back.",
+          },
+          {
+            question: "How should I choose between `git revert` and `git reset`?",
+            answer:
+              "A practical rule is that `revert` creates a new commit that cancels an earlier one, while `reset` moves a branch ref itself. That usually makes revert the safer tool for history that has already been shared, and reset the better tool for local cleanup, rollback, or branch reshaping before others depend on it. The real risk comes from using reset to rewrite history that other people have already pulled.",
+          },
+          {
+            question: "What does reflog actually record, and why does it so often save recovery situations?",
+            answer:
+              "Reflog records ref movement history, not every action you ever took. When HEAD or a branch moves because of reset, rebase, merge, checkout-style actions, or similar operations, reflog often retains the previous positions for a while. That is why it can be so valuable: even if you moved a branch away from a commit, Git may still remember where that ref used to point, giving you a path back.",
+          },
+          {
+            question: "Why do some commits seem recoverable at first but later disappear for real?",
+            answer:
+              "Because reflog entries and unreachable objects are not permanent storage. Once no ref keeps an object reachable and enough time passes for cleanup and garbage collection, Git may eventually remove it. That is why recovery is usually time-sensitive. If you suspect you lost something important, stop reshaping the repository and inspect reflog and ref state first instead of continuing with more destructive actions.",
+          },
+        ],
+      },
+      {
+        id: "stash-switch",
+        title: "stash, switching, and history boundaries",
+        description: "Clarify stash behavior, branch switching, detached HEAD, and merge-versus-rebase decisions.",
+        items: [
+          {
+            question: "Why did `git stash` not include my new files?",
+            answer:
+              "Because stash normally records changes from tracked files in the working tree and index. The official `git stash` docs say you need `git stash push -u` to include untracked files, and `-a` if you also want ignored files. It also helps to remember that `apply` keeps the stash entry, while `pop` tries to remove it after a successful apply.",
+          },
+          {
+            question: "What is detached HEAD, and does it mean something is broken?",
+            answer:
+              "Not necessarily. The official `git switch` docs describe detached HEAD as a valid state for inspecting a commit or doing temporary experiments, where HEAD points to a commit instead of a branch name. If the work you do there is worth keeping, create a branch right away so those commits have a stable name.",
+          },
+          {
+            question: "Should I use merge or rebase?",
+            answer:
+              "The Pro Git book treats both as normal integration tools: merge preserves the branching structure, while rebase rewrites your commits onto a new base for a cleaner linear history. The important warning from the official book is not to rebase commits that have already left your repository and may be the basis of someone else’s work. A practical rule is rebase for local cleanup, merge for already-shared history.",
+          },
+          {
+            question: "Why does Git block me when I try to switch branches?",
+            answer:
+              "The official `git switch` docs say Git aborts the operation if switching would lead to the loss of local changes. That is a safety feature, not an error condition. The usual safe options are to commit, stash, or only use `--discard-changes` when you intentionally want to throw those local changes away.",
+          },
+          {
+            question: "How should I choose between stash, a temporary commit, and a temporary branch?",
+            answer:
+              "If the change is short-lived and not ready to become a named part of history, stash is often the lightest option. If the change already has a clear boundary and you want to preserve context, a normal commit is usually clearer. If the work may live longer, needs a name, or could turn into a real line of work, a temporary branch is often easier to track than a growing stash stack. The real decision is not command preference but whether the work deserves a durable name and place in history.",
+          },
+        ],
+      },
+    ],
   },
   docsIndex: {
     eyebrow: "Docs Library",

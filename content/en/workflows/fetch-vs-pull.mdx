@@ -26,10 +26,37 @@ git fetch origin
 
 ## Why fetch is a better default habit
 
-Fetch separates “sync remote state” from “modify my branch”.
+Fetch separates "sync remote state" from "modify my branch".
 
 That gives you room to inspect:
 
 - whether the remote moved ahead
 - whether your branch diverged
 - whether merge, rebase, or fast-forward is the better next step
+
+## A safer decision order
+
+1. do I only need updated information
+2. am I ready to integrate that information
+3. if yes, should the integration be ff-only, merge, or rebase
+
+## Suggested usage
+
+### for personal branches
+
+```bash
+git fetch origin
+git rebase origin/main
+```
+
+### for stable shared branches
+
+```bash
+git pull --ff-only
+```
+
+## Common mistakes
+
+- assuming pull is always the safer beginner shortcut
+- forgetting that pull may create merge or rebase side effects
+- treating fetch as optional instead of as an inspection step

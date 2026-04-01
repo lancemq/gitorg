@@ -17,6 +17,8 @@ export const metadata = {
 
 这是最常见的一种团队协作场景：从主线拉出功能分支，独立开发一段时间，在发起评审前同步主线并整理提交，最后再合并回主线。
 
+它适合绝大多数日常研发任务，因为它把“正在做的事”和“团队稳定主线”清楚隔开了。
+
 ## 一条更稳的流程
 
 ```bash
@@ -39,12 +41,58 @@ git rebase origin/main
 git log --oneline --decorate -5
 ```
 
+## 一个完整的日常节奏
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c feature/login-validation
+# 开发并提交
+git fetch origin
+git rebase origin/main
+git diff --stat origin/main...
+git push -u origin feature/login-validation
+```
+
+这条流程真正固定下来的，是一套判断顺序：
+
+1. 先从最新主线切分支
+2. 开发过程中定期观察主线变化
+3. 发评审前先同步和清理
+4. 再把分支推上去给别人看
+
 ## 这条流程的核心价值
 
 - 功能边界清晰
 - review 对象明确
 - 回滚和 cherry-pick 更容易
 - 主线不被半成品污染
+
+## 为什么发评审前要先同步主线
+
+如果功能分支和主线分叉太久，review 里会混入：
+
+- 已经过期的上下文
+- 不必要的冲突噪声
+- reviewer 不该替你分辨的历史杂音
+
+所以同步主线，不只是“让分支变新”，也是在降低评审成本。
+
+## 关键检查点
+
+建议每次准备评审前都至少看：
+
+```bash
+git branch -vv
+git diff --stat origin/main...
+git log --oneline --decorate -8
+```
+
+重点确认：
+
+1. 分支是否已经跟上主线
+2. diff 范围是否仍然只包含这个功能
+3. 最近提交是否还保持清晰边界
 
 ## 常见失误
 
@@ -53,3 +101,25 @@ git log --oneline --decorate -5
 - 发评审前不整理噪声提交
 - 一个功能分支里混入多个不相关主题
 
+## 特殊情况
+
+- 如果团队不允许 rebase 已共享分支，就用 merge 方式同步主线
+- 如果分支已经多人协作，历史整理动作要提前沟通
+- 如果一个任务跨度非常大，考虑拆成更小的系列分支，而不是让单个 feature 分支无限膨胀
+
+## 相关命令
+
+- `git switch`
+- `git fetch`
+- `git rebase`
+- `git merge`
+- `git diff`
+- `git push`
+
+## 接下来建议继续学什么
+
+这一页之后，最适合继续看：
+
+1. `sync before review`
+2. `fetch vs pull`
+3. `squash vs rebase merge`

@@ -7,25 +7,120 @@ export const metadata = {
   sourceUrls: [
     "https://git-scm.com/docs/git-cherry-pick",
     "https://git-scm.com/docs/git-branch",
+    "https://git-scm.com/docs/git-log",
   ],
 };
 
 # 用 cherry-pick 回移修复教程
 
-## 场景说明
+## 这个工作流适合什么场景
 
-在旧版本维护线中按提交精确回移修复，而不是整条分支整合。
+当某个修复已经进入主线，但旧版本维护线还没有这个修复时，最常见的问题就是：
+
+“我只想把这一个修复带过去，不想把整条主线历史都合进去。”
+
+这时候就很适合用 `cherry-pick` 做精确回移。
+
+它通常适合：
+
+- 旧版本 bug fix 回移
+- 多条维护线同步单个修复
+- 不希望把无关功能一起带入维护分支的情况
 
 ## 推荐顺序
 
-1. 先定位需要回移的提交
-2. 切到维护分支执行 cherry-pick
-3. 验证差异和测试结果
+### 1. 先定位需要回移的提交
+
+```bash
+git log --oneline --decorate main
+```
+
+这一步一定要先做清楚。回移最怕的不是命令冲突，而是选错提交。
+
+### 2. 切到维护分支执行 cherry-pick
+
+```bash
+git switch release/2.3
+git cherry-pick <commit-sha>
+```
+
+如果需要回移多个连续提交，再考虑使用多个 SHA 或连续区间。
+
+### 3. 验证差异和测试结果
+
+```bash
+git show --stat --oneline HEAD
+git diff --stat origin/release/2.3...
+```
+
+回移完成后，不要只看“命令成功了没有”，更要确认：
+
+- 改动范围是否符合预期
+- 依赖的上下文有没有缺失
+- 测试是否仍然通过
 
 ## 为什么这个顺序更稳
 
-工作流的价值通常不在某一条命令本身，而在于它把先看什么、再做什么、出了问题怎么回退固定下来。
+回移工作流的关键，不是“会不会 cherry-pick”，而是把判断顺序固定下来：
+
+1. 先确认到底要哪一个提交
+2. 再决定目标维护分支是谁
+3. 最后验证这个修复是否能单独成立
+
+## 一个典型示例
+
+假设 `main` 上的登录修复提交是 `abc1234`，你要把它回移到 `release/2.3`：
+
+```bash
+git log --oneline main
+git switch release/2.3
+git cherry-pick abc1234
+git show --stat --oneline HEAD
+```
+
+如果这个修复依赖了另一个先前提交，就不能只机械地回移一个 SHA，而要先确认依赖链是否完整。
+
+## 关键检查点
+
+回移时至少检查这几项：
+
+1. 目标提交是否真的只包含你想要的修复
+2. 维护分支是否已经在正确位置
+3. 回移后 diff 是否只有预期变化
+4. 测试是否能在维护线语境下通过
+
+## 常见误区
+
+### 误区 1：看到修复提交就直接 cherry-pick
+
+先确认提交范围和依赖关系，再执行更稳。
+
+### 误区 2：回移多个修复时不区分先后依赖
+
+有些修复本身依赖前一个重构或前置提交，不能孤立搬运。
+
+### 误区 3：回移成功就默认可以发布
+
+命令成功只说明 Git 接受了改动，不等于这个修复在旧版本上下文中一定成立。
+
+## 特殊情况
+
+- 如果回移时发生冲突，先确认是上下文差异还是依赖缺失
+- 如果修复涉及 schema、配置或接口变化，旧版本可能还缺少前置条件
+- 如果同一个修复要回移到多条维护线，建议一条线验证通过后再继续其他分支
 
 ## 相关命令
 
-建议结合 git fetch、git log、git diff、git merge、git rebase 或 git cherry-pick 一起理解。
+- `git log`
+- `git switch`
+- `git cherry-pick`
+- `git diff`
+- `git show`
+
+## 接下来建议继续学什么
+
+这一页之后，最适合继续看：
+
+1. `release branch workflow`
+2. `hotfix and urgent fixes`
+3. `fetch vs pull`

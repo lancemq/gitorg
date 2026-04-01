@@ -7,25 +7,43 @@ export const metadata = {
   sourceUrls: [
     "https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows",
     "https://git-scm.com/docs/git-merge",
+    "https://git-scm.com/docs/git-branch",
   ],
 };
 
 # Release Branch Workflow
 
-## Scenario
+## Where this workflow fits
 
-Explain when to cut a release branch, when to freeze features, and how to flow fixes back to main.
+Release branches are useful when the team needs a stable lane for test, packaging, and release-only fixes while main keeps moving.
 
 ## Suggested sequence
 
-1. Cut a release branch from a stable mainline
-2. Accept only release-related fixes
-3. Merge final fixes back into the mainline
+### 1. cut a release branch from a stable mainline
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c release/2.4.0
+```
+
+### 2. freeze features and accept only release-related fixes
+
+That usually means bug fixes, config adjustments, docs, and packaging changes only.
+
+### 3. merge the final release fixes back into main
+
+```bash
+git switch main
+git merge release/2.4.0
+```
 
 ## Why this order is safer
 
-The value of a workflow usually comes less from a single command and more from fixing the order of observation, action, and recovery.
+Release work becomes easier when "prepare this version" is separated from "continue building new work."
 
-## Related commands
+## Common mistakes
 
-This topic makes more sense alongside commands such as git fetch, git log, git diff, git merge, git rebase, or git cherry-pick.
+- continuing to add features after cutting the release branch
+- fixing release-only issues without flowing them back to main
+- leaving release branches alive far beyond the release window

@@ -61,20 +61,18 @@ export default async function FaqPage({ params }: Props) {
         </header>
 
         <section className="panel faq-page-section">
-          <div className="faq-group" id="pull-sync">
-            <h2>{locale === "zh" ? "pull 与同步" : "pull and sync"}</h2>
-            <FaqList items={dict.home.faq.items.slice(0, 2)} />
-          </div>
-
-          <div className="faq-group" id="reset-recovery">
-            <h2>{locale === "zh" ? "reset 与恢复" : "reset and recovery"}</h2>
-            <FaqList items={dict.home.faq.items.slice(2, 5)} />
-          </div>
-
-          <div className="faq-group" id="stash-switch">
-            <h2>{locale === "zh" ? "stash 与切换" : "stash and switching"}</h2>
-            <FaqList items={dict.home.faq.items.slice(5)} />
-          </div>
+          {dict.faqPage.groups.map((group) => (
+            <div className="faq-group" id={group.id} key={group.id}>
+              <div className="section-head compact">
+                <div>
+                  <p className="eyebrow">{dict.faqPage.eyebrow}</p>
+                  <h2>{group.title}</h2>
+                </div>
+                <p>{group.description}</p>
+              </div>
+              <FaqList items={group.items} />
+            </div>
+          ))}
         </section>
       </article>
     </SiteShell>

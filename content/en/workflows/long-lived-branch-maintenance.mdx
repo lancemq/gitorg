@@ -7,25 +7,38 @@ export const metadata = {
   sourceUrls: [
     "https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows",
     "https://git-scm.com/docs/git-rebase",
+    "https://git-scm.com/docs/git-merge",
   ],
 };
 
 # Maintaining Long-lived Branches
 
-## Scenario
+## Why long-lived branches get expensive
 
-Show how long-lived branches can stay aligned with main and avoid painful late merges.
+The longer a branch stays alive, the easier it is for divergence, repeated conflicts, and noisy integration history to pile up.
+
+The real goal is not "never conflict." The goal is to keep sync batches small and regular.
 
 ## Suggested sequence
 
-1. Set a regular sync cadence
-2. Keep each integration batch small
-3. Pay down conflict debt regularly
+1. set a recurring sync cadence
+2. keep each integration batch small
+3. pay down conflict and history debt regularly
 
-## Why this order is safer
+## A realistic maintenance rhythm
 
-The value of a workflow usually comes less from a single command and more from fixing the order of observation, action, and recovery.
+```bash
+git switch migration/auth-refactor
+git fetch origin
+git rebase origin/main
+git status
+git log --oneline --decorate -8
+```
 
-## Related commands
+After each sync, validate the branch before drift builds again.
 
-This topic makes more sense alongside commands such as git fetch, git log, git diff, git merge, git rebase, or git cherry-pick.
+## Common mistakes
+
+- waiting until the final merge to sync
+- letting one long-lived branch absorb multiple unrelated themes
+- syncing repeatedly but never cleaning the resulting history

@@ -31,6 +31,20 @@ git switch -c hotfix/login-timeout
 2. 合并或提交到稳定分支
 3. 再把修复回流到主线或其他仍在维护的分支
 
+## 一个更完整的紧急修复节奏
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c hotfix/login-timeout
+# 修复并提交
+git add .
+git commit -m "fix: handle login timeout"
+git push -u origin hotfix/login-timeout
+```
+
+修复落地后，再明确把它回流到需要的主线或维护线。
+
 ## 为什么 hotfix 要避免顺手带功能改动
 
 因为紧急修复的核心是缩小变更面：
@@ -39,7 +53,39 @@ git switch -c hotfix/login-timeout
 - 回滚越容易
 - 事故定位越清楚
 
-## 很实用的一条经验
-
 如果某个“顺手改动”不是为了让 hotfix 生效，它通常就不应该出现在 hotfix 里。
 
+## 关键检查点
+
+在 hotfix 发布前，至少确认：
+
+1. 修复是否建立在稳定分支上
+2. 本次 diff 是否只覆盖事故相关内容
+3. 回流目标分支是否都已经明确
+
+推荐配合：
+
+```bash
+git diff --stat main...
+git log --oneline --decorate -5
+```
+
+## 常见误区
+
+- 在 hotfix 里顺手改 unrelated 代码
+- 修完后只发布，不回流主线
+- 用 hotfix 分支继续承载后续功能开发
+
+## 特殊情况
+
+- 如果线上修复需要同时进入多个维护版本，先固定回流顺序
+- 如果修复依赖未发布功能，应该重新评估是 hotfix 还是普通发布问题
+- 如果团队有发布审批流程，hotfix 分支也要纳入标准验证链路
+
+## 接下来建议继续学什么
+
+这一页之后，最适合继续看：
+
+1. `release branch workflow`
+2. `backport with cherry-pick`
+3. `fetch vs pull`

@@ -7,25 +7,62 @@ export const metadata = {
   sourceUrls: [
     "https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes",
     "https://git-scm.com/docs/git-fetch",
+    "https://git-scm.com/docs/git-remote",
   ],
 };
 
 # Fork and Upstream Sync
 
-## Scenario
+## Where this workflow fits
 
-Keep origin and upstream roles clear when collaborating through a fork workflow.
+In a fork workflow you usually manage two remotes:
+
+- `origin`: your fork
+- `upstream`: the canonical repository
+
+Most confusion comes from blurring those two roles.
 
 ## Suggested sequence
 
-1. Use your fork as origin
-2. Add the canonical repository as upstream
-3. Fetch upstream regularly and sync your local main branch
+### 1. make sure the remotes are mapped correctly
+
+```bash
+git remote -v
+git remote add upstream <upstream-url>
+git remote -v
+```
+
+### 2. fetch upstream first
+
+```bash
+git fetch upstream
+```
+
+### 3. sync your local main branch
+
+```bash
+git switch main
+git rebase upstream/main
+```
+
+If your team prefers not to rewrite local history, use merge instead.
+
+### 4. push the updated main back to your fork
+
+```bash
+git push origin main
+```
 
 ## Why this order is safer
 
-The value of a workflow usually comes less from a single command and more from fixing the order of observation, action, and recovery.
+It fixes the remote boundary:
 
-## Related commands
+- read from upstream
+- stabilize locally
+- publish back to origin
 
-This topic makes more sense alongside commands such as git fetch, git log, git diff, git merge, git rebase, or git cherry-pick.
+## Common mistakes
+
+- treating `origin` as the canonical repo
+- cutting new branches from an outdated fork main
+- forgetting to push the synced result back to your fork

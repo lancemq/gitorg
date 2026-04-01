@@ -7,25 +7,62 @@ export const metadata = {
   sourceUrls: [
     "https://git-scm.com/docs/git-cherry-pick",
     "https://git-scm.com/docs/git-branch",
+    "https://git-scm.com/docs/git-log",
   ],
 };
 
 # Backporting with Cherry-pick
 
-## Scenario
+## Where this workflow fits
 
-Backport precise fixes onto maintenance branches without merging an entire feature branch.
+When a fix already landed on main but an older maintenance line still needs it, the usual problem is:
+
+"I need this one repair, not the whole branch history."
+
+That is when `cherry-pick` is a strong fit.
 
 ## Suggested sequence
 
-1. Identify the exact commit to backport
-2. Switch to the maintenance branch and cherry-pick
-3. Validate the resulting diff and tests
+### 1. identify the exact commit
+
+```bash
+git log --oneline --decorate main
+```
+
+The first risk in backporting is not conflict. It is choosing the wrong commit.
+
+### 2. switch to the maintenance branch and cherry-pick
+
+```bash
+git switch release/2.3
+git cherry-pick <commit-sha>
+```
+
+### 3. validate the resulting diff and tests
+
+```bash
+git show --stat --oneline HEAD
+git diff --stat origin/release/2.3...
+```
+
+Do not stop at "the command succeeded." Confirm the resulting change still makes sense on the older branch.
 
 ## Why this order is safer
 
-The value of a workflow usually comes less from a single command and more from fixing the order of observation, action, and recovery.
+Backporting works best when the order is fixed:
 
-## Related commands
+1. confirm the right commit
+2. confirm the target maintenance branch
+3. confirm the fix still stands alone after the pick
 
-This topic makes more sense alongside commands such as git fetch, git log, git diff, git merge, git rebase, or git cherry-pick.
+## Common mistakes
+
+- cherry-picking before checking dependency commits
+- backporting multiple commits without thinking through order
+- assuming a successful cherry-pick means the fix is release-ready
+
+## Special cases
+
+- if the fix depends on earlier refactors, a single cherry-pick may not be enough
+- if the old branch has different config or schema expectations, validate in branch context
+- if multiple maintenance lines need the same repair, verify one branch before repeating the flow

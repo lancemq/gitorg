@@ -1,0 +1,169 @@
+export const metadata = {
+  title: "用 worktree 并行处理多个任务",
+  slug: "parallel-work-with-worktree",
+  locale: "zh",
+  section: "workflows",
+  summary: "当你需要同时处理当前功能、紧急修复或评审修改时，用 git worktree 在同一个仓库上开出多个独立工作目录。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-worktree",
+    "https://git-scm.com/book/en/v2/Git-Tools-Advanced-Merging",
+    "https://git-scm.com/docs/git-switch",
+  ],
+};
+
+# 用 worktree 并行处理多个任务
+
+## 这个工作流解决什么问题
+
+很多团队协作里的卡点，并不是不会切分支，而是你已经在一个工作目录里做了很多事，突然又需要：
+
+- 临时修一个 hotfix
+- 拉一个评审分支下来复现问题
+- 给另一个功能做小改动
+- 在不打断当前工作区的前提下切换任务
+
+传统做法往往是反复 stash、切分支、再切回来。`git worktree` 的价值，是让同一个仓库可以同时拥有多个独立工作目录，每个目录绑定一个分支或提交状态。
+
+## 什么时候适合用 worktree
+
+这个流程尤其适合：
+
+- 当前功能开发做到一半，又临时插入紧急任务
+- 需要同时维护功能分支和 hotfix 分支
+- 想在不污染当前工作区的情况下验证另一个分支
+- 做代码评审、回归验证、版本维护时，需要多个并行上下文
+
+如果你只是偶尔切一下分支，而且当前工作区很干净，普通 `git switch` 就够了，不一定非要上 worktree。
+
+## 一条最小可用流程
+
+### 1. 先在主仓库目录保持当前任务不动
+
+假设你当前就在主仓库目录里继续写功能分支：
+
+```bash
+git status
+git branch -vv
+```
+
+### 2. 再额外开一个独立工作目录
+
+```bash
+git worktree add ../repo-hotfix hotfix/login-timeout
+```
+
+这条命令的效果是：
+
+- 在 `../repo-hotfix` 创建一个新的工作目录
+- 这个新目录直接检出到 `hotfix/login-timeout`
+- 原来的工作目录完全不受影响
+
+### 3. 在新 worktree 里独立处理任务
+
+```bash
+cd ../repo-hotfix
+git status
+git branch -vv
+```
+
+此时你已经拥有两个并行上下文：
+
+- 原目录继续写功能
+- 新目录处理 hotfix
+
+## 一个真实团队场景
+
+假设你正在 `feature/payment-redesign` 上做较大改动，这时线上突然出了一个登录超时问题。
+
+如果继续在原目录里切分支，你会面临：
+
+- 当前未提交改动要不要 stash
+- 切走后再切回来是否会影响上下文
+- hotfix 完成后怎么恢复原来的工作状态
+
+用 worktree 的节奏会更稳：
+
+```bash
+# 原目录继续保留 feature/payment-redesign
+git status
+
+# 新开一个目录专门处理 hotfix
+git worktree add ../repo-hotfix hotfix/login-timeout
+cd ../repo-hotfix
+git status
+```
+
+这样你不仅减少了 stash 来回切换的心智负担，也让每个任务都有自己清晰的工作区。
+
+## worktree 和普通切分支的区别
+
+普通切分支解决的是“同一个工作目录里切到另一个分支”。
+
+worktree 解决的是“同一个仓库，同时拥有多个工作目录”。
+
+这两者最大的差异在于：
+
+- 普通切分支会直接改变你当前目录的上下文
+- worktree 会把不同上下文拆到不同目录里
+
+所以在并行任务较多的时候，worktree 往往更稳。
+
+## 推荐的判断顺序
+
+当你想切任务时，先问自己：
+
+1. 当前工作区干净吗
+2. 当前任务是否还会马上回来继续做
+3. 新任务是否需要独立目录、独立依赖、独立上下文
+
+如果第 2、3 条的答案偏向“是”，worktree 往往比 stash + switch 更合适。
+
+## 常见误区
+
+### 误区 1：worktree 等于再 clone 一份仓库
+
+不是。它共享同一个 Git 仓库对象数据库，只是开出了多个工作目录。
+
+### 误区 2：开了多个 worktree 就可以随便忘记它们
+
+worktree 虽然轻量，但仍然需要你清楚记录哪个目录在做什么任务，否则后面一样会混乱。
+
+### 误区 3：所有分支切换问题都该用 worktree 解决
+
+也不是。worktree 最适合并行任务场景，不是每次切分支都必须使用的默认方案。
+
+## 特殊情况
+
+- 如果某个分支已经被另一个 worktree 占用，Git 会阻止你在新的 worktree 里再次检出它
+- 如果任务结束了，记得清理不再需要的工作目录和 worktree 记录
+- 如果项目依赖安装体积很大，要评估多个工作目录带来的磁盘开销
+
+## 很实用的一组命令
+
+```bash
+git worktree list
+git worktree add ../repo-review review/fix-copy
+git worktree remove ../repo-review
+```
+
+这组命令分别对应：
+
+- 看当前有哪些 worktree
+- 新增一个 worktree
+- 清理一个不用的 worktree
+
+## 相关命令
+
+- `git worktree`
+- `git switch`
+- `git branch`
+- `git status`
+- `git fetch`
+
+## 接下来建议继续学什么
+
+这一页之后，最适合继续看：
+
+1. `feature branch collaboration`
+2. `hotfix and urgent fixes`
+3. `sync before review`

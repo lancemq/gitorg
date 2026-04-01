@@ -31,7 +31,19 @@ After the fix:
 2. land it on the stable branch
 3. propagate the fix back into main or any maintained branches that still need it
 
-## Why hotfixes should avoid “while we are here” changes
+## A fuller hotfix rhythm
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c hotfix/login-timeout
+# fix and commit
+git add .
+git commit -m "fix: handle login timeout"
+git push -u origin hotfix/login-timeout
+```
+
+## Why hotfixes should avoid "while we are here" changes
 
 Urgent fixes work best when the change surface stays small:
 
@@ -39,3 +51,8 @@ Urgent fixes work best when the change surface stays small:
 - rollback is simpler
 - incident analysis stays clearer
 
+## Common mistakes
+
+- mixing unrelated cleanup into the hotfix
+- shipping the fix without flowing it back to main
+- treating the hotfix branch like a normal feature branch

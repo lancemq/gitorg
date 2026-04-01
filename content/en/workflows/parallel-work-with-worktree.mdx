@@ -1,0 +1,154 @@
+export const metadata = {
+  title: "Parallel Task Handling with Worktree",
+  slug: "parallel-work-with-worktree",
+  locale: "en",
+  section: "workflows",
+  summary: "Use git worktree to open multiple working directories from the same repository when feature work, review fixes, and urgent tasks overlap.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-worktree",
+    "https://git-scm.com/docs/git-switch",
+    "https://git-scm.com/book/en/v2/Git-Tools-Advanced-Merging",
+  ],
+};
+
+# Parallel Task Handling with Worktree
+
+## What this workflow solves
+
+Many team interruptions are not about branch syntax. They happen because you are deep into one working directory and suddenly need to:
+
+- ship a hotfix
+- check a review branch
+- make a small change on another task
+- do all of that without disturbing the current workspace
+
+The traditional answer is often stash, switch, switch back, and hope context survives. `git worktree` gives you another option: multiple independent working directories backed by the same repository.
+
+## When worktree is a strong fit
+
+This workflow is especially useful when:
+
+- feature work is in progress and an urgent task appears
+- you need to maintain a feature branch and a hotfix at the same time
+- you want to inspect or validate another branch without touching the current working tree
+- review, regression, or release work needs a second isolated context
+
+## A minimal usable flow
+
+### 1. leave the current task untouched in the main directory
+
+```bash
+git status
+git branch -vv
+```
+
+### 2. create a second working directory
+
+```bash
+git worktree add ../repo-hotfix hotfix/login-timeout
+```
+
+This creates a new directory and checks out `hotfix/login-timeout` there, while the original working directory stays exactly as it was.
+
+### 3. handle the urgent task in the new worktree
+
+```bash
+cd ../repo-hotfix
+git status
+git branch -vv
+```
+
+Now you have two parallel contexts:
+
+- the original directory keeps your feature work
+- the new directory handles the hotfix
+
+## A realistic team scenario
+
+Suppose you are midway through `feature/payment-redesign` and production suddenly needs a login timeout fix.
+
+If you switch directly in the original directory, you immediately run into questions like:
+
+- should I stash first
+- will switching break my current context
+- how do I get back to the exact previous state cleanly
+
+With worktree, the rhythm is calmer:
+
+```bash
+# keep the feature branch where it is
+git status
+
+# open a second directory for the hotfix
+git worktree add ../repo-hotfix hotfix/login-timeout
+cd ../repo-hotfix
+git status
+```
+
+That lowers the mental cost of task switching because each task gets its own directory.
+
+## Worktree versus ordinary branch switching
+
+Ordinary branch switching solves:
+
+"change the branch inside this one directory"
+
+Worktree solves:
+
+"keep multiple working directories for the same repository at once"
+
+That difference matters most when tasks overlap.
+
+## A safer decision order
+
+Before switching tasks, ask:
+
+1. is the current working tree clean
+2. will I need to come back to this task soon
+3. does the next task deserve its own directory and context
+
+If the answer to the last two is yes, worktree is often better than stash plus repeated branch switching.
+
+## Common mistakes
+
+### Mistake 1: thinking worktree is just another clone
+
+It is not. Worktrees share the same repository object database and refs infrastructure.
+
+### Mistake 2: creating many worktrees and forgetting what each one is for
+
+Worktree reduces task-switching friction, but it still needs deliberate organization.
+
+### Mistake 3: using worktree for every branch move
+
+It is best for parallel-task situations, not necessarily for every normal branch switch.
+
+## Special cases
+
+- Git prevents the same branch from being checked out by multiple worktrees at the same time
+- when a task is done, remove the worktree and clean up the record
+- very large dependency trees may make multiple working directories heavier on disk than expected
+
+## Handy commands
+
+```bash
+git worktree list
+git worktree add ../repo-review review/fix-copy
+git worktree remove ../repo-review
+```
+
+## Related commands
+
+- `git worktree`
+- `git switch`
+- `git branch`
+- `git status`
+- `git fetch`
+
+## What to read next
+
+After this topic, the best follow-ups are:
+
+1. `feature branch collaboration`
+2. `hotfix and urgent fixes`
+3. `sync before review`

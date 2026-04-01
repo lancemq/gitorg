@@ -45,6 +45,16 @@ git fetch origin
 
 所以，pull 不应该被简单理解成“安全同步一下”。
 
+## 一个更稳的判断顺序
+
+面对远端更新时，推荐按下面的顺序想：
+
+1. 我现在只是想知道远端变了没有吗
+2. 我已经准备好把这些变化整合进当前分支了吗
+3. 这次整合应该是 merge、rebase，还是只允许 ff-only
+
+只要把这 3 个问题分开，很多 Git 同步困惑都会明显减少。
+
 ## 推荐的教学用法
 
 ### 对个人分支
@@ -62,6 +72,28 @@ git pull --ff-only
 
 `--ff-only` 的好处是：如果本地和远端已经分叉，它会直接失败，而不是替你做一个你没意识到的整合动作。
 
+## 一个典型场景
+
+你早上打开项目，想确认今天开始工作前该怎么同步：
+
+```bash
+git status
+git fetch origin
+git branch -vv
+```
+
+如果发现当前分支只是落后于远端，而且没有分叉：
+
+```bash
+git pull --ff-only
+```
+
+如果发现你在个人功能分支上，且更希望保持线性历史：
+
+```bash
+git rebase origin/main
+```
+
 ## 常见误区
 
 ### 误区 1：pull 比 fetch 更省事，所以更适合初学者
@@ -72,6 +104,10 @@ git pull --ff-only
 
 不一定。它可能已经帮你做了 merge 或 rebase，只是你没有立刻意识到。
 
+### 误区 3：先 pull，出了问题再说
+
+更稳的方式是：先 fetch，把远端状态看清楚。
+
 ## 团队建议
 
 如果你正在设计团队 Git 规范，可以把下面这条写进约定：
@@ -79,3 +115,11 @@ git pull --ff-only
 - 开发分支同步前优先 `fetch`
 - 共享分支默认 `pull --ff-only`
 - 是否启用 `pull.rebase` 需要团队统一说明
+
+## 接下来建议继续学什么
+
+这一页之后，最适合继续看：
+
+1. `sync before review`
+2. `feature branch collaboration`
+3. `hotfix and urgent fixes`

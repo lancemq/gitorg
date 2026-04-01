@@ -7,25 +7,48 @@ export const metadata = {
   sourceUrls: [
     "https://git-scm.com/book/en/v2/Git-Tools-Submodules",
     "https://git-scm.com/docs/git-submodule",
+    "https://git-scm.com/docs/git-status",
   ],
 };
 
 # Submodule Update Flow
 
-## Scenario
+## Why this workflow is easy to misread
 
-Outline a safe routine for updating submodules, locking revisions, and syncing the parent repository.
+A submodule update looks like "changing a directory," but it is really two repositories interacting:
+
+- the submodule repository itself
+- the parent repository that records which submodule commit should be used
 
 ## Suggested sequence
 
-1. Move the submodule to the intended commit
-2. Commit the pointer change in the parent repo
-3. Verify init and recursive update flows
+### 1. move the submodule to the intended commit
 
-## Why this order is safer
+```bash
+git submodule update --init --recursive
+cd path/to/submodule
+git fetch origin
+git switch main
+git pull --ff-only
+```
 
-The value of a workflow usually comes less from a single command and more from fixing the order of observation, action, and recovery.
+### 2. commit the pointer update in the parent repo
 
-## Related commands
+```bash
+cd ../..
+git status
+git add path/to/submodule
+git commit -m "chore: update submodule pointer"
+```
 
-This topic makes more sense alongside commands such as git fetch, git log, git diff, git merge, git rebase, or git cherry-pick.
+### 3. verify init and recursive update behavior
+
+```bash
+git submodule update --init --recursive
+```
+
+## Common mistakes
+
+- assuming the parent repo stores full submodule file history
+- updating the submodule but forgetting to commit the pointer change
+- forgetting initialization and then treating the submodule state as broken
