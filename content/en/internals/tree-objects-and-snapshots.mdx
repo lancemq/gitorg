@@ -11,20 +11,117 @@ export const metadata = {
 
 # Tree Objects and Snapshots
 
-## The short version
+Tree objects are the part of Git that makes the repository look like a directory structure instead of a pile of unrelated blobs.
 
-Explain how tree objects encode directory structure and why commits represent full snapshot trees.
+## What a tree stores
 
-## Key ideas
+A tree records entries such as:
 
-- A tree records paths, modes, and child objects
-- A commit points to a root tree
-- Snapshot thinking is closer to how Git really works than a patch-only mental model
+- a path name
+- a file mode
+- the object ID of the child entry
+
+Those child entries may point to:
+
+- blobs for file content
+- other trees for subdirectories
+
+So a tree is Git's way of representing a directory snapshot.
+
+## Why trees matter
+
+A blob only knows content. It does not know where that content lives.
+
+A tree adds the missing structure:
+
+- which names exist
+- which entries are files vs directories
+- which object each path points to
+
+This is why a commit can represent a whole project state instead of just one changed file.
+
+## Commits point to a root tree
+
+A commit object does not directly list every file. Instead, it points to one root tree.
+
+That root tree recursively links to other trees and blobs, which together describe the repository snapshot at that commit.
+
+So when people say "a commit stores a snapshot," the precise meaning is closer to:
+
+- a commit points to a root tree
+- that tree graph describes the full snapshot
+
+## Why Git is better understood as snapshots than patches
+
+Many developers first learn Git through diffs, so they imagine each commit as mostly a patch.
+
+Diffs are very important for display and review, but internally Git is more naturally described as storing snapshots through tree and blob relationships.
+
+That snapshot model explains a lot:
+
+- why checkout can reconstruct full directory state
+- why commits represent repository state, not just textual changes
+- why comparing commits often means comparing two trees
+
+## Use case 1: why a filename change is not a blob change
+
+Suppose you rename a file without changing its content.
+
+The blob may stay the same, because the content stayed the same. What changes is the tree structure that maps names to objects.
+
+That is a good example of Git separating:
+
+- content identity
+- path placement
+
+## Use case 2: why checkout restores whole project state
+
+When you check out a commit, Git is not just applying a patch line by line from nowhere. It has a tree-based snapshot it can use to reconstruct the directory layout and file contents for that commit.
+
+## Use case 3: why comparing commits often means comparing trees
+
+A commit comparison usually boils down to asking:
+
+- what did the old root tree contain?
+- what does the new root tree contain?
+
+That is why so many diff and status operations make more sense once you see trees as the structural backbone of the snapshot model.
+
+## Special case: one commit can reuse many old objects
+
+Because trees and blobs are object-based, a new commit does not need to rewrite every file as brand-new content if most of the repository stayed the same.
+
+Unchanged parts of the snapshot can still point to existing objects. That is one reason the object graph is both powerful and efficient.
+
+## Common misconceptions
+
+### "A commit directly stores every file inline"
+
+Not exactly. A commit points to a root tree, and the tree structure describes the snapshot.
+
+### "Git mainly stores patches"
+
+Diffs are important, but the internal model is better understood as snapshots built from trees and blobs.
+
+### "A rename must create a totally new file object"
+
+Not necessarily. The content blob may stay the same while the tree entries change.
 
 ## Why this helps you understand commands
 
-Many command differences that feel arbitrary become easier once you see how Git is updating objects, refs, the index, or reachability.
+Once tree objects make sense, it becomes easier to understand:
+
+- why commits represent full repository states
+- why checkout can rebuild directory structures
+- why renames and path changes are structural
+- why diff and status are often comparing snapshots, not just patches
 
 ## Suggested follow-up
 
-It pairs well with git show, git log --graph, git cat-file, git rev-parse, or git fetch.
+It pairs especially well with:
+
+- `git ls-tree`
+- `git cat-file`
+- `git show`
+- `git diff`
+- `git checkout`

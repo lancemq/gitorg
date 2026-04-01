@@ -3,7 +3,7 @@ import type { ComponentType } from "react";
 
 import { DocSupport } from "@/components/doc-support";
 import { SiteShell } from "@/components/site-shell";
-import { StructuredData } from "@/components/structured-data";
+import { buildBreadcrumbData, StructuredData } from "@/components/structured-data";
 import type { Locale, SidebarContent } from "@/lib/i18n";
 import type { DocCard, DocNeighbors } from "@/lib/content";
 import { getSiteUrl } from "@/lib/site";
@@ -21,6 +21,7 @@ type DocTemplateProps = {
   pathname: string;
   sourcesTitle: string;
   sourceUrls: string[];
+  lastModified?: string;
   Body: ComponentType;
   showSources?: boolean;
   relatedDocs?: DocCard[];
@@ -37,6 +38,7 @@ export function DocTemplate({
   pathname,
   sourcesTitle,
   sourceUrls,
+  lastModified,
   Body,
   showSources = false,
   relatedDocs = [],
@@ -44,26 +46,34 @@ export function DocTemplate({
 }: DocTemplateProps) {
   const siteUrl = getSiteUrl();
   const inLanguage = locale === "zh" ? "zh-CN" : "en";
+  const breadcrumbItems = breadcrumbs.map((item) => ({
+    name: item.label,
+    url: `${siteUrl}${item.href ?? pathname}`,
+  }));
 
   return (
     <SiteShell locale={locale} sidebar={sidebar}>
       <article className="doc-page">
         <StructuredData
-          data={{
-            "@context": "https://schema.org",
-            "@type": "TechArticle",
-            headline: title,
-            description: summary,
-            inLanguage,
-            url: `${siteUrl}${pathname}`,
-            isPartOf: {
-              "@type": "WebSite",
-              name: "GitOrg Atlas",
-              url: `${siteUrl}/${locale}`,
+          data={[
+            {
+              "@context": "https://schema.org",
+              "@type": "TechArticle",
+              headline: title,
+              description: summary,
+              inLanguage,
+              url: `${siteUrl}${pathname}`,
+              dateModified: lastModified,
+              isPartOf: {
+                "@type": "WebSite",
+                name: "GitOrg Atlas",
+                url: `${siteUrl}/${locale}`,
+              },
+              about: breadcrumbs.map((item) => item.label),
+              citation: sourceUrls,
             },
-            about: breadcrumbs.map((item) => item.label),
-            citation: sourceUrls,
-          }}
+            buildBreadcrumbData(breadcrumbItems),
+          ]}
         />
         <nav className="breadcrumbs" aria-label="Breadcrumb">
           {breadcrumbs.map((item, index) => (

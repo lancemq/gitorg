@@ -11,20 +11,141 @@ export const metadata = {
 
 # Blob Objects and Content Addressing
 
-## The short version
+If you want to understand Git below the command surface, blobs are one of the best places to start. A blob is one of Git's most basic object types, and it explains why Git can treat content itself as the primary identity.
 
-Explain how blobs store raw content and why hashes become the identity of Git objects.
+## What a blob stores
 
-## Key ideas
+A blob stores raw file content.
 
-- A blob stores file content without path context
-- Object IDs come from headers plus content
-- Identical content maps to the same blob
+That description matters because of what it does **not** store:
+
+- no filename
+- no directory path
+- no file history label
+- no commit message
+
+From Git's point of view, a blob is just content.
+
+That means the same content can appear in different paths, branches, or commits while still referring to the same underlying blob object.
+
+## Why content addressing matters
+
+Git is content-addressed. That means an object's identity comes from the object data itself, not from an external database row or a mutable record ID.
+
+Conceptually, Git computes an object ID from:
+
+- the object type
+- the object size
+- the object content
+
+So if the content changes, the object ID changes too.
+
+This gives Git a very strong guarantee:
+
+- identical object content leads to the same object identity
+- changed content leads to a different identity
+
+## Why identical files can map to the same blob
+
+Suppose two files in different directories contain exactly the same text.
+
+Git does not need two different blob objects just because the paths differ. The path information lives elsewhere. The blob only represents content.
+
+This is one reason Git can store snapshots efficiently while still thinking in terms of object identity.
+
+## Where the filename actually lives
+
+People often assume a file object in Git must know its own path. But that path is not stored in the blob.
+
+The path is stored by a tree object, which maps:
+
+- a name
+- a mode
+- an object ID
+
+So Git separates:
+
+- content itself: blob
+- placement in a directory tree: tree
+
+That separation is one of the keys to understanding Git's internal model.
+
+## Why this is different from a normal "file history" mental model
+
+Many users imagine Git as tracking a changing file over time as one continuous thing.
+
+Internally, Git is closer to:
+
+- blobs for content
+- trees for directory structure
+- commits for full repository snapshots
+
+That is why Git can reason about content reuse, renames, and snapshot identity without needing one permanent file object that lives forever.
+
+## Use case 1: why editing a file creates a new object identity
+
+When you edit a file and stage it, Git is no longer talking about "the same blob with a new version number." It is preparing content that will hash to a different blob object.
+
+That helps explain why even a small change results in a different object ID.
+
+## Use case 2: why renames are not stored as a special blob property
+
+If blobs stored paths, a rename would have to change the blob. But a blob does not know its path.
+
+So a rename is better understood as:
+
+- a tree-level change in where some content appears
+- not a mutation inside the blob itself
+
+This is part of why Git often detects renames heuristically from content relationships instead of preserving them as a built-in object field.
+
+## Use case 3: why `git hash-object` is so revealing
+
+Low-level commands like `git hash-object` are useful because they expose the content-addressed model directly.
+
+They make it easier to see that Git is not assigning arbitrary IDs. The ID comes from the object data.
+
+## Special case: a blob is not "a file in the repo" in the everyday sense
+
+It is tempting to say "a blob is a file." That is close enough for a first pass, but not really precise.
+
+A blob is:
+
+- file content only
+- without location context
+- without commit context
+
+That distinction becomes important once you start reasoning about trees, commits, or duplicate content.
+
+## Common misconceptions
+
+### "A blob stores the filename too"
+
+No. The filename and path live in tree objects.
+
+### "Git tracks files as one permanent identity over time"
+
+Not in the way many people first imagine. Git tracks snapshots and objects, and blob identity is derived from content.
+
+### "Two identical files must be stored as two separate blobs"
+
+Not necessarily. If the content is identical, the same blob object can represent it.
 
 ## Why this helps you understand commands
 
-Many command differences that feel arbitrary become easier once you see how Git is updating objects, refs, the index, or reachability.
+Once blobs and content addressing click, it becomes easier to understand:
+
+- why object IDs change with content
+- why staging writes toward new object identity
+- why renames are not baked into blob objects
+- why low-level inspection commands expose so much about Git's model
 
 ## Suggested follow-up
 
-It pairs well with git show, git log --graph, git cat-file, git rev-parse, or git fetch.
+It pairs especially well with:
+
+- `git hash-object`
+- `git cat-file`
+- `git ls-tree`
+- `git show`
+- `git rev-parse`

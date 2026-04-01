@@ -3,6 +3,35 @@ import type { Metadata } from "next";
 import type { Locale } from "@/lib/i18n";
 
 const siteName = "GitOrg Atlas";
+const siteKeywords = {
+  zh: [
+    "Git 教程",
+    "Git 命令",
+    "Git 工作流",
+    "Git 原理",
+    "Git 学习路线",
+    "GitOrg Atlas",
+  ],
+  en: [
+    "Git tutorial",
+    "Git commands",
+    "Git workflows",
+    "Git internals",
+    "Git learning path",
+    "GitOrg Atlas",
+  ],
+} as const;
+const defaultRobots = {
+  index: true,
+  follow: true,
+  googleBot: {
+    index: true,
+    follow: true,
+    "max-image-preview": "large" as const,
+    "max-snippet": -1,
+    "max-video-preview": -1,
+  },
+};
 
 export function getLocaleLang(locale: Locale) {
   return locale === "zh" ? "zh-CN" : "en";
@@ -25,6 +54,10 @@ export function buildAlternates(locale: Locale, pathname: string) {
   };
 }
 
+function getKeywords(locale: Locale) {
+  return [...siteKeywords[locale]];
+}
+
 type PageMetadataInput = {
   locale: Locale;
   pathname?: string;
@@ -44,12 +77,16 @@ export function buildPageMetadata({
     title: fullTitle,
     description,
     applicationName: siteName,
+    keywords: getKeywords(locale),
+    category: "technology",
+    robots: defaultRobots,
     alternates: buildAlternates(locale, pathname),
     openGraph: {
       title: fullTitle,
       description,
       siteName,
       locale: getLocaleLang(locale),
+      alternateLocale: locale === "zh" ? ["en"] : ["zh-CN"],
       type: "website",
       url: `/${locale}${pathname}`,
     },
@@ -68,12 +105,16 @@ export function buildLocaleHomeMetadata(locale: Locale): Metadata {
     title: siteName,
     description,
     applicationName: siteName,
+    keywords: getKeywords(locale),
+    category: "technology",
+    robots: defaultRobots,
     alternates: buildAlternates(locale, ""),
     openGraph: {
       title: siteName,
       description,
       siteName,
       locale: getLocaleLang(locale),
+      alternateLocale: locale === "zh" ? ["en"] : ["zh-CN"],
       type: "website",
       url: `/${locale}`,
     },

@@ -12,20 +12,119 @@ export const metadata = {
 
 # Commit Objects, Parents, and Messages
 
-## The short version
+A commit is not just "some saved changes plus a message." It is the object that ties together a repository snapshot, parent history, authorship metadata, and message text into one node of the history graph.
 
-Show how commit objects connect trees, parent commits, and messages into the history graph.
+## What a commit object contains
 
-## Key ideas
+A commit object typically includes:
 
-- Commit objects contain tree, parent, author, and message data
-- Parent links shape the commit graph
-- The commit message is part of the object content
+- a pointer to a root tree
+- one or more parent commits
+- author and committer metadata
+- the commit message
+
+Those fields are what let Git treat a commit as both:
+
+- a snapshot of repository state
+- a connected point in the broader history graph
+
+## Why parent links matter so much
+
+The parent list is what gives Git history its shape.
+
+- a normal commit usually has one parent
+- an initial commit has none
+- a merge commit usually has two or more parents
+
+When Git walks history, computes ancestry, decides whether a fast-forward is possible, or draws a graph, it is following these parent links.
+
+Without parent relationships, Git would have snapshots but not a meaningful notion of history structure.
+
+## Why the message is part of the object identity
+
+The commit message is not just an annotation outside the commit. It is part of the commit object content.
+
+That means if you change the message, you change the object content, and therefore the commit ID changes too.
+
+This is why commands like `git commit --amend` or history rewriting operations produce new commit IDs even if the file snapshot barely changed or did not change at all.
+
+## Why changing one commit can ripple through later history
+
+If a commit gets a new identity, its child commits may also need new identities because their parent pointer changed.
+
+That is one reason rebases and amends can rewrite a whole stretch of visible history:
+
+- one commit changes
+- descendant commits now point to a different parent
+- so they become new objects too
+
+## Use case 1: why amend creates a new commit
+
+People often talk about amend as if it edits a commit in place.
+
+Internally, it is better understood as:
+
+- create a new commit object
+- point the branch at the new object
+- leave the old commit behind until it becomes unreachable and eventually collectible
+
+That mental model explains both the new SHA and the recovery patterns around reflog.
+
+## Use case 2: why merge commits look different
+
+A merge commit is different because it records more than one parent.
+
+That is how Git knows the merge commit joined multiple history lines. The commit message may explain the intent to humans, but the parent list is what makes the merge real structurally.
+
+## Use case 3: why log and graph tools can reconstruct history
+
+Commands like `git log --graph` are not guessing from timestamps or branch names. They are traversing parent links stored in commit objects.
+
+That is why parent structure is much more important than branch labels when it comes to how Git understands history.
+
+## Special case: author and committer are not always the same
+
+Commit metadata can distinguish between:
+
+- who originally authored the change
+- who actually created the commit object in its current form
+
+This becomes especially relevant in workflows involving rebases, cherry-picks, or patch application.
+
+## Special case: message-only rewrites still rewrite history
+
+Because the message is part of the commit content, even a pure message rewrite still produces a new commit object. That is why changing "just the wording" is still history rewriting from Git's point of view.
+
+## Common misconceptions
+
+### "A commit is just a patch plus a label"
+
+Not really. A commit points to a tree, records parents, and stores metadata and message content.
+
+### "Changing only the message should keep the same commit ID"
+
+No. The message is part of the object content.
+
+### "Branch names define the history graph"
+
+No. Branches are refs. Parent links inside commits define the graph.
 
 ## Why this helps you understand commands
 
-Many command differences that feel arbitrary become easier once you see how Git is updating objects, refs, the index, or reachability.
+Once commit structure becomes clearer, it is easier to understand:
+
+- why amend changes SHAs
+- why rebase rewrites descendant commits
+- why merge commits are structurally different
+- why log commands can reconstruct ancestry
+- why branch names are pointers, not the history itself
 
 ## Suggested follow-up
 
-It pairs well with git show, git log --graph, git cat-file, git rev-parse, or git fetch.
+It pairs especially well with:
+
+- `git commit`
+- `git commit --amend`
+- `git rebase`
+- `git log --graph`
+- `git cat-file`

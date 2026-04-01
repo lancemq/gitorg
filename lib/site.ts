@@ -1,4 +1,4 @@
-const DEFAULT_SITE_URL = "http://localhost:3000";
+const DEFAULT_SITE_URL = "https://gitorg.xyz";
 
 function normalizeUrl(value?: string | null) {
   if (!value) {

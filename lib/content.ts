@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import type { ComponentType } from "react";
 import { cache } from "react";
@@ -430,7 +430,7 @@ function extractMetadataField(source: string, key: keyof Omit<DocMetadata, "sour
 }
 
 async function readDocMetadata(locale: Locale, docPath: DocPath): Promise<DocMetadata> {
-  const absolutePath = path.join(process.cwd(), "content", locale, `${docPath}.mdx`);
+  const absolutePath = getDocAbsolutePath(locale, docPath);
   const source = await readFile(absolutePath, "utf8");
   const metadataBlock = source.match(metadataBlockPattern)?.[1] ?? "";
   const title = extractMetadataField(metadataBlock, "title");
@@ -450,6 +450,10 @@ async function readDocMetadata(locale: Locale, docPath: DocPath): Promise<DocMet
     section,
     sourceUrls: [],
   };
+}
+
+function getDocAbsolutePath(locale: Locale, docPath: DocPath) {
+  return path.join(process.cwd(), "content", locale, `${docPath}.mdx`);
 }
 
 const getIndexedDocs = cache(async (locale: Locale): Promise<IndexedDoc[]> => {
@@ -609,6 +613,29 @@ export async function getSearchDocs(locale: Locale): Promise<SearchDoc[]> {
     title: doc.metadata.title,
     summary: doc.metadata.summary,
   }));
+}
+
+export async function getDocLastModified(locale: Locale, docPath: DocPath) {
+  const fileStat = await stat(getDocAbsolutePath(locale, docPath));
+  return fileStat.mtime;
+}
+
+export async function getLatestDocLastModified(
+  locale: Locale,
+  section?: DocSection,
+) {
+  const paths = section
+    ? docPathRegistry.filter((docPath) => docPath.startsWith(`${section}/`))
+    : docPathRegistry;
+
+  const modifiedTimes = await Promise.all(
+    paths.map(async (docPath) => getDocLastModified(locale, docPath)),
+  );
+
+  return modifiedTimes.reduce(
+    (latest, current) => (current > latest ? current : latest),
+    new Date(0),
+  );
 }
 
 export async function getDocNeighbors(locale: Locale, docPath: DocPath): Promise<DocNeighbors> {

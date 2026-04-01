@@ -17,12 +17,162 @@ An object still existing in the repository is not the same as that object still 
 
 ## What reachability means
 
-If an object can still be reached from branches, tags, HEAD, or reflog history, it is usually easier for Git to retain and for you to recover.
+Git stores blobs, trees, commits, and tags as objects. Those objects matter because of how they are connected, not because they sit in a flat list.
+
+An object is usually considered reachable if Git can still get to it from some known starting point, such as:
+
+- a branch ref like `refs/heads/main`
+- a tag
+- `HEAD`
+- a remote-tracking ref
+- reflog history
+
+If some starting point still leads to an object through refs and object links, that object is still part of the reachable graph.
+
+## Why reachability matters so much
+
+Git does not mainly decide what is safe by asking whether you personally remember a SHA. It cares much more about whether the repository still has a path to that object.
+
+That affects two practical things:
+
+1. how easy the object is to recover
+2. whether garbage collection may eventually clean it up
+
+So many recovery questions are really reachability questions in disguise.
 
 ## Why recovery often works after mistakes
 
-After reset, rebase, or merge, old objects often do not disappear immediately. What you lose first is frequently the obvious name, not the underlying data.
+After commands like these:
 
-## Why you still should act quickly
+- `git reset --hard`
+- `git rebase`
+- `git commit --amend`
+- `git branch -D`
 
-Over time, unreachable objects can be collected. That is why recovery gets harder if you wait too long after a destructive mistake.
+people often assume history was instantly deleted.
+
+What usually happened instead is:
+
+- a ref moved to a new commit
+- the old commits lost their most obvious names
+- but the underlying objects did not disappear immediately
+
+That means the first thing you often lose is the visible pointer, not the data itself.
+
+## Why reflog is often the lifeline
+
+Many commits that feel "gone" are no longer in normal branch history, but are still mentioned in reflog entries.
+
+Reflog records where refs used to point.
+
+So even if `main` no longer points to an older commit, reflog may still give you a path back to it. From there you can:
+
+- create a rescue branch
+- reset a ref
+- cherry-pick the needed commit back
+
+That is why a common recovery sequence is:
+
+1. check whether a normal ref still points to the data
+2. if not, inspect reflog
+3. then decide whether to restore the branch or only extract a few commits
+
+## What garbage collection actually does
+
+`git gc` is not random deletion. It is repository maintenance:
+
+- packing objects efficiently
+- improving storage and lookup performance
+- cleaning up old unreachable objects when they have aged past retention windows
+
+So garbage collection is both a performance feature and part of the reason recovery windows are finite.
+
+Conceptually:
+
+- reachable objects are typically retained
+- unreachable objects are not removed immediately
+- but old unreachable objects become more likely candidates for cleanup over time
+
+## Use case 1: why reset does not always destroy recent commits
+
+Suppose you run:
+
+```bash
+git reset --hard HEAD~2
+```
+
+It may look like the last two commits vanished. In many cases what really happened is:
+
+- `main` moved backward
+- those two commits stopped being pointed to by `main`
+
+If reflog still remembers the previous branch tip, those commits are often recoverable.
+
+## Use case 2: why amend leaves an older commit behind for a while
+
+`git commit --amend` usually creates a new commit object instead of mutating the old one in place.
+
+The branch then points to the new commit. If nothing else points to the old commit, it may become unreachable from normal branch history.
+
+But it usually does not disappear immediately, which is why fixing a bad amend is often possible for a while.
+
+## Use case 3: why deleting a branch does not always erase its work immediately
+
+Deleting a branch deletes a ref.
+
+If that branch's commits are not also reachable from some other branch, tag, or reflog entry, they become harder to find.
+
+But harder to find is not the same as immediately gone. There is often still a recovery window before garbage collection removes long-unreachable data.
+
+## Special case: unreachable does not mean instantly nonexistent
+
+This is one of the most important distinctions.
+
+- reachable means safer and easier to recover
+- unreachable means riskier, not necessarily already deleted
+
+In practice the path is often:
+
+- first the object loses a convenient name
+- then it becomes recoverable only through lower-level history like reflog
+- eventually, if enough time passes, it may be garbage-collected
+
+## Special case: recovery windows depend on repository policy
+
+Different repos can retain reflog and unreachable data for different amounts of time.
+
+That means recovery is not only about personal command skill. It also depends on repository maintenance policy and timing.
+
+## Common misconceptions
+
+### "If I know the SHA, the object is safe forever"
+
+No. If the object has already been garbage-collected, knowing its SHA does not recreate it.
+
+### "Reset instantly deletes the underlying objects"
+
+Usually not. Reset most often moves refs first.
+
+### "gc is dangerous, so it should never run"
+
+Not really. `git gc` is normal maintenance. The real risk is misunderstanding how it limits the recovery window for long-unreachable data.
+
+## Why this helps you understand commands
+
+Once reachability is clear, it becomes easier to reason about:
+
+- why reflog can recover so many mistakes
+- why deleting a branch is not always permanent right away
+- why amend, rebase, and reset often leave recoverable history behind
+- why acting quickly matters after destructive mistakes
+- why some old history eventually becomes unrecoverable
+
+## Suggested follow-up
+
+It pairs especially well with:
+
+- `git reflog`
+- `git reset`
+- `git fsck`
+- `git gc`
+- `git prune`

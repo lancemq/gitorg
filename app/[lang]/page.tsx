@@ -116,20 +116,35 @@ export default async function LocalizedHomePage({ params }: Props) {
   return (
     <SiteShell locale={locale} sidebar={getSidebarContent(locale, { kind: "docs", activePath: "overview" })}>
       <StructuredData
-        data={{
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          name: "GitOrg Atlas",
-          url: pageUrl,
-          inLanguage,
-          description: dict.home.hero.description,
-          about: [
-            "Git commands",
-            "Git workflows",
-            "Git internals",
-            "Git recovery",
-          ],
-        }}
+        data={[
+          {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: "GitOrg Atlas",
+            url: pageUrl,
+            inLanguage,
+            description: dict.home.hero.description,
+            about: [
+              "Git commands",
+              "Git workflows",
+              "Git internals",
+              "Git recovery",
+            ],
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: dict.home.hero.title,
+            description: dict.home.hero.description,
+            inLanguage,
+            url: pageUrl,
+            isPartOf: {
+              "@type": "WebSite",
+              name: "GitOrg Atlas",
+              url: siteUrl,
+            },
+          },
+        ]}
       />
       <section className="hero panel" id="overview">
         <div className="hero-copy">

@@ -12,20 +12,186 @@ export const metadata = {
 
 # Merge Bases and Ancestry
 
-## The short version
+Many branch operations feel confusing because we see two branch names, but Git sees a graph and asks a more precise question first: where did these histories last agree?
 
-Explain how Git uses common ancestors to reason about branch differences, merge inputs, and reachability.
+## Start with the core idea
 
-## Key ideas
+When Git compares branches, performs a merge, decides whether a fast-forward is possible, or figures out which commits a rebase should replay, it usually starts by finding a **common ancestor**.
 
-- The common ancestor defines the comparison starting point
-- merge-base directly shapes merge and rebase decisions
-- Reachability underlies many Git queries
+That common ancestor is the `merge base`.
+
+You can think of it like this:
+
+- `main` is at one point in history
+- `feature` is at another point
+- Git first finds the last point where both were still on the same line
+
+Only then can it reason about what changed on each side.
+
+## What ancestry means in Git
+
+Git history is a graph of commit objects.
+
+- A normal commit usually has one parent
+- A merge commit has two or more parents
+- If you can walk parent pointers backward from commit B and eventually reach commit A, then A is an ancestor of B
+
+So when we say:
+
+- A is an ancestor of B  
+  it means B's history already contains A
+- A is not an ancestor of B  
+  it means they may be related, but B cannot reach A through parent links
+
+This is a structural property of the commit graph, not a naming convention.
+
+## What merge-base is really solving
+
+Suppose:
+
+- `main` moved forward
+- `feature` also moved forward
+- now you want to combine them
+
+Git does not simply compare the two latest snapshots and guess. It first asks:
+
+1. what is their common ancestor?
+2. what changed from that ancestor to `main`?
+3. what changed from that ancestor to `feature`?
+
+That is the basis of a three-way comparison:
+
+- base: the merge base
+- ours: the current side
+- theirs: the other side
+
+This is why merge-base is not a niche internal detail. It is central to how Git understands divergent history.
+
+## Why it affects merge
+
+### Fast-forward is an ancestry check
+
+If `main` is already an ancestor of `feature`, then moving `main` to `feature` does not require a merge commit. Git can simply move the ref forward.
+
+So fast-forward is basically:
+
+- check the ancestry relationship
+- if one side is only behind and has not diverged
+- move the ref
+
+### When Git needs a real merge commit
+
+If both branches created commits after the common ancestor, history diverged.
+
+In that case Git must:
+
+- find the merge base
+- compare each side against that base
+- combine the results
+- possibly create a merge commit
+
+## Why it also affects rebase
+
+`git rebase` is often explained as replaying your commits onto a new base.
+
+The important hidden question is: which commits count as *your* commits?
+
+Git answers that by looking at the common ancestor.
+
+Conceptually, it does something like this:
+
+- find the merge base between your branch and the target branch
+- identify commits that exist after that base on your side
+- replay those commits on top of the new base
+
+That is why rebase may replay only some commits, or skip commits Git considers already represented in the target history.
+
+## Use case 1: understanding `main...feature`
+
+Triple-dot syntax often feels mysterious at first, but it is closely tied to the merge base.
+
+In many contexts, `A...B` means:
+
+- find the common ancestor of A and B
+- use that point as the comparison reference
+
+That is usually closer to the question we really care about: what changed since these branches split?
+
+## Use case 2: deciding whether a commit is already included
+
+Teams often need to answer questions like:
+
+- is this fix already in `main`?
+- does this branch still need rebasing?
+
+If a commit is already in the ancestor chain of the target branch, then structurally that history already includes it. That is why ancestry checks are so important for:
+
+- fast-forward decisions
+- replay decisions
+- duplicate-detection logic
+
+## Use case 3: why conflicts are sometimes surprising
+
+People sometimes say:
+
+- the final file differences look small
+- why is merge still conflicting?
+
+Because Git is not only looking at the two end states. It is looking at:
+
+- the common ancestor
+- what one side changed from that base
+- what the other side changed from that base
+
+If both sides changed the same region relative to the same base, Git may flag a conflict even if the end results look "close" at a glance.
+
+## Special case: there may be more than one merge base
+
+In more complex histories, especially when branches have been merged back and forth repeatedly, Git can encounter multiple candidate merge bases.
+
+That is a reminder that Git history is a graph problem, not a simple linear timeline.
+
+Most everyday users do not need to manage that manually, but it helps explain why one merge can behave differently from another even when the branch names look familiar.
+
+## Special case: ancestry checks drive automation too
+
+Release gates and CI policies often need to answer questions such as:
+
+- is commit X already contained in branch Y?
+- is this release branch missing a hotfix from main?
+
+Those are ancestry questions. They are about the commit graph, not superficial file similarity.
+
+## Common misconceptions
+
+### "Git just compares the latest snapshots directly"
+
+Not in many important cases. Merge, rebase, and several comparison modes often begin by finding a merge base.
+
+### "Different branch names mean completely separate histories"
+
+No. Git cares about commit graph structure. Branch names are just refs that point into that graph.
+
+### "Conflict size depends only on how different the final files look"
+
+Not entirely. Conflict behavior also depends on where the common ancestor is and what each side changed relative to it.
 
 ## Why this helps you understand commands
 
-Many command differences that feel arbitrary become easier once you see how Git is updating objects, refs, the index, or reachability.
+Once merge bases and ancestry click, it becomes much easier to understand:
+
+- why some updates can fast-forward and others need merges
+- why rebase replays only part of a branch
+- why `A..B` and `A...B` are not the same
+- why a commit can already be "in history" without being obvious from branch names
+- why merge conflict decisions are inherently three-way
 
 ## Suggested follow-up
 
-It pairs well with git show, git log --graph, git cat-file, git rev-parse, or git fetch.
+It pairs especially well with:
+
+- `git merge`
+- `git rebase`
+- `git cherry-pick`
+- `git log --graph`
+- `git merge-base`

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 
 import { DocTemplate } from "@/components/doc-template";
-import { getDocByPath, getDocHref, getDocNeighbors, getDocPathFromSlugParts, getDocPaths, getRelatedDocs } from "@/lib/content";
+import { getDocByPath, getDocHref, getDocLastModified, getDocNeighbors, getDocPathFromSlugParts, getDocPaths, getRelatedDocs } from "@/lib/content";
 import {
   getDictionary,
   getDocsSectionTitle,
@@ -85,9 +85,10 @@ export default async function DocDetailPage({ params }: Props) {
   }
 
   const doc = await getDocByPath(locale, docPath);
-  const [neighbors, relatedDocs] = await Promise.all([
+  const [neighbors, relatedDocs, lastModified] = await Promise.all([
     getDocNeighbors(locale, docPath),
     getRelatedDocs(locale, docPath),
+    getDocLastModified(locale, docPath),
   ]);
   const DocBody = doc.Component;
   const breadcrumbs =
@@ -116,6 +117,7 @@ export default async function DocDetailPage({ params }: Props) {
       pathname={getDocHref(locale, docPath)}
       sourcesTitle={dict.docsIndex.sourcesTitle}
       sourceUrls={doc.metadata.sourceUrls}
+      lastModified={lastModified.toISOString()}
       Body={DocBody}
       relatedDocs={relatedDocs}
       neighbors={neighbors}

@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 
 import { DocSupport } from "@/components/doc-support";
 import { SiteShell } from "@/components/site-shell";
-import { StructuredData } from "@/components/structured-data";
-import { getCommandDoc, getDocNeighbors, getRelatedDocs } from "@/lib/content";
+import { buildBreadcrumbData, StructuredData } from "@/components/structured-data";
+import { getCommandDoc, getDocLastModified, getDocNeighbors, getRelatedDocs } from "@/lib/content";
 import {
   commandSlugs,
   getDictionary,
@@ -69,32 +69,51 @@ export default async function CommandPage({ params }: Props) {
   const commandSlug = slug as CommandSlug;
   const doc = await getCommandDoc(locale, commandSlug);
   const docPath = `commands/${commandSlug}` as const;
-  const [neighbors, relatedDocs] = await Promise.all([
+  const [neighbors, relatedDocs, lastModified] = await Promise.all([
     getDocNeighbors(locale, docPath),
     getRelatedDocs(locale, docPath),
+    getDocLastModified(locale, docPath),
   ]);
   const DocBody = doc.Component;
   const siteUrl = getSiteUrl();
   const inLanguage = locale === "zh" ? "zh-CN" : "en";
+  const pageUrl = `${siteUrl}/${locale}/commands/${commandSlug}`;
 
   return (
     <SiteShell locale={locale} sidebar={getSidebarContent(locale, { kind: "docs", activePath: `commands/${commandSlug}` })}>
       <StructuredData
-        data={{
-          "@context": "https://schema.org",
-          "@type": "TechArticle",
-          headline: doc.metadata.title,
-          description: doc.metadata.summary,
-          inLanguage,
-          url: `${siteUrl}/${locale}/commands/${commandSlug}`,
-          isPartOf: {
-            "@type": "CollectionPage",
-            name: `${dict.commandPage.breadcrumbs.commands} | GitOrg Atlas`,
-            url: `${siteUrl}/${locale}/commands`,
+        data={[
+          {
+            "@context": "https://schema.org",
+            "@type": "TechArticle",
+            headline: doc.metadata.title,
+            description: doc.metadata.summary,
+            inLanguage,
+            url: pageUrl,
+            dateModified: lastModified.toISOString(),
+            isPartOf: {
+              "@type": "CollectionPage",
+              name: `${dict.commandPage.breadcrumbs.commands} | GitOrg Atlas`,
+              url: `${siteUrl}/${locale}/commands`,
+            },
+            citation: doc.metadata.sourceUrls,
+            about: ["Git", commandSlug],
           },
-          citation: doc.metadata.sourceUrls,
-          about: ["Git", commandSlug],
-        }}
+          buildBreadcrumbData([
+            {
+              name: dict.commandPage.breadcrumbs.overview,
+              url: `${siteUrl}/${locale}`,
+            },
+            {
+              name: dict.commandPage.breadcrumbs.commands,
+              url: `${siteUrl}/${locale}/commands`,
+            },
+            {
+              name: doc.metadata.title,
+              url: pageUrl,
+            },
+          ]),
+        ]}
       />
       <nav className="breadcrumbs" aria-label="Breadcrumb">
         <Link href={`/${locale}`}>{dict.commandPage.breadcrumbs.overview}</Link>

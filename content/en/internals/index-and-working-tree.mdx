@@ -28,3 +28,123 @@ The real difference between many commands is simply which layer they touch:
 - `git reset` can move refs and may also realign the index and working tree
 
 If you treat the index as “the candidate snapshot for the next commit,” Git behavior becomes much more predictable.
+
+## The three layers in more detail
+
+### Working tree
+
+The working tree is what you can see and edit directly in your filesystem right now.
+
+It includes:
+
+- modified files you have not staged
+- untracked files
+- the current checked-out version of tracked files
+
+This layer is for active editing, not for durable history.
+
+### Index
+
+The index, also called the staging area, sits between the working tree and committed history.
+
+Its job is to represent the exact snapshot Git will use for the next commit.
+
+That is why `git add` is not just "save this file." It is more precisely:
+
+- take current content from the working tree
+- write it into the index as part of the next candidate snapshot
+
+### Object store
+
+The object store contains durable Git objects such as:
+
+- blobs
+- trees
+- commits
+- tags
+
+These are the objects that become part of repository history and internal structure.
+
+Once data has been written into objects and connected by refs, it is in a much more durable layer than the working tree.
+
+## Why the index is the layer people most often miss
+
+A lot of Git confusion comes from mentally collapsing the working tree and the index into one thing.
+
+But Git keeps them separate on purpose:
+
+- the working tree can stay messy while you experiment
+- the index can be kept clean as the next precise commit snapshot
+
+That is what makes partial staging and deliberate commit shaping possible.
+
+## Use case 1: why `git add` does not create a commit
+
+After `git add`, your working tree may still contain more changes than the index does.
+
+That is because the index is its own layer. You staged a snapshot candidate, not a finalized history entry.
+
+## Use case 2: why `git status` is so informative
+
+`git status` becomes much easier to read once you realize it is mostly comparing these layers:
+
+- working tree vs index
+- index vs current commit
+
+That is why it can separately tell you:
+
+- what is staged
+- what is modified but unstaged
+- what is untracked
+
+## Use case 3: why `git restore` and `git reset` can feel tricky
+
+These commands can affect different layers depending on flags and mode.
+
+That is why they feel complicated until you start asking:
+
+- is this changing the ref?
+- is this changing the index?
+- is this changing the working tree?
+
+Once you ask those three questions, their behavior becomes much less mysterious.
+
+## Special case: the index is not just a temporary clipboard
+
+Some people imagine the index as a vague buffer. It is more precise than that. It is Git's structured representation of the next commit snapshot.
+
+That is why it matters so much for partial staging and commit crafting.
+
+## Common misconceptions
+
+### "Working tree and index are basically the same"
+
+No. They are separate layers, and many commands are defined by which one they touch.
+
+### "`git add` saves work permanently"
+
+Not by itself. It stages content into the index, but it does not create commit history yet.
+
+### "`git reset` is one single kind of action"
+
+Not really. Reset can move refs and may also realign the index and working tree depending on the mode.
+
+## Why this helps you understand commands
+
+Once the three-layer model is clear, it becomes much easier to reason about:
+
+- staging vs committing
+- unstaged vs staged changes
+- restore behavior
+- reset behavior
+- why status outputs are structured the way they are
+
+## Suggested follow-up
+
+It pairs especially well with:
+
+- `git add`
+- `git status`
+- `git restore`
+- `git reset`
+- `git commit`
