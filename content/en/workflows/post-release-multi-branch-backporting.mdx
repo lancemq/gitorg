@@ -1,0 +1,28 @@
+export const metadata = {
+  title: "Post-release Multi-branch Backporting",
+  slug: "post-release-multi-branch-backporting",
+  locale: "en",
+  section: "workflows",
+  summary: "Control order, validation, and branch boundaries when one fix must be backported into multiple released maintenance lines.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-cherry-pick",
+    "https://git-scm.com/docs/git-branch",
+  ],
+};
+
+# Post-release Multi-branch Backporting
+
+## What this workflow solves
+
+After release, one fix may need to land on multiple supported versions. The problem is no longer just "can we backport it" but:
+
+- which maintained lines really need it
+- in what order they should receive it
+- whether each line can absorb the same patch cleanly
+
+## A steadier order
+
+1. decide which released lines are affected
+2. rank the maintenance lines
+3. backport and validate one line at a time
+4. record which lines are done and which are intentionally skipped

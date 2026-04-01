@@ -1,0 +1,28 @@
+export const metadata = {
+  title: "Merge Queue Workflow",
+  slug: "merge-queue-workflow",
+  locale: "en",
+  section: "workflows",
+  summary: "Use merge queues to control high-throughput PR merges, reduce stale-base retries, and make protected-branch integration more predictable.",
+  sourceUrls: [
+    "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/merging-a-pull-request-with-a-merge-queue?tool=webui",
+  ],
+};
+
+# Merge Queue Workflow
+
+## Where this workflow fits
+
+Merge queue becomes valuable when many pull requests are competing for the same protected branch and branch freshness keeps expiring between review and merge.
+
+## What it solves
+
+- repeated "base changed, re-run checks" cycles
+- race conditions between multiple approved PRs
+- human coordination overhead around who merges next
+
+## Common mistakes
+
+- assuming merge queue replaces review quality
+- enabling queue before CI and branch rules are stable
+- treating queue as a universal default for very small teams

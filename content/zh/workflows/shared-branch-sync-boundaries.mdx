@@ -1,0 +1,52 @@
+export const metadata = {
+  title: "多人共享分支的同步边界",
+  slug: "shared-branch-sync-boundaries",
+  locale: "zh",
+  section: "workflows",
+  summary: "当多人同时在同一分支协作时，明确什么动作可以做、什么动作不该做，减少同步混乱和历史覆盖。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Branching-Rebasing",
+    "https://git-scm.com/docs/git-push",
+    "https://git-scm.com/docs/git-pull",
+  ],
+};
+
+# 多人共享分支的同步边界
+
+## 为什么共享分支特别容易踩坑
+
+只要一条分支开始被多人共同依赖，很多你在个人分支上习以为常的动作都会立刻变得高风险。
+
+比如：
+
+- 随手 rebase
+- 强推覆盖
+- 在不了解别人进度时 reset
+
+这些动作在个人分支上可能只是整理历史，在共享分支上却可能直接制造同步事故。
+
+## 这页最核心的一条原则
+
+共享分支上优先保证“别人能稳定同步”，再考虑“历史是否足够漂亮”。
+
+## 建议统一的边界
+
+- 允许：`fetch`、`pull --ff-only`、显式 merge、明确的 review 合并
+- 谨慎：在共享分支上 rebase
+- 避免：无通知 force push、reset 覆盖、私自改写已共享历史
+
+## 为什么这条边界更稳
+
+因为共享分支最重要的不是单个人的整理效率，而是团队整体的同步可预测性。
+
+## 常见误区
+
+- 把共享分支当成个人分支继续整理
+- 觉得“我只是改了一下历史，别人拉一下就好”
+- 不区分主分支、release 分支、多人协作特性分支的风险等级
+
+## 接下来建议继续学什么
+
+1. `fetch vs pull`
+2. `pr merge strategy and platform settings`
+3. `merge queue workflow`

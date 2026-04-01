@@ -1,0 +1,33 @@
+export const metadata = {
+  title: "Conflict Governance for Long-lived Branches",
+  slug: "long-lived-branch-conflict-governance",
+  locale: "en",
+  section: "workflows",
+  summary: "Turn repeated long-branch conflicts from ad hoc firefighting into a managed process with sync cadence, hotspot tracking, and reusable conflict resolution.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Tools-Rerere",
+    "https://git-scm.com/docs/git-rerere",
+    "https://git-scm.com/docs/git-rebase",
+  ],
+};
+
+# Conflict Governance for Long-lived Branches
+
+## Why this deserves its own workflow
+
+Long-lived branches do not just "have conflicts." They tend to produce recurring, predictable, high-cost conflict zones.
+
+The real upgrade is moving from repeated firefighting to deliberate governance.
+
+## A steadier approach
+
+1. set a sync cadence
+2. identify conflict hotspots
+3. reuse repeated conflict resolutions where appropriate
+4. feed that knowledge back into branch and module boundaries
+
+## Common mistakes
+
+- treating every conflict as a one-off event
+- relying on one maintainer to carry all merge pain
+- enabling reuse mechanisms but never validating the outcome

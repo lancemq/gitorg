@@ -88,13 +88,20 @@ export type WorkflowSlug =
   | "fetch-vs-pull"
   | "feature-branch-collaboration"
   | "parallel-work-with-worktree"
+  | "rerere-for-recurring-conflicts"
+  | "shared-branch-sync-boundaries"
   | "sync-before-review"
+  | "pr-merge-strategy-and-platform-settings"
+  | "merge-queue-workflow"
   | "hotfix-and-urgent-fixes"
+  | "open-source-fork-pr-contribution"
   | "release-branch-workflow"
   | "backport-with-cherry-pick"
+  | "post-release-multi-branch-backporting"
   | "fork-upstream-sync"
   | "squash-vs-rebase-merge"
   | "long-lived-branch-maintenance"
+  | "long-lived-branch-conflict-governance"
   | "submodule-update-flow";
 
 export type InternalsSlug =
@@ -535,13 +542,20 @@ export const workflowSlugs = [
   "fetch-vs-pull",
   "feature-branch-collaboration",
   "parallel-work-with-worktree",
+  "rerere-for-recurring-conflicts",
+  "shared-branch-sync-boundaries",
   "sync-before-review",
+  "pr-merge-strategy-and-platform-settings",
+  "merge-queue-workflow",
   "hotfix-and-urgent-fixes",
+  "open-source-fork-pr-contribution",
   "release-branch-workflow",
   "backport-with-cherry-pick",
+  "post-release-multi-branch-backporting",
   "fork-upstream-sync",
   "squash-vs-rebase-merge",
   "long-lived-branch-maintenance",
+  "long-lived-branch-conflict-governance",
   "submodule-update-flow",
 ] as const satisfies readonly WorkflowSlug[];
 

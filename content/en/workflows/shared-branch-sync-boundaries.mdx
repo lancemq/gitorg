@@ -1,0 +1,28 @@
+export const metadata = {
+  title: "Sync Boundaries on Shared Branches",
+  slug: "shared-branch-sync-boundaries",
+  locale: "en",
+  section: "workflows",
+  summary: "Define what is safe and unsafe on a branch shared by multiple people so sync stays predictable and history rewrites do not turn into team-wide incidents.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Branching-Rebasing",
+    "https://git-scm.com/docs/git-push",
+    "https://git-scm.com/docs/git-pull",
+  ],
+};
+
+# Sync Boundaries on Shared Branches
+
+## Why shared branches are different
+
+Once multiple people depend on the same branch, actions that feel harmless on a personal branch can become destructive team-wide.
+
+## A useful rule
+
+Prioritize "everyone can sync safely" over "history looks maximally tidy."
+
+## Safer boundaries
+
+- allow fetch, ff-only pulls, explicit merges, and deliberate review merges
+- treat shared-branch rebases with care
+- avoid force-push and reset-based history rewrites unless the team explicitly coordinates them

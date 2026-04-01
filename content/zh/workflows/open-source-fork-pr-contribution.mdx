@@ -1,0 +1,60 @@
+export const metadata = {
+  title: "开源贡献 / fork + PR 完整提交流程",
+  slug: "open-source-fork-pr-contribution",
+  locale: "zh",
+  section: "workflows",
+  summary: "把开源贡献里从 fork、同步上游、切分支、提交改动到发起 PR 的完整节奏串起来。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project.html",
+    "https://docs.github.com/articles/syncing-a-fork?platform=linux",
+  ],
+};
+
+# 开源贡献 / fork + PR 完整提交流程
+
+## 这个工作流适合什么场景
+
+当你没有主仓库直接写权限，而是通过 fork + PR 参与协作时，这页就是最标准的工作流骨架。
+
+## 一条完整节奏
+
+1. fork 主仓库
+2. 本地 clone 自己的 fork
+3. 添加 `upstream`
+4. 同步本地主分支到最新上游
+5. 切功能分支
+6. 提交改动并 push 到自己的 fork
+7. 发起 PR
+
+## 为什么这个顺序重要
+
+因为 fork 工作流的核心边界是：
+
+- `upstream` 用来读
+- `origin` 用来推自己的分支
+
+一旦这层边界混了，后面同步、开分支和发 PR 都会变得混乱。
+
+## 最小可用命令流
+
+```bash
+git remote add upstream <upstream-url>
+git fetch upstream
+git switch main
+git rebase upstream/main
+git push origin main
+git switch -c feature/fix-docs
+git push -u origin feature/fix-docs
+```
+
+## 常见误区
+
+- 从过期的 fork 主分支切新任务
+- 把 `origin` 和 `upstream` 角色搞反
+- PR 前不先同步上游主线
+
+## 接下来建议继续学什么
+
+1. `fork upstream sync`
+2. `sync before review`
+3. `feature branch collaboration`

@@ -1,0 +1,51 @@
+export const metadata = {
+  title: "Merge Queue 工作流",
+  slug: "merge-queue-workflow",
+  locale: "zh",
+  section: "workflows",
+  summary: "当团队并发合并很多 PR 时，用 merge queue 降低串行抢占主线、重复排队和基底过期的问题。",
+  sourceUrls: [
+    "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/merging-a-pull-request-with-a-merge-queue?tool=webui",
+  ],
+};
+
+# Merge Queue 工作流
+
+## 这个工作流适合什么团队
+
+如果团队同时有很多 PR 等待合并，主线很容易出现：
+
+- 你刚同步完主线，别人已经先合了
+- CI 通过了，但基底又过期了
+- 多个 PR 抢同一个合并窗口
+
+merge queue 的价值，就是把“谁先合、按什么基底合、如何串行验证”交给平台统一协调。
+
+## 它解决的核心问题
+
+merge queue 不是单纯让合并排队，而是让：
+
+- 合并顺序更可预测
+- 基底更新更统一
+- CI 和保护规则更可解释
+
+## 一个更稳的使用前提
+
+merge queue 最适合这些前提已经成立的团队：
+
+- PR 流程成熟
+- 分支保护规则清晰
+- CI 稳定且值得信任
+- 团队愿意把“谁先合”交给流程，而不是靠人工抢时间
+
+## 常见误区
+
+- 以为 merge queue 能代替评审质量
+- 以为开了 queue 就不需要 pre-review sync
+- 以为 queue 适合所有规模的团队
+
+## 接下来建议继续学什么
+
+1. `pr merge strategy and platform settings`
+2. `sync before review`
+3. `shared-branch-sync-boundaries`

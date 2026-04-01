@@ -1,0 +1,61 @@
+export const metadata = {
+  title: "发布后多维护线回移策略",
+  slug: "post-release-multi-branch-backporting",
+  locale: "zh",
+  section: "workflows",
+  summary: "当一个修复需要在多个已发布版本之间回移时，如何控制顺序、验证范围和分支边界。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-cherry-pick",
+    "https://git-scm.com/docs/git-branch",
+  ],
+};
+
+# 发布后多维护线回移策略
+
+## 这个工作流解决什么问题
+
+最典型的场景是：线上某个 bug 修好了，但你同时还维护多个已发布版本。
+
+这时问题不只是“回不回移”，而是：
+
+- 先回哪条线
+- 哪些线真的需要这个修复
+- 用 merge 还是 cherry-pick
+- 如何验证每条线的回移结果
+
+## 更稳的处理顺序
+
+1. 先确认修复影响哪些已发布版本
+2. 再排维护线优先级
+3. 逐条回移并逐条验证
+4. 明确记录哪些线已经完成，哪些线不需要
+
+## 为什么不能“一次性全搬”
+
+因为不同维护线的上下文往往已经分化：
+
+- 依赖版本不同
+- 配置状态不同
+- 代码结构不同
+
+同一个修复，在不同线上的落地方式未必完全一样。
+
+## 推荐节奏
+
+通常最稳的是：
+
+- 先在最接近主线的一条维护线验证
+- 再向更旧的维护线逐步回移
+- 每条线都单独确认 diff 和测试
+
+## 常见误区
+
+- 以为一个 cherry-pick 成功就代表所有线都能直接复用
+- 不先排优先级，导致多线回移顺序混乱
+- 修完后没有记录“哪些版本已带修复”
+
+## 接下来建议继续学什么
+
+1. `backport with cherry-pick`
+2. `release branch workflow`
+3. `hotfix and urgent fixes`

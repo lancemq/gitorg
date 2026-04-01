@@ -1,0 +1,40 @@
+export const metadata = {
+  title: "Rerere for Recurring Conflicts",
+  slug: "rerere-for-recurring-conflicts",
+  locale: "en",
+  section: "workflows",
+  summary: "Use rerere to record and reuse conflict resolutions when the same merge or rebase conflicts appear again and again.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rerere",
+    "https://git-scm.com/book/en/v2/Git-Tools-Rerere",
+  ],
+};
+
+# Rerere for Recurring Conflicts
+
+## What this workflow solves
+
+On long-lived branches and repeated rebases, the exhausting part is often not conflict itself but solving the same conflict over and over again.
+
+`rerere` helps Git remember how you resolved a conflict before, so similar conflicts can be reused later.
+
+## When rerere is worth enabling
+
+- long-lived branches sync with main regularly
+- the same files conflict repeatedly
+- the team backports or replays similar fixes across multiple branches
+
+## Minimal setup
+
+```bash
+git config --global rerere.enabled true
+git config --global rerere.autoupdate true
+```
+
+The first conflict still needs normal manual resolution. The win appears when similar conflicts show up again.
+
+## Common mistakes
+
+- assuming rerere replaces understanding the conflict
+- accepting reused results without checking them
+- expecting perfect reuse when the surrounding context has changed heavily

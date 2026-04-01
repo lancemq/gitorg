@@ -1,0 +1,81 @@
+export const metadata = {
+  title: "用 rerere 处理重复冲突",
+  slug: "rerere-for-recurring-conflicts",
+  locale: "zh",
+  section: "workflows",
+  summary: "当同一类冲突反复出现时，用 rerere 记录并复用你的解决结果，减少长期分支和频繁同步里的重复劳动。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rerere",
+    "https://git-scm.com/book/en/v2/Git-Tools-Rerere",
+  ],
+};
+
+# 用 rerere 处理重复冲突
+
+## 这个工作流解决什么问题
+
+在长期分支、频繁 rebase、反复同步主线的场景里，最让人疲惫的不是“会冲突”，而是“同一个冲突反复解决很多次”。
+
+`rerere` 的价值，就是让 Git 记住你之前如何解决过某类冲突，下次再遇到相同冲突时尽量帮你复用结果。
+
+## 什么时候适合启用 rerere
+
+- 长期分支经常同步主线
+- 同一批文件经常发生重复冲突
+- 团队在 release 线、维护线和主线之间反复搬运修复
+
+如果你平时很少遇到重复冲突，rerere 不一定会立刻带来明显收益。
+
+## 最小可用流程
+
+```bash
+git config --global rerere.enabled true
+git config --global rerere.autoupdate true
+```
+
+之后第一次遇到冲突时，仍然按正常方式手动解决、暂存并继续流程。  
+当类似冲突再次出现时，Git 就有机会复用之前的解决记录。
+
+## 一个典型场景
+
+假设一条长期分支每周都要 rebase 到最新 `main`，而某几个配置文件几乎每次都会冲突。
+
+第一次冲突时：
+
+1. 手动解决
+2. `git add` 暂存结果
+3. 完成 rebase 或 merge
+
+之后同类冲突再次出现时，rerere 就可能自动套用之前的处理方式，把你从重复劳动里解放出来。
+
+## 为什么这个流程更稳
+
+rerere 不是让你“不理解冲突”，而是把“已经理解并解决过的冲突”沉淀成可复用经验。
+
+它最适合团队已经知道哪些区域高频冲突、而且这些冲突解决方式相对稳定的场景。
+
+## 关键检查点
+
+即使启用了 rerere，也仍然要确认：
+
+1. 这次复用的冲突解决结果是否仍然正确
+2. 上下文是否和上次完全一致
+3. 自动更新后的文件是否需要再做人工检查
+
+## 常见误区
+
+- 以为 rerere 可以代替理解冲突本身
+- 看到自动复用就完全不检查结果
+- 在冲突模式变化很大的场景里，误以为 rerere 总能完美套用
+
+## 特殊情况
+
+- 如果冲突上下文已经变形太多，rerere 可能无法复用
+- 如果同一类文件冲突逻辑频繁改变，盲目信任自动结果会有风险
+- 最适合 rerere 的不是“一次性冲突”，而是“重复冲突”
+
+## 接下来建议继续学什么
+
+1. `long-lived branch conflict governance`
+2. `long-lived branch maintenance`
+3. `fetch vs pull`

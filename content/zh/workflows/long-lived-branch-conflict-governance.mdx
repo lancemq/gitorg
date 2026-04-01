@@ -1,0 +1,53 @@
+export const metadata = {
+  title: "长期分支冲突治理",
+  slug: "long-lived-branch-conflict-governance",
+  locale: "zh",
+  section: "workflows",
+  summary: "把长期分支里的冲突处理从临时救火升级成可治理的流程，包括同步节奏、冲突热区识别和重复冲突复用。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Tools-Rerere",
+    "https://git-scm.com/docs/git-rerere",
+    "https://git-scm.com/docs/git-rebase",
+  ],
+};
+
+# 长期分支冲突治理
+
+## 为什么“冲突治理”值得单独成篇
+
+很多团队对长期分支的认知停留在“有冲突就解决”，但真正痛苦的地方在于：
+
+- 冲突反复出现
+- 同一批文件总是高风险区
+- 每次同步都像一次小型事故
+
+所以你需要的不是一次次临时救火，而是一套长期治理思路。
+
+## 更稳的治理思路
+
+1. 先固定同步节奏，减少大爆炸式整合
+2. 标记高频冲突文件和模块
+3. 用 rerere 复用重复冲突的解决方案
+4. 在团队里沉淀“哪些区域最容易打架”
+
+## 为什么这比“等冲突来了再说”更有效
+
+因为长期分支里的冲突，往往不是随机事件，而是可重复、可观察、可治理的问题。
+
+## 很值得形成的习惯
+
+- 每次同步后记录冲突热区
+- 对重复冲突启用 rerere
+- 一旦某些目录长期高冲突，回头讨论是不是应该拆模块、缩小并行修改范围
+
+## 常见误区
+
+- 以为冲突只是个人操作问题
+- 每次同步都靠同一个人硬扛
+- 看到 rerere 能复用，就不再检查结果
+
+## 接下来建议继续学什么
+
+1. `rerere for recurring conflicts`
+2. `long-lived branch maintenance`
+3. `shared-branch-sync-boundaries`

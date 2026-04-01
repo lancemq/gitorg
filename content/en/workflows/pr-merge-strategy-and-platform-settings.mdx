@@ -1,0 +1,34 @@
+export const metadata = {
+  title: "PR Merge Strategy and Platform Settings",
+  slug: "pr-merge-strategy-and-platform-settings",
+  locale: "en",
+  section: "workflows",
+  summary: "Make pull request merge policy and platform configuration part of the same decision so history shape and repository settings stay aligned.",
+  sourceUrls: [
+    "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github?apiVersion=2022-11-28",
+    "https://docs.github.com/articles/about-pull-request-merges",
+  ],
+};
+
+# PR Merge Strategy and Platform Settings
+
+## Why these two decisions belong together
+
+Teams often debate squash versus rebase merge in abstract terms, but the real outcome depends on what the hosting platform actually allows.
+
+This workflow keeps two questions together:
+
+- what shape of history does the team want
+- what merge methods and branch protections does the platform enforce
+
+## A steadier decision order
+
+1. decide whether main should preserve PR granularity or commit granularity
+2. decide how much history rewriting is acceptable after review
+3. configure the platform to expose only the approved merge methods
+
+## Common mistakes
+
+- assuming the platform default equals the team default
+- documenting one merge rule while leaving three methods enabled
+- discussing Git semantics without checking repository settings and protections

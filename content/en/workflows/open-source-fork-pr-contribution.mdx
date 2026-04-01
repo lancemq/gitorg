@@ -1,0 +1,36 @@
+export const metadata = {
+  title: "Open Source Contribution with Fork + PR",
+  slug: "open-source-fork-pr-contribution",
+  locale: "en",
+  section: "workflows",
+  summary: "Connect the full open-source contribution loop from fork and upstream sync through branch creation, pushing to your fork, and opening a pull request.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project.html",
+    "https://docs.github.com/articles/syncing-a-fork?platform=linux",
+  ],
+};
+
+# Open Source Contribution with Fork + PR
+
+## Where this workflow fits
+
+Use this flow when you do not have direct write access to the canonical repository and contribute through a fork plus pull request model.
+
+## The complete rhythm
+
+1. fork the canonical repository
+2. clone your fork locally
+3. add `upstream`
+4. sync local main with upstream
+5. create a feature branch
+6. push that branch to your fork
+7. open the PR
+
+## Why the remote boundary matters
+
+In this model:
+
+- `upstream` is usually where you read from
+- `origin` is usually where you push your work
+
+Confusing those two roles is the source of many fork-workflow mistakes.
