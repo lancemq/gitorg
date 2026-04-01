@@ -1,0 +1,85 @@
+export const metadata = {
+  title: "Rescue work from detached HEAD",
+  slug: "detached-head-rescue",
+  locale: "en",
+  section: "recovery",
+  summary: "Detached HEAD is not an error by itself. The real risk is creating commits there and leaving them without a branch name that preserves them.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-switch",
+    "https://git-scm.com/docs/git-checkout",
+    "https://git-scm.com/docs/git-reflog",
+  ],
+};
+
+# Rescue work from detached HEAD
+
+## Detached HEAD simply means HEAD points to a commit, not a branch name
+
+This often happens when you check out:
+
+- an older commit
+- a tag
+- a specific object for inspection
+
+That state is not automatically a problem.
+
+## The real risk
+
+The risk begins when you:
+
+- make new commits while detached
+- switch away again
+- forget to attach those commits to a branch
+
+At that point the commits may still exist, but they become easier to lose track of.
+
+## If you are still in detached HEAD and the work matters
+
+Create a branch immediately:
+
+```bash
+git switch -c rescue/detached-head
+```
+
+That single step is often the whole rescue.
+
+## If you already left that state
+
+Use reflog first:
+
+```bash
+git reflog
+```
+
+Find the commit you created in detached HEAD, then attach a branch to it:
+
+```bash
+git switch -c rescue/detached-head <commit>
+```
+
+## How to recognize detached HEAD
+
+Common signs include:
+
+- `git status` explicitly says detached HEAD
+- `git branch --show-current` prints nothing
+- `HEAD` points directly to a commit instead of a branch
+
+## When no rescue is needed
+
+If you only inspected an old commit and did not create new commits, you usually do not need a rescue path at all.  
+You can just return to a branch:
+
+```bash
+git switch main
+```
+
+## The best habit
+
+If you create anything worth keeping while detached, do this immediately:
+
+```bash
+git switch -c <branch-name>
+```
+
+Name it first, then continue. That keeps detached HEAD from turning into a recovery story.

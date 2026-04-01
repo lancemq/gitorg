@@ -1,0 +1,94 @@
+export const metadata = {
+  title: "Recover after an over-aggressive reset",
+  slug: "recover-after-reset",
+  locale: "en",
+  section: "recovery",
+  summary: "When reset moves the branch, index, or working tree farther than expected, first identify which layer changed, then recover with reflog, ORIG_HEAD, or a rescue branch.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-reset",
+    "https://git-scm.com/docs/git-reflog",
+    "https://git-scm.com/book/en/v2/Git-Tools-Reset-Demystified",
+  ],
+};
+
+# Recover after an over-aggressive reset
+
+## First, identify what you actually lost
+
+`git reset` is scary because it may affect three different layers:
+
+- where the branch and `HEAD` point
+- what is staged in the index
+- what your working tree files look like
+
+Before you “fix” anything, stop and decide which layer changed unexpectedly.
+
+## The safest first step
+
+```bash
+git status
+git log --oneline --graph --decorate -n 20
+git reflog
+```
+
+Each command answers a different question:
+
+- `status` checks working tree and index state
+- `log` shows where the branch points now
+- `reflog` shows where it pointed before
+
+Many “lost commit” situations are really “the branch name moved away from the commit.”
+
+## Three common cases
+
+### 1. You wanted to uncommit, but keep your local changes
+
+This is usually closer to a `--soft` or `--mixed` scenario.  
+If you reset farther back than intended, find the earlier position in reflog and create a rescue branch first:
+
+```bash
+git reflog
+git switch -c rescue/reset HEAD@{1}
+```
+
+That gives the old position a durable name before you decide what to do next.
+
+### 2. The branch moved, but the commits still exist
+
+This is the most common case. Find the old position and recreate a pointer:
+
+```bash
+git reflog
+git branch rescue/reset <old-commit>
+```
+
+Then decide whether to keep working from that rescue branch or move the original branch back.
+
+### 3. `reset --hard` also replaced your working tree
+
+This is the dangerous one.  
+If the content never existed in a commit, stash, or another ref, Git may not be able to restore the file state.  
+But if those changes did exist in a commit, reflog can often still get you back to that point.
+
+## When `ORIG_HEAD` helps
+
+Git updates `ORIG_HEAD` for some risky operations, and it can be a fast way back:
+
+```bash
+git show ORIG_HEAD
+git switch -c rescue/orig-head ORIG_HEAD
+```
+
+Do not treat it as a full history log. It is closer to “the position before the last big move.”
+
+## A conservative recovery order
+
+1. Stop running more `reset` commands
+2. Inspect `git reflog`
+3. Create a `rescue/*` branch from the old position
+4. Only then choose whether to reset back, cherry-pick, or continue from the rescue branch
+
+## A good rule
+
+If you are not fully sure which old position is correct, do not move the original branch yet.  
+Create a rescue branch first. It is the cheapest safety move in this kind of incident.

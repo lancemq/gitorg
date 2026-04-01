@@ -1,0 +1,91 @@
+export const metadata = {
+  title: "误删分支后怎么找回",
+  slug: "recover-deleted-branch",
+  locale: "zh",
+  section: "recovery",
+  summary: "分支删掉后，通常先确认是名字没了还是提交也不可达了，再用 reflog、merge-base 和旧引用位置把分支接回来。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-branch",
+    "https://git-scm.com/docs/git-reflog",
+    "https://git-scm.com/book/en/v2/Git-Internals-Maintenance-and-Data-Recovery",
+  ],
+};
+
+# 误删分支后怎么找回
+
+## 先别把“分支没了”和“提交没了”混在一起
+
+删除分支，先消失的通常是分支名，不一定是底层提交对象。  
+只要还有别的引用、reflog 或最近历史能指向那些提交，恢复往往不难。
+
+## 第一轮检查
+
+```bash
+git branch -a
+git reflog
+git log --oneline --graph --decorate --all -n 40
+```
+
+你要回答两个问题：
+
+1. 这个分支只是本地删了，还是远端也没有了？
+2. 它最后大概停在哪个提交上？
+
+## 最常见的恢复方式
+
+如果你在 reflog 或图里找到了那个提交，直接把分支重新建回来：
+
+```bash
+git branch feature/rescue <commit>
+```
+
+或者如果你想立刻切过去：
+
+```bash
+git switch -c feature/rescue <commit>
+```
+
+## 如果是远端分支还在
+
+那问题更简单，本地只是把跟踪分支删了：
+
+```bash
+git fetch origin
+git switch -c feature/name --track origin/feature/name
+```
+
+这种情况更像“重新建立本地入口”，不是复杂恢复。
+
+## 如果你只记得大概位置
+
+可以结合这些线索：
+
+- 最近做过 merge / rebase / checkout 的 reflog
+- 相关 PR 合并点
+- `git merge-base`
+- 历史图里的分叉点
+
+恢复的关键不是马上找到分支名，而是先找到它最后指向的提交。
+
+## 什么时候恢复会变难
+
+下面几种情况会明显提高难度：
+
+- 分支删掉很久了
+- 没有任何别的分支或标签再引用那些提交
+- reflog 窗口已经过去
+- 仓库已经做过垃圾回收
+
+所以一旦发现删错，最好立刻停下来找，而不是先继续整理仓库。
+
+## 推荐动作顺序
+
+1. `git reflog`
+2. 找到最后一个可信提交
+3. 新建 `rescue/*` 分支
+4. 再决定是否恢复原分支名
+
+## 一个经验
+
+真正的恢复目标不是“把原名字抢回来”，而是“先把原来的工作接住”。  
+名字可以后改，提交位置先接住最重要。

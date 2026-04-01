@@ -1,0 +1,91 @@
+export const metadata = {
+  title: "rebase 出错后怎么恢复",
+  slug: "recover-after-rebase",
+  locale: "zh",
+  section: "recovery",
+  summary: "当 rebase 过程中冲突、提交丢失或结果不对时，先停止继续改写历史，再用 reflog、abort 和救援分支恢复可控状态。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rebase",
+    "https://git-scm.com/docs/git-reflog",
+    "https://git-scm.com/book/en/v2/Git-Branching-Rebasing",
+  ],
+};
+
+# rebase 出错后怎么恢复
+
+## 先记住：rebase 出错时最怕继续慌着重试
+
+很多人一看到冲突、提交顺序不对，或者觉得某个提交不见了，就继续 rebase、reset、checkout 来回试。  
+真正更稳的做法是先停下，先把“出问题前的入口”保住。
+
+## 先分清两类场景
+
+### 场景一：rebase 还没结束
+
+这时 Git 通常会明确告诉你可以：
+
+- `git rebase --continue`
+- `git rebase --skip`
+- `git rebase --abort`
+
+如果你已经不确定现在的中间状态对不对，优先考虑 `--abort`，回到 rebase 之前再重新判断。
+
+### 场景二：rebase 已经完成，但结果不对
+
+这时不要再假设“可能只是我看错了”。  
+先直接看 reflog，确认 rebase 前分支原本在哪里。
+
+```bash
+git reflog
+```
+
+常见做法是先用 rebase 前的位置建一条救援分支：
+
+```bash
+git switch -c rescue/pre-rebase HEAD@{3}
+```
+
+## 为什么 rebase 后“提交像丢了”
+
+因为 rebase 的本质不是搬运原来的提交对象，而是基于新基底重放一组新的提交。  
+这意味着：
+
+- 提交 ID 会变
+- 历史关系会变
+- 旧提交对象可能暂时还在，但分支名不再指向它们
+
+所以很多“丢了”的感觉，其实是“名字改指向了新提交”。
+
+## 一个保守恢复流程
+
+```bash
+git status
+git log --oneline --graph --decorate -n 30
+git reflog
+git switch -c rescue/pre-rebase <old-commit>
+```
+
+然后再决定是：
+
+- 直接回到 rebase 前
+- 只摘回部分提交
+- 还是重新做一遍更干净的 rebase
+
+## 什么时候该直接 `--abort`
+
+如果你满足下面任一条件，通常优先 `git rebase --abort`：
+
+- 还在 rebase 过程里
+- 你已经分不清自己解决的是哪一个冲突
+- 你不确定 `skip` 会不会漏掉重要提交
+- 这次 rebase 本来就只是本地整理，不值得冒险继续赌
+
+## 什么时候该先建救援分支
+
+如果 rebase 已经结束、历史已经改写、而且你想对比“改之前”和“改之后”，那就先建救援分支。  
+它的价值不是马上修好，而是先把证据和旧位置保住。
+
+## 一个实用原则
+
+rebase 失败时，目标不是立刻“修到能 push”，而是先恢复到“你还能解释现在发生了什么”的状态。  
+能解释，后面才安全。

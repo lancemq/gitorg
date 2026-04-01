@@ -1,0 +1,97 @@
+export const metadata = {
+  title: "reset 过头后怎么恢复",
+  slug: "recover-after-reset",
+  locale: "zh",
+  section: "recovery",
+  summary: "当 reset 把分支、暂存区或工作区挪得太远时，先分清是哪一层变了，再用 reflog、ORIG_HEAD 或救援分支恢复。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-reset",
+    "https://git-scm.com/docs/git-reflog",
+    "https://git-scm.com/book/en/v2/Git-Tools-Reset-Demystified",
+  ],
+};
+
+# reset 过头后怎么恢复
+
+## 先判断你到底丢了什么
+
+`git reset` 最容易让人慌，是因为它可能同时影响三层状态：
+
+- 分支和 `HEAD` 指向哪里
+- 暂存区里是什么
+- 工作区文件长什么样
+
+恢复前先别急着再执行更多命令。先看清到底是哪一层被改了。
+
+## 最稳的第一步
+
+```bash
+git status
+git log --oneline --graph --decorate -n 20
+git reflog
+```
+
+这三步的意义不同：
+
+- `status` 看工作区和暂存区
+- `log` 看当前分支现在指向哪
+- `reflog` 看它之前指向过哪
+
+很多时候，“丢了提交”其实只是分支名字被挪走了。
+
+## 常见三种情况
+
+### 1. 只是想撤回提交，但工作区改动还想保留
+
+这通常更接近 `--soft` 或 `--mixed` 的撤回场景。  
+如果你 reset 得比预期更远，可以直接从 reflog 找到原位置，再建一个救援分支：
+
+```bash
+git reflog
+git switch -c rescue/reset HEAD@{1}
+```
+
+先把旧位置接住，再决定是否把当前分支移动回去。
+
+### 2. 分支指针被挪走了，但提交还在
+
+这是最常见的“看起来没了，其实还在”。做法通常是：
+
+```bash
+git reflog
+git branch rescue/reset <old-commit>
+```
+
+如果确认那个旧提交就是你要找回的位置，再决定是否：
+
+- 继续从救援分支整理
+- 或把原分支重置回去
+
+### 3. `reset --hard` 连工作区也覆盖了
+
+这是最危险的场景。  
+如果改动从未进入过提交、stash 或别的引用，Git 不一定能帮你找回工作区文件内容。  
+但如果这些内容之前至少进入过某个提交，通常仍然可以借助 reflog 找回旧提交。
+
+## `ORIG_HEAD` 什么时候有用
+
+Git 在部分高风险操作后会更新 `ORIG_HEAD`，它经常能帮你迅速回到操作前的位置。
+
+```bash
+git show ORIG_HEAD
+git switch -c rescue/orig-head ORIG_HEAD
+```
+
+但不要把它当成永久救命绳。它更像“最近一次大动作前的位置”，而不是完整历史。
+
+## 推荐的恢复顺序
+
+1. 停止继续 `reset`
+2. 运行 `git reflog`
+3. 用旧位置新建 `rescue/*` 分支
+4. 再决定是 `reset` 回去、`cherry-pick`，还是从救援分支继续整理
+
+## 一个判断原则
+
+如果你还没完全确认旧位置是否正确，不要直接把原分支硬挪回去。  
+先建救援分支，是这类事故里最便宜也最稳的动作。

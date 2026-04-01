@@ -1,0 +1,86 @@
+export const metadata = {
+  title: "detached HEAD 状态下如何自救",
+  slug: "detached-head-rescue",
+  locale: "zh",
+  section: "recovery",
+  summary: "detached HEAD 本身不是错误，真正的风险是你在这个状态下产生了值得保留的提交却没有立刻接住它们。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-switch",
+    "https://git-scm.com/docs/git-checkout",
+    "https://git-scm.com/docs/git-reflog",
+  ],
+};
+
+# detached HEAD 状态下如何自救
+
+## detached HEAD 不是灾难，本质上只是“HEAD 没指向分支名”
+
+当你 checkout 某个旧提交、标签或特定对象时，`HEAD` 可能直接指向一个提交，而不是某个分支。  
+这就叫 detached HEAD。
+
+它本身完全可以是正常状态，比如：
+
+- 想临时检查历史
+- 想验证某个旧版本
+- 想做一次短实验
+
+## 真正的风险在哪
+
+风险不在“进入 detached HEAD”，而在于：
+
+- 你在这个状态下继续提交了
+- 然后又切回别的分支
+- 结果这些提交没有被任何分支名接住
+
+这时提交对象未必立刻消失，但会变得更难找到。
+
+## 如果你已经在 detached HEAD 下做了提交
+
+最稳的动作是马上建分支：
+
+```bash
+git switch -c rescue/detached-head
+```
+
+这一步的作用不是修复一切，而是先给当前提交一个名字。
+
+## 如果你已经离开那个状态了
+
+先不要慌，通常先看 reflog：
+
+```bash
+git reflog
+```
+
+找到当时 detached HEAD 下的提交位置后，再把它接回来：
+
+```bash
+git switch -c rescue/detached-head <commit>
+```
+
+## 怎么判断当前是不是 detached HEAD
+
+常见信号有：
+
+- `git status` 明确提示 detached HEAD
+- `git branch --show-current` 没有输出
+- `HEAD` 指向的是提交而不是分支
+
+## 什么时候可以不恢复
+
+如果你只是看了一眼旧提交、没有产生新提交，也没有要保留的工作，那 detached HEAD 根本不需要“修复”。  
+你只要切回正常分支就行：
+
+```bash
+git switch main
+```
+
+## 一个实用习惯
+
+只要你在 detached HEAD 状态下做了任何值得保留的实验，第一反应就应该是：
+
+```bash
+git switch -c <some-branch-name>
+```
+
+先命名，再继续。这样后面几乎不会变成恢复问题。

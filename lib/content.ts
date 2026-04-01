@@ -8,10 +8,12 @@ import {
   commandSlugs,
   internalsSlugs,
   learningPathSlugs,
+  recoverySlugs,
   workflowSlugs,
   type CommandSlug,
   type InternalsSlug,
   type Locale,
+  type RecoverySlug,
 } from "@/lib/i18n";
 
 export type DocSection =
@@ -151,6 +153,10 @@ export const docPathRegistry = [
   "internals/commit-message-and-parents",
   "internals/refspec-and-ref-updates",
   "recovery/reflog-recovery",
+  "recovery/recover-after-reset",
+  "recovery/recover-after-rebase",
+  "recovery/recover-deleted-branch",
+  "recovery/detached-head-rescue",
   "concepts/git-history",
 ] as const;
 
@@ -269,6 +275,10 @@ const contentModules = {
     "internals/commit-message-and-parents": () => import("@/content/zh/internals/commit-message-and-parents.mdx"),
     "internals/refspec-and-ref-updates": () => import("@/content/zh/internals/refspec-and-ref-updates.mdx"),
     "recovery/reflog-recovery": () => import("@/content/zh/recovery/reflog-recovery.mdx"),
+    "recovery/recover-after-reset": () => import("@/content/zh/recovery/recover-after-reset.mdx"),
+    "recovery/recover-after-rebase": () => import("@/content/zh/recovery/recover-after-rebase.mdx"),
+    "recovery/recover-deleted-branch": () => import("@/content/zh/recovery/recover-deleted-branch.mdx"),
+    "recovery/detached-head-rescue": () => import("@/content/zh/recovery/detached-head-rescue.mdx"),
     "concepts/git-history": () => import("@/content/zh/concepts/git-history.mdx"),
   },
   en: {
@@ -384,6 +394,10 @@ const contentModules = {
     "internals/commit-message-and-parents": () => import("@/content/en/internals/commit-message-and-parents.mdx"),
     "internals/refspec-and-ref-updates": () => import("@/content/en/internals/refspec-and-ref-updates.mdx"),
     "recovery/reflog-recovery": () => import("@/content/en/recovery/reflog-recovery.mdx"),
+    "recovery/recover-after-reset": () => import("@/content/en/recovery/recover-after-reset.mdx"),
+    "recovery/recover-after-rebase": () => import("@/content/en/recovery/recover-after-rebase.mdx"),
+    "recovery/recover-deleted-branch": () => import("@/content/en/recovery/recover-deleted-branch.mdx"),
+    "recovery/detached-head-rescue": () => import("@/content/en/recovery/detached-head-rescue.mdx"),
     "concepts/git-history": () => import("@/content/en/concepts/git-history.mdx"),
   },
 } satisfies Record<Locale, Record<DocPath, ContentLoader>>;
@@ -523,7 +537,7 @@ function getOrderedPathSeries(section: DocSection): DocPath[] {
     case "learning-path":
       return learningPathSlugs.map((slug) => `learning-path/${slug}` as DocPath);
     case "recovery":
-      return ["recovery/reflog-recovery"];
+      return recoverySlugs.map((slug) => `recovery/${slug}` as DocPath);
     case "concepts":
       return ["concepts/git-history"];
     default:
@@ -574,6 +588,11 @@ export async function getInternalsDocs(locale: Locale) {
   return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("internals/")));
 }
 
+export async function getRecoveryDocs(locale: Locale) {
+  const docs = await getIndexedDocs(locale);
+  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("recovery/")));
+}
+
 export function getDocHref(locale: Locale, docPath: DocPath) {
   if (docPath.startsWith("commands/")) {
     return `/${locale}/commands/${docPath.replace("commands/", "")}`;
@@ -593,6 +612,10 @@ export function getDocHref(locale: Locale, docPath: DocPath) {
 
   if (docPath.startsWith("internals/")) {
     return `/${locale}/internals/${docPath.replace("internals/", "")}`;
+  }
+
+  if (docPath.startsWith("recovery/")) {
+    return `/${locale}/recovery/${docPath.replace("recovery/", "")}`;
   }
 
   if (docPath === "learning-path/quick-start") {
@@ -737,6 +760,26 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
     "commands/git-reset",
     "commands/git-rebase",
   ],
+  "recovery/recover-after-reset": [
+    "commands/git-reset",
+    "commands/git-reflog",
+    "commands/git-revert",
+  ],
+  "recovery/recover-after-rebase": [
+    "commands/git-rebase",
+    "commands/git-reflog",
+    "internals/refs-and-head",
+  ],
+  "recovery/recover-deleted-branch": [
+    "commands/git-branch",
+    "commands/git-reflog",
+    "internals/reachability-and-garbage-collection",
+  ],
+  "recovery/detached-head-rescue": [
+    "commands/git-switch",
+    "commands/git-reflog",
+    "internals/refs-and-head",
+  ],
 };
 
 export async function getRelatedDocs(
@@ -761,7 +804,7 @@ export async function getRelatedDocs(
 
 export async function getFeaturedSectionDocs(
   locale: Locale,
-  section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "internals">,
+  section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "internals" | "recovery">,
   limit = 3,
 ): Promise<DocCard[]> {
   const docs =
@@ -773,7 +816,9 @@ export async function getFeaturedSectionDocs(
         ? await getBestPracticeDocs(locale)
         : section === "workflows"
           ? await getWorkflowDocs(locale)
-          : await getInternalsDocs(locale);
+          : section === "internals"
+            ? await getInternalsDocs(locale)
+            : await getRecoveryDocs(locale);
 
   return docs.slice(0, limit).map((doc) => toIndexedDocCard(locale, doc));
 }
@@ -810,6 +855,11 @@ export async function getCommandDoc(locale: Locale, slug: CommandSlug) {
 
 export async function getInternalDoc(locale: Locale, slug: InternalsSlug) {
   const docPath = `internals/${slug}` as DocPath;
+  return getDocByPath(locale, docPath);
+}
+
+export async function getRecoveryDoc(locale: Locale, slug: RecoverySlug) {
+  const docPath = `recovery/${slug}` as DocPath;
   return getDocByPath(locale, docPath);
 }
 

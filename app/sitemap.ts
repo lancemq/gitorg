@@ -43,6 +43,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.85,
       }))(),
       (async () => ({
+        pathname: `/${locale}/recovery`,
+        lastModified: await getLatestDocLastModified(locale, "recovery"),
+        changeFrequency: "weekly" as const,
+        priority: 0.84,
+      }))(),
+      (async () => ({
         pathname: `/${locale}/internals`,
         lastModified: await getLatestDocLastModified(locale, "internals"),
         changeFrequency: "monthly" as const,

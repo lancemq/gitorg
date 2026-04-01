@@ -118,6 +118,13 @@ export type InternalsSlug =
   | "commit-message-and-parents"
   | "refspec-and-ref-updates";
 
+export type RecoverySlug =
+  | "reflog-recovery"
+  | "recover-after-reset"
+  | "recover-after-rebase"
+  | "recover-deleted-branch"
+  | "detached-head-rescue";
+
 export type LearningPathSlug =
   | "quick-start"
   | "setup-and-clone"
@@ -184,6 +191,11 @@ type Dictionary = {
     description: string;
   };
   workflowIndex: {
+    eyebrow: string;
+    title: string;
+    description: string;
+  };
+  recoveryIndex: {
     eyebrow: string;
     title: string;
     description: string;
@@ -335,6 +347,18 @@ function buildWorkflowNavItem(locale: Locale, activePath?: string): NavItem {
   return {
     label: locale === "zh" ? "工作流" : "Workflows",
     href: `/${locale}/workflows`,
+    active: parentActive,
+  };
+}
+
+function buildRecoveryNavItem(locale: Locale, activePath?: string): NavItem {
+  const parentActive =
+    activePath === "recovery-index" ||
+    recoverySlugs.some((slug) => activePath === `recovery/${slug}`);
+
+  return {
+    label: locale === "zh" ? "恢复与排障" : "Recovery",
+    href: `/${locale}/recovery`,
     active: parentActive,
   };
 }
@@ -559,6 +583,14 @@ export const workflowSlugs = [
   "submodule-update-flow",
 ] as const satisfies readonly WorkflowSlug[];
 
+export const recoverySlugs = [
+  "reflog-recovery",
+  "recover-after-reset",
+  "recover-after-rebase",
+  "recover-deleted-branch",
+  "detached-head-rescue",
+] as const satisfies readonly RecoverySlug[];
+
 export const internalsSlugs = [
   "object-database",
   "index-and-working-tree",
@@ -589,6 +621,7 @@ const zhDictionary: Dictionary = {
             buildBestPracticeNavItem("zh", activePath),
             buildWorkflowNavItem("zh", activePath),
             buildCommandNavItem("zh", activePath),
+            buildRecoveryNavItem("zh", activePath),
           ],
         },
         {
@@ -628,6 +661,11 @@ const zhDictionary: Dictionary = {
     eyebrow: "Workflows",
     title: "Git 工作流频道",
     description: "把日常协作中的关键流程拆成多个专题，包括同步策略、功能分支协作、评审前同步，以及紧急修复场景。",
+  },
+  recoveryIndex: {
+    eyebrow: "Recovery",
+    title: "Git 恢复与排障频道",
+    description: "把最常见的 Git 误操作和恢复路径拆成多个专题，包括 reset、rebase、误删分支、detached HEAD 与 reflog 自救。",
   },
   learningPathIndex: {
     eyebrow: "Quick Start",
@@ -917,8 +955,8 @@ const zhDictionary: Dictionary = {
       {
         id: "recovery",
         eyebrow: "Recovery",
-        title: "恢复手册",
-        description: "误操作后的定位与恢复思路。",
+        title: "恢复与排障",
+        description: "误操作后的定位、判断与恢复路径。",
       },
       {
         id: "concepts",
@@ -939,7 +977,7 @@ const zhDictionary: Dictionary = {
       concepts: "概念",
       faq: "常见问题",
       learningPath: "学习路径",
-      recovery: "恢复手册",
+      recovery: "恢复与排障",
     },
   },
   commandSlugs,
@@ -1218,6 +1256,7 @@ const enDictionary: Dictionary = {
             buildBestPracticeNavItem("en", activePath),
             buildWorkflowNavItem("en", activePath),
             buildCommandNavItem("en", activePath),
+            buildRecoveryNavItem("en", activePath),
           ],
         },
         {
@@ -1257,6 +1296,11 @@ const enDictionary: Dictionary = {
     eyebrow: "Workflows",
     title: "Git Workflows Channel",
     description: "Break common collaboration routines into reusable flows, including sync strategy, feature-branch teamwork, review prep, and urgent fixes.",
+  },
+  recoveryIndex: {
+    eyebrow: "Recovery",
+    title: "Git Recovery Channel",
+    description: "Turn common Git mistakes into focused rescue guides covering reset, rebase, deleted branches, detached HEAD, and reflog-first recovery.",
   },
   learningPathIndex: {
     eyebrow: "Quick Start",

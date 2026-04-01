@@ -37,7 +37,7 @@ const audiencePaths = {
     {
       title: "排障恢复入口",
       description: "误操作、历史写乱、想撤回时，先从 reflog 和恢复手册开始。",
-      href: "/docs/recovery/reflog-recovery",
+      href: "/recovery",
     },
   ],
   en: [
@@ -54,7 +54,7 @@ const audiencePaths = {
     {
       title: "Recovery and Undo Path",
       description: "When history goes sideways, start with reflog and recovery-oriented guides.",
-      href: "/docs/recovery/reflog-recovery",
+      href: "/recovery",
     },
   ],
 } as const;
@@ -63,13 +63,13 @@ const scenarioLinks = {
   zh: [
     { label: "我要同步远端但不想直接改当前分支", href: "/workflows/fetch-vs-pull" },
     { label: "我想整理提交历史但担心风险", href: "/commands/git-rebase" },
-    { label: "我把东西弄丢了，想找回提交", href: "/commands/git-reflog" },
+    { label: "我把东西弄丢了，想找回提交", href: "/recovery/reflog-recovery" },
     { label: "我想理解 Git 到底在保存什么", href: "/internals/object-database" },
   ],
   en: [
     { label: "I want upstream changes without mutating my branch yet", href: "/workflows/fetch-vs-pull" },
     { label: "I want to clean up history without losing control", href: "/commands/git-rebase" },
-    { label: "I lost work and need to recover commits", href: "/commands/git-reflog" },
+    { label: "I lost work and need to recover commits", href: "/recovery/reflog-recovery" },
     { label: "I want to understand what Git actually stores", href: "/internals/object-database" },
   ],
 } as const;

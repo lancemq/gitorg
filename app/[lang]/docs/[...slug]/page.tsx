@@ -78,6 +78,10 @@ export default async function DocDetailPage({ params }: Props) {
     redirect(`/${locale}/learning-path`);
   }
 
+  if (rawDocPath.startsWith("recovery/")) {
+    redirect(`/${locale}/recovery/${rawDocPath.replace("recovery/", "")}`);
+  }
+
   const sectionId = docPath.split("/")[0] as DocsSectionId;
 
   if (!getDocPaths(locale).includes(docPath)) {

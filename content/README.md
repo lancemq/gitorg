@@ -75,6 +75,10 @@
 - `zh/internals/packfiles-and-storage.mdx`
 - `zh/internals/reachability-and-garbage-collection.mdx`
 - `zh/recovery/reflog-recovery.mdx`
+- `zh/recovery/recover-after-reset.mdx`
+- `zh/recovery/recover-after-rebase.mdx`
+- `zh/recovery/recover-deleted-branch.mdx`
+- `zh/recovery/detached-head-rescue.mdx`
 - `zh/concepts/git-history.mdx`
 - `en/learning-path/quick-start.mdx`
 - `en/commands/git-rebase.mdx`
@@ -123,4 +127,8 @@
 - `en/internals/packfiles-and-storage.mdx`
 - `en/internals/reachability-and-garbage-collection.mdx`
 - `en/recovery/reflog-recovery.mdx`
+- `en/recovery/recover-after-reset.mdx`
+- `en/recovery/recover-after-rebase.mdx`
+- `en/recovery/recover-deleted-branch.mdx`
+- `en/recovery/detached-head-rescue.mdx`
 - `en/concepts/git-history.mdx`
