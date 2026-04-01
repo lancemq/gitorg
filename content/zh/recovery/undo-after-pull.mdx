@@ -1,0 +1,110 @@
+export const metadata = {
+  title: "pull 之后后悔了怎么撤回",
+  slug: "undo-after-pull",
+  locale: "zh",
+  section: "recovery",
+  summary: "当 pull 之后发现分支状态不对、自动 merge 不符合预期，或者 rebase 结果混乱时，先判断 pull 实际做了什么，再选择 ORIG_HEAD、reflog 或救援分支。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-pull",
+    "https://git-scm.com/docs/git-reset",
+    "https://git-scm.com/docs/git-reflog",
+  ],
+};
+
+# pull 之后后悔了怎么撤回
+
+## 先别急着说“我要撤回 pull”
+
+真正要先弄清的是：这次 `git pull` 到底做了什么。
+
+它可能只是：
+
+- 做了一个 `fetch`
+- 做了快进更新
+- 做了一个 merge
+- 或者按配置走了 rebase
+
+不同路径，撤回方式不一样。
+
+<CommandFlowFigure
+  title="先判断 pull 的实际结果"
+  caption="不要把所有 pull 后悔场景都当成一个问题。先分清它是快进、merge 还是 rebase，恢复动作才会稳。"
+  inputsLabel="先观察"
+  inputs="git status|git log --oneline --graph|git reflog"
+  commandLabel="git pull"
+  outputsLabel="可能结果"
+  outputs="快进更新|merge 提交|rebase 改写"
+  note="恢复前先回答：这次 pull 改的是引用、历史结构，还是只是让当前分支快进。"
+/>
+
+## 第一轮检查
+
+```bash
+git status
+git log --oneline --graph --decorate -n 20
+git reflog
+```
+
+如果你看到了：
+
+- 一个新的 merge commit：多半是 merge 型 pull
+- 一串新提交 ID：多半是 rebase 型 pull
+- 没有额外 merge，只是分支前进了：多半是 fast-forward
+
+## `ORIG_HEAD` 为什么很重要
+
+很多 merge 和 pull 场景里，Git 会把操作前的位置记到 `ORIG_HEAD`。
+
+```bash
+git show ORIG_HEAD
+git switch -c rescue/before-pull ORIG_HEAD
+```
+
+这通常是最便宜的保险动作。
+
+## 三类常见撤回方式
+
+### 1. pull 只是快进了
+
+如果只是快进，而且你就是想回到 pull 前：
+
+```bash
+git reset --hard ORIG_HEAD
+```
+
+但在真正执行前，先建救援分支更稳：
+
+```bash
+git switch -c rescue/before-pull ORIG_HEAD
+```
+
+### 2. pull 产生了 merge commit
+
+如果这个 merge 还没共享出去，通常可以考虑把当前分支回到 merge 前的位置。  
+但如果这次 pull 已经继续被别人基于它工作，就应该更谨慎，优先考虑 `revert`。
+
+### 3. pull 走的是 rebase
+
+这时更像“rebase 出错恢复”问题。  
+直接看 reflog，找到 pull / rebase 前的位置，再先建救援分支。
+
+## 一个更稳的习惯
+
+很多“pull 后悔了”问题，本质上都来自于 pull 同时做了“获取远端变化”和“改当前分支”两件事。  
+如果你想降低这类事故，平时更稳的节奏是：
+
+1. `git fetch`
+2. 看图和状态
+3. 再决定 merge、rebase，还是先不动
+
+## 推荐恢复顺序
+
+1. 先确认这次 pull 是哪条整合路径
+2. 看 `ORIG_HEAD` 和 `reflog`
+3. 建 `rescue/*` 分支
+4. 再决定 reset、revert 或重做同步
+
+## 一个判断原则
+
+如果你还没搞清 pull 产生的是 merge 还是 rebase，就先不要动 reset。  
+先把“pull 前的位置”接住，比立刻回滚更重要。

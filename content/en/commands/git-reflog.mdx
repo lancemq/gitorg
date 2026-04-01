@@ -40,6 +40,14 @@ git checkout -b rescue HEAD@{2}
 2. locate the pre-mistake position
 3. either create a rescue branch or move the ref back
 
+<ReflogFigure
+  title="Reflog preserves position clues"
+  caption="In many rescue cases the old commit still exists, but the branch name no longer points to it. Reflog keeps those older positions visible long enough for you to attach a rescue branch."
+  historyLabel="Position history"
+  rescueLabel="Recovery move"
+  nowLabel="Current HEAD"
+/>
+
 ## Key distinction
 
 - `git log` shows commit history
@@ -76,4 +84,3 @@ That difference is why reflog is so useful when normal history still exists but 
 - The most expensive failure mode in history commands is rewriting or moving commits that other people already depend on.
 - If the operation might affect team flow, run `git status`, `git log --oneline --graph`, and `git reflog` first so the recovery path is visible.
 - When in doubt, create a backup branch before continuing so you preserve an obvious way back.
-

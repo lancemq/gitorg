@@ -1,0 +1,97 @@
+export const metadata = {
+  title: "force push 之后怎么判断影响范围",
+  slug: "assess-force-push-impact",
+  locale: "zh",
+  section: "recovery",
+  summary: "force push 之后，真正关键的不是立刻再推一次，而是先判断哪些引用被覆盖、哪些同事可能已基于旧历史继续工作，以及恢复窗口还有多大。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-push",
+    "https://git-scm.com/docs/git-reflog",
+    "https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History",
+  ],
+};
+
+# force push 之后怎么判断影响范围
+
+## force push 后第一反应不该是“再 force 一次”
+
+真正该先回答的是：
+
+1. 你覆盖掉的是哪条分支
+2. 旧历史是否还有人正在使用
+3. 远端或本地还有没有恢复入口
+
+这不是单纯的命令问题，而是协作影响判断。
+
+<CommandFlowFigure
+  title="force push 之后先做影响评估"
+  caption="先确认被覆盖的是哪条历史、谁可能受影响、旧提交是否还可追踪，再决定恢复动作。"
+  inputsLabel="先确认"
+  inputs="目标分支|旧提交位置|协作者状态"
+  commandLabel="force push"
+  outputsLabel="判断结果"
+  outputs="仅本地影响|共享历史受影响|需要恢复分支"
+  note="越是共享分支，越要先做影响沟通和恢复判断，而不是继续重写。"
+/>
+
+## 第一轮检查
+
+```bash
+git fetch origin
+git log --oneline --graph --decorate --all -n 40
+git reflog
+```
+
+你要先找出：
+
+- force 前本地分支在哪
+- force 后远端分支在哪
+- 旧提交是否还能从 reflog 或其他分支找到
+
+## 三个高优先级判断
+
+### 1. 这是个人分支还是共享分支
+
+如果只是你个人尚未被别人依赖的分支，恢复和修正成本通常小很多。  
+如果是共享分支、主分支、发布分支，影响判断优先级就远高于“怎么改回来”。
+
+### 2. 有没有人已经基于旧历史继续工作
+
+这是最关键的问题。  
+如果别人已经基于旧历史 pull、分支或继续提交，那么你接下来做的每一步都不再只是“修自己”，而是在影响团队同步。
+
+### 3. 旧位置是否还可恢复
+
+只要旧提交还在 reflog 或别的引用里，通常就还有恢复机会。  
+所以先建救援分支往往是第一步：
+
+```bash
+git switch -c rescue/pre-force HEAD@{1}
+```
+
+## `--force-with-lease` 为什么更稳
+
+它不是“更温柔的 force”，而是多了一层乐观锁检查。  
+如果远端已经被别人更新，它会拒绝直接覆盖。  
+这不能替代沟通，但能挡住一部分“我以为没人动，其实已经有人动了”的事故。
+
+## 一个推荐动作顺序
+
+1. 先停止继续 push
+2. 通过 reflog 找到 force 前位置
+3. 建救援分支
+4. 判断是否需要恢复远端分支
+5. 如果是共享分支，先同步团队认知，再决定恢复路径
+
+## 什么时候要优先沟通而不是优先操作
+
+如果满足下面任一条件，先沟通通常比先操作更重要：
+
+- 被覆盖的是共享分支
+- 有 PR、流水线或发布流程依赖这条分支
+- 你不确定是否已经有人同步了旧历史
+
+## 一个实用原则
+
+force push 出问题时，真正昂贵的不是“恢复提交”，而是“恢复团队对历史的共同理解”。  
+所以先判断影响面，再执行恢复动作。

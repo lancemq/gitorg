@@ -1,0 +1,95 @@
+export const metadata = {
+  title: "Assess the impact after a force push",
+  slug: "assess-force-push-impact",
+  locale: "en",
+  section: "recovery",
+  summary: "After a force push, the urgent task is not another push. First identify which refs were replaced, who may still depend on the old history, and what recovery window still exists.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-push",
+    "https://git-scm.com/docs/git-reflog",
+    "https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History",
+  ],
+};
+
+# Assess the impact after a force push
+
+## The first move is not “force push again”
+
+The real questions are:
+
+1. which branch did you overwrite
+2. whether anyone else may still depend on the old history
+3. whether the old position is still recoverable
+
+This is as much a collaboration problem as a Git command problem.
+
+<CommandFlowFigure
+  title="Evaluate the blast radius first"
+  caption="After a force push, first identify the replaced history, likely collaborators, and the remaining recovery clues."
+  inputsLabel="Check first"
+  inputs="target branch|old commit position|collaborator state"
+  commandLabel="force push"
+  outputsLabel="Possible impact"
+  outputs="local-only correction|shared-history disruption|branch recovery needed"
+  note="The more shared the branch is, the more important communication becomes before additional rewrite commands."
+/>
+
+## First round of checks
+
+```bash
+git fetch origin
+git log --oneline --graph --decorate --all -n 40
+git reflog
+```
+
+Use that to determine:
+
+- where your local branch pointed before the force push
+- where the remote branch points now
+- whether the old commits are still easy to name
+
+## Three priority questions
+
+### 1. Is this a personal branch or a shared branch?
+
+If it is a personal branch that nobody else relies on, recovery is usually much simpler.  
+If it is shared, the blast radius is immediately larger.
+
+### 2. Has anyone already continued from the old history?
+
+This is the most important question.  
+If others already pulled or branched from the old commits, the problem is no longer just “fix my branch.” It becomes “restore a shared understanding of history.”
+
+### 3. Is the old position still recoverable?
+
+If the old commit is still visible in reflog or another ref, create a rescue branch first:
+
+```bash
+git switch -c rescue/pre-force HEAD@{1}
+```
+
+## Why `--force-with-lease` is safer
+
+It is not merely a “gentler” force push. It adds a safety check that refuses to overwrite the remote if it changed unexpectedly since your last known view.  
+That does not replace communication, but it prevents a class of avoidable accidents.
+
+## A practical response order
+
+1. Stop pushing for a moment
+2. Find the pre-force position in reflog
+3. Create a rescue branch
+4. Decide whether the remote branch must be restored
+5. If the branch is shared, align the team before more rewriting
+
+## When communication comes before commands
+
+Communication should usually come first when:
+
+- the overwritten branch is shared
+- release or CI flow depends on it
+- you are unsure whether teammates already synced the old history
+
+## One good rule
+
+The expensive part of a bad force push is often not recovering the commits.  
+It is recovering the team’s shared mental model of the branch.

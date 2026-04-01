@@ -157,6 +157,8 @@ export const docPathRegistry = [
   "recovery/recover-after-rebase",
   "recovery/recover-deleted-branch",
   "recovery/detached-head-rescue",
+  "recovery/undo-after-pull",
+  "recovery/assess-force-push-impact",
   "concepts/git-history",
 ] as const;
 
@@ -279,6 +281,8 @@ const contentModules = {
     "recovery/recover-after-rebase": () => import("@/content/zh/recovery/recover-after-rebase.mdx"),
     "recovery/recover-deleted-branch": () => import("@/content/zh/recovery/recover-deleted-branch.mdx"),
     "recovery/detached-head-rescue": () => import("@/content/zh/recovery/detached-head-rescue.mdx"),
+    "recovery/undo-after-pull": () => import("@/content/zh/recovery/undo-after-pull.mdx"),
+    "recovery/assess-force-push-impact": () => import("@/content/zh/recovery/assess-force-push-impact.mdx"),
     "concepts/git-history": () => import("@/content/zh/concepts/git-history.mdx"),
   },
   en: {
@@ -398,6 +402,8 @@ const contentModules = {
     "recovery/recover-after-rebase": () => import("@/content/en/recovery/recover-after-rebase.mdx"),
     "recovery/recover-deleted-branch": () => import("@/content/en/recovery/recover-deleted-branch.mdx"),
     "recovery/detached-head-rescue": () => import("@/content/en/recovery/detached-head-rescue.mdx"),
+    "recovery/undo-after-pull": () => import("@/content/en/recovery/undo-after-pull.mdx"),
+    "recovery/assess-force-push-impact": () => import("@/content/en/recovery/assess-force-push-impact.mdx"),
     "concepts/git-history": () => import("@/content/en/concepts/git-history.mdx"),
   },
 } satisfies Record<Locale, Record<DocPath, ContentLoader>>;
@@ -779,6 +785,16 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
     "commands/git-switch",
     "commands/git-reflog",
     "internals/refs-and-head",
+  ],
+  "recovery/undo-after-pull": [
+    "commands/git-pull",
+    "commands/git-reset",
+    "commands/git-reflog",
+  ],
+  "recovery/assess-force-push-impact": [
+    "commands/git-push",
+    "commands/git-reflog",
+    "best-practices/shared-history-boundaries",
   ],
 };
 

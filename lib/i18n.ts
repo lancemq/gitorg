@@ -123,7 +123,9 @@ export type RecoverySlug =
   | "recover-after-reset"
   | "recover-after-rebase"
   | "recover-deleted-branch"
-  | "detached-head-rescue";
+  | "detached-head-rescue"
+  | "undo-after-pull"
+  | "assess-force-push-impact";
 
 export type LearningPathSlug =
   | "quick-start"
@@ -589,6 +591,8 @@ export const recoverySlugs = [
   "recover-after-rebase",
   "recover-deleted-branch",
   "detached-head-rescue",
+  "undo-after-pull",
+  "assess-force-push-impact",
 ] as const satisfies readonly RecoverySlug[];
 
 export const internalsSlugs = [

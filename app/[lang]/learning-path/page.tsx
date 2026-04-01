@@ -55,31 +55,109 @@ export default async function LearningPathChannelPage({ params }: Props) {
   const [docs, featuredDocs] = await Promise.all([getLearningPathDocs(locale), getFeaturedSectionDocs(locale, "learning-path", 5)]);
 
   const featuredSequence = featuredDocs.filter((doc) => doc.slug !== "quick-start");
+  const tracks =
+    locale === "zh"
+      ? [
+          {
+            id: "starter",
+            eyebrow: "Path 01",
+            title: "Git 新手路径",
+            description: "从环境准备、第一次提交到第一次远端同步，适合零基础建立最小可用闭环。",
+            href: `/${locale}/learning-path`,
+            items: [
+              { title: "准备环境与 clone", href: `/${locale}/docs/learning-path/setup-and-clone` },
+              { title: "理解暂存与提交", href: `/${locale}/docs/learning-path/stage-and-commit` },
+              { title: "完成第一次同步", href: `/${locale}/docs/learning-path/sync-with-remote` },
+            ],
+          },
+          {
+            id: "team",
+            eyebrow: "Path 02",
+            title: "团队协作路径",
+            description: "围绕 fetch、pull、功能分支、评审前同步与最佳实践，建立更稳的团队协作节奏。",
+            href: `/${locale}/workflows`,
+            items: [
+              { title: "先搞清 fetch 和 pull", href: `/${locale}/workflows/fetch-vs-pull` },
+              { title: "第一次功能分支协作", href: `/${locale}/docs/learning-path/first-feature-branch` },
+              { title: "评审前同步与整理", href: `/${locale}/workflows/sync-before-review` },
+            ],
+          },
+          {
+            id: "recovery",
+            eyebrow: "Path 03",
+            title: "排障恢复路径",
+            description: "当 reset、rebase、pull 或分支误操作把历史弄乱时，先走一条保守恢复路线。",
+            href: `/${locale}/recovery`,
+            items: [
+              { title: "先掌握 reflog", href: `/${locale}/recovery/reflog-recovery` },
+              { title: "reset 过头怎么找回", href: `/${locale}/recovery/recover-after-reset` },
+              { title: "rebase 出错如何回到可控状态", href: `/${locale}/recovery/recover-after-rebase` },
+            ],
+          },
+        ]
+      : [
+          {
+            id: "starter",
+            eyebrow: "Path 01",
+            title: "Git Starter Path",
+            description: "Build the smallest safe Git loop from setup and first commits to your first remote sync.",
+            href: `/${locale}/learning-path`,
+            items: [
+              { title: "Set up and clone", href: `/${locale}/docs/learning-path/setup-and-clone` },
+              { title: "Understand staging and commit", href: `/${locale}/docs/learning-path/stage-and-commit` },
+              { title: "Finish the first sync loop", href: `/${locale}/docs/learning-path/sync-with-remote` },
+            ],
+          },
+          {
+            id: "team",
+            eyebrow: "Path 02",
+            title: "Team Collaboration Path",
+            description: "Learn the collaboration rhythm around fetch, pull, feature branches, pre-review sync, and team-safe habits.",
+            href: `/${locale}/workflows`,
+            items: [
+              { title: "Start with fetch versus pull", href: `/${locale}/workflows/fetch-vs-pull` },
+              { title: "First feature-branch collaboration", href: `/${locale}/docs/learning-path/first-feature-branch` },
+              { title: "Sync before review", href: `/${locale}/workflows/sync-before-review` },
+            ],
+          },
+          {
+            id: "recovery",
+            eyebrow: "Path 03",
+            title: "Recovery and Undo Path",
+            description: "Use a conservative rescue path when reset, rebase, pull, or branch mistakes leave history in a confusing state.",
+            href: `/${locale}/recovery`,
+            items: [
+              { title: "Start with reflog", href: `/${locale}/recovery/reflog-recovery` },
+              { title: "Recover after reset", href: `/${locale}/recovery/recover-after-reset` },
+              { title: "Recover after a bad rebase", href: `/${locale}/recovery/recover-after-rebase` },
+            ],
+          },
+        ];
   const learningSignals =
     locale === "zh"
       ? [
-          { label: "起点", value: "零基础到可提交" },
-          { label: "节奏", value: "4 个步骤" },
-          { label: "目标", value: "完成第一次协作闭环" },
+          { label: "起点", value: "零基础到团队协作" },
+          { label: "路线", value: "3 条学习路径" },
+          { label: "目标", value: "按问题选择正确路线" },
         ]
       : [
-          { label: "Starting Point", value: "Zero to first safe commit" },
-          { label: "Rhythm", value: "4 steps" },
-          { label: "Outcome", value: "Finish your first collaboration loop" },
+          { label: "Starting Point", value: "Zero to team-ready Git" },
+          { label: "Routes", value: "3 learning tracks" },
+          { label: "Outcome", value: "Choose the right path for the job" },
         ];
   const learningChecklist =
     locale === "zh"
       ? [
-          "环境与仓库来源",
-          "暂存与提交模型",
-          "远端同步节奏",
-          "第一次分支协作",
+          "Git 新手路径",
+          "团队协作路径",
+          "排障恢复路径",
+          "再进入专题深挖",
         ]
       : [
-          "Setup and repository source",
-          "Staging and commit model",
-          "Remote sync rhythm",
-          "First feature branch loop",
+          "Git starter path",
+          "Team collaboration path",
+          "Recovery and undo path",
+          "Then go deeper by topic",
         ];
   const siteUrl = getSiteUrl();
   const pageUrl = `${siteUrl}/${locale}/learning-path`;
@@ -131,6 +209,42 @@ export default async function LearningPathChannelPage({ params }: Props) {
             </ul>
           </aside>
         </div>
+
+        <section className="panel docs-group learning-path-sequence">
+          <div className="docs-group-head">
+            <p className="eyebrow">{dict.learningPathIndex.eyebrow}</p>
+            <h2>{locale === "zh" ? "先选一条学习路线" : "Pick a Learning Route First"}</h2>
+            <p>
+              {locale === "zh"
+                ? "把内容从“很多文章”改成“明确路线”。先决定你现在是新手上路、团队协作，还是在处理事故恢复。"
+                : "Turn the site from “many articles” into “clear routes.” Decide whether you are learning the basics, team flow, or recovery."}
+            </p>
+          </div>
+
+          <div className="learning-track-grid">
+            {tracks.map((track) => (
+              <article className="learning-track-card" key={track.id}>
+                <div className="learning-track-head">
+                  <span className="card-kicker">{track.eyebrow}</span>
+                  <h3>
+                    <Link className="column-heading-link" href={track.href}>
+                      {track.title}
+                    </Link>
+                  </h3>
+                </div>
+                <p>{track.description}</p>
+                <div className="learning-track-links">
+                  {track.items.map((item, index) => (
+                    <Link className="learning-track-link" href={item.href} key={item.href}>
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      <strong>{item.title}</strong>
+                    </Link>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
 
         <section className="panel docs-group learning-path-sequence">
           <div className="docs-group-head">

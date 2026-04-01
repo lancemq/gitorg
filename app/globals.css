@@ -1175,6 +1175,87 @@ h3 {
     linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(252, 249, 244, 0.94));
 }
 
+.learning-track-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.learning-track-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 100%;
+  padding: 18px;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 16px 26px rgba(17, 17, 17, 0.04);
+}
+
+.learning-track-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.learning-track-head h3 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.learning-track-card > p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.learning-track-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.learning-track-link {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 16px;
+  background: rgba(248, 248, 245, 0.72);
+  transition: border-color 0.18s ease, background-color 0.18s ease, transform 0.18s ease;
+}
+
+.learning-track-link:hover,
+.learning-track-link:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(17, 17, 17, 0.16);
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.learning-track-link span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(255, 132, 0, 0.08);
+  color: #8d4c00;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.learning-track-link strong {
+  min-width: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
 .learning-path-flow {
   position: relative;
   display: flex;
@@ -1665,6 +1746,54 @@ h3 {
   border-left: 8px solid var(--border);
 }
 
+.reflog-figure {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.reflog-track,
+.reflog-branch-row {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.reflog-label,
+.reflog-branch-label {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.reflog-nodes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.reflog-node,
+.reflog-branch-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font-size: 0.82rem;
+}
+
+.reflog-node-current,
+.reflog-branch-pill {
+  border-color: rgba(255, 132, 0, 0.24);
+  background: rgba(255, 132, 0, 0.1);
+  color: #8d4c00;
+}
+
 .command-flow-figure {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -1957,6 +2086,7 @@ h3 {
   .card-grid-three,
   .meta-grid,
   .learning-path-signals,
+  .learning-track-grid,
   .docs-list,
   .scenario-grid,
   .doc-related-grid {
@@ -1989,6 +2119,10 @@ h3 {
 
   .learning-path-step-arrow {
     display: none;
+  }
+
+  .learning-track-card {
+    padding: 16px;
   }
 
   .section-head {

@@ -39,6 +39,14 @@ git cherry-pick <commit-a> <commit-b>
 
 如果这些提交存在依赖关系，建议按照原始顺序挑选。
 
+<CherryPickFigure
+  title="cherry-pick 转运的是补丁，不是整条分支"
+  caption="源分支里的提交效果会在目标分支上生成新的对应提交。你保留了改动意图，但不会保留原始提交 ID 和父提交关系。"
+  sourceLabel="源分支补丁"
+  targetLabel="目标分支新提交"
+  transferLabel="pick"
+/>
+
 ## 典型使用场景
 
 ### 场景 1：把线上修复带回发布分支

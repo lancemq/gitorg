@@ -31,6 +31,14 @@ git cherry-pick <commit-hash>
 
 This creates a new commit on the current branch with the same change effect, but not the same commit ID.
 
+<CherryPickFigure
+  title="Cherry-pick transfers a patch, not a whole branch"
+  caption="The destination branch gets a new commit with the same change effect, but it keeps a new identity and a different parent chain."
+  sourceLabel="Patch on source branch"
+  targetLabel="Patch replayed on target"
+  transferLabel="pick"
+/>
+
 ## Typical use cases
 
 ### Backporting a fix
@@ -95,4 +103,3 @@ Cherry-pick is great for precise patch transfer, but heavy use across many branc
 - The most expensive failure mode in history commands is rewriting or moving commits that other people already depend on.
 - If the operation might affect team flow, run `git status`, `git log --oneline --graph`, and `git reflog` first so the recovery path is visible.
 - When in doubt, create a backup branch before continuing so you preserve an obvious way back.
-

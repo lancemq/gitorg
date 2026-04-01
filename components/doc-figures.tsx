@@ -162,6 +162,108 @@ export function MergeFigure({
   );
 }
 
+type ReflogFigureProps = {
+  title: string;
+  caption: string;
+  historyLabel: string;
+  rescueLabel: string;
+  nowLabel: string;
+};
+
+export function ReflogFigure({
+  title,
+  caption,
+  historyLabel,
+  rescueLabel,
+  nowLabel,
+}: ReflogFigureProps) {
+  return (
+    <FigureFrame title={title} caption={caption}>
+      <div className="reflog-figure">
+        <div className="reflog-track">
+          <span className="reflog-label">{historyLabel}</span>
+          <div className="reflog-nodes">
+            <span className="reflog-node">HEAD@{"{3}"}</span>
+            <span className="reflog-node">HEAD@{"{2}"}</span>
+            <span className="reflog-node">HEAD@{"{1}"}</span>
+            <span className="reflog-node reflog-node-current">{nowLabel}</span>
+          </div>
+        </div>
+        <div className="reflog-branch-row">
+          <span className="reflog-branch-label">{rescueLabel}</span>
+          <div className="reflog-branch-pill">rescue/recover</div>
+        </div>
+      </div>
+    </FigureFrame>
+  );
+}
+
+type CherryPickFigureProps = {
+  title: string;
+  caption: string;
+  sourceLabel: string;
+  targetLabel: string;
+  transferLabel: string;
+};
+
+export function CherryPickFigure({
+  title,
+  caption,
+  sourceLabel,
+  targetLabel,
+  transferLabel,
+}: CherryPickFigureProps) {
+  return (
+    <FigureFrame title={title} caption={caption}>
+      <div className="history-figure">
+        <section className="history-lane">
+          <div className="history-lane-header">
+            <span>{sourceLabel}</span>
+          </div>
+          <div className="history-branches">
+            <div className="history-branch">
+              <span className="history-branch-name">main</span>
+              <div className="history-nodes">
+                <span className="history-node">A</span>
+                <span className="history-node">B</span>
+                <span className="history-node">C</span>
+              </div>
+            </div>
+            <div className="history-branch history-branch-offset">
+              <span className="history-branch-name">feature</span>
+              <div className="history-nodes">
+                <span className="history-node">B</span>
+                <span className="history-node">D</span>
+                <span className="history-node history-node-accent">E</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div className="history-arrow" aria-hidden="true">
+          <span>{transferLabel}</span>
+        </div>
+
+        <section className="history-lane">
+          <div className="history-lane-header">
+            <span>{targetLabel}</span>
+          </div>
+          <div className="history-branches">
+            <div className="history-branch">
+              <span className="history-branch-name">release</span>
+              <div className="history-nodes">
+                <span className="history-node">A</span>
+                <span className="history-node">R1</span>
+                <span className="history-node history-node-accent">E&#39;</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </FigureFrame>
+  );
+}
+
 type ResetFigureProps = {
   title: string;
   caption: string;
