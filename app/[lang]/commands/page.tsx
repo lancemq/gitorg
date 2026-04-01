@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ChannelHighlights } from "@/components/channel-highlights";
 import { SiteShell } from "@/components/site-shell";
 import { buildCollectionPageData, StructuredData } from "@/components/structured-data";
@@ -93,11 +94,12 @@ export default async function CommandsIndexPage({ params }: Props) {
         })}
       />
       <section className="docs-landing">
-        <nav className="breadcrumbs" aria-label="Breadcrumb">
-          <Link href={`/${locale}`}>{dict.commandPage.breadcrumbs.overview}</Link>
-          <span>/</span>
-          <strong>{dict.commandPage.breadcrumbs.commands}</strong>
-        </nav>
+        <Breadcrumbs
+          items={[
+            { label: dict.commandPage.breadcrumbs.overview, href: `/${locale}` },
+            { label: dict.commandPage.breadcrumbs.commands },
+          ]}
+        />
 
         <div className="section-head">
           <div>

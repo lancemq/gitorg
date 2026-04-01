@@ -1,6 +1,6 @@
-import Link from "next/link";
 import type { ComponentType } from "react";
 
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { DocPrimer } from "@/components/doc-primer";
 import { DocSupport } from "@/components/doc-support";
 import { SiteShell } from "@/components/site-shell";
@@ -78,14 +78,7 @@ export function DocTemplate({
             buildBreadcrumbData(breadcrumbItems),
           ]}
         />
-        <nav className="breadcrumbs" aria-label="Breadcrumb">
-          {breadcrumbs.map((item, index) => (
-            <span key={`${item.label}-${index}`}>
-              {index > 0 ? <span>/</span> : null}
-              {item.href ? <Link href={item.href}>{item.label}</Link> : <strong>{item.label}</strong>}
-            </span>
-          ))}
-        </nav>
+        <Breadcrumbs items={breadcrumbs} />
 
         <header className="panel doc-hero">
           <p className="eyebrow">{eyebrow}</p>

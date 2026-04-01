@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { DocPrimer } from "@/components/doc-primer";
 import { DocSupport } from "@/components/doc-support";
 import { SiteShell } from "@/components/site-shell";
@@ -117,13 +117,13 @@ export default async function CommandPage({ params }: Props) {
           ]),
         ]}
       />
-      <nav className="breadcrumbs" aria-label="Breadcrumb">
-        <Link href={`/${locale}`}>{dict.commandPage.breadcrumbs.overview}</Link>
-        <span>/</span>
-        <Link href={`/${locale}/commands`}>{dict.commandPage.breadcrumbs.commands}</Link>
-        <span>/</span>
-        <strong>{doc.metadata.title}</strong>
-      </nav>
+      <Breadcrumbs
+        items={[
+          { label: dict.commandPage.breadcrumbs.overview, href: `/${locale}` },
+          { label: dict.commandPage.breadcrumbs.commands, href: `/${locale}/commands` },
+          { label: doc.metadata.title },
+        ]}
+      />
 
       <section className="command-hero">
         <div className="command-copy">

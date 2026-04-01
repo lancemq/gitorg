@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { FaqList } from "@/components/faq-list";
 import { SiteShell } from "@/components/site-shell";
 import { StructuredData } from "@/components/structured-data";
@@ -69,11 +69,12 @@ export default async function FaqPage({ params }: Props) {
             inLanguage: locale === "zh" ? "zh-CN" : "en",
           }}
         />
-        <nav className="breadcrumbs" aria-label="Breadcrumb">
-          <Link href={`/${locale}`}>{dict.commandPage.breadcrumbs.overview}</Link>
-          <span>/</span>
-          <strong>{dict.commandPage.breadcrumbs.faq}</strong>
-        </nav>
+        <Breadcrumbs
+          items={[
+            { label: dict.commandPage.breadcrumbs.overview, href: `/${locale}` },
+            { label: dict.commandPage.breadcrumbs.faq },
+          ]}
+        />
 
         <header className="panel doc-hero faq-hero">
           <p className="eyebrow">{dict.faqPage.eyebrow}</p>
