@@ -6,7 +6,9 @@
 
 - `app/` 页面、语言路由与全局样式
 - `components/` 可复用 UI 组件
+- `docs/` 网站需求、信息架构、设计与路线图文档
 - `lib/i18n.ts` 双语内容、菜单与命令文档字典
+- `content/` 双语 MDX 教程内容源
 - `gitorg.pen` 原始 Pencil 设计稿
 
 ## 启动
