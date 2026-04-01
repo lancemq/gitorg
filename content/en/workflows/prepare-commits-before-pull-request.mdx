@@ -1,0 +1,44 @@
+export const metadata = {
+  title: "Prepare commit history before opening a pull request",
+  slug: "prepare-commits-before-pull-request",
+  locale: "en",
+  section: "workflows",
+  summary: "Build a stable pre-PR routine around syncing, commit cleanup, risk checks, and review-friendly history.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rebase",
+    "https://git-scm.com/docs/git-commit",
+    "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project",
+  ],
+};
+
+# Prepare commit history before opening a pull request
+
+Pre-PR cleanup is not about making history look clever. It is about making review easier.
+
+## A practical order
+
+1. sync with the current main line
+2. remove obvious noise commits
+3. check commit messages and change boundaries
+4. confirm there is no shared-history risk
+
+## A conservative flow
+
+```bash
+git fetch origin
+git rebase origin/main
+git log --oneline --decorate -n 10
+```
+
+If your team prefers merge over rebase at this step, the principle still holds: understand the branch relationship before publishing the PR.
+
+## Four things worth checking
+
+- whether there are obvious “fixup” style commits to consolidate
+- whether each commit message carries a clear intent
+- whether unrelated changes were mixed together
+- whether someone else may already depend on this history
+
+## One principle
+
+Commit history is written for future review, rollback, and debugging, not just for Git itself.

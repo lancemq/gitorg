@@ -1,11 +1,12 @@
 import Link from "next/link";
 import type { ComponentType } from "react";
 
+import { DocPrimer } from "@/components/doc-primer";
 import { DocSupport } from "@/components/doc-support";
 import { SiteShell } from "@/components/site-shell";
 import { buildBreadcrumbData, StructuredData } from "@/components/structured-data";
 import type { Locale, SidebarContent } from "@/lib/i18n";
-import type { DocCard, DocNeighbors } from "@/lib/content";
+import type { DocCard, DocNeighbors, DocPrimer as DocPrimerType } from "@/lib/content";
 import { getSiteUrl } from "@/lib/site";
 
 type DocTemplateProps = {
@@ -23,6 +24,7 @@ type DocTemplateProps = {
   sourceUrls: string[];
   lastModified?: string;
   Body: ComponentType;
+  primer?: DocPrimerType;
   showSources?: boolean;
   relatedDocs?: DocCard[];
   neighbors?: DocNeighbors;
@@ -40,6 +42,7 @@ export function DocTemplate({
   sourceUrls,
   lastModified,
   Body,
+  primer,
   showSources = false,
   relatedDocs = [],
   neighbors,
@@ -89,6 +92,8 @@ export function DocTemplate({
           <h1>{title}</h1>
           <p className="lead">{summary}</p>
         </header>
+
+        {primer ? <DocPrimer locale={locale} primer={primer} /> : null}
 
         <section className="panel doc-content">
           <div className="mdx-content">

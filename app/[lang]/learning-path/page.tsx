@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ChannelHighlights } from "@/components/channel-highlights";
 import { SiteShell } from "@/components/site-shell";
 import { buildCollectionPageData, StructuredData } from "@/components/structured-data";
-import { getFeaturedSectionDocs, getLearningPathDocs } from "@/lib/content";
+import { getFeaturedSectionDocs, getLearningPathDocs, getRepresentativeSectionDocs } from "@/lib/content";
 import {
   getDictionary,
   getSidebarContent,
@@ -52,7 +53,11 @@ export default async function LearningPathChannelPage({ params }: Props) {
 
   const locale = lang as Locale;
   const dict = getDictionary(locale);
-  const [docs, featuredDocs] = await Promise.all([getLearningPathDocs(locale), getFeaturedSectionDocs(locale, "learning-path", 5)]);
+  const [docs, featuredDocs, representativeDocs] = await Promise.all([
+    getLearningPathDocs(locale),
+    getFeaturedSectionDocs(locale, "learning-path", 5),
+    getRepresentativeSectionDocs(locale, "learning-path", 3),
+  ]);
 
   const featuredSequence = featuredDocs.filter((doc) => doc.slug !== "quick-start");
   const tracks =
@@ -245,6 +250,18 @@ export default async function LearningPathChannelPage({ params }: Props) {
             ))}
           </div>
         </section>
+
+        <ChannelHighlights
+          locale={locale}
+          eyebrow={dict.learningPathIndex.eyebrow}
+          title={locale === "zh" ? "代表专题" : "Representative Topics"}
+          description={
+            locale === "zh"
+              ? "如果你只先看少量入口，优先抓住环境准备、第一次分支协作和 reflog 这三个关键节点。"
+              : "If you only start with a few anchors, prioritize setup, the first feature-branch loop, and reflog-based recovery."
+          }
+          docs={representativeDocs}
+        />
 
         <section className="panel docs-group learning-path-sequence">
           <div className="docs-group-head">

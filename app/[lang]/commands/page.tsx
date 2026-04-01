@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ChannelHighlights } from "@/components/channel-highlights";
 import { SiteShell } from "@/components/site-shell";
 import { buildCollectionPageData, StructuredData } from "@/components/structured-data";
-import { getCommandDocs, getFeaturedSectionDocs } from "@/lib/content";
+import { getCommandDocs, getFeaturedSectionDocs, getRepresentativeSectionDocs } from "@/lib/content";
 import {
   advancedCommandSlugs,
   basicCommandSlugs,
@@ -56,9 +57,10 @@ export default async function CommandsIndexPage({ params }: Props) {
 
   const locale = lang as Locale;
   const dict = getDictionary(locale);
-  const [docs, featuredDocs] = await Promise.all([
+  const [docs, featuredDocs, representativeDocs] = await Promise.all([
     getCommandDocs(locale),
     getFeaturedSectionDocs(locale, "commands", 4),
+    getRepresentativeSectionDocs(locale, "commands", 3),
   ]);
 
   const sortedDocs = docs.sort(
@@ -125,6 +127,18 @@ export default async function CommandsIndexPage({ params }: Props) {
             ))}
           </div>
         </section>
+
+        <ChannelHighlights
+          locale={locale}
+          eyebrow={dict.commandIndex.eyebrow}
+          title={locale === "zh" ? "代表专题" : "Representative Topics"}
+          description={
+            locale === "zh"
+              ? "如果你想先把命令站的核心价值看明白，优先看状态判断、历史整理和恢复入口这三类专题。"
+              : "If you want the essence of the command channel first, start with status awareness, history shaping, and recovery entry points."
+          }
+          docs={representativeDocs}
+        />
 
         <section className="panel docs-group">
           <div className="docs-group-head">

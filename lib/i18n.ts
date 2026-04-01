@@ -87,13 +87,17 @@ export type BestPracticeSlug =
 export type WorkflowSlug =
   | "fetch-vs-pull"
   | "feature-branch-collaboration"
+  | "multi-person-sync-routine"
+  | "prepare-commits-before-pull-request"
   | "parallel-work-with-worktree"
+  | "monorepo-sparse-checkout-workflow"
   | "rerere-for-recurring-conflicts"
   | "shared-branch-sync-boundaries"
   | "sync-before-review"
   | "pr-merge-strategy-and-platform-settings"
   | "merge-queue-workflow"
   | "hotfix-and-urgent-fixes"
+  | "hotfix-rollback-after-release"
   | "open-source-fork-pr-contribution"
   | "release-branch-workflow"
   | "backport-with-cherry-pick"
@@ -567,13 +571,17 @@ export const bestPracticeSlugs = [
 export const workflowSlugs = [
   "fetch-vs-pull",
   "feature-branch-collaboration",
+  "multi-person-sync-routine",
+  "prepare-commits-before-pull-request",
   "parallel-work-with-worktree",
+  "monorepo-sparse-checkout-workflow",
   "rerere-for-recurring-conflicts",
   "shared-branch-sync-boundaries",
   "sync-before-review",
   "pr-merge-strategy-and-platform-settings",
   "merge-queue-workflow",
   "hotfix-and-urgent-fixes",
+  "hotfix-rollback-after-release",
   "open-source-fork-pr-contribution",
   "release-branch-workflow",
   "backport-with-cherry-pick",
@@ -622,26 +630,26 @@ const zhDictionary: Dictionary = {
           title: "Learning Path",
           items: [
             buildLearningPathNavItem("zh", activePath),
-            buildBestPracticeNavItem("zh", activePath),
             buildWorkflowNavItem("zh", activePath),
             buildCommandNavItem("zh", activePath),
+          ],
+        },
+        {
+          title: "Topics",
+          items: [
+            buildBestPracticeNavItem("zh", activePath),
+            buildInternalsNavItem("zh", activePath),
             buildRecoveryNavItem("zh", activePath),
           ],
         },
         {
-          title: "Concepts",
+          title: "Resources",
           items: [
             {
               label: "Git 历史",
               href: "/zh/history",
               active: activePath === "concepts/git-history",
             },
-            buildInternalsNavItem("zh", activePath),
-          ],
-        },
-        {
-          title: "Resources",
-          items: [
             {
               label: "常见问题",
               href: "/zh/faq",
@@ -1257,26 +1265,26 @@ const enDictionary: Dictionary = {
           title: "Learning Path",
           items: [
             buildLearningPathNavItem("en", activePath),
-            buildBestPracticeNavItem("en", activePath),
             buildWorkflowNavItem("en", activePath),
             buildCommandNavItem("en", activePath),
+          ],
+        },
+        {
+          title: "Topics",
+          items: [
+            buildBestPracticeNavItem("en", activePath),
+            buildInternalsNavItem("en", activePath),
             buildRecoveryNavItem("en", activePath),
           ],
         },
         {
-          title: "Concepts",
+          title: "Resources",
           items: [
             {
               label: "Git History",
               href: "/en/history",
               active: activePath === "concepts/git-history",
             },
-            buildInternalsNavItem("en", activePath),
-          ],
-        },
-        {
-          title: "Resources",
-          items: [
             {
               label: "FAQ",
               href: "/en/faq",

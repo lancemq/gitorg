@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ChannelHighlights } from "@/components/channel-highlights";
 import { SiteShell } from "@/components/site-shell";
 import { buildCollectionPageData, StructuredData } from "@/components/structured-data";
-import { getFeaturedSectionDocs, getInternalsDocs } from "@/lib/content";
+import { getFeaturedSectionDocs, getInternalsDocs, getRepresentativeSectionDocs } from "@/lib/content";
 import {
   getDictionary,
   getSidebarContent,
@@ -54,9 +55,10 @@ export default async function GitInternalsChannelPage({ params }: Props) {
 
   const locale = lang as Locale;
   const dict = getDictionary(locale);
-  const [docs, featuredDocs] = await Promise.all([
+  const [docs, featuredDocs, representativeDocs] = await Promise.all([
     getInternalsDocs(locale),
     getFeaturedSectionDocs(locale, "internals", 4),
+    getRepresentativeSectionDocs(locale, "internals", 3),
   ]);
 
   const sortedDocs = docs.sort(
@@ -116,6 +118,18 @@ export default async function GitInternalsChannelPage({ params }: Props) {
             ))}
           </div>
         </section>
+
+        <ChannelHighlights
+          locale={locale}
+          eyebrow={dict.internalsIndex.eyebrow}
+          title={locale === "zh" ? "代表专题" : "Representative Topics"}
+          description={
+            locale === "zh"
+              ? "对象数据库、引用与 HEAD、可恢复性，是把命令行为真正看懂的三块核心底板。"
+              : "The object store, refs and HEAD, and recoverability are the three ideas that make Git behavior finally click."
+          }
+          docs={representativeDocs}
+        />
 
         <section className="panel docs-group">
           <div className="docs-group-head">

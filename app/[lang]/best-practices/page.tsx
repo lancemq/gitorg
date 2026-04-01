@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ChannelHighlights } from "@/components/channel-highlights";
 import { SiteShell } from "@/components/site-shell";
 import { buildCollectionPageData, StructuredData } from "@/components/structured-data";
-import { getBestPracticeDocs, getFeaturedSectionDocs } from "@/lib/content";
+import { getBestPracticeDocs, getFeaturedSectionDocs, getRepresentativeSectionDocs } from "@/lib/content";
 import {
   bestPracticeSlugs,
   getDictionary,
@@ -54,9 +55,10 @@ export default async function BestPracticesChannelPage({ params }: Props) {
 
   const locale = lang as Locale;
   const dict = getDictionary(locale);
-  const [docs, featuredDocs] = await Promise.all([
+  const [docs, featuredDocs, representativeDocs] = await Promise.all([
     getBestPracticeDocs(locale),
     getFeaturedSectionDocs(locale, "best-practices", 4),
+    getRepresentativeSectionDocs(locale, "best-practices", 3),
   ]);
 
   const sortedDocs = docs.sort(
@@ -116,6 +118,18 @@ export default async function BestPracticesChannelPage({ params }: Props) {
             ))}
           </div>
         </section>
+
+        <ChannelHighlights
+          locale={locale}
+          eyebrow={dict.bestPracticeIndex.eyebrow}
+          title={locale === "zh" ? "代表专题" : "Representative Topics"}
+          description={
+            locale === "zh"
+              ? "先看提交质量、共享历史边界和安全推送，基本就能建立一套更稳的协作底线。"
+              : "Commit hygiene, shared-history boundaries, and safe push habits are the fastest way to build a stable collaboration baseline."
+          }
+          docs={representativeDocs}
+        />
 
         <section className="panel docs-group">
           <div className="docs-group-head">

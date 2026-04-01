@@ -124,13 +124,17 @@ export const docPathRegistry = [
   "best-practices/small-batch-review",
   "workflows/fetch-vs-pull",
   "workflows/feature-branch-collaboration",
+  "workflows/multi-person-sync-routine",
+  "workflows/prepare-commits-before-pull-request",
   "workflows/parallel-work-with-worktree",
+  "workflows/monorepo-sparse-checkout-workflow",
   "workflows/rerere-for-recurring-conflicts",
   "workflows/shared-branch-sync-boundaries",
   "workflows/sync-before-review",
   "workflows/pr-merge-strategy-and-platform-settings",
   "workflows/merge-queue-workflow",
   "workflows/hotfix-and-urgent-fixes",
+  "workflows/hotfix-rollback-after-release",
   "workflows/open-source-fork-pr-contribution",
   "workflows/release-branch-workflow",
   "workflows/backport-with-cherry-pick",
@@ -248,13 +252,17 @@ const contentModules = {
     "best-practices/small-batch-review": () => import("@/content/zh/best-practices/small-batch-review.mdx"),
     "workflows/fetch-vs-pull": () => import("@/content/zh/workflows/fetch-vs-pull.mdx"),
     "workflows/feature-branch-collaboration": () => import("@/content/zh/workflows/feature-branch-collaboration.mdx"),
+    "workflows/multi-person-sync-routine": () => import("@/content/zh/workflows/multi-person-sync-routine.mdx"),
+    "workflows/prepare-commits-before-pull-request": () => import("@/content/zh/workflows/prepare-commits-before-pull-request.mdx"),
     "workflows/parallel-work-with-worktree": () => import("@/content/zh/workflows/parallel-work-with-worktree.mdx"),
+    "workflows/monorepo-sparse-checkout-workflow": () => import("@/content/zh/workflows/monorepo-sparse-checkout-workflow.mdx"),
     "workflows/rerere-for-recurring-conflicts": () => import("@/content/zh/workflows/rerere-for-recurring-conflicts.mdx"),
     "workflows/shared-branch-sync-boundaries": () => import("@/content/zh/workflows/shared-branch-sync-boundaries.mdx"),
     "workflows/sync-before-review": () => import("@/content/zh/workflows/sync-before-review.mdx"),
     "workflows/pr-merge-strategy-and-platform-settings": () => import("@/content/zh/workflows/pr-merge-strategy-and-platform-settings.mdx"),
     "workflows/merge-queue-workflow": () => import("@/content/zh/workflows/merge-queue-workflow.mdx"),
     "workflows/hotfix-and-urgent-fixes": () => import("@/content/zh/workflows/hotfix-and-urgent-fixes.mdx"),
+    "workflows/hotfix-rollback-after-release": () => import("@/content/zh/workflows/hotfix-rollback-after-release.mdx"),
     "workflows/open-source-fork-pr-contribution": () => import("@/content/zh/workflows/open-source-fork-pr-contribution.mdx"),
     "workflows/release-branch-workflow": () => import("@/content/zh/workflows/release-branch-workflow.mdx"),
     "workflows/backport-with-cherry-pick": () => import("@/content/zh/workflows/backport-with-cherry-pick.mdx"),
@@ -369,13 +377,17 @@ const contentModules = {
     "best-practices/small-batch-review": () => import("@/content/en/best-practices/small-batch-review.mdx"),
     "workflows/fetch-vs-pull": () => import("@/content/en/workflows/fetch-vs-pull.mdx"),
     "workflows/feature-branch-collaboration": () => import("@/content/en/workflows/feature-branch-collaboration.mdx"),
+    "workflows/multi-person-sync-routine": () => import("@/content/en/workflows/multi-person-sync-routine.mdx"),
+    "workflows/prepare-commits-before-pull-request": () => import("@/content/en/workflows/prepare-commits-before-pull-request.mdx"),
     "workflows/parallel-work-with-worktree": () => import("@/content/en/workflows/parallel-work-with-worktree.mdx"),
+    "workflows/monorepo-sparse-checkout-workflow": () => import("@/content/en/workflows/monorepo-sparse-checkout-workflow.mdx"),
     "workflows/rerere-for-recurring-conflicts": () => import("@/content/en/workflows/rerere-for-recurring-conflicts.mdx"),
     "workflows/shared-branch-sync-boundaries": () => import("@/content/en/workflows/shared-branch-sync-boundaries.mdx"),
     "workflows/sync-before-review": () => import("@/content/en/workflows/sync-before-review.mdx"),
     "workflows/pr-merge-strategy-and-platform-settings": () => import("@/content/en/workflows/pr-merge-strategy-and-platform-settings.mdx"),
     "workflows/merge-queue-workflow": () => import("@/content/en/workflows/merge-queue-workflow.mdx"),
     "workflows/hotfix-and-urgent-fixes": () => import("@/content/en/workflows/hotfix-and-urgent-fixes.mdx"),
+    "workflows/hotfix-rollback-after-release": () => import("@/content/en/workflows/hotfix-rollback-after-release.mdx"),
     "workflows/open-source-fork-pr-contribution": () => import("@/content/en/workflows/open-source-fork-pr-contribution.mdx"),
     "workflows/release-branch-workflow": () => import("@/content/en/workflows/release-branch-workflow.mdx"),
     "workflows/backport-with-cherry-pick": () => import("@/content/en/workflows/backport-with-cherry-pick.mdx"),
@@ -431,11 +443,167 @@ export type DocNeighbors = {
   next?: DocCard;
 };
 
+export type DocPrimer = {
+  audience: string[];
+  prerequisites: string[];
+  risks: string[];
+};
+
+type DocPrimerSeed = {
+  audience: readonly string[];
+  prerequisites: readonly string[];
+  risks: readonly string[];
+};
+
 export type ContentStats = {
   totalDocs: number;
   commandDocs: number;
   sectionCounts: Record<DocSection, number>;
 };
+
+const primerDefaults: Record<Locale, Record<DocSection, DocPrimerSeed>> = {
+  zh: {
+    commands: {
+      audience: ["已经会基本提交和分支操作的开发者", "想理解命令边界与风险的人"],
+      prerequisites: ["知道工作区、暂存区、提交的基本关系", "能读懂 `git status` 和简单历史图"],
+      risks: ["误把本地整理命令用到共享历史", "在没确认恢复路径前直接继续改写历史"],
+    },
+    "best-practices": {
+      audience: ["希望把 Git 用得更稳的个人或团队", "准备建立协作规范的维护者"],
+      prerequisites: ["至少有一次真实协作经验", "知道常见命令但还没形成稳定习惯"],
+      risks: ["把建议当硬规则而忽略上下文", "只记流程，不理解背后的协作边界"],
+    },
+    workflows: {
+      audience: ["要把命令组合成稳定流程的团队成员", "需要处理协作顺序和分支边界的人"],
+      prerequisites: ["知道 fetch / pull / push / branch 的基本作用", "能理解一条分支为什么会分叉"],
+      risks: ["照抄流程却没确认当前分支关系", "在共享分支上用错整合方式"],
+    },
+    internals: {
+      audience: ["想建立稳定 Git 心智模型的学习者", "经常遇到历史、引用、恢复问题的开发者"],
+      prerequisites: ["会看基础命令输出", "知道提交、分支、HEAD 这些名词"],
+      risks: ["只背底层术语却不连接到实际命令", "把对象、引用、工作区混成一层理解"],
+    },
+    recovery: {
+      audience: ["正在处理 Git 误操作的人", "想提前建立保守恢复习惯的协作者"],
+      prerequisites: ["先停手，不继续乱试命令", "能执行 `git reflog`、`git status`、`git log --graph`"],
+      risks: ["还没保住旧位置就继续 reset / rebase", "在没判断影响面时直接改共享历史"],
+    },
+    "learning-path": {
+      audience: ["刚开始系统学 Git 的新手", "想补齐最小协作闭环的人"],
+      prerequisites: ["会打开终端并进入仓库目录", "知道本地和远端仓库的基本区别"],
+      risks: ["跳过顺序直接学高风险命令", "把示例命令直接用到当前工作仓库"],
+    },
+    concepts: {
+      audience: ["想先理解历史图再看命令的人"],
+      prerequisites: ["知道提交不是文件快照列表那么简单"],
+      risks: ["把概念页当命令说明页使用"],
+    },
+  },
+  en: {
+    commands: {
+      audience: ["Developers who already know basic commit and branch actions", "Readers who want to understand command boundaries and risk"],
+      prerequisites: ["A basic mental model of worktree, index, and commits", "Comfort reading `git status` and a small commit graph"],
+      risks: ["Using local cleanup commands on already shared history", "Continuing to rewrite before confirming a recovery path"],
+    },
+    "best-practices": {
+      audience: ["Individuals or teams who want more predictable Git habits", "Maintainers setting collaboration expectations"],
+      prerequisites: ["At least one real collaboration loop", "Basic command familiarity without a stable routine yet"],
+      risks: ["Treating guidance as absolute law without context", "Memorizing process without understanding team boundaries"],
+    },
+    workflows: {
+      audience: ["Teams turning commands into repeatable routines", "Readers who need sequencing, branch, and sync discipline"],
+      prerequisites: ["Basic understanding of fetch, pull, push, and branches", "A sense of how and why branches diverge"],
+      risks: ["Copying a workflow without checking branch state", "Choosing the wrong integration path on shared branches"],
+    },
+    internals: {
+      audience: ["Readers building a durable Git mental model", "Developers who keep running into history, ref, or recovery confusion"],
+      prerequisites: ["Comfort reading basic Git output", "A rough idea of commits, branches, and HEAD"],
+      risks: ["Learning low-level terms without connecting them to commands", "Collapsing objects, refs, and working state into one concept"],
+    },
+    recovery: {
+      audience: ["Anyone actively handling a Git mistake", "Readers who want a conservative rescue habit before trouble happens"],
+      prerequisites: ["Stop mutating the repo further", "Be ready to inspect `git reflog`, `git status`, and `git log --graph`"],
+      risks: ["Running more reset or rebase commands before preserving a checkpoint", "Changing shared history before assessing blast radius"],
+    },
+    "learning-path": {
+      audience: ["Beginners learning Git as a system", "Developers who want a reliable first collaboration loop"],
+      prerequisites: ["Basic terminal comfort", "A rough distinction between local and remote repositories"],
+      risks: ["Skipping ahead to high-risk commands", "Running sample commands directly in the wrong repository"],
+    },
+    concepts: {
+      audience: ["Readers who want the history model before advanced commands"],
+      prerequisites: ["A basic sense that commits are not just a file list"],
+      risks: ["Treating a concepts page like a command how-to"],
+    },
+  },
+} as const;
+
+const primerOverrides: Record<Locale, Partial<Record<DocPath, DocPrimerSeed>>> = {
+  zh: {
+    "commands/git-rebase": {
+      audience: ["已经会 merge / pull 的开发者", "想整理本地提交历史的人"],
+      prerequisites: ["知道共享历史和本地历史的区别", "愿意先看 reflog 再做改写"],
+      risks: ["对已共享提交做 rebase", "冲突时不先保住旧位置就继续重试"],
+    },
+    "commands/git-reset": {
+      audience: ["想撤回提交、取消暂存或回到旧位置的人"],
+      prerequisites: ["知道 HEAD、暂存区、工作区是三层", "能接受先建救援分支再操作"],
+      risks: ["误用 `--hard` 覆盖工作区", "没确认共享边界就移动历史"],
+    },
+    "commands/git-reflog": {
+      audience: ["正在处理 reset、rebase、删分支事故的人"],
+      prerequisites: ["知道 reflog 记录的是引用位置变化", "愿意先查位置再动分支"],
+      risks: ["把 reflog 当永久保险箱", "看到旧位置后直接覆盖原分支而不先建救援分支"],
+    },
+    "commands/git-cherry-pick": {
+      audience: ["要把补丁带到另一个分支的人", "维护发布分支和回补修复的人"],
+      prerequisites: ["知道目标提交可能依赖前置提交", "会判断是 pick 单个补丁还是整合整条分支"],
+      risks: ["在多分支重复 pick 造成历史混乱", "忽略前置依赖导致目标分支状态不完整"],
+    },
+    "commands/git-merge": {
+      audience: ["需要整合分支历史的协作者"],
+      prerequisites: ["知道分支为什么会分叉", "能看懂 merge commit 的含义"],
+      risks: ["在冲突没理解清楚时强行继续", "把 merge 和 rebase 的适用边界混掉"],
+    },
+    "commands/git-stash": {
+      audience: ["要临时切任务但不想立刻提交的人"],
+      prerequisites: ["知道 stash 默认不等于完整备份", "知道 apply 和 pop 的区别"],
+      risks: ["误以为 stash 会自动保存一切", "长期堆积 stash 导致上下文难以追踪"],
+    },
+  },
+  en: {
+    "commands/git-rebase": {
+      audience: ["Developers who already understand merge and pull", "Readers cleaning up local commit history"],
+      prerequisites: ["A clear distinction between private and shared history", "A willingness to inspect reflog before rewriting"],
+      risks: ["Rebasing commits that are already shared", "Retrying through conflict states without preserving a checkpoint"],
+    },
+    "commands/git-reset": {
+      audience: ["Readers who want to uncommit, unstage, or move back to an earlier point"],
+      prerequisites: ["A three-layer model of HEAD, index, and worktree", "A habit of creating a rescue branch first"],
+      risks: ["Using `--hard` and overwriting local file state", "Moving history before checking the sharing boundary"],
+    },
+    "commands/git-reflog": {
+      audience: ["Readers handling reset, rebase, and branch-loss incidents"],
+      prerequisites: ["Knowing that reflog tracks ref movement", "A habit of inspecting positions before moving branches"],
+      risks: ["Treating reflog as permanent storage", "Jumping straight to overwrite the branch instead of making a rescue branch"],
+    },
+    "commands/git-cherry-pick": {
+      audience: ["Readers backporting patches across branches", "Maintainers moving fixes into release lines"],
+      prerequisites: ["Awareness that a picked commit may depend on earlier commits", "A judgment about patch transfer versus full branch integration"],
+      risks: ["Creating duplicated or diverging history across branches", "Ignoring dependency chains and replaying an incomplete patch"],
+    },
+    "commands/git-merge": {
+      audience: ["Collaborators integrating branch history"],
+      prerequisites: ["A basic model of branch divergence", "Comfort reading what a merge commit means"],
+      risks: ["Forcing through conflicts without understanding them", "Blurring the boundary between merge and rebase"],
+    },
+    "commands/git-stash": {
+      audience: ["Readers pausing work without making a real commit yet"],
+      prerequisites: ["Understanding that stash is not an all-purpose backup", "Knowing the difference between apply and pop"],
+      risks: ["Assuming stash preserved everything automatically", "Letting the stash stack become untracked long-term context"],
+    },
+  },
+} as const;
 
 type IndexedDoc = {
   path: DocPath;
@@ -721,6 +889,21 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
     "commands/git-switch",
     "workflows/hotfix-and-urgent-fixes",
   ],
+  "workflows/multi-person-sync-routine": [
+    "commands/git-fetch",
+    "commands/git-pull",
+    "workflows/shared-branch-sync-boundaries",
+  ],
+  "workflows/prepare-commits-before-pull-request": [
+    "commands/git-rebase",
+    "best-practices/pull-request-prep",
+    "workflows/sync-before-review",
+  ],
+  "workflows/monorepo-sparse-checkout-workflow": [
+    "commands/git-sparse-checkout",
+    "commands/git-worktree",
+    "workflows/submodule-update-flow",
+  ],
   "workflows/rerere-for-recurring-conflicts": [
     "commands/git-rebase",
     "commands/git-mergetool",
@@ -748,6 +931,11 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
   ],
   "workflows/post-release-multi-branch-backporting": [
     "workflows/backport-with-cherry-pick",
+    "workflows/release-branch-workflow",
+    "workflows/hotfix-and-urgent-fixes",
+  ],
+  "workflows/hotfix-rollback-after-release": [
+    "commands/git-revert",
     "workflows/release-branch-workflow",
     "workflows/hotfix-and-urgent-fixes",
   ],
@@ -798,6 +986,39 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
   ],
 };
 
+const representativeSectionPaths = {
+  "learning-path": [
+    "learning-path/setup-and-clone",
+    "learning-path/first-feature-branch",
+    "recovery/reflog-recovery",
+  ],
+  commands: [
+    "commands/git-status",
+    "commands/git-rebase",
+    "commands/git-reflog",
+  ],
+  "best-practices": [
+    "best-practices/commit-hygiene",
+    "best-practices/shared-history-boundaries",
+    "best-practices/review-and-safe-push",
+  ],
+  workflows: [
+    "workflows/fetch-vs-pull",
+    "workflows/sync-before-review",
+    "workflows/hotfix-and-urgent-fixes",
+  ],
+  internals: [
+    "internals/object-database",
+    "internals/refs-and-head",
+    "internals/reachability-and-garbage-collection",
+  ],
+  recovery: [
+    "recovery/reflog-recovery",
+    "recovery/recover-after-reset",
+    "recovery/undo-after-pull",
+  ],
+} as const satisfies Partial<Record<DocSection, readonly DocPath[]>>;
+
 export async function getRelatedDocs(
   locale: Locale,
   docPath: DocPath,
@@ -837,6 +1058,16 @@ export async function getFeaturedSectionDocs(
             : await getRecoveryDocs(locale);
 
   return docs.slice(0, limit).map((doc) => toIndexedDocCard(locale, doc));
+}
+
+export async function getRepresentativeSectionDocs(
+  locale: Locale,
+  section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "internals" | "recovery">,
+  limit = 3,
+): Promise<DocCard[]> {
+  const paths = representativeSectionPaths[section] ?? [];
+  const docs = await Promise.all(paths.slice(0, limit).map((docPath) => getDocByPath(locale, docPath)));
+  return docs.map((doc) => toDocCard(locale, doc));
 }
 
 export async function getContentStats(locale: Locale): Promise<ContentStats> {
@@ -881,4 +1112,16 @@ export async function getRecoveryDoc(locale: Locale, slug: RecoverySlug) {
 
 export function getDocPathFromSlugParts(slugParts: string[]) {
   return slugParts.join("/") as DocPath;
+}
+
+export function getDocPrimer(locale: Locale, docPath: DocPath): DocPrimer {
+  const section = docPath.split("/")[0] as DocSection;
+  const defaults = primerDefaults[locale][section];
+  const override = primerOverrides[locale][docPath];
+
+  return {
+    audience: Array.from(override?.audience ?? defaults.audience),
+    prerequisites: Array.from(override?.prerequisites ?? defaults.prerequisites),
+    risks: Array.from(override?.risks ?? defaults.risks),
+  };
 }

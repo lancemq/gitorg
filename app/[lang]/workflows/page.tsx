@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ChannelHighlights } from "@/components/channel-highlights";
 import { SiteShell } from "@/components/site-shell";
 import { buildCollectionPageData, StructuredData } from "@/components/structured-data";
-import { getFeaturedSectionDocs, getWorkflowDocs } from "@/lib/content";
+import { getFeaturedSectionDocs, getRepresentativeSectionDocs, getWorkflowDocs } from "@/lib/content";
 import {
   getDictionary,
   getSidebarContent,
@@ -54,9 +55,10 @@ export default async function WorkflowsChannelPage({ params }: Props) {
 
   const locale = lang as Locale;
   const dict = getDictionary(locale);
-  const [docs, featuredDocs] = await Promise.all([
+  const [docs, featuredDocs, representativeDocs] = await Promise.all([
     getWorkflowDocs(locale),
     getFeaturedSectionDocs(locale, "workflows", 4),
+    getRepresentativeSectionDocs(locale, "workflows", 3),
   ]);
 
   const sortedDocs = docs.sort(
@@ -116,6 +118,18 @@ export default async function WorkflowsChannelPage({ params }: Props) {
             ))}
           </div>
         </section>
+
+        <ChannelHighlights
+          locale={locale}
+          eyebrow={dict.workflowIndex.eyebrow}
+          title={locale === "zh" ? "代表专题" : "Representative Topics"}
+          description={
+            locale === "zh"
+              ? "这三类专题最能体现工作流频道的价值：同步边界、评审前整理，以及紧急修复时的操作顺序。"
+              : "These topics show the channel at its best: sync boundaries, pre-review preparation, and urgent-fix sequencing."
+          }
+          docs={representativeDocs}
+        />
 
         <section className="panel docs-group">
           <div className="docs-group-head">

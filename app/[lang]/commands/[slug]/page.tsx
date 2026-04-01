@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { DocPrimer } from "@/components/doc-primer";
 import { DocSupport } from "@/components/doc-support";
 import { SiteShell } from "@/components/site-shell";
 import { buildBreadcrumbData, StructuredData } from "@/components/structured-data";
-import { getCommandDoc, getDocLastModified, getDocNeighbors, getRelatedDocs } from "@/lib/content";
+import { getCommandDoc, getDocLastModified, getDocNeighbors, getDocPrimer, getRelatedDocs } from "@/lib/content";
 import {
   commandSlugs,
   getDictionary,
@@ -74,6 +75,7 @@ export default async function CommandPage({ params }: Props) {
     getRelatedDocs(locale, docPath),
     getDocLastModified(locale, docPath),
   ]);
+  const primer = getDocPrimer(locale, docPath);
   const DocBody = doc.Component;
   const siteUrl = getSiteUrl();
   const inLanguage = locale === "zh" ? "zh-CN" : "en";
@@ -139,6 +141,8 @@ export default async function CommandPage({ params }: Props) {
           ))}
         </aside>
       </section>
+
+      <DocPrimer locale={locale} primer={primer} />
 
       <section className="panel doc-content command-doc-content">
         <div className="mdx-content">

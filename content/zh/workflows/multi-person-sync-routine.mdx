@@ -1,0 +1,53 @@
+export const metadata = {
+  title: "多人协作时的同步节奏",
+  slug: "multi-person-sync-routine",
+  locale: "zh",
+  section: "workflows",
+  summary: "围绕多人并行开发，建立一套先 fetch、再观察、再整合的同步节奏，减少 pull 惊喜和共享历史误操作。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-fetch",
+    "https://git-scm.com/docs/git-pull",
+    "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project",
+  ],
+};
+
+# 多人协作时的同步节奏
+
+多人协作里最容易出问题的不是命令不会用，而是同步节奏太随意。
+
+推荐的一条保守节奏是：
+
+1. 先 `git fetch`
+2. 看当前分支和上游分支是否分叉
+3. 再决定 merge、rebase，还是先不动
+
+## 为什么不建议把一切都交给 pull
+
+因为 `pull` 把“获取远端变化”和“改当前分支”绑在了一起。  
+协作越多人，越应该把这两步拆开。
+
+## 一个团队可执行的同步顺序
+
+```bash
+git fetch origin
+git status
+git log --oneline --graph --decorate --all -n 20
+```
+
+看清楚之后，再根据团队约定选择：
+
+- `git merge origin/main`
+- `git rebase origin/main`
+- 或暂时不整合
+
+## 什么时候最需要这条流程
+
+- 有多人同时改同一模块
+- 当前分支已经存在本地提交
+- 准备发起 PR 前
+- 刚从假期、上下文切换或长时间未同步回来
+
+## 一个实践原则
+
+同步动作要尽量可解释。  
+如果你已经解释不清这次同步之后历史为什么长这样，那就说明节奏太快了。

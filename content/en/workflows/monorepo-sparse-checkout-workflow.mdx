@@ -1,0 +1,48 @@
+export const metadata = {
+  title: "Sparse-checkout and worktree flow for monorepos",
+  slug: "monorepo-sparse-checkout-workflow",
+  locale: "en",
+  section: "workflows",
+  summary: "Use sparse-checkout and worktree together in a monorepo to reduce context load and support parallel task work without loading the whole tree every time.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-sparse-checkout",
+    "https://git-scm.com/docs/git-worktree",
+    "https://git-scm.com/docs/git-submodule",
+  ],
+};
+
+# Sparse-checkout and worktree flow for monorepos
+
+In a monorepo, the pain is often not Git itself. The pain is scope.
+
+Two tools help a lot:
+
+- `sparse-checkout` to limit the active directory surface
+- `worktree` to open a second working copy for parallel tasks
+
+## A common scenario
+
+You only need the frontend app, but the repo also contains backend services, infra code, tooling, and shared packages.
+
+## A practical flow
+
+```bash
+git sparse-checkout init --cone
+git sparse-checkout set apps/web packages/ui
+git worktree add ../repo-hotfix hotfix/login-fix
+```
+
+That lets you:
+
+- keep the main working tree focused
+- handle a hotfix in parallel
+- avoid pulling the full repo surface into daily attention
+
+## Boundary with submodules
+
+If this is one monorepo, prefer sparse-checkout and worktree first.  
+If you are managing true repository-to-repository dependencies, then submodule may be the more relevant tool.
+
+## One principle
+
+In large repositories, workflow quality improves when the active scope becomes explicit and small.

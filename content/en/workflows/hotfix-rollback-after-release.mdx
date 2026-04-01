@@ -1,0 +1,43 @@
+export const metadata = {
+  title: "Rollback a failed hotfix after release",
+  slug: "hotfix-rollback-after-release",
+  locale: "en",
+  section: "workflows",
+  summary: "When a production hotfix causes new problems, first choose the rollback scope and stabilize the branch model before layering on more fixes.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-revert",
+    "https://git-scm.com/docs/git-tag",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+  ],
+};
+
+# Rollback a failed hotfix after release
+
+When a hotfix goes wrong, the real danger is often not the bug itself but the panic-driven urge to stack more changes onto production immediately.
+
+## First assess, do not pile on
+
+Ask:
+
+- is the problem isolated to the hotfix
+- should you roll back one commit, one patch, or the entire release state
+- which branch currently represents the source of truth
+
+## Why revert is often the first tool
+
+If the hotfix is already shared and deployed, `git revert` is often the safer starting point because it keeps the incident visible in history:
+
+```bash
+git revert <hotfix-commit>
+```
+
+## A safer incident order
+
+1. label the current production state
+2. roll back the smallest necessary scope
+3. rebuild the fix on an isolated branch
+4. decide how to feed it back into main and release lines
+
+## One principle
+
+During incident response, restore system stability first and optimize history elegance second.

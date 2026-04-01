@@ -1,0 +1,49 @@
+export const metadata = {
+  title: "monorepo 场景下的稀疏检出与多工作树协作",
+  slug: "monorepo-sparse-checkout-workflow",
+  locale: "zh",
+  section: "workflows",
+  summary: "在 monorepo 场景里，用 sparse-checkout 和 worktree 限定工作范围，降低上下文负担并支持并行任务。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-sparse-checkout",
+    "https://git-scm.com/docs/git-worktree",
+    "https://git-scm.com/docs/git-submodule",
+  ],
+};
+
+# monorepo 场景下的稀疏检出与多工作树协作
+
+monorepo 最常见的问题不是 Git 失效，而是工作范围太大。
+
+这时可以把两个能力结合起来：
+
+- `sparse-checkout`：只拉起当前需要的目录
+- `worktree`：为并行任务开多个独立工作副本
+
+## 一个常见场景
+
+你只改前端应用，但仓库里还有后端、脚本、基础设施和大量共享包。  
+如果每次都把整棵树都拉起来，成本会很高。
+
+## 一条可执行流程
+
+```bash
+git sparse-checkout init --cone
+git sparse-checkout set apps/web packages/ui
+git worktree add ../repo-hotfix hotfix/login-fix
+```
+
+这样你可以：
+
+- 在当前工作树处理主任务
+- 在另一个 worktree 里处理热修
+- 同时让当前工作区范围保持更小
+
+## 和 submodule 的边界
+
+如果仓库本身就是 monorepo，优先考虑 sparse-checkout / worktree。  
+如果你管理的是独立仓库依赖关系，才更可能落到 submodule。
+
+## 一个原则
+
+在大型仓库里，Git 工作流优化的关键不只是命令更高级，而是把“我现在真正要改的范围”压缩到足够清楚。

@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ChannelHighlights } from "@/components/channel-highlights";
 import { SiteShell } from "@/components/site-shell";
 import { buildCollectionPageData, StructuredData } from "@/components/structured-data";
-import { getFeaturedSectionDocs, getRecoveryDocs } from "@/lib/content";
+import { getFeaturedSectionDocs, getRecoveryDocs, getRepresentativeSectionDocs } from "@/lib/content";
 import {
   getDictionary,
   getSidebarContent,
@@ -54,9 +55,10 @@ export default async function RecoveryChannelPage({ params }: Props) {
 
   const locale = lang as Locale;
   const dict = getDictionary(locale);
-  const [docs, featuredDocs] = await Promise.all([
+  const [docs, featuredDocs, representativeDocs] = await Promise.all([
     getRecoveryDocs(locale),
     getFeaturedSectionDocs(locale, "recovery", 4),
+    getRepresentativeSectionDocs(locale, "recovery", 3),
   ]);
 
   const sortedDocs = docs.sort(
@@ -116,6 +118,18 @@ export default async function RecoveryChannelPage({ params }: Props) {
             ))}
           </div>
         </section>
+
+        <ChannelHighlights
+          locale={locale}
+          eyebrow={dict.recoveryIndex.eyebrow}
+          title={locale === "zh" ? "代表专题" : "Representative Topics"}
+          description={
+            locale === "zh"
+              ? "如果你只先读三篇，优先理解 reflog、自救式 reset 恢复，以及 pull 后如何回到可控状态。"
+              : "If you only read three first, start with reflog, reset recovery, and how to get back to control after a bad pull."
+          }
+          docs={representativeDocs}
+        />
 
         <section className="panel docs-group">
           <div className="docs-group-head">

@@ -1,0 +1,49 @@
+export const metadata = {
+  title: "A sync routine for multi-person collaboration",
+  slug: "multi-person-sync-routine",
+  locale: "en",
+  section: "workflows",
+  summary: "Use a fetch-first, inspect-first sync rhythm in team collaboration so pull does not become a source of surprise or silent history mutation.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-fetch",
+    "https://git-scm.com/docs/git-pull",
+    "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project",
+  ],
+};
+
+# A sync routine for multi-person collaboration
+
+In team Git work, the real problem is often not command knowledge but an inconsistent sync rhythm.
+
+A conservative routine looks like this:
+
+1. `git fetch` first
+2. inspect whether your branch and upstream diverged
+3. only then choose merge, rebase, or wait
+
+## Why not let pull do everything
+
+Because `pull` combines “observe remote updates” and “mutate my current branch” into one step.  
+The more collaborators involved, the more useful it is to separate those actions.
+
+## A team-usable sync flow
+
+```bash
+git fetch origin
+git status
+git log --oneline --graph --decorate --all -n 20
+```
+
+Then choose the integration path your team expects.
+
+## When this matters most
+
+- several people are editing the same area
+- your branch already has local commits
+- you are about to open or refresh a PR
+- you are returning after context drift
+
+## One principle
+
+A sync action should stay explainable.  
+If you cannot explain why the branch graph looks the way it does after syncing, the routine is too implicit.

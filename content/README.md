@@ -67,6 +67,10 @@
 - `zh/workflows/feature-branch-collaboration.mdx`
 - `zh/workflows/sync-before-review.mdx`
 - `zh/workflows/hotfix-and-urgent-fixes.mdx`
+- `zh/workflows/multi-person-sync-routine.mdx`
+- `zh/workflows/prepare-commits-before-pull-request.mdx`
+- `zh/workflows/monorepo-sparse-checkout-workflow.mdx`
+- `zh/workflows/hotfix-rollback-after-release.mdx`
 - `zh/internals/object-database.mdx`
 - `zh/internals/index-and-working-tree.mdx`
 - `zh/internals/refs-and-head.mdx`
@@ -121,6 +125,10 @@
 - `en/workflows/feature-branch-collaboration.mdx`
 - `en/workflows/sync-before-review.mdx`
 - `en/workflows/hotfix-and-urgent-fixes.mdx`
+- `en/workflows/multi-person-sync-routine.mdx`
+- `en/workflows/prepare-commits-before-pull-request.mdx`
+- `en/workflows/monorepo-sparse-checkout-workflow.mdx`
+- `en/workflows/hotfix-rollback-after-release.mdx`
 - `en/internals/object-database.mdx`
 - `en/internals/index-and-working-tree.mdx`
 - `en/internals/refs-and-head.mdx`

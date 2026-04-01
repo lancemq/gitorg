@@ -1,0 +1,42 @@
+export const metadata = {
+  title: "发布后热修失败，如何回滚与稳定主线",
+  slug: "hotfix-rollback-after-release",
+  locale: "zh",
+  section: "workflows",
+  summary: "当发布后热修本身引入问题时，优先判断回滚粒度、共享影响和后续补丁路径，而不是立刻继续叠加修复。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-revert",
+    "https://git-scm.com/docs/git-tag",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+  ],
+};
+
+# 发布后热修失败，如何回滚与稳定主线
+
+热修失败时，最危险的往往不是 bug 本身，而是慌着继续往生产线上叠修复。
+
+## 先做的不是继续提交，而是判断
+
+- 问题是否只来自热修本身
+- 需要回滚的是一个提交、一个 patch，还是整次发布
+- 哪条分支是当前真相来源
+
+## 为什么优先考虑 revert
+
+如果热修已经共享并部署，通常优先考虑 `git revert`，因为它更容易保留完整事故轨迹。
+
+```bash
+git revert <hotfix-commit>
+```
+
+## 一条更稳的事故顺序
+
+1. 先标记当前线上状态
+2. 回滚最小必要范围
+3. 在独立分支重做修复
+4. 再决定如何回补主线和发布线
+
+## 一个原则
+
+事故处理中，先把系统带回稳定状态，再追求历史优雅。  
+稳定优先，漂亮其次。
