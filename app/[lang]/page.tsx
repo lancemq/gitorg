@@ -74,6 +74,11 @@ const scenarioLinks = {
   ],
 } as const;
 
+const heroSignals = {
+  zh: ["命令 · 工作流 · 原理", "图解 + 练习 + 恢复", "双语教程体系"],
+  en: ["Commands · Workflows · Internals", "Figures + Practice + Recovery", "Bilingual learning system"],
+} as const;
+
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
@@ -112,6 +117,7 @@ export default async function LocalizedHomePage({ params }: Props) {
   const inLanguage = locale === "zh" ? "zh-CN" : "en";
   const journeys = audiencePaths[locale];
   const scenarios = scenarioLinks[locale];
+  const signals = heroSignals[locale];
 
   return (
     <SiteShell locale={locale} sidebar={getSidebarContent(locale, { kind: "docs", activePath: "overview" })}>
@@ -147,10 +153,22 @@ export default async function LocalizedHomePage({ params }: Props) {
         ]}
       />
       <section className="hero panel" id="overview">
+        <div className="hero-backdrop" aria-hidden="true">
+          <span className="hero-orb hero-orb-primary" />
+          <span className="hero-orb hero-orb-secondary" />
+          <span className="hero-grid" />
+        </div>
         <div className="hero-copy">
           <p className="eyebrow">{dict.home.hero.eyebrow}</p>
           <h1>{dict.home.hero.title}</h1>
           <p className="lead">{dict.home.hero.description}</p>
+          <div className="hero-signals" aria-label={locale === "zh" ? "重点内容" : "Highlights"}>
+            {signals.map((signal) => (
+              <span className="hero-signal" key={signal}>
+                {signal}
+              </span>
+            ))}
+          </div>
           <div className="hero-actions">
             <Link className="button button-primary" href={`/${locale}/learning-path`}>
               {dict.home.hero.primaryAction}

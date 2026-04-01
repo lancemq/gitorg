@@ -17,15 +17,21 @@ export async function SiteShell({ locale, sidebar, children }: SiteShellProps) {
   return (
     <div className="shell">
       <aside className="sidebar">
-        <Link className="brand" href={`/${locale}`}>
-          <span className="brand-mark">G</span>
-          <span className="brand-text">{sidebar.brandLabel}</span>
-        </Link>
+        <div className="sidebar-top">
+          <div className="sidebar-glow" aria-hidden="true" />
+          <Link className="brand" href={`/${locale}`}>
+            <span className="brand-mark">G</span>
+            <span className="brand-copy">
+              <span className="brand-kicker">GitOrg Atlas</span>
+              <span className="brand-text">{sidebar.brandLabel}</span>
+            </span>
+          </Link>
 
-        <LanguageSwitcher
-          currentLocale={locale}
-          label={sidebar.localeLabel}
-        />
+          <LanguageSwitcher
+            currentLocale={locale}
+            label={sidebar.localeLabel}
+          />
+        </div>
 
         <nav className="side-nav">
           {sidebar.groups.map((group) => (
