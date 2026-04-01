@@ -52,6 +52,13 @@ export default function RootLayout({
               name: "GitOrg Atlas",
               url: siteUrl,
               logo: `${siteUrl}/opengraph-image`,
+              areaServed: [
+                { "@type": "Country", name: "China" },
+                { "@type": "Country", name: "Singapore" },
+                { "@type": "Country", name: "Malaysia" },
+                { "@type": "Country", name: "United States" },
+                { "@type": "Country", name: "United Kingdom" },
+              ],
               sameAs: [
                 "https://gitorg.xyz",
               ],
@@ -63,6 +70,17 @@ export default function RootLayout({
               alternateName: ["GitOrg Atlas", "GitOrg 图谱"],
               url: siteUrl,
               inLanguage: ["zh-CN", "en"],
+              availableLanguage: ["zh-CN", "en"],
+              audience: {
+                "@type": "Audience",
+                geographicArea: [
+                  { "@type": "Country", name: "China" },
+                  { "@type": "Country", name: "Singapore" },
+                  { "@type": "Country", name: "Malaysia" },
+                  { "@type": "Country", name: "United States" },
+                  { "@type": "Country", name: "United Kingdom" },
+                ],
+              },
               publisher: {
                 "@type": "Organization",
                 name: "GitOrg Atlas",

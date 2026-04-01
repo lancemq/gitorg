@@ -4,8 +4,10 @@ import { notFound } from "next/navigation";
 
 import { FaqList } from "@/components/faq-list";
 import { SiteShell } from "@/components/site-shell";
+import { StructuredData } from "@/components/structured-data";
 import { getDictionary, getSidebarContent, isValidLocale, locales, type Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo";
+import { getSiteUrl } from "@/lib/site";
 
 type Props = {
   params: Promise<{
@@ -44,10 +46,29 @@ export default async function FaqPage({ params }: Props) {
 
   const locale = lang as Locale;
   const dict = getDictionary(locale);
+  const siteUrl = getSiteUrl();
 
   return (
     <SiteShell locale={locale} sidebar={getSidebarContent(locale, { kind: "docs", activePath: "faq" })}>
       <article className="doc-page">
+        <StructuredData
+          data={{
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: dict.faqPage.groups.flatMap((group) =>
+              group.items.map((item) => ({
+                "@type": "Question",
+                name: item.question,
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: item.answer,
+                },
+              })),
+            ),
+            url: `${siteUrl}/${locale}/faq`,
+            inLanguage: locale === "zh" ? "zh-CN" : "en",
+          }}
+        />
         <nav className="breadcrumbs" aria-label="Breadcrumb">
           <Link href={`/${locale}`}>{dict.commandPage.breadcrumbs.overview}</Link>
           <span>/</span>

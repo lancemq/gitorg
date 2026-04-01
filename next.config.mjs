@@ -9,6 +9,28 @@ const withMDX = createMDX({
 const nextConfig = {
   pageExtensions: ["ts", "tsx", "md", "mdx"],
   outputFileTracingRoot: path.resolve(process.cwd()),
+  async headers() {
+    return [
+      {
+        source: "/zh/:path*",
+        headers: [
+          {
+            key: "Content-Language",
+            value: "zh-CN",
+          },
+        ],
+      },
+      {
+        source: "/en/:path*",
+        headers: [
+          {
+            key: "Content-Language",
+            value: "en",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default withMDX(nextConfig);

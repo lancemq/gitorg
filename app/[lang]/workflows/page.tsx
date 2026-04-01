@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { SiteShell } from "@/components/site-shell";
+import { buildCollectionPageData, StructuredData } from "@/components/structured-data";
 import { getFeaturedSectionDocs, getWorkflowDocs } from "@/lib/content";
 import {
   getDictionary,
@@ -14,6 +15,7 @@ import {
   type WorkflowSlug,
 } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo";
+import { getSiteUrl } from "@/lib/site";
 
 type Props = {
   params: Promise<{
@@ -62,9 +64,23 @@ export default async function WorkflowsChannelPage({ params }: Props) {
       workflowSlugs.indexOf(a.metadata.slug as WorkflowSlug) -
       workflowSlugs.indexOf(b.metadata.slug as WorkflowSlug),
   );
+  const siteUrl = getSiteUrl();
+  const pageUrl = `${siteUrl}/${locale}/workflows`;
 
   return (
     <SiteShell locale={locale} sidebar={getSidebarContent(locale, { kind: "docs", activePath: "workflows-index" })}>
+      <StructuredData
+        data={buildCollectionPageData({
+          name: dict.workflowIndex.title,
+          url: pageUrl,
+          description: dict.workflowIndex.description,
+          items: sortedDocs.map((doc) => ({
+            name: doc.metadata.title,
+            url: `${siteUrl}/${locale}/workflows/${doc.metadata.slug}`,
+            description: doc.metadata.summary,
+          })),
+        })}
+      />
       <section className="docs-landing">
         <nav className="breadcrumbs" aria-label="Breadcrumb">
           <Link href={`/${locale}`}>{dict.commandPage.breadcrumbs.overview}</Link>

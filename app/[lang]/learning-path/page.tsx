@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { SiteShell } from "@/components/site-shell";
+import { buildCollectionPageData, StructuredData } from "@/components/structured-data";
 import { getFeaturedSectionDocs, getLearningPathDocs } from "@/lib/content";
 import {
   getDictionary,
@@ -12,6 +13,7 @@ import {
   type Locale,
 } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo";
+import { getSiteUrl } from "@/lib/site";
 
 type Props = {
   params: Promise<{
@@ -50,7 +52,7 @@ export default async function LearningPathChannelPage({ params }: Props) {
 
   const locale = lang as Locale;
   const dict = getDictionary(locale);
-  const [, featuredDocs] = await Promise.all([getLearningPathDocs(locale), getFeaturedSectionDocs(locale, "learning-path", 5)]);
+  const [docs, featuredDocs] = await Promise.all([getLearningPathDocs(locale), getFeaturedSectionDocs(locale, "learning-path", 5)]);
 
   const featuredSequence = featuredDocs.filter((doc) => doc.slug !== "quick-start");
   const learningSignals =
@@ -79,9 +81,25 @@ export default async function LearningPathChannelPage({ params }: Props) {
           "Remote sync rhythm",
           "First feature branch loop",
         ];
+  const siteUrl = getSiteUrl();
+  const pageUrl = `${siteUrl}/${locale}/learning-path`;
 
   return (
     <SiteShell locale={locale} sidebar={getSidebarContent(locale, { kind: "docs", activePath: "learning-path-index" })}>
+      <StructuredData
+        data={buildCollectionPageData({
+          name: dict.learningPathIndex.title,
+          url: pageUrl,
+          description: dict.learningPathIndex.description,
+          items: docs
+            .filter((doc) => doc.metadata.slug !== "quick-start")
+            .map((doc) => ({
+              name: doc.metadata.title,
+              url: `${siteUrl}/${locale}/docs/learning-path/${doc.metadata.slug}`,
+              description: doc.metadata.summary,
+            })),
+        })}
+      />
       <section className="docs-landing learning-path-landing">
         <nav className="breadcrumbs" aria-label="Breadcrumb">
           <Link href={`/${locale}`}>{dict.commandPage.breadcrumbs.overview}</Link>

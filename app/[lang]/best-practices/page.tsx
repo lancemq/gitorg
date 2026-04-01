@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { SiteShell } from "@/components/site-shell";
+import { buildCollectionPageData, StructuredData } from "@/components/structured-data";
 import { getBestPracticeDocs, getFeaturedSectionDocs } from "@/lib/content";
 import {
   bestPracticeSlugs,
@@ -14,6 +15,7 @@ import {
   type Locale,
 } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo";
+import { getSiteUrl } from "@/lib/site";
 
 type Props = {
   params: Promise<{
@@ -62,9 +64,23 @@ export default async function BestPracticesChannelPage({ params }: Props) {
       bestPracticeSlugs.indexOf(a.metadata.slug as BestPracticeSlug) -
       bestPracticeSlugs.indexOf(b.metadata.slug as BestPracticeSlug),
   );
+  const siteUrl = getSiteUrl();
+  const pageUrl = `${siteUrl}/${locale}/best-practices`;
 
   return (
     <SiteShell locale={locale} sidebar={getSidebarContent(locale, { kind: "docs", activePath: "best-practices-index" })}>
+      <StructuredData
+        data={buildCollectionPageData({
+          name: dict.bestPracticeIndex.title,
+          url: pageUrl,
+          description: dict.bestPracticeIndex.description,
+          items: sortedDocs.map((doc) => ({
+            name: doc.metadata.title,
+            url: `${siteUrl}/${locale}/best-practices/${doc.metadata.slug}`,
+            description: doc.metadata.summary,
+          })),
+        })}
+      />
       <section className="docs-landing">
         <nav className="breadcrumbs" aria-label="Breadcrumb">
           <Link href={`/${locale}`}>{dict.commandPage.breadcrumbs.overview}</Link>

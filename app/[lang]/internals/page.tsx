@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { SiteShell } from "@/components/site-shell";
+import { buildCollectionPageData, StructuredData } from "@/components/structured-data";
 import { getFeaturedSectionDocs, getInternalsDocs } from "@/lib/content";
 import {
   getDictionary,
@@ -14,6 +15,7 @@ import {
   type Locale,
 } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo";
+import { getSiteUrl } from "@/lib/site";
 
 type Props = {
   params: Promise<{
@@ -62,9 +64,23 @@ export default async function GitInternalsChannelPage({ params }: Props) {
       internalsSlugs.indexOf(a.metadata.slug as InternalsSlug) -
       internalsSlugs.indexOf(b.metadata.slug as InternalsSlug),
   );
+  const siteUrl = getSiteUrl();
+  const pageUrl = `${siteUrl}/${locale}/internals`;
 
   return (
     <SiteShell locale={locale} sidebar={getSidebarContent(locale, { kind: "docs", activePath: "internals-index" })}>
+      <StructuredData
+        data={buildCollectionPageData({
+          name: dict.internalsIndex.title,
+          url: pageUrl,
+          description: dict.internalsIndex.description,
+          items: sortedDocs.map((doc) => ({
+            name: doc.metadata.title,
+            url: `${siteUrl}/${locale}/internals/${doc.metadata.slug}`,
+            description: doc.metadata.summary,
+          })),
+        })}
+      />
       <section className="docs-landing">
         <nav className="breadcrumbs" aria-label="Breadcrumb">
           <Link href={`/${locale}`}>{dict.commandPage.breadcrumbs.overview}</Link>

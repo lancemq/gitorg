@@ -7,6 +7,12 @@ type BreadcrumbItem = {
   url: string;
 };
 
+type CollectionItem = {
+  name: string;
+  url: string;
+  description?: string;
+};
+
 export function StructuredData({ data }: StructuredDataProps) {
   return (
     <script
@@ -27,4 +33,40 @@ export function buildBreadcrumbData(items: BreadcrumbItem[]) {
       item: item.url,
     })),
   };
+}
+
+type CollectionPageInput = {
+  name: string;
+  url: string;
+  description: string;
+  items: CollectionItem[];
+};
+
+export function buildCollectionPageData({
+  name,
+  url,
+  description,
+  items,
+}: CollectionPageInput) {
+  return [
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name,
+      url,
+      description,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name,
+      itemListElement: items.map((item, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        url: item.url,
+        name: item.name,
+        description: item.description,
+      })),
+    },
+  ];
 }

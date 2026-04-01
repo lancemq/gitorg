@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { SiteShell } from "@/components/site-shell";
+import { buildCollectionPageData, StructuredData } from "@/components/structured-data";
 import { getCommandDocs, getFeaturedSectionDocs } from "@/lib/content";
 import {
   advancedCommandSlugs,
@@ -16,6 +17,7 @@ import {
   type Locale,
 } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo";
+import { getSiteUrl } from "@/lib/site";
 
 type Props = {
   params: Promise<{
@@ -71,9 +73,23 @@ export default async function CommandsIndexPage({ params }: Props) {
   const advancedDocs = sortedDocs.filter((doc) =>
     (advancedCommandSlugs as readonly CommandSlug[]).includes(doc.metadata.slug as CommandSlug),
   );
+  const siteUrl = getSiteUrl();
+  const pageUrl = `${siteUrl}/${locale}/commands`;
 
   return (
     <SiteShell locale={locale} sidebar={getSidebarContent(locale, { kind: "docs", activePath: "commands-index" })}>
+      <StructuredData
+        data={buildCollectionPageData({
+          name: dict.commandIndex.title,
+          url: pageUrl,
+          description: dict.commandIndex.description,
+          items: sortedDocs.map((doc) => ({
+            name: doc.metadata.title,
+            url: `${siteUrl}/${locale}/commands/${doc.metadata.slug}`,
+            description: doc.metadata.summary,
+          })),
+        })}
+      />
       <section className="docs-landing">
         <nav className="breadcrumbs" aria-label="Breadcrumb">
           <Link href={`/${locale}`}>{dict.commandPage.breadcrumbs.overview}</Link>
