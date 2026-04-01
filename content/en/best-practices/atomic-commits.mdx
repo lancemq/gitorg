@@ -12,20 +12,80 @@ export const metadata = {
 
 # Atomic Commits
 
-## Core guidance
+## Why atomic commits are not just aesthetics
 
-Keep each commit focused on one logical change to simplify review and rollback.
+An atomic commit is not about making history look neat. It is about making each commit explainable, reviewable, and reversible on its own.
 
-## Why it matters
+Once one commit mixes multiple intentions, every downstream workflow gets heavier:
 
-Good Git practice is less about looking clever with commands and more about keeping history readable, collaboration predictable, and recovery paths clear.
+- reviewers must mentally separate concerns first
+- revert becomes much riskier
+- cherry-pick is more likely to drag unrelated work along
+- incident analysis gets murkier
 
-## Checklist
+That is why atomic commits are a collaboration practice, not a cosmetic one.
 
-- Keep one intent per commit
-- Separate refactors from behavior changes when possible
-- Review the diff before committing
+## 1. One commit should answer one question
 
-## Commands to review alongside it
+A practical test is not “how many files changed?” but “do these changes belong to the same intent?”
 
-It usually helps to review this topic alongside git status, git log, and git diff, then add git rebase, git merge, or force-with-lease where appropriate.
+Good candidates for one commit:
+
+- fixing empty email validation
+- renaming a set of fields consistently
+- adding tests directly tied to one behavior change
+
+Poor candidates for one commit:
+
+- bugfix plus style polish
+- refactor plus behavior change
+- formatting cleanup mixed with product logic
+
+## 2. Three questions before you commit
+
+Ask yourself:
+
+1. Can I summarize this commit in one sentence?
+2. Would reverting only this commit be relatively safe?
+3. Could a reviewer understand the intent from this commit alone?
+
+If two of those answers are unclear, the commit is usually still too broad.
+
+## 3. Split staging is often the real skill
+
+The most useful tool here is still:
+
+```bash
+git add --patch
+```
+
+Its value is that it moves boundary-setting earlier, into staging, instead of hoping the boundary will magically become clear after the commit already exists.
+
+## 4. Atomic commits directly improve review, revert, and cherry-pick
+
+### Review
+
+Reviewers can react to the actual change instead of first untangling it.
+
+### Revert
+
+A one-intent commit is much closer to surgical rollback.
+
+### Cherry-pick
+
+Small focused fixes are far easier to transplant into another branch without collateral damage.
+
+## 5. A lightweight team baseline
+
+If the team has no standard yet, this is already enough:
+
+1. one commit, one intent
+2. do not mix refactor and behavior change without a good reason
+3. inspect `git diff --staged` before committing
+4. when in doubt, split smaller
+
+That last check is still one of the highest-value habits:
+
+```bash
+git diff --staged
+```

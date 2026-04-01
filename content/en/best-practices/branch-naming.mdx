@@ -12,20 +12,70 @@ export const metadata = {
 
 # Branch Naming Conventions
 
-## Core guidance
+## Why branch names affect collaboration more than people expect
 
-Adopt predictable branch naming patterns to improve collaboration, automation, and debugging.
+Branch names look small, but they keep showing up in PRs, CI logs, release conversations, and rollback decisions.  
+When names are vague, people repeatedly pay the cost of asking what the branch is for. When names are stable, that context becomes almost free.
 
-## Why it matters
+## 1. A useful branch name says two things
 
-Good Git practice is less about looking clever with commands and more about keeping history readable, collaboration predictable, and recovery paths clear.
+A strong pattern usually communicates:
 
-## Checklist
+- the kind of work
+- the topic of the work
 
-- Make names reflect branch type and topic
-- Standardize prefixes across the team
-- Avoid mixing temporary and long-lived naming styles
+For example:
 
-## Commands to review alongside it
+- `feature/login-validation`
+- `fix/navbar-overlap`
+- `docs/release-notes`
+- `chore/remove-legacy-flag`
 
-It usually helps to review this topic alongside git status, git log, and git diff, then add git rebase, git merge, or force-with-lease where appropriate.
+That already gives teammates context before they even open the diff.
+
+## 2. Internal consistency matters more than the exact vocabulary
+
+You do not need the perfect global naming scheme. You do need the team to stop drifting between multiple inconsistent prefixes.
+
+If the team picks:
+
+- `feature/`
+- `fix/`
+- `docs/`
+- `chore/`
+- `release/`
+
+then keep using those consistently.
+
+## 3. Weak names create hidden cost
+
+Names like these usually age badly:
+
+- `test`
+- `new-branch`
+- `my-work`
+- `update`
+- `bugfix-final-v2`
+
+They are hard to search, hard to discuss, and nearly useless in CI or incident recovery.
+
+## 4. Naming works only when work boundaries are already clear
+
+Branch naming is not a rescue tool for mixed work.  
+If one branch contains login validation, navbar cleanup, and docs changes, the naming problem started earlier with branch scope.
+
+The better order is:
+
+1. define a clean work boundary
+2. choose a name that reflects that boundary
+
+## 5. A practical team rule set
+
+Start with this:
+
+1. every work branch gets a prefix
+2. keep the list of prefixes small
+3. the rest of the name should describe the topic directly
+4. vague names do not enter review
+
+That is already enough to improve review, CI clarity, and release communication.

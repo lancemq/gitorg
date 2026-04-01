@@ -17,6 +17,10 @@ export const metadata = {
 
 `git rebase` 会把一组提交重新应用到新的基底之上，所以你通常会得到“内容相近但提交 ID 变化过”的历史。
 
+<MentalModelBox title="先建立一个脑内模型">
+  <p>把 rebase 想成“把你这条分支上的提交重新排队，再接到新的基底后面”。它不是简单合并，而是重写提交之间的祖先关系。</p>
+</MentalModelBox>
+
 <RebaseFigure
   title="rebase 的历史变化"
   caption="feature 上原来的 E、F 会以新的提交身份重新接到最新 main 后面，所以常见现象是内容还在，但提交 ID 已经变了。"
@@ -40,6 +44,10 @@ export const metadata = {
 - 你还没有准备好恢复方案时
 
 实践上，rebase 最适合“自己的特性分支”。
+
+<WarningBox title="高风险边界">
+  <p>只要这段历史已经进入 review、CI 或同事的工作流，rebase 的问题就不再只是“会不会冲突”，而是“会不会让别人依赖的提交位置整体变化”。</p>
+</WarningBox>
 
 ## 基本流程
 
@@ -91,6 +99,10 @@ git branch backup/feature-login-before-rebase
 ```
 
 这一步在高风险场景下非常值，因为它把“能回去”先做实了。
+
+<TipBox title="一个很值的小习惯">
+  <p>在高风险 rebase 前先建 `backup/...` 分支，成本很低，但会显著降低你后面做判断时的心理压力。</p>
+</TipBox>
 
 ## 交互式 rebase 最常见的用途
 

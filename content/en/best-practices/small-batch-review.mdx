@@ -12,20 +12,68 @@ export const metadata = {
 
 # Small-batch Review
 
-## Core guidance
+## Why reviews slow down when the batch gets too large
 
-Use smaller commit batches and shorter branch lifecycles to keep review fast and clear.
+Review bottlenecks are often blamed on reviewer availability, but oversized review batches are just as common.  
+Once one review contains many files, multiple topics, and several rounds of exploratory history, reviewers need a lot of setup work before they can offer good feedback.
 
-## Why it matters
+That usually leads to:
 
-Good Git practice is less about looking clever with commands and more about keeping history readable, collaboration predictable, and recovery paths clear.
+- fewer meaningful comments
+- more missed risk
+- longer review cycles
+- more back-and-forth later
 
-## Checklist
+## 1. Keep one review centered on one main problem
 
-- Keep branch lifetimes short
-- Limit the scope of a single review
-- Split work into multiple PRs when needed
+A useful rule is that a review should answer one primary question.  
+If a branch contains:
 
-## Commands to review alongside it
+- feature work
+- refactor
+- styling cleanup
+- docs updates
 
-It usually helps to review this topic alongside git status, git log, and git diff, then add git rebase, git merge, or force-with-lease where appropriate.
+then it is usually no longer a small-batch review candidate.
+
+## 2. Short branch lifetimes help review stay readable
+
+Long-lived branches naturally accumulate noise:
+
+- the mainline moves further away
+- tiny corrective commits pile up
+- reviewers struggle to see what changed this round
+
+Shorter-lived branches make it easier to keep the review focused and current.
+
+## 3. Splitting work improves discussion quality
+
+Breaking one large change into several reviewable slices helps because:
+
+- each PR can focus on one theme
+- comments stay closer to the real decision
+- rollback and follow-up fixes are easier to scope
+
+The goal is not more PRs for the sake of process. The goal is better discussion per PR.
+
+## 4. Signals that a review is already too large
+
+These are common warning signs:
+
+- you cannot summarize the review in one sentence
+- the diff spans unrelated areas
+- the reviewer needs lots of background before any comments are possible
+- you keep saying “there are also a few extra changes in here”
+
+When those signs appear, splitting the review is usually cheaper than pushing ahead.
+
+## 5. A lightweight small-batch policy
+
+Start with:
+
+1. one main topic per review
+2. short branch lifetimes
+3. split larger work into independently mergeable slices
+4. inspect review scope before sending it out
+
+That tends to make review faster without making development slower.

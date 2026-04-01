@@ -17,6 +17,10 @@ export const metadata = {
 
 `git rebase` reapplies a set of commits onto a new base, so you often end up with similar content but different commit IDs.
 
+<MentalModelBox title="Build the right mental model first">
+  <p>Think of rebase as taking your branch-local commits, replaying them in order, and attaching that replayed sequence to a new base. It is not just integration. It rewrites ancestry.</p>
+</MentalModelBox>
+
 <RebaseFigure
   title="How rebase changes history"
   caption="The original feature commits E and F are replayed on top of the newer main branch, which is why the content survives while the commit IDs change."
@@ -72,6 +76,10 @@ For example:
 git branch backup/feature-login-before-rebase
 ```
 
+<TipBox title="A low-cost safety habit">
+  <p>Creating a quick backup branch before a risky rebase is one of the cheapest ways to reduce recovery pressure later.</p>
+</TipBox>
+
 ## Why interactive rebase matters
 
 ```bash
@@ -112,6 +120,10 @@ If what you really mean is “this branch is already part of review, CI, or some
 ## Additional caution
 
 Rebase is not automatically safe just because the branch is “yours.” If CI, review flows, or teammates already rely on that branch, rewriting it can still create coordination cost.
+
+<WarningBox title="Where rebase turns risky">
+  <p>Once review, CI, or other people’s branches already depend on the current history, the problem is no longer only “can I resolve conflicts?” It becomes “is it still safe to move the commit lineage under everyone else?”</p>
+</WarningBox>
 
 ## Recovery mindset
 

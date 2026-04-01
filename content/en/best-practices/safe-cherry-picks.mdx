@@ -12,20 +12,75 @@ export const metadata = {
 
 # Safe Cherry-picks
 
-## Core guidance
+## Why cherry-pick feels simpler than it really is
 
-Use cherry-pick safely when backporting fixes or selectively reusing commits.
+`git cherry-pick` looks like “just copy that commit over here,” but the real difficulty is context. The original commit lived inside a branch history, with assumptions before and after it.
 
-## Why it matters
+That is why unsafe cherry-picks often create:
 
-Good Git practice is less about looking clever with commands and more about keeping history readable, collaboration predictable, and recovery paths clear.
+- duplicate fixes
+- missing supporting changes
+- behavior that no longer fits the target branch
 
-## Checklist
+## 1. Verify the target branch actually needs the commit
 
-- Confirm the target branch really needs the commit
-- Review the resulting diff and tests
-- Record where the backport came from
+One of the most common mistakes is cherry-picking a fix that is already present indirectly through another merge or follow-up patch.
 
-## Commands to review alongside it
+Before picking, confirm:
 
-It usually helps to review this topic alongside git status, git log, and git diff, then add git rebase, git merge, or force-with-lease where appropriate.
+- what the target branch currently contains
+- whether the fix depends on nearby commits
+- whether equivalent behavior is already present
+
+If you cannot clearly explain why this branch still needs that commit, pause first.
+
+## 2. Not every commit is a good cherry-pick candidate
+
+Good candidates are usually:
+
+- self-contained bugfixes
+- small focused changes
+- commits with low dependence on surrounding context
+
+Weaker candidates are:
+
+- large refactors
+- changes tightly coupled to older interfaces
+- commits whose correctness depends on several neighboring commits
+
+## 3. Success means more than “the command finished”
+
+After cherry-picking, inspect the result:
+
+```bash
+git show --stat
+git diff --stat HEAD~1..HEAD
+```
+
+Then run the smallest useful tests or checks. You want to know:
+
+- the intended fix really landed
+- unrelated noise did not come with it
+- the behavior still makes sense on this branch
+
+## 4. Preserve traceability when backporting
+
+When backporting, it is often worth using:
+
+```bash
+git cherry-pick -x <commit>
+```
+
+That leaves a pointer back to the original commit, which makes later debugging and audit work much easier.
+
+## 5. A conservative cherry-pick routine
+
+Use this order:
+
+1. confirm the target branch truly needs the fix
+2. check whether companion commits are required
+3. cherry-pick with traceability when appropriate
+4. inspect the resulting diff and run checks
+5. record why the backport happened
+
+That turns cherry-pick into deliberate reuse instead of hopeful copying.

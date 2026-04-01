@@ -12,20 +12,73 @@ export const metadata = {
 
 # Preparing a Branch for Review
 
-## Core guidance
+## Why “review-ready” branches get better feedback
 
-Clean up commits, sync with the latest base, and remove noise before asking for review.
+A lot of review friction comes from sending a branch before it is shaped for review: the base is stale, the commits are noisy, and unrelated changes are still mixed in.  
+That forces the reviewer to do cleanup work before they can even discuss the solution.
 
-## Why it matters
+## 1. Sync the branch before asking for review
 
-Good Git practice is less about looking clever with commands and more about keeping history readable, collaboration predictable, and recovery paths clear.
+If the branch is far behind the mainline, the reviewer has to reason about both your changes and the drift from upstream.
 
-## Checklist
+A common safe pattern is:
 
-- Sync with the latest base branch
-- Make commit messages readable
-- Re-check history with log and diff
+```bash
+git fetch origin
+git rebase origin/main
+```
 
-## Commands to review alongside it
+or merge instead if the branch is already shared. The point is not one mandatory command. The point is entering review with a clear base.
 
-It usually helps to review this topic alongside git status, git log, and git diff, then add git rebase, git merge, or force-with-lease where appropriate.
+## 2. Remove noisy history before it becomes someone else’s problem
+
+Typical review noise looks like this:
+
+- `fix typo`
+- `try again`
+- `temp debug`
+- several tiny corrective commits that belong to one logical change
+
+If those are still local, clean them up first. Reviewers should see the real story, not every intermediate stumble.
+
+## 3. Three checks that catch most problems
+
+```bash
+git status
+git log --oneline --decorate -8
+git diff --stat origin/main...
+```
+
+This usually tells you:
+
+- whether the branch is clean enough to publish
+- whether the recent commits still match your intent
+- whether the scope is larger than you thought
+
+If you need one more scope check:
+
+```bash
+git diff --name-only origin/main...
+```
+
+## 4. Good review prep makes intent obvious
+
+The reviewer should be able to see:
+
+- what problem this branch solves
+- how the commits are grouped
+- where the risky parts are
+
+That means readable commit subjects, cleaner ordering, and fewer unrelated edits in the same review.
+
+## 5. A lightweight review-readiness standard
+
+Start with:
+
+1. sync with the latest base
+2. clean obvious noise commits
+3. make commit subjects readable
+4. inspect log and diff one more time
+5. avoid bundling unrelated work together
+
+That alone already improves review quality a lot.

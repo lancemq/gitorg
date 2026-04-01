@@ -223,7 +223,7 @@ export default async function LocalizedHomePage({ params }: Props) {
         </div>
       </section>
 
-      <section className="section" id="journeys">
+      <section className="section section-learning" id="journeys">
         <div className="section-head">
           <div>
             <p className="eyebrow">{locale === "zh" ? "Start Here" : "Start Here"}</p>
@@ -246,7 +246,7 @@ export default async function LocalizedHomePage({ params }: Props) {
         </div>
       </section>
 
-      <section className="section" id="scenarios">
+      <section className="section section-recovery" id="scenarios">
         <div className="section-head">
           <div>
             <p className="eyebrow">{locale === "zh" ? "Scenarios" : "Scenarios"}</p>
@@ -270,7 +270,7 @@ export default async function LocalizedHomePage({ params }: Props) {
 
       <section className="section dual-section" id="best-practices">
         {dict.home.knowledgeColumns.map((column) => (
-          <article className="column-card" id={column.id} key={column.id}>
+          <article className={`column-card column-card-${column.id}`} id={column.id} key={column.id}>
             <div className="section-head compact">
               <div>
                 <p className="eyebrow">{column.eyebrow}</p>
@@ -326,7 +326,7 @@ export default async function LocalizedHomePage({ params }: Props) {
         ))}
       </section>
 
-      <section className="section" id="reference">
+      <section className="section section-commands" id="reference">
         <div className="section-head">
           <div>
             <p className="eyebrow">{dict.home.reference.eyebrow}</p>
@@ -348,7 +348,7 @@ export default async function LocalizedHomePage({ params }: Props) {
         </div>
       </section>
 
-      <section className="section" id="faq">
+      <section className="section section-resources" id="faq">
         <div className="section-head">
           <div>
             <p className="eyebrow">{dict.home.faq.eyebrow}</p>

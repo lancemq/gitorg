@@ -93,7 +93,7 @@ export default async function CommandsIndexPage({ params }: Props) {
           })),
         })}
       />
-      <section className="docs-landing">
+      <section className="docs-landing channel-page channel-page-commands">
         <Breadcrumbs
           items={[
             { label: dict.commandPage.breadcrumbs.overview, href: `/${locale}` },

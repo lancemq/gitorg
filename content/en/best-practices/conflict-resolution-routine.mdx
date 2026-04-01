@@ -12,20 +12,78 @@ export const metadata = {
 
 # Conflict Resolution Routine
 
-## Core guidance
+## Why conflict handling breaks down under pressure
 
-Turn conflict handling into a repeatable routine so fewer steps are missed under pressure.
+Conflicts are rarely dangerous because the commands are mysterious. They become dangerous because people improvise: edit files first, guess later, and eventually lose track of whether they are in merge, rebase, or cherry-pick.
 
-## Why it matters
+The fix is not more panic-driven command memorization. The fix is a routine.
 
-Good Git practice is less about looking clever with commands and more about keeping history readable, collaboration predictable, and recovery paths clear.
+## 1. Always start with status
 
-## Checklist
+Run:
 
-- Check status before editing files
-- Re-run tests or key checks after resolving
-- Make sure all conflict markers are gone
+```bash
+git status
+```
 
-## Commands to review alongside it
+before touching the files. It tells you:
 
-It usually helps to review this topic alongside git status, git log, and git diff, then add git rebase, git merge, or force-with-lease where appropriate.
+- whether you are in merge or rebase
+- which files are conflicted
+- what Git expects next
+
+That gives you context before action.
+
+## 2. Do not treat conflict markers as the real problem
+
+The markers are just symptoms. The real task is to decide which logic should survive and how the two sides relate to the current goal.
+
+A safer order is:
+
+1. understand what each side represents
+2. decide what to keep, combine, or rewrite
+3. remove the markers
+4. validate the result
+
+## 3. “File saved” is not the end of the process
+
+After resolving a conflict, you still need to:
+
+```bash
+git add <resolved-files>
+git status
+```
+
+Then continue with the correct flow:
+
+- `git rebase --continue`
+- complete the merge workflow
+- or finish the cherry-pick flow
+
+If the change matters, re-run the smallest useful tests too.
+
+## 4. Know when to stop instead of forcing it
+
+Pause when:
+
+- you no longer understand what the two sides mean
+- unrelated files keep getting dragged in
+- you are not sure whether you are inside merge, rebase, or cherry-pick
+- you are trying to “make the file compile first and think later”
+
+At that point, aborting is often safer:
+
+- `git merge --abort`
+- `git rebase --abort`
+
+## 5. A reusable team routine
+
+This is a strong baseline:
+
+1. run `git status`
+2. understand the conflict before editing
+3. remove all markers completely
+4. re-check the behavior
+5. only then continue or commit
+
+That routine turns conflict handling from a stressful surprise into an expected workflow.

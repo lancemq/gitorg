@@ -10,11 +10,6 @@ type Props = {
   label: string;
 };
 
-const fixedLocaleNames: Record<Locale, string> = {
-  zh: "中文",
-  en: "English",
-};
-
 function LocaleBadge({ locale }: { locale: Locale }) {
   return (
     <span className={`locale-option-icon locale-option-icon-${locale}`} aria-hidden="true">
@@ -44,12 +39,12 @@ export function LanguageSwitcher({ currentLocale, label }: Props) {
       <div className="locale-options">
         {locales.map((locale) => (
           <Link
+            aria-label={locale === "zh" ? "切换到中文" : "Switch to English"}
             className={`locale-option${locale === currentLocale ? " is-active" : ""}`}
             href={`/${locale}${pathWithoutLocale === "/" ? "" : pathWithoutLocale}`}
             key={locale}
           >
             <LocaleBadge locale={locale} />
-            {fixedLocaleNames[locale]}
           </Link>
         ))}
       </div>

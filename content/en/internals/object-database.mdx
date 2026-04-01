@@ -15,6 +15,10 @@ export const metadata = {
 
 At the lowest level, Git is not a list of file versions. It is a database that stores objects and locates them again by IDs derived from their content.
 
+<MentalModelBox title="Do not picture Git as cloud storage">
+  <p>A steadier model is this: Git stores objects first, then uses refs, HEAD, and tags as names that point at those objects. Most day-to-day commands move names around durable objects.</p>
+</MentalModelBox>
+
 ## Why the object model comes first
 
 Several Git behaviors become easier to reason about once the object model is clear:
@@ -110,6 +114,10 @@ They make the working state line up with the objects named by a different ref.
 This matters for recovery. An object may still exist in the database while becoming harder to reach because no branch, tag, or reflog entry points to it clearly anymore.
 
 That is why many recovery situations are really about lost references, not instantly deleted objects.
+
+<TipBox title="Why this matters for recovery">
+  <p>Many “I lost my work” Git incidents are not about instant deletion. They are about losing the obvious ref that still pointed at the object.</p>
+</TipBox>
 
 ## The most useful takeaway
 

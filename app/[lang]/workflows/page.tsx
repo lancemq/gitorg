@@ -84,7 +84,7 @@ export default async function WorkflowsChannelPage({ params }: Props) {
           })),
         })}
       />
-      <section className="docs-landing">
+      <section className="docs-landing channel-page channel-page-workflows">
         <Breadcrumbs
           items={[
             { label: dict.commandPage.breadcrumbs.overview, href: `/${locale}` },

@@ -12,20 +12,75 @@ export const metadata = {
 
 # Release Hygiene
 
-## Core guidance
+## Why release-time Git mistakes are expensive
 
-Use a small set of Git checks before release to reduce mistakes around tags, branches, and version state.
+A little Git ambiguity during development becomes much more costly at release time. A mistargeted tag, a release from the wrong branch, or a dirty working tree can make future version tracking much harder.
 
-## Why it matters
+Release hygiene is really about making one thing crystal clear: which exact history produced this release.
 
-Good Git practice is less about looking clever with commands and more about keeping history readable, collaboration predictable, and recovery paths clear.
+## 1. Confirm branch and commit state first
 
-## Checklist
+Start with:
 
-- Confirm the release tag points to the right commit
-- Check working tree and branch state
-- Verify the diff against release notes
+```bash
+git status
+git log --oneline --decorate -5
+```
 
-## Commands to review alongside it
+You want to know:
 
-It usually helps to review this topic alongside git status, git log, and git diff, then add git rebase, git merge, or force-with-lease where appropriate.
+- whether you are on the intended release branch
+- whether the working tree is clean
+- whether the most recent commits are really the release candidates
+
+## 2. Tags should point to deliberate commits
+
+The two common mistakes are:
+
+- tagging the wrong commit
+- using inconsistent tag names
+
+A safer pattern is:
+
+```bash
+git tag -a v1.4.0 -m "Release v1.4.0"
+git show v1.4.0
+```
+
+That final `git show` is important because it confirms exactly where the tag landed.
+
+## 3. Re-check release scope before publishing
+
+It helps to compare the last release tag to the candidate:
+
+```bash
+git diff --stat v1.3.0..HEAD
+```
+
+That gives a quick sanity check on:
+
+- whether the change set matches expectations
+- whether unrelated work slipped in
+- whether the release notes still match the real history
+
+## 4. Good release history is future-friendly
+
+Releases are not only for today. Later you may need to:
+
+- answer when a bug entered
+- compare two releases
+- roll back to a known stable point
+
+That is much easier when tags are consistent, explicit, and verifiable.
+
+## 5. A practical release checklist
+
+Use this as a minimal baseline:
+
+1. verify branch and working tree
+2. inspect recent commits
+3. confirm release diff scope
+4. create a clear annotated tag
+5. verify the tag target once more
+
+That is lightweight, but it prevents many avoidable release-history problems.

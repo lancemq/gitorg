@@ -507,18 +507,17 @@ kbd {
 }
 
 .locale-option {
-  flex: 1;
+  width: 48px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 12px;
+  gap: 0;
+  padding: 10px 0;
   border: 1px solid var(--border);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.72);
   color: var(--text-muted);
   text-align: center;
-  font-size: 14px;
   transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
@@ -526,13 +525,13 @@ kbd {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 24px;
-  height: 24px;
-  padding: 0 6px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
   border-radius: 999px;
   background: var(--surface-muted);
   color: var(--text-muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -958,6 +957,26 @@ h3 {
   margin-top: 40px;
 }
 
+.section-learning .docs-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(241, 249, 247, 0.94));
+}
+
+.section-recovery .scenario-link {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(253, 244, 240, 0.98));
+}
+
+.section-commands .roadmap-item {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 247, 238, 0.95));
+}
+
+.section-resources .faq-item {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 247, 250, 0.94));
+}
+
 .section-actions {
   display: flex;
   justify-content: flex-start;
@@ -1026,6 +1045,16 @@ h3 {
   padding: 24px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 243, 236, 0.94));
+}
+
+.column-card-best-practices {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(245, 244, 255, 0.93));
+}
+
+.column-card-internals {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(244, 247, 250, 0.94));
 }
 
 .column-heading-link {
@@ -1325,6 +1354,42 @@ h3 {
   gap: 24px;
 }
 
+.channel-page {
+  position: relative;
+}
+
+.channel-page::before {
+  content: "";
+  position: absolute;
+  inset: 18px 0 auto auto;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(8px);
+  opacity: 0.88;
+}
+
+.channel-page-commands::before {
+  background: radial-gradient(circle, rgba(255, 132, 0, 0.12), transparent 68%);
+}
+
+.channel-page-workflows::before {
+  background: radial-gradient(circle, rgba(15, 118, 110, 0.14), transparent 68%);
+}
+
+.channel-page-best-practices::before {
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.12), transparent 68%);
+}
+
+.channel-page-internals::before {
+  background: radial-gradient(circle, rgba(17, 24, 39, 0.12), transparent 68%);
+}
+
+.channel-page-recovery::before {
+  background: radial-gradient(circle, rgba(180, 64, 32, 0.12), transparent 68%);
+}
+
 .doc-page > .doc-content {
   margin-bottom: 12px;
 }
@@ -1333,23 +1398,53 @@ h3 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
+  padding: 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 244, 237, 0.9));
 }
 
 .doc-primer-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 14px 16px;
+  min-height: 100%;
+  padding: 16px 16px 16px 18px;
   border: 1px solid rgba(17, 17, 17, 0.08);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.88);
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(250, 247, 240, 0.88));
+  box-shadow: 0 14px 24px rgba(17, 17, 17, 0.04);
+  overflow: hidden;
+}
+
+.doc-primer-card::before {
+  content: "";
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  left: 8px;
+  width: 3px;
+  border-radius: 999px;
+}
+
+.doc-primer-card:nth-child(1)::before {
+  background: linear-gradient(180deg, rgba(15, 118, 110, 0.24), rgba(15, 118, 110, 0.72));
+}
+
+.doc-primer-card:nth-child(2)::before {
+  background: linear-gradient(180deg, rgba(99, 102, 241, 0.24), rgba(99, 102, 241, 0.72));
+}
+
+.doc-primer-card:nth-child(3)::before {
+  background: linear-gradient(180deg, rgba(180, 64, 32, 0.24), rgba(180, 64, 32, 0.72));
 }
 
 .doc-primer-label {
-  color: var(--text-muted);
+  color: var(--text);
   font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
@@ -1386,6 +1481,36 @@ h3 {
 .doc-related,
 .doc-sequence {
   padding: 14px 16px;
+}
+
+.channel-page .docs-group {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 244, 237, 0.94));
+}
+
+.channel-page-commands .docs-group {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 247, 238, 0.95));
+}
+
+.channel-page-workflows .docs-group {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(240, 248, 246, 0.94));
+}
+
+.channel-page-best-practices .docs-group {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(243, 242, 255, 0.92));
+}
+
+.channel-page-internals .docs-group {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(242, 245, 248, 0.94));
+}
+
+.channel-page-recovery .docs-group {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(252, 243, 239, 0.94));
 }
 
 .docs-group-head {
@@ -1440,6 +1565,30 @@ h3 {
   margin: 0;
   color: var(--text-muted);
   line-height: 1.65;
+}
+
+.channel-page-workflows .channel-highlight-card,
+.channel-page-workflows .docs-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(241, 249, 247, 0.94));
+}
+
+.channel-page-best-practices .channel-highlight-card,
+.channel-page-best-practices .docs-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(245, 244, 255, 0.93));
+}
+
+.channel-page-internals .channel-highlight-card,
+.channel-page-internals .docs-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(244, 247, 250, 0.94));
+}
+
+.channel-page-recovery .channel-highlight-card,
+.channel-page-recovery .docs-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(253, 244, 240, 0.94));
 }
 
 .learning-path-landing {
@@ -1963,8 +2112,10 @@ h3 {
 .doc-figure {
   margin: 1.4rem 0 1.6rem;
   border: 1px solid var(--border);
-  border-radius: 20px;
-  background: linear-gradient(180deg, rgba(255, 251, 245, 0.95), rgba(255, 255, 255, 0.98));
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 251, 245, 0.98), rgba(255, 255, 255, 0.98));
+  box-shadow: 0 20px 34px rgba(17, 17, 17, 0.05);
   overflow: hidden;
 }
 
@@ -1972,13 +2123,15 @@ h3 {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 16px 18px 14px;
+  padding: 18px 20px 16px;
   border-bottom: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.72);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 247, 238, 0.78));
 }
 
 .doc-figure-header strong {
-  font-size: 0.94rem;
+  font-family: var(--font-body), sans-serif;
+  font-size: 1rem;
 }
 
 .doc-figure-header span {
@@ -1988,7 +2141,116 @@ h3 {
 }
 
 .doc-figure-body {
-  padding: 18px;
+  padding: 20px;
+}
+
+.doc-callout {
+  position: relative;
+  margin: 1.4rem 0;
+  padding: 18px 18px 18px 20px;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 246, 239, 0.94));
+  box-shadow: 0 16px 26px rgba(17, 17, 17, 0.05);
+  overflow: hidden;
+}
+
+.doc-callout::before {
+  content: "";
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  left: 8px;
+  width: 3px;
+  border-radius: 999px;
+}
+
+.doc-callout-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.doc-callout-header strong {
+  font-family: var(--font-body), sans-serif;
+  font-size: 1rem;
+}
+
+.doc-callout-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.doc-callout-body > :first-child {
+  margin-top: 0;
+}
+
+.doc-callout-body > :last-child {
+  margin-bottom: 0;
+}
+
+.doc-callout-tip::before {
+  background: linear-gradient(180deg, rgba(15, 118, 110, 0.24), rgba(15, 118, 110, 0.74));
+}
+
+.doc-callout-tip .doc-callout-icon {
+  background: rgba(15, 118, 110, 0.12);
+  color: #0f766e;
+}
+
+.doc-callout-tip {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(240, 248, 246, 0.94));
+}
+
+.doc-callout-warning::before {
+  background: linear-gradient(180deg, rgba(180, 64, 32, 0.24), rgba(180, 64, 32, 0.78));
+}
+
+.doc-callout-warning .doc-callout-icon {
+  background: rgba(180, 64, 32, 0.12);
+  color: #8c3c2a;
+}
+
+.doc-callout-warning {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(253, 244, 240, 0.95));
+}
+
+.doc-callout-mental-model::before {
+  background: linear-gradient(180deg, rgba(99, 102, 241, 0.24), rgba(99, 102, 241, 0.76));
+}
+
+.doc-callout-mental-model .doc-callout-icon {
+  background: rgba(99, 102, 241, 0.12);
+  color: #4f46e5;
+}
+
+.doc-callout-mental-model {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(245, 244, 255, 0.94));
+}
+
+.doc-callout-practice::before {
+  background: linear-gradient(180deg, rgba(255, 132, 0, 0.24), rgba(255, 132, 0, 0.78));
+}
+
+.doc-callout-practice .doc-callout-icon {
+  background: rgba(255, 132, 0, 0.12);
+  color: #8d4c00;
+}
+
+.doc-callout-practice {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 247, 238, 0.95));
 }
 
 .history-figure {
@@ -2328,6 +2590,28 @@ h3 {
   background: #fff;
 }
 
+.practice-lab-card {
+  position: relative;
+  min-height: 100%;
+  padding: 16px 16px 16px 18px;
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 246, 239, 0.94));
+  box-shadow: 0 14px 24px rgba(17, 17, 17, 0.04);
+  overflow: hidden;
+}
+
+.practice-lab-card::before {
+  content: "";
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  left: 8px;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 132, 0, 0.22), rgba(255, 132, 0, 0.74));
+}
+
 .commit-graph-label,
 .refs-column-label,
 .layers-card-label,
@@ -2455,12 +2739,24 @@ h3 {
 }
 
 .practice-lab {
-  margin: 1.6rem 0;
+  position: relative;
+  margin: 1.8rem 0;
   padding: 20px;
   border: 1px solid var(--border);
-  border-radius: 22px;
+  border-radius: 28px;
   background:
-    linear-gradient(180deg, rgba(255, 250, 244, 0.95), rgba(255, 255, 255, 0.98));
+    linear-gradient(180deg, rgba(255, 250, 244, 0.98), rgba(255, 255, 255, 0.98));
+  box-shadow: 0 18px 30px rgba(17, 17, 17, 0.05);
+  overflow: hidden;
+}
+
+.practice-lab::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(255, 132, 0, 0.9), rgba(15, 118, 110, 0.7), rgba(99, 102, 241, 0.7));
 }
 
 .practice-lab-header {
@@ -2471,7 +2767,8 @@ h3 {
 }
 
 .practice-lab-header strong {
-  font-size: 0.95rem;
+  font-family: var(--font-body), sans-serif;
+  font-size: 1.08rem;
 }
 
 .practice-lab-header p {
@@ -2506,11 +2803,39 @@ h3 {
 }
 
 .practice-lab-card-warning {
-  background: rgba(255, 245, 236, 0.9);
+  background: rgba(255, 245, 236, 0.98);
+}
+
+.practice-lab-card-warning::before {
+  background: linear-gradient(180deg, rgba(180, 64, 32, 0.24), rgba(180, 64, 32, 0.78));
 }
 
 .mdx-content code {
   font-size: 0.95em;
+}
+
+.doc-hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 244, 237, 0.94));
+}
+
+.doc-hero::after {
+  content: "";
+  position: absolute;
+  top: -60px;
+  right: -10px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 132, 0, 0.14), transparent 66%);
+  pointer-events: none;
+}
+
+.doc-content {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(250, 248, 243, 0.96));
 }
 
 .doc-sources ul {
@@ -2650,7 +2975,9 @@ h3 {
 }
 
 .warning-card {
-  background: #f6f3ea;
+  background:
+    linear-gradient(180deg, rgba(249, 244, 234, 0.96), rgba(245, 239, 229, 0.92));
+  border-color: rgba(180, 64, 32, 0.14);
 }
 
 @media (max-width: 1120px) {
