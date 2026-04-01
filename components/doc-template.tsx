@@ -66,7 +66,19 @@ export function DocTemplate({
               description: summary,
               inLanguage,
               url: `${siteUrl}${pathname}`,
+              mainEntityOfPage: `${siteUrl}${pathname}`,
               dateModified: lastModified,
+              image: `${siteUrl}/opengraph-image`,
+              author: {
+                "@type": "Organization",
+                name: "GitOrg Atlas",
+                url: siteUrl,
+              },
+              publisher: {
+                "@type": "Organization",
+                name: "GitOrg Atlas",
+                url: siteUrl,
+              },
               isPartOf: {
                 "@type": "WebSite",
                 name: "GitOrg Atlas",

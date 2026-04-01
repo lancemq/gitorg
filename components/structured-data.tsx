@@ -55,11 +55,13 @@ export function buildCollectionPageData({
       name,
       url,
       description,
+      numberOfItems: items.length,
     },
     {
       "@context": "https://schema.org",
       "@type": "ItemList",
       name,
+      numberOfItems: items.length,
       itemListElement: items.map((item, index) => ({
         "@type": "ListItem",
         position: index + 1,

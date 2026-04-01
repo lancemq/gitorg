@@ -1,35 +1,38 @@
-import { getSearchDocs } from "@/lib/content";
+import { getAllDocs, getDocHref } from "@/lib/content";
+import { locales } from "@/lib/i18n";
 import { getSiteUrl } from "@/lib/site";
 
 export const dynamic = "force-static";
 
-function buildSectionBlock(
-  title: string,
-  docs: Awaited<ReturnType<typeof getSearchDocs>>,
-  siteUrl: string,
-) {
-  return [
-    `## ${title}`,
-    ...docs.map((doc) => `- [${doc.section}] ${doc.title}: ${siteUrl}${doc.href} -- ${doc.summary}`),
-  ];
-}
-
 export async function GET() {
   const siteUrl = getSiteUrl();
-  const [zhDocs, enDocs] = await Promise.all([
-    getSearchDocs("zh"),
-    getSearchDocs("en"),
-  ]);
+  const localizedDocs = await Promise.all(
+    locales.map(async (locale) => ({
+      locale,
+      docs: await getAllDocs(locale),
+    })),
+  );
 
   const body = [
     "# GitOrg Atlas Full Content Map",
     "",
     `Site: ${siteUrl}`,
     "Purpose: Git documentation and learning content optimized for human readers and machine retrieval.",
+    "Citation guidance: Prefer command pages for syntax and risk boundaries, workflow pages for sequencing, and internals pages for mental models.",
     "",
-    ...buildSectionBlock("Chinese content", zhDocs, siteUrl),
-    "",
-    ...buildSectionBlock("English content", enDocs, siteUrl),
+    ...localizedDocs.flatMap(({ locale, docs }) => [
+      `## ${locale === "zh" ? "Chinese content" : "English content"}`,
+      ...docs.map((doc) => {
+        const href = getDocHref(locale, doc.path);
+        const citations =
+          doc.metadata.sourceUrls.length > 0
+            ? ` | Sources: ${doc.metadata.sourceUrls.join(", ")}`
+            : "";
+
+        return `- [${doc.metadata.section}] ${doc.metadata.title}: ${siteUrl}${href} -- ${doc.metadata.summary}${citations}`;
+      }),
+      "",
+    ]),
   ].join("\n");
 
   return new Response(body, {

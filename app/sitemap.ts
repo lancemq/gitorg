@@ -43,12 +43,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.85,
       }))(),
       (async () => ({
-        pathname: `/${locale}/recovery`,
-        lastModified: await getLatestDocLastModified(locale, "recovery"),
-        changeFrequency: "weekly" as const,
-        priority: 0.84,
-      }))(),
-      (async () => ({
         pathname: `/${locale}/internals`,
         lastModified: await getLatestDocLastModified(locale, "internals"),
         changeFrequency: "monthly" as const,
@@ -75,6 +69,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ]),
   );
 
+  const machineReadableRoutes = [
+    {
+      pathname: "/llms.txt",
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.4,
+    },
+    {
+      pathname: "/llms-full.txt",
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.35,
+    },
+    {
+      pathname: "/content-index.json",
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.35,
+    },
+  ];
+
   const docRoutes = await Promise.all(
     locales.flatMap((locale) =>
       getDocPaths(locale).map(async (docPath) => ({
@@ -86,14 +101,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ),
   );
 
-  return [...staticRoutes, ...docRoutes].map((entry) => ({
+  return [...staticRoutes, ...docRoutes, ...machineReadableRoutes].map((entry) => ({
     url: `${siteUrl}${entry.pathname}`,
     lastModified: entry.lastModified,
     changeFrequency: entry.changeFrequency,
     priority: entry.priority,
-    alternates: buildLocaleAlternates(
-      siteUrl,
-      entry.pathname.replace(/^\/(zh|en)/, ""),
-    ),
+    alternates: entry.pathname.startsWith("/zh") || entry.pathname.startsWith("/en")
+      ? buildLocaleAlternates(
+          siteUrl,
+          entry.pathname.replace(/^\/(zh|en)/, ""),
+        )
+      : undefined,
   }));
 }
