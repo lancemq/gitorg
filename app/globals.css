@@ -1191,12 +1191,12 @@ h3 {
 
 .column-card-best-practices {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(245, 244, 255, 0.93));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(252, 247, 239, 0.94));
 }
 
 .column-card-internals {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(244, 247, 250, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(249, 246, 240, 0.94));
 }
 
 .column-heading-link {
@@ -1521,11 +1521,11 @@ h3 {
 }
 
 .channel-page-best-practices::before {
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.12), transparent 68%);
+  background: radial-gradient(circle, rgba(255, 167, 72, 0.14), transparent 68%);
 }
 
 .channel-page-internals::before {
-  background: radial-gradient(circle, rgba(17, 24, 39, 0.12), transparent 68%);
+  background: radial-gradient(circle, rgba(90, 77, 58, 0.12), transparent 68%);
 }
 
 .channel-page-recovery::before {
@@ -1642,12 +1642,12 @@ h3 {
 
 .channel-page-best-practices .docs-group {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(243, 242, 255, 0.92));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(252, 248, 241, 0.94));
 }
 
 .channel-page-internals .docs-group {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(242, 245, 248, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(249, 247, 242, 0.94));
 }
 
 .channel-page-recovery .docs-group {
@@ -1718,13 +1718,13 @@ h3 {
 .channel-page-best-practices .channel-highlight-card,
 .channel-page-best-practices .docs-card {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(245, 244, 255, 0.93));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 249, 242, 0.95));
 }
 
 .channel-page-internals .channel-highlight-card,
 .channel-page-internals .docs-card {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(244, 247, 250, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(251, 248, 243, 0.95));
 }
 
 .channel-page-recovery .channel-highlight-card,
@@ -2215,39 +2215,15 @@ h3 {
 
 .mdx-content h1,
 .mdx-content h2,
-.mdx-content h3 {
+.mdx-content h3,
+.mdx-content h4,
+.mdx-content h5,
+.mdx-content h6 {
   margin-top: 1.6em;
   margin-bottom: 0.6em;
   overflow: visible;
   text-overflow: clip;
   white-space: normal;
-}
-
-.mdx-content h2,
-.mdx-content h3 {
-  position: relative;
-}
-
-.mdx-content h2::before {
-  content: "";
-  position: absolute;
-  top: -0.5rem;
-  left: 0;
-  width: 40px;
-  height: 2px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(255, 132, 0, 0.55), rgba(255, 132, 0, 0.14));
-}
-
-.mdx-content h3::before {
-  content: "";
-  position: absolute;
-  top: -0.32rem;
-  left: 0;
-  width: 20px;
-  height: 1px;
-  border-radius: 999px;
-  background: rgba(17, 17, 17, 0.12);
 }
 
 .doc-hero h1,

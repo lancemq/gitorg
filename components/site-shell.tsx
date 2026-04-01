@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { DocSearch } from "@/components/doc-search";
-import { getSearchDocs } from "@/lib/content";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import type { Locale, SidebarContent } from "@/lib/i18n";
 
@@ -11,9 +10,7 @@ type SiteShellProps = {
   children: React.ReactNode;
 };
 
-export async function SiteShell({ locale, sidebar, children }: SiteShellProps) {
-  const searchItems = await getSearchDocs(locale);
-
+export function SiteShell({ locale, sidebar, children }: SiteShellProps) {
   return (
     <div className="shell">
       <aside className="sidebar">
@@ -91,7 +88,7 @@ export async function SiteShell({ locale, sidebar, children }: SiteShellProps) {
         </div>
       </aside>
 
-      <DocSearch items={searchItems} label={sidebar.searchLabel} locale={locale} />
+      <DocSearch label={sidebar.searchLabel} locale={locale} />
 
       <main className="content">{children}</main>
     </div>

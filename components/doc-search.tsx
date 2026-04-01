@@ -14,7 +14,6 @@ import type { SearchDoc } from "@/lib/content";
 import type { Locale } from "@/lib/i18n";
 
 type DocSearchProps = {
-  items: SearchDoc[];
   label: string;
   locale: Locale;
 };
@@ -105,6 +104,16 @@ const noResultHintTitles = {
   en: "No exact matches",
 };
 
+const loadingStates = {
+  zh: "正在加载搜索索引...",
+  en: "Loading search index...",
+};
+
+const loadErrorStates = {
+  zh: "搜索暂时不可用，请稍后重试。",
+  en: "Search is temporarily unavailable. Please try again.",
+};
+
 const searchSuggestionLabels = {
   zh: {
     prerequisite: "先读",
@@ -188,11 +197,15 @@ const sectionOrder: SearchDoc["section"][] = [
   "recovery",
 ];
 
-export function DocSearch({ items, label, locale }: DocSearchProps) {
+export function DocSearch({ label, locale }: DocSearchProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const [items, setItems] = useState<SearchDoc[]>([]);
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   const [activeSection, setActiveSection] = useState<SearchDoc["section"] | "all">("all");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [recentHrefs, setRecentHrefs] = useState<string[]>(() => {
@@ -365,6 +378,48 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
   );
   const highlightedResult =
     flatDisplayItems[Math.min(selectedIndex, Math.max(flatDisplayItems.length - 1, 0))];
+
+  useEffect(() => {
+    if (!isOpen || hasLoaded || isLoading) {
+      return;
+    }
+
+    const controller = new AbortController();
+
+    async function loadSearchItems() {
+      setIsLoading(true);
+      setLoadError(false);
+
+      try {
+        const response = await fetch(`/api/search/${locale}`, {
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to load search docs: ${response.status}`);
+        }
+
+        const nextItems = (await response.json()) as SearchDoc[];
+        setItems(nextItems);
+        setHasLoaded(true);
+      } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        console.error(error);
+        setLoadError(true);
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    void loadSearchItems();
+
+    return () => controller.abort();
+  }, [hasLoaded, isLoading, isOpen, locale]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -568,7 +623,15 @@ export function DocSearch({ items, label, locale }: DocSearchProps) {
               role="listbox"
               aria-label={shortcutLabels[locale]}
             >
-              {displayGroups.length > 0 ? (
+              {isLoading ? (
+                <div className="search-empty-state">
+                  <p className="search-empty">{loadingStates[locale]}</p>
+                </div>
+              ) : loadError ? (
+                <div className="search-empty-state">
+                  <p className="search-empty">{loadErrorStates[locale]}</p>
+                </div>
+              ) : displayGroups.length > 0 ? (
                 displayGroups.map((group) => (
                   <section className="search-group" key={group.id}>
                     <header className="search-group-header">
