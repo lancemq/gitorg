@@ -13,48 +13,141 @@ export const metadata = {
 
 # GitLab Groups, Projects, and Permissions
 
-## Why this topic matters early
-
-Teams new to GitLab often focus first on code flow and overlook the organizational model.  
-But in GitLab, groups, subgroups, projects, and roles directly affect:
+Teams new to GitLab often focus first on merge requests and CI, while overlooking the organizational model. But in GitLab, groups, subgroups, projects, and roles directly shape:
 
 - who can view repositories
 - who can push
-- who can deploy
-- who can change CI/CD variables and protected settings
+- who can touch protected branches
+- who can change CI/CD variables, environments, and deployment settings
 
-So the permissions model is not merely admin work. It is part of the collaboration design.
+That means the permissions model is not only admin configuration. It is part of collaboration design.
 
-## Start with group versus project
+<PlatformHierarchyFigure
+  title="How GitLab structure and inheritance relate"
+  caption="GitLab usually starts with a group, then optional subgroups, then projects. Permission inheritance can be powerful, but only if the hierarchy reflects real team boundaries."
+  topLabel="Organization layer"
+  middleLabel="Team or product layer"
+  bottomLabel="Project layer"
+  topItems="top-level group|shared members|common policies"
+  middleItems="subgroup|team boundary|inherited permissions"
+  bottomItems="project|repository|MR / CI / environments"
+/>
 
-- `Group`: the organizational container
-- `Project`: the repository and its immediate collaboration surface
+<MentalModelBox title="Design the boundary before adding the people">
+  GitLab structure is not just a place to file repositories. It is the container for permissions, collaboration scope, and operational safety. If the group structure is careless, branch protection, CI variables, and contributor access become messy together.
+</MentalModelBox>
 
-Once subgroups are involved, membership and permissions may cascade downward.
+## Start by separating group, subgroup, and project
 
-## Why inheritance needs care
+### Group
 
-Permission inheritance is convenient, but careless structure can create problems quickly:
+A group is the organizational container. It typically holds:
 
-- external collaborators may see too much
-- too many users may gain broad operating power
-- CI/CD and protected-branch boundaries can become unclear
+- members
+- shared policies
+- multiple related repositories
+- inherited access rules
 
-## Safer operating habits
+### Subgroup
 
-1. design group boundaries before scaling members
-2. place projects intentionally, not by convenience alone
-3. use more conservative access for external contributors and automation identities
-4. avoid over-assigning high roles
+A subgroup is useful when a larger organization needs another real boundary, such as:
+
+- a business line
+- a platform team
+- a restricted area
+- a separate customer-facing scope
+
+### Project
+
+A project is the actual repository and its local collaboration surface. Merge requests, issues, CI/CD pipelines, protected branches, environments, and project variables all live close to this level.
+
+## Why inheritance is both useful and risky
+
+Inheritance is convenient because:
+
+- you do not need to add people to every project manually
+- shared rules are easier to maintain
+- automation identities can be reused more consistently
+
+But it also creates fast-moving risk:
+
+- external collaborators may see more than intended
+- users may receive stronger rights than the team realizes
+- deep subgroup trees can make access logic hard to explain
+
+The real problem is not that inheritance is complex. It is that it feels easy early and becomes confusing later.
+
+## Resources that deserve extra care
+
+In GitLab, “permission” is not only about pushing code. Teams should review access carefully around:
+
+- protected branches
+- tags and releases
+- CI/CD variables
+- deployment environments
+- runners and pipeline configuration
+
+When these boundaries are vague, incident handling, audits, and release safety all become harder.
+
+## A safer design sequence
+
+### 1. Define group boundaries first
+
+Do not start by dropping every repository into one large group and assuming permissions can be cleaned up later. The group structure should reflect real collaboration scope from the beginning.
+
+### 2. Decide which projects actually belong together
+
+Projects that share a group should usually have similar membership patterns, trust levels, and workflow expectations.
+
+### 3. Treat external contributors and automation identities separately
+
+These two identity types are the most likely to get over-broad permissions “for convenience.” A safer default is:
+
+- external contributors get the smallest useful scope
+- automation identities get only task-specific access
+
+### 4. Be conservative with high roles
+
+Maintainer and stronger roles should not become the team’s default convenience setting. Overuse makes accountability and incident review blurry.
+
+## A lightweight team permissions baseline
+
+Even a small rule set helps:
+
+1. most users should not receive the highest role by default
+2. subgroups should represent real boundaries, not arbitrary folders
+3. external and automation identities should be reviewed separately
+4. protected branches, variables, and environments deserve separate scrutiny
+5. inheritance is a tool, not a reason to inherit everything
+
+<TipBox title="Organization design and permission design should happen together">
+  If your group structure exists only because “we needed another folder,” the permission model will eventually become harder to reason about than the code workflow itself.
+</TipBox>
 
 ## Common mistakes
 
-- treating GitLab as only code hosting and ignoring organization design
-- giving Maintainer or stronger access too freely
-- adding subgroups before understanding the inheritance chain
+### Treating GitLab as only code hosting
+
+That mindset underestimates the importance of groups, roles, and protected resources, especially once the team grows.
+
+### Handing out Maintainer too freely
+
+It may feel efficient at first, but it weakens responsibility boundaries and makes later incident review harder.
+
+### Creating subgroup depth without clear purpose
+
+More layers do not automatically mean better control. Unclear subgroup trees usually create unclear inheritance.
+
+<PracticeBox title="A quick structure review before creating a new group">
+  Ask these questions first:
+  
+  1. Does this group or subgroup represent a real team, business, or sensitivity boundary?
+  2. Do the projects underneath it really share similar membership and control needs?
+  3. If outside contributors or automation accounts join later, will this structure still feel safely scoped?
+</PracticeBox>
 
 ## Good follow-up reads
 
-1. GitLab forks and contribution flow
-2. shared history boundaries
-3. GitLab CI/CD and runners
+1. `GitLab Flow and Merge Requests`
+2. `GitLab CI/CD and Runners`
+3. `Shared History Boundaries`

@@ -12,46 +12,137 @@ export const metadata = {
 
 # reflog 恢复手册
 
-## 先记住一个结论
+`reflog` 是很多 Git 恢复动作里最值得先看的东西。误操作之后，你最先丢掉的通常不是提交对象，而是“当前分支原来指向哪里”的名字和上下文。
 
-很多 Git 误操作之后，最先丢的是“名字”，不是“对象”。所以排查恢复时，第一反应通常不是慌着重做，而是先看 reflog。
+<ReflogFigure
+  title="reflog 真正在帮你做什么"
+  caption="它记录的是引用如何移动，所以恢复的第一步通常是先重新定位旧位置，再决定要不要把当前分支改回去。"
+  historyLabel="最近的引用移动"
+  rescueLabel="先接住旧位置"
+  nowLabel="现在"
+/>
 
-## 常见适用场景
+<MentalModelBox title="先找旧位置，再决定恢复策略">
+  `reflog` 不是直接帮你“撤销一切”。它先告诉你 HEAD 和分支曾经去过哪里。真正的恢复动作，通常是从这些旧位置里选一个最可信的落点，再决定是 reset、建救援分支，还是 cherry-pick 部分提交。
+</MentalModelBox>
 
-- `reset --hard` 之后后悔了
-- `rebase` 过程中历史被改乱了
-- `pull` 之后想回到原来位置
-- 分支被删了，但怀疑提交对象还在
+## 哪些场景最适合先看 reflog
 
-## 恢复步骤
+- `reset --hard` 之后才发现回退过头了
+- `rebase` 过程中把原来的提交顺序改乱了
+- `pull` 之后历史变得和预期不一样
+- 分支被删了，但怀疑提交对象仍然存在
+- `commit --amend` 或 `rebase -i` 之后想找回旧版本
 
-### 1. 先查看 reflog
+它的价值在于：你不用先想清楚最终怎么恢复，只要先把“旧位置在哪”找出来，很多事情就立刻可控了。
+
+## 一个最稳的恢复顺序
+
+### 1. 先看 reflog，不要急着继续试命令
 
 ```bash
-git reflog
+git reflog --date=local
 ```
 
-找到误操作前的那条位置记录，比如 `HEAD@{1}` 或 `HEAD@{2}`。
+重点不是把每条都看懂，而是找到“误操作之前的那个状态”。常见线索包括：
 
-### 2. 不要直接覆盖，先建救援分支
+- `reset: moving to ...`
+- `rebase (start)` / `rebase (finish)`
+- `checkout: moving from ... to ...`
+- `commit (amend): ...`
+
+### 2. 找到目标位置后，先建救援分支
 
 ```bash
-git checkout -b rescue HEAD@{1}
+git switch -c rescue/recover HEAD@{1}
 ```
 
-这样最稳，因为你先把旧位置接住，再决定后面怎么整理。
+如果你对 `HEAD@{1}` 没把握，也可以先用提交 SHA 建分支。  
+这一步的核心不是“立刻修复”，而是先把旧位置固定下来。这样后面就算你继续尝试 reset、merge、cherry-pick，也不会把这个落点再丢掉。
 
-### 3. 再决定真正恢复策略
+### 3. 再根据目标选择真正的恢复动作
 
-- 想把当前分支回到旧位置：`git reset --hard <target>`
-- 想保留两边内容：从救援分支继续整理
-- 想只拿回部分改动：`cherry-pick` 或手动摘取
+- 想让当前分支回到旧位置：`git reset --hard <target>`
+- 想保留当前状态并另开一条线整理：继续用 `rescue/*` 分支
+- 想只取回部分提交：`git cherry-pick <sha>`
+- 想比较两边差异后再决定：`git log --oneline --graph --decorate --all`
 
-## 为什么先建分支更安全
+## 为什么“先建分支”比“直接 reset 回去”更稳
 
-因为恢复动作本身也可能继续移动引用。先建一个 `rescue` 分支，等于先把旧位置固定下来，后面怎么试都更安心。
+很多人知道 `reflog` 有用，但还是容易在找到旧位置后马上执行一次新的 `reset --hard`。问题在于，恢复动作本身也会继续移动引用。如果你判断错了目标位置，很容易在混乱中继续叠加混乱。
 
-## 一个实用原则
+保守做法是：
+
+1. `git reflog`
+2. `git switch -c rescue/... <old-position>`
+3. 在救援分支上检查内容、跑测试、比对差异
+4. 最后再决定要不要改当前分支
+
+这套顺序会慢一点，但事故处理中“慢一点但稳一点”通常更值。
+
+## 三种常见恢复场景怎么判断
+
+### reset 后想找回
+
+重点是找到 reset 之前的 HEAD，然后先接住旧提交。  
+如果只是想恢复到旧位置，后续可以在确认无误后把主分支 reset 回去。
+
+### rebase 后历史乱了
+
+重点不是先纠结哪些 SHA 变了，而是找到 rebase 前的分支头。  
+很多时候 `HEAD@{n}` 或 `branch@{n}` 就能直接定位到 rebase 开始前。
+
+### pull 后想撤回
+
+先判断这次 `pull` 实际做了什么：
+
+- 是 fast-forward
+- 是 merge
+- 还是 rebase
+
+然后再从 reflog 里定位 `pull` 之前的状态。不要在没搞清 pull 结果之前直接硬 reset。
+
+## reflog 不是万能恢复器，它也有边界
+
+- reflog 默认是本地记录，不会替你恢复别人机器上的状态
+- 记录不是永久保留的，长期未引用对象可能被清理
+- 如果仓库做过 aggressive gc，恢复窗口可能缩短
+- 你能否恢复成功，也取决于相关对象是否仍然可达或尚未被清掉
+
+所以更稳的习惯是：一旦进入事故排查，就尽早建救援分支，而不是把恢复机会押在“以后总能再找回来”。
+
+<WarningBox title="不要把 reflog 当成可以无限后悔的保险箱">
+  `reflog` 很强，但不是永远存在、永远完整。它更像一个恢复窗口，而不是永久备份系统。看到可能有价值的旧位置后，先建分支接住，才是真正保守的动作。
+</WarningBox>
+
+## 常见误区
+
+### 只要看到旧 SHA，就立刻 reset
+
+这样做太快了。正确顺序通常是先建 `rescue/*` 分支，再决定是否真的要重置当前分支。
+
+### 以为 reflog 只在 reset 后才有用
+
+只要引用移动过，很多操作都会留下记录，包括 checkout、merge、rebase、amend、pull。
+
+### 以为分支删了，提交就一定没了
+
+很多时候只是名字没了，对象还在，只是需要靠 reflog 或其他引用记录重新定位。
+
+<PracticeLab
+  title="练习：用 reflog 找回一次误 reset 的状态"
+  intro="先故意做一次可控的小误操作，再用 reflog 把旧位置接住。练过一次，真实事故里你会冷静很多。"
+  setupLabel="准备"
+  setup={`mkdir reflog-lab && cd reflog-lab\ngit init\necho one > notes.txt\ngit add notes.txt\ngit commit -m \"init\"\necho two >> notes.txt\ngit commit -am \"second\"\necho three >> notes.txt\ngit commit -am \"third\"`}
+  stepsLabel="步骤"
+  steps="执行 `git reset --hard HEAD~1` | 立刻运行 `git reflog --date=local` 找到 reset 前的记录 | 使用 `git switch -c rescue/recover HEAD@{1}` 建立救援分支 | 用 `git log --oneline --graph --decorate --all` 对比当前分支和救援分支 | 确认后再决定是否让原分支回到旧位置"
+  outcomesLabel="你应该观察到"
+  outcomes="旧提交其实没有立刻消失 | rescue 分支会把旧位置重新接住 | 当前分支和救援分支会出现清晰的分叉关系 | 你可以在不破坏现状的前提下继续判断下一步"
+  mistakesLabel="常见错误"
+  mistakes="看到 `HEAD@{1}` 就直接再做一次 reset | 没建救援分支就继续试别的命令 | 找到旧 SHA 后不做任何记录，过一会儿又忘了目标是哪条"
+/>
+
+## 一条最值得长期记住的恢复习惯
 
 看到历史不对时，优先做这三件事：
 

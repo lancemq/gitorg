@@ -13,37 +13,123 @@ export const metadata = {
 
 # A sync routine for multi-person collaboration
 
-In team Git work, the real problem is often not command knowledge but an inconsistent sync rhythm.
+In team Git work, the real problem is often not command knowledge. It is sync behavior that is too implicit.  
+When several people move the same branches, “just pull and see what happens” creates more confusion than speed.
 
-A conservative routine looks like this:
-
-1. `git fetch` first
-2. inspect whether your branch and upstream diverged
-3. only then choose merge, rebase, or wait
+<CommandFlowFigure
+  title="A safer team sync loop"
+  caption="Separate observation from integration. Teams stay calmer when fetch, inspection, and actual branch mutation are not collapsed into one reflex."
+  inputsLabel="Inspect first"
+  inputs="origin/main|current branch|local unpublished commits"
+  commandLabel="fetch → inspect → integrate"
+  outputsLabel="Then choose"
+  outputs="merge|rebase|wait"
+  note="The best sync action is one you can still explain five minutes later."
+/>
 
 ## Why not let pull do everything
 
-Because `pull` combines “observe remote updates” and “mutate my current branch” into one step.  
-The more collaborators involved, the more useful it is to separate those actions.
+`git pull` is not a bad command. The problem is that it bundles two different intentions:
 
-## A team-usable sync flow
+- observe what changed remotely
+- mutate the current branch
+
+In low-risk solo work, that may be acceptable. In collaborative work, especially when branches diverge often, separating those intentions gives you far more control.
+
+<TipBox title="Fetch-first is not about ceremony. It is about clarity.">
+  A team sync routine is healthy when developers can answer three questions before integrating: what changed upstream, what do I have locally, and which integration strategy matches team expectations here?
+</TipBox>
+
+## A practical team-ready sequence
 
 ```bash
 git fetch origin
 git status
+git branch -vv
 git log --oneline --graph --decorate --all -n 20
 ```
 
-Then choose the integration path your team expects.
+This short sequence helps answer:
 
-## When this matters most
+1. which upstream branch the current branch tracks
+2. whether local unpublished commits exist
+3. whether upstream moved
+4. whether the relationship is fast-forward, divergence, or “do not touch yet”
 
-- several people are editing the same area
+Once those are clear, merge or rebase becomes a conscious decision instead of a reflex.
+
+## When to merge, when to rebase, when to wait
+
+### Merge is often the safer choice when
+
+- the branch is shared
+- the team prefers append-only history on integration branches
+- preserving the real join point matters more than cleanup
+
+### Rebase is often the better choice when
+
+- the branch is still personal or review-only
+- you want to clean history before sharing it widely
+- the team explicitly expects linear feature branch history
+
+### Waiting is sometimes the best move when
+
+- you do not fully understand the incoming changes yet
+- your worktree is still messy
+- you are returning after context drift and need to reorient first
+
+“Wait” is not indecision here. It is controlled sequencing.
+
+## When this routine matters most
+
+- several contributors touch the same area
 - your branch already has local commits
-- you are about to open or refresh a PR
-- you are returning after context drift
+- you are about to open or refresh a pull request
+- you are returning after a long interruption
+- the main branch is moving quickly
 
-## One principle
+These are exactly the moments when hidden branch mutation creates the biggest cognitive cost.
 
-A sync action should stay explainable.  
-If you cannot explain why the branch graph looks the way it does after syncing, the routine is too implicit.
+## A lightweight team sync contract
+
+You do not need a heavy handbook. A minimal rule set is often enough:
+
+1. default to `fetch` before integration
+2. inspect branch tracking and divergence
+3. avoid casual rebase on shared branches
+4. keep personal-branch cleanup aligned with team rules
+5. if the resulting history is hard to explain, stop and inspect again
+
+The value of the contract is shared expectation, not bureaucracy.
+
+## Common mistakes
+
+### “I always use pull and it usually works”
+
+That only proves the edge case has not hit yet. The real risk is that when it does hit, the resulting history is much harder to reason about.
+
+### “Conflict resolution skill is enough”
+
+Conflicts are only one cost. Hidden history mutation and unclear review context are often more expensive than the conflict itself.
+
+### “Command standardization is the main thing”
+
+Command consistency helps, but decision consistency matters more. Teams become smoother when people align on why they merge, rebase, or wait.
+
+<PracticeLab
+  title="Practice: simulate a team sync decision"
+  intro="Create a branch with local commits, let upstream advance separately, and practice deciding the integration path only after inspection."
+  setupLabel="Setup"
+  setup={`git switch main\ngit pull --ff-only\ngit switch -c feature/sync-routine\necho local >> notes.txt\ngit commit -am \"local work\"\n# let another clone or teammate advance main`}
+  stepsLabel="Steps"
+  steps="Run `git fetch origin` | Inspect `git branch -vv` | Use `git log --oneline --graph --decorate --all -n 20` to see whether the branch diverged | Decide whether merge, rebase, or waiting is the safer option | Write down why that decision fits this branch"
+  outcomesLabel="What you should observe"
+  outcomes="Fetch does not mutate the current branch | Local and upstream work become easier to distinguish | The integration choice becomes explainable instead of habitual | Team communication gets simpler because the branch state is visible"
+  mistakesLabel="Common mistakes"
+  mistakes="Fetching and then reflexively pulling anyway | Choosing rebase on a shared branch without checking team expectations | Skipping branch inspection and relying on memory"
+/>
+
+## The principle worth keeping
+
+A sync action should remain explainable.  
+If you cannot explain why the history looks the way it does after syncing, the routine is still too implicit.

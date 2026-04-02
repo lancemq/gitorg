@@ -13,31 +13,130 @@ export const metadata = {
 
 # Rollback a failed hotfix after release
 
-When a hotfix goes wrong, the real danger is often not the bug itself but the panic-driven urge to stack more changes onto production immediately.
+When a hotfix goes wrong, the real danger is often not the defect alone. It is the panic-driven tendency to keep patching directly on production branches until nobody can clearly explain what happened.
 
-## First assess, do not pile on
+<CommandFlowFigure
+  title="A calmer hotfix rollback flow"
+  caption="Assess the blast radius, revert the smallest safe scope, rebuild the fix on an isolated branch, then deliberately feed it back into the main and release lines."
+  inputsLabel="Assess first"
+  inputs="production symptoms|hotfix commit scope|release tag|main / release branch state"
+  commandLabel="assess → revert → rebuild"
+  outputsLabel="Aim for"
+  outputs="stable production|clear branch state|controlled follow-up fix"
+  note="In incidents, stable and explainable beats elegant and fast-looking."
+/>
 
-Ask:
+<WarningBox title="If the hotfix is shared, do not start with reset">
+  Once a hotfix has been pushed, deployed, or referenced by release tooling, `reset` often causes more context loss than value. In those cases, `git revert` is usually the safer first move because it preserves the incident trail.
+</WarningBox>
 
-- is the problem isolated to the hotfix
-- should you roll back one commit, one patch, or the entire release state
-- which branch currently represents the source of truth
+## First define the incident boundary
 
-## Why revert is often the first tool
+Before touching history, clarify:
 
-If the hotfix is already shared and deployed, `git revert` is often the safer starting point because it keeps the incident visible in history:
+1. is the issue isolated to the hotfix
+2. do you need to roll back one commit, one patch set, or the entire release state
+3. which tag or commit corresponds to the currently deployed version
+4. which branch represents the trustworthy source of truth right now
+
+That framing keeps a production bug from turning into a branch-history accident.
+
+## Why revert is often the right first tool
+
+If the hotfix is already shared and deployed, `git revert <hotfix-commit>` is usually safer than resetting the branch because it keeps the rollback legible:
+
+- the history remains auditable
+- teammates can sync the rollback cleanly
+- release notes and tags stay easier to explain
+- later review can distinguish the original hotfix from the rollback itself
 
 ```bash
 git revert <hotfix-commit>
 ```
 
-## A safer incident order
+If multiple commits belong to the failed hotfix, confirm the exact boundary first. Do not jump straight from “something is wrong” to “move the branch backward.”
 
-1. label the current production state
-2. roll back the smallest necessary scope
-3. rebuild the fix on an isolated branch
-4. decide how to feed it back into main and release lines
+## A safer incident sequence
 
-## One principle
+### 1. Mark the current production state
 
-During incident response, restore system stability first and optimize history elegance second.
+If production is unhealthy, first make the problematic state identifiable. That may be:
+
+- a tag
+- an incident record
+- a release note marker
+
+The point is to make sure the broken state has a name before you start changing things again.
+
+### 2. Roll back the smallest necessary scope
+
+If only the hotfix is bad, revert the hotfix.  
+If the release boundary itself was wrong, then consider a larger rollback scope. The smaller the reversible unit, the easier the follow-up recovery.
+
+### 3. Rebuild the fix on an isolated branch
+
+Do not keep experimenting on the already messy release line.  
+Use the rollback to restore stability, then rebuild the corrected fix separately and verify it there.
+
+### 4. Decide how the corrected fix flows back
+
+This is where teams often create the second accident. A failed hotfix means your main line, release line, and deployment tags may now tell different stories. Be explicit about:
+
+- which branch receives the corrected fix first
+- whether the fix must be backported
+- whether new tags or release annotations are needed
+
+## When reset is especially risky
+
+Direct reset tends to be the wrong first move when:
+
+- the commit was pushed to a shared branch
+- others may already have based work on it
+- deployment systems, tags, or release notes already reference it
+- the rollback scope is still unclear
+
+In these situations, the cost of lost context is often higher than the cost of one extra revert commit.
+
+## A lightweight team incident protocol
+
+You do not need a heavy process document. Even this small baseline helps:
+
+1. identify the production tag or commit first
+2. prefer traceable rollback actions on shared history
+3. stabilize production before rebuilding the fix
+4. explicitly realign main and release branches afterward
+5. leave written context for the rollback and follow-up change
+
+That protocol turns incident response into something the team can repeat calmly.
+
+## Common mistakes
+
+### “Production is broken, so keep fixing on the same branch”
+
+That often turns one incident into two. Stabilize first, then rebuild.
+
+### “Rollback means move the branch backward”
+
+On shared history, rollback often means adding a visible undo path, not erasing the path that already happened.
+
+### “Once the hotfix is fixed, the branch model is automatically fine”
+
+Not necessarily. Main, release, and deployment markers still need to be reconciled deliberately.
+
+<PracticeLab
+  title="Practice: plan a rollback for a bad hotfix"
+  intro="This exercise is about sequencing and judgment, not just typing a command."
+  setupLabel="Setup"
+  setup={`git switch main\ngit switch -c hotfix/login-timeout\necho patch >> app.txt\ngit commit -am \"hotfix: adjust login timeout\"\n# assume this commit is already deployed and caused trouble`}
+  stepsLabel="Steps"
+  steps="Identify the tag or commit representing the current production state | Decide whether only the hotfix commit should be reverted | Design a `git revert <sha>` rollback path | Create a separate branch for the corrected fix | Decide how the corrected fix should flow back into main and the release line"
+  outcomesLabel="What you should observe"
+  outcomes="Rollback and rebuilding the fix are different jobs | Revert keeps the incident visible | Release branches and main may need explicit realignment | Good tags and notes reduce confusion during incident response"
+  mistakesLabel="Common mistakes"
+  mistakes="Resetting shared history before understanding the blast radius | Stacking more patches on the broken release branch | Forgetting to realign release and main after the rollback"
+/>
+
+## The principle worth keeping
+
+In incident response, restore a stable system first and optimize historical elegance second.  
+Stability first, beauty second, explainability throughout.

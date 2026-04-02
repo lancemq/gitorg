@@ -3211,6 +3211,56 @@ h3 {
   right: calc(33.333% - 11px);
 }
 
+.platform-hierarchy-figure {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.platform-hierarchy-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 243, 236, 0.94));
+  box-shadow: 0 12px 26px rgba(17, 17, 17, 0.05);
+}
+
+.platform-hierarchy-card-accent {
+  border-color: rgba(255, 132, 0, 0.18);
+  background: linear-gradient(180deg, rgba(255, 251, 246, 0.99), rgba(255, 244, 226, 0.95));
+}
+
+.platform-hierarchy-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.platform-hierarchy-connector {
+  position: relative;
+  justify-self: center;
+  width: 2px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.18);
+}
+
+.platform-hierarchy-connector::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -1px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid rgba(17, 17, 17, 0.3);
+  border-bottom: 2px solid rgba(17, 17, 17, 0.3);
+  transform: translateX(-50%) rotate(45deg);
+}
+
 .transfer-figure {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -4147,7 +4197,8 @@ h3 {
   .entry-tab-grid,
   .doc-related-grid,
   .repo-layout-figure,
-  .revision-range-figure {
+  .revision-range-figure,
+  .platform-hierarchy-figure {
     grid-template-columns: 1fr;
   }
 

@@ -6,27 +6,144 @@ export const metadata = {
   summary: "Use reflog to locate previous references and recover from reset, rebase, or lost branch states.",
   sourceUrls: [
     "https://git-scm.com/docs/git-reflog.html",
-    "https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection.html",
+    "https://git-scm.com/book/en/v2/Git-Internals-Maintenance-and-Data-Recovery",
   ],
 };
 
 # Recovering with reflog
 
-## What reflog is
+`git reflog` is often the most practical recovery tool in everyday Git accidents. After a bad reset, rebase, amend, or pull, what you usually lose first is not the commit object itself but the name and reference that used to point to it.
 
-Reflog is a local record of reference movement. When `HEAD` or a branch reference changes, Git usually records that movement.
+<ReflogFigure
+  title="What reflog actually gives you"
+  caption="It records how references moved over time. Recovery usually starts by finding the old position, then deciding whether to reset, branch off, or cherry-pick from it."
+  historyLabel="Recent reference movement"
+  rescueLabel="Safer first move"
+  nowLabel="Now"
+/>
 
-That makes it especially useful after:
+<MentalModelBox title="Find the old position before choosing the fix">
+  Reflog does not magically undo everything for you. It helps you answer a more important question first: where did this branch or HEAD point before things went sideways? Once you know that, the recovery strategy becomes much easier to choose safely.
+</MentalModelBox>
 
-- a reset you regret
-- a rebase that went wrong
-- a checkout, merge, or commit you want to backtrack from
+## When reflog is the right first stop
 
-## The usual recovery flow
+- after a `reset --hard` you regret
+- after a rebase that rewrote history in the wrong way
+- after a `pull` that changed the branch differently than expected
+- after deleting a branch and suspecting the commits still exist
+- after `commit --amend` or interactive rebase when you want the previous state back
+
+The real value is that you do not need to know the final recovery plan yet. You only need to relocate the trustworthy old state.
+
+## A conservative recovery flow
+
+### 1. Inspect reflog before trying more mutations
 
 ```bash
-git reflog
-git branch recovery/<name> <commit>
+git reflog --date=local
 ```
 
-Create a rescue branch first when you want a safer recovery path.
+Look for entries that correspond to the operation right before the mistake. Useful clues often include:
+
+- `reset: moving to ...`
+- `rebase (start)` / `rebase (finish)`
+- `checkout: moving from ... to ...`
+- `commit (amend): ...`
+
+### 2. Create a rescue branch before resetting anything
+
+```bash
+git switch -c rescue/recover HEAD@{1}
+```
+
+If `HEAD@{1}` is not the correct entry, use the SHA or another reflog position instead.  
+The goal here is not to finish the recovery immediately. It is to pin the old state somewhere safe so later experiments do not erase your best recovery target.
+
+### 3. Choose the real restoration path afterward
+
+- want the current branch to return to that state: `git reset --hard <target>`
+- want to keep today’s state and recover in parallel: continue on the `rescue/*` branch
+- want only some commits back: `git cherry-pick <sha>`
+- want to compare both sides first: `git log --oneline --graph --decorate --all`
+
+## Why “branch first, reset later” is safer
+
+Many people know reflog is useful, but still jump straight from “I found the old SHA” to “I will reset immediately.” The problem is that recovery commands are also reference-moving commands. If you guess wrong once, you can make the situation harder to reason about.
+
+A safer rhythm is:
+
+1. run `git reflog`
+2. create `rescue/...`
+3. inspect content and history on that rescue branch
+4. only then decide whether the original branch should move
+
+This costs a little more time, but incident response is usually better when it is calm and reversible.
+
+## Three common recovery situations
+
+### Recover after reset
+
+Your job is to find the branch tip from before the reset, pin it on a rescue branch, and only then decide whether the original branch should be moved back.
+
+### Recover after rebase
+
+Do not focus first on which SHAs changed. Focus on where the branch pointed before the rebase started. Reflog usually makes that visible quickly.
+
+### Recover after pull
+
+First understand what the pull actually did:
+
+- fast-forward
+- merge
+- or rebase
+
+Then use reflog to locate the pre-pull position. Do not hard-reset blindly before you know what changed.
+
+## Reflog is powerful, but it has limits
+
+- reflog is local, not a shared cross-machine audit log
+- entries are not kept forever
+- aggressive cleanup and time can shrink the recovery window
+- success still depends on whether the old objects remain available
+
+That is why the best habit is to create a rescue branch as soon as you find a meaningful old position.
+
+<WarningBox title="Do not treat reflog like unlimited undo history">
+  Reflog is a recovery window, not a permanent backup strategy. When you find a useful old position, capture it early. A rescue branch is often the difference between a controlled recovery and a second accident during the first one.
+</WarningBox>
+
+## Common mistakes
+
+### Resetting immediately after finding an old SHA
+
+You may be right, but it is still the riskier sequence. Branch first if you want a reversible path.
+
+### Thinking reflog matters only after reset
+
+Checkout, merge, rebase, amend, and pull can all leave useful reflog entries.
+
+### Assuming deleted branch means deleted commits
+
+Sometimes only the name disappeared. The objects may still exist and be recoverable.
+
+<PracticeLab
+  title="Practice: recover from a deliberate bad reset"
+  intro="Create a tiny repository, make a reversible mistake, and use reflog to recover it. This is one of the highest-value Git drills you can run."
+  setupLabel="Setup"
+  setup={`mkdir reflog-lab && cd reflog-lab\ngit init\necho one > notes.txt\ngit add notes.txt\ngit commit -m \"init\"\necho two >> notes.txt\ngit commit -am \"second\"\necho three >> notes.txt\ngit commit -am \"third\"`}
+  stepsLabel="Steps"
+  steps="Run `git reset --hard HEAD~1` | Inspect `git reflog --date=local` and find the pre-reset entry | Create `git switch -c rescue/recover HEAD@{1}` | Compare both branches with `git log --oneline --graph --decorate --all` | Decide whether the original branch should move back or whether rescue work should continue separately"
+  outcomesLabel="What you should observe"
+  outcomes="The old commit does not vanish immediately | A rescue branch safely captures the old position | The current branch and rescue branch become easier to reason about | Recovery becomes a choice, not a panic reaction"
+  mistakesLabel="Common mistakes"
+  mistakes="Running another hard reset before creating a rescue branch | Forgetting which reflog entry was the pre-incident state | Treating `HEAD@{1}` as always correct without inspecting the reflog context"
+/>
+
+## The habit worth remembering
+
+When Git history looks wrong, start with this:
+
+1. `git reflog`
+2. create a rescue branch
+3. choose reset, cherry-pick, merge, or manual reconstruction only after the old position is safe

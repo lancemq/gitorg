@@ -923,6 +923,71 @@ export function TransferNegotiationFigure({
   );
 }
 
+type PlatformHierarchyFigureProps = {
+  title: string;
+  caption: string;
+  topLabel: string;
+  middleLabel: string;
+  bottomLabel: string;
+  topItems: string;
+  middleItems: string;
+  bottomItems: string;
+};
+
+export function PlatformHierarchyFigure({
+  title,
+  caption,
+  topLabel,
+  middleLabel,
+  bottomLabel,
+  topItems,
+  middleItems,
+  bottomItems,
+}: PlatformHierarchyFigureProps) {
+  const topList = splitItems(topItems);
+  const middleList = splitItems(middleItems);
+  const bottomList = splitItems(bottomItems);
+
+  return (
+    <FigureFrame title={title} caption={caption}>
+      <div className="platform-hierarchy-figure">
+        <section className="platform-hierarchy-card">
+          <span className="split-figure-label">{topLabel}</span>
+          <div className="platform-hierarchy-pills">
+            {topList.map((item) => (
+              <span className="split-pill" key={item}>
+                {item}
+              </span>
+            ))}
+          </div>
+        </section>
+        <div className="platform-hierarchy-connector" aria-hidden="true" />
+        <section className="platform-hierarchy-card platform-hierarchy-card-accent">
+          <span className="split-figure-label">{middleLabel}</span>
+          <div className="platform-hierarchy-pills">
+            {middleList.map((item) => (
+              <span className="split-pill split-pill-accent" key={item}>
+                {item}
+              </span>
+            ))}
+          </div>
+        </section>
+        <div className="platform-hierarchy-connector" aria-hidden="true" />
+        <section className="platform-hierarchy-card">
+          <span className="split-figure-label">{bottomLabel}</span>
+          <div className="platform-hierarchy-pills">
+            {bottomList.map((item) => (
+              <span className="split-pill" key={item}>
+                {item}
+              </span>
+            ))}
+          </div>
+        </section>
+      </div>
+    </FigureFrame>
+  );
+}
+
 type PracticeLabProps = {
   title: string;
   intro: string;
