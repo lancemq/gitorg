@@ -92,13 +92,26 @@ export default async function CommandPage({ params }: Props) {
             description: doc.metadata.summary,
             inLanguage,
             url: pageUrl,
+            mainEntityOfPage: pageUrl,
             dateModified: lastModified.toISOString(),
+            image: `${siteUrl}/opengraph-image`,
+            author: {
+              "@type": "Organization",
+              name: "GitOrg Atlas",
+              url: siteUrl,
+            },
+            publisher: {
+              "@type": "Organization",
+              name: "GitOrg Atlas",
+              url: siteUrl,
+            },
             isPartOf: {
               "@type": "CollectionPage",
               name: `${dict.commandPage.breadcrumbs.commands} | GitOrg Atlas`,
               url: `${siteUrl}/${locale}/commands`,
             },
             citation: doc.metadata.sourceUrls,
+            keywords: ["Git", commandSlug, doc.metadata.title],
             about: ["Git", commandSlug],
           },
           buildBreadcrumbData([
