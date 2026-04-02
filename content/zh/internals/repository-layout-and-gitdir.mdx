@@ -67,6 +67,15 @@ Git 真正关心的，不一定是名叫 `.git` 的目录，而是**当前仓库
 
 这在 `git worktree` 里尤其常见。
 
+<RepositoryLayoutFigure
+  title="Git 仓库布局的三种典型形态"
+  caption="默认仓库、linked worktree 和 bare repo 都能成立；关键不在名字，而在 gitdir 和工作区如何对应。"
+  worktreeLabel="默认仓库"
+  gitdirLabel="gitdir / .git"
+  sharedLabel="linked worktree"
+  bareLabel="bare repo"
+/>
+
 ## bare repo 为什么重要
 
 bare repo 没有普通工作区，它更像一个纯仓库目录。  

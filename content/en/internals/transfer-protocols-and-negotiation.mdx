@@ -59,6 +59,15 @@ That helps with:
 
 So packfiles are not only a storage concept. They are also a transport concept.
 
+<TransferNegotiationFigure
+  title="The fetch / push mental model"
+  caption="Both sides compare refs and already-known objects first, then exchange only the missing pack data that is actually required."
+  localLabel="local"
+  remoteLabel="remote"
+  refsLabel="ref negotiation"
+  packLabel="pack exchange"
+/>
+
 ## Clone versus fetch
 
 From the user perspective:

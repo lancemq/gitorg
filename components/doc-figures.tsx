@@ -736,6 +736,193 @@ export function ThreeLayersFigure({
   );
 }
 
+type PlumbingPorcelainFigureProps = {
+  title: string;
+  caption: string;
+  porcelainLabel: string;
+  plumbingLabel: string;
+  workflowLabel: string;
+  primitivesLabel: string;
+};
+
+export function PlumbingPorcelainFigure({
+  title,
+  caption,
+  porcelainLabel,
+  plumbingLabel,
+  workflowLabel,
+  primitivesLabel,
+}: PlumbingPorcelainFigureProps) {
+  return (
+    <FigureFrame title={title} caption={caption}>
+      <div className="split-figure">
+        <section className="split-figure-card">
+          <span className="split-figure-label">{porcelainLabel}</span>
+          <strong>{workflowLabel}</strong>
+          <div className="split-figure-pills">
+            <span className="split-pill">status</span>
+            <span className="split-pill">add</span>
+            <span className="split-pill">commit</span>
+            <span className="split-pill">merge</span>
+            <span className="split-pill">rebase</span>
+          </div>
+        </section>
+        <div className="split-figure-divider" aria-hidden="true">
+          ↓
+        </div>
+        <section className="split-figure-card split-figure-card-accent">
+          <span className="split-figure-label">{plumbingLabel}</span>
+          <strong>{primitivesLabel}</strong>
+          <div className="split-figure-pills">
+            <span className="split-pill split-pill-accent">hash-object</span>
+            <span className="split-pill split-pill-accent">cat-file</span>
+            <span className="split-pill split-pill-accent">update-index</span>
+            <span className="split-pill split-pill-accent">update-ref</span>
+            <span className="split-pill split-pill-accent">rev-list</span>
+          </div>
+        </section>
+      </div>
+    </FigureFrame>
+  );
+}
+
+type RepositoryLayoutFigureProps = {
+  title: string;
+  caption: string;
+  worktreeLabel: string;
+  gitdirLabel: string;
+  sharedLabel: string;
+  bareLabel: string;
+};
+
+export function RepositoryLayoutFigure({
+  title,
+  caption,
+  worktreeLabel,
+  gitdirLabel,
+  sharedLabel,
+  bareLabel,
+}: RepositoryLayoutFigureProps) {
+  return (
+    <FigureFrame title={title} caption={caption}>
+      <div className="repo-layout-figure">
+        <section className="repo-layout-card">
+          <span className="split-figure-label">{worktreeLabel}</span>
+          <div className="repo-layout-stack">
+            <div className="repo-layout-box">project files</div>
+            <div className="repo-layout-box repo-layout-box-accent">{gitdirLabel}</div>
+          </div>
+        </section>
+        <section className="repo-layout-card">
+          <span className="split-figure-label">{sharedLabel}</span>
+          <div className="repo-layout-row">
+            <div className="repo-layout-box">worktree A</div>
+            <div className="repo-layout-box">worktree B</div>
+          </div>
+          <div className="repo-layout-box repo-layout-box-accent">shared gitdir / objects</div>
+        </section>
+        <section className="repo-layout-card">
+          <span className="split-figure-label">{bareLabel}</span>
+          <div className="repo-layout-box repo-layout-box-accent">refs / objects / hooks / config</div>
+          <div className="repo-layout-note">no checked-out worktree</div>
+        </section>
+      </div>
+    </FigureFrame>
+  );
+}
+
+type RevisionRangeFigureProps = {
+  title: string;
+  caption: string;
+  singleLabel: string;
+  rangeLabel: string;
+  mergeBaseLabel: string;
+};
+
+export function RevisionRangeFigure({
+  title,
+  caption,
+  singleLabel,
+  rangeLabel,
+  mergeBaseLabel,
+}: RevisionRangeFigureProps) {
+  return (
+    <FigureFrame title={title} caption={caption}>
+      <div className="revision-range-figure">
+        <section className="repo-layout-card">
+          <span className="split-figure-label">{singleLabel}</span>
+          <div className="history-nodes">
+            <span className="history-node">HEAD</span>
+            <span className="history-node">HEAD~1</span>
+            <span className="history-node">HEAD^2</span>
+          </div>
+        </section>
+        <section className="repo-layout-card">
+          <span className="split-figure-label">{rangeLabel}</span>
+          <div className="history-nodes">
+            <span className="history-node">A..B</span>
+            <span className="history-node">B only</span>
+          </div>
+        </section>
+        <section className="repo-layout-card repo-layout-card-accent">
+          <span className="split-figure-label">{mergeBaseLabel}</span>
+          <div className="history-nodes">
+            <span className="history-node">A</span>
+            <span className="history-node history-node-accent">MB</span>
+            <span className="history-node">B</span>
+            <span className="history-node">A...B</span>
+          </div>
+        </section>
+      </div>
+    </FigureFrame>
+  );
+}
+
+type TransferNegotiationFigureProps = {
+  title: string;
+  caption: string;
+  localLabel: string;
+  remoteLabel: string;
+  refsLabel: string;
+  packLabel: string;
+};
+
+export function TransferNegotiationFigure({
+  title,
+  caption,
+  localLabel,
+  remoteLabel,
+  refsLabel,
+  packLabel,
+}: TransferNegotiationFigureProps) {
+  return (
+    <FigureFrame title={title} caption={caption}>
+      <div className="transfer-figure">
+        <section className="transfer-card">
+          <span className="split-figure-label">{localLabel}</span>
+          <div className="transfer-pill-row">
+            <span className="split-pill">refs/heads/main</span>
+            <span className="split-pill">origin/main</span>
+            <span className="split-pill">objects</span>
+          </div>
+        </section>
+        <div className="transfer-center">
+          <span className="transfer-arrow">{refsLabel}</span>
+          <span className="transfer-arrow transfer-arrow-accent">{packLabel}</span>
+        </div>
+        <section className="transfer-card transfer-card-accent">
+          <span className="split-figure-label">{remoteLabel}</span>
+          <div className="transfer-pill-row">
+            <span className="split-pill split-pill-accent">refs/heads/main</span>
+            <span className="split-pill split-pill-accent">refs/tags/v2.0</span>
+            <span className="split-pill split-pill-accent">pack objects</span>
+          </div>
+        </section>
+      </div>
+    </FigureFrame>
+  );
+}
+
 type PracticeLabProps = {
   title: string;
   intro: string;

@@ -96,6 +96,15 @@ plumbing 命令更像底层构件，例如：
 例如，团队里的大多数人不应该用 `update-ref` 来代替正常分支命令；  
 同样，也不该把 `hash-object` 当作常规工作流的一部分。
 
+<PlumbingPorcelainFigure
+  title="Git 的两层命令视角"
+  caption="高层协作命令通常在组合底层原语；理解分层之后，很多“复杂命令”就不再像黑盒。"
+  porcelainLabel="Porcelain"
+  plumbingLabel="Plumbing"
+  workflowLabel="面向任务与协作"
+  primitivesLabel="面向对象与引用原语"
+/>
+
 ## 一个典型误区
 
 很多人第一次接触 plumbing，会误以为：

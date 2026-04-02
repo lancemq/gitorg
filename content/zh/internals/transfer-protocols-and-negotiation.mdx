@@ -61,6 +61,15 @@ export const metadata = {
 
 所以理解 pack，不只是存储优化问题，也是在理解网络同步为什么能这么做。
 
+<TransferNegotiationFigure
+  title="一次 fetch / push 的底层心智模型"
+  caption="双方先比较 refs 和已知对象，再只交换真正缺失的 pack 数据，而不是盲目复制整仓。"
+  localLabel="本地"
+  remoteLabel="远端"
+  refsLabel="refs 协商"
+  packLabel="pack 交换"
+/>
+
 ## clone 和 fetch 的底层差异
 
 从体验看：

@@ -2991,10 +2991,22 @@ h3 {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  position: relative;
 }
 
 .history-branch-offset {
   padding-left: 28px;
+}
+
+.history-branch-offset::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 34px;
+  width: 20px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.18);
 }
 
 .history-branch-name {
@@ -3008,6 +3020,24 @@ h3 {
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+  position: relative;
+  isolation: isolate;
+  padding: 4px 0;
+  min-height: 42px;
+}
+
+.history-nodes::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: 50%;
+  height: 2px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(17, 17, 17, 0.1), rgba(17, 17, 17, 0.22), rgba(17, 17, 17, 0.1));
+  z-index: 0;
+  pointer-events: none;
 }
 
 .history-node {
@@ -3022,6 +3052,9 @@ h3 {
   background: #fff;
   font-size: 0.82rem;
   font-weight: 600;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 0 0 4px rgba(248, 244, 237, 0.92);
 }
 
 .history-node-accent {
@@ -3042,6 +3075,204 @@ h3 {
   font-size: 0.8rem;
   font-weight: 600;
   white-space: nowrap;
+}
+
+.split-figure,
+.repo-layout-figure,
+.revision-range-figure {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+
+.split-figure {
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+}
+
+.split-figure-card,
+.repo-layout-card,
+.transfer-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 100%;
+  padding: 16px;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.split-figure-card-accent,
+.repo-layout-card-accent,
+.transfer-card-accent {
+  background: rgba(248, 243, 255, 0.74);
+  border-color: rgba(99, 102, 241, 0.16);
+}
+
+.split-figure-label {
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.split-figure-pills,
+.transfer-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.split-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.split-pill-accent {
+  background: rgba(255, 132, 0, 0.1);
+  border-color: rgba(255, 132, 0, 0.22);
+  color: #8d4c00;
+}
+
+.split-figure-divider {
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.repo-layout-stack,
+.repo-layout-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.repo-layout-row {
+  flex-direction: row;
+}
+
+.repo-layout-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.repo-layout-box-accent {
+  background: rgba(255, 132, 0, 0.08);
+  border-color: rgba(255, 132, 0, 0.2);
+  color: #8d4c00;
+}
+
+.repo-layout-note {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.repo-layout-figure {
+  position: relative;
+}
+
+.repo-layout-figure::before,
+.repo-layout-figure::after {
+  content: "";
+  position: absolute;
+  top: 52%;
+  width: 22px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.18);
+  pointer-events: none;
+}
+
+.repo-layout-figure::before {
+  left: calc(33.333% - 11px);
+}
+
+.repo-layout-figure::after {
+  right: calc(33.333% - 11px);
+}
+
+.transfer-figure {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+}
+
+.transfer-center {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  position: relative;
+}
+
+.transfer-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 96px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: var(--surface-muted);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  position: relative;
+  overflow: hidden;
+}
+
+.transfer-arrow::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 50%;
+  height: 2px;
+  transform: translateY(-50%);
+  background: rgba(17, 17, 17, 0.16);
+  border-radius: 999px;
+}
+
+.transfer-arrow::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.transfer-arrow > * ,
+.transfer-arrow {
+  z-index: 0;
+}
+
+.transfer-arrow-accent {
+  background: rgba(255, 132, 0, 0.12);
+  color: #8d4c00;
 }
 
 .gitflow-figure {
@@ -3446,6 +3677,26 @@ h3 {
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
+  position: relative;
+  isolation: isolate;
+  min-height: 42px;
+  padding: 4px 0;
+}
+
+.commit-graph-track::before,
+.commit-graph-branch::before,
+.refs-track::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: 50%;
+  height: 2px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(17, 17, 17, 0.1), rgba(17, 17, 17, 0.22), rgba(17, 17, 17, 0.1));
+  z-index: 0;
+  pointer-events: none;
 }
 
 .commit-graph-merge {
@@ -3456,6 +3707,18 @@ h3 {
 
 .commit-graph-branch {
   padding-left: 22px;
+}
+
+.commit-graph-branch::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  width: 18px;
+  height: 2px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.18);
 }
 
 .commit-graph-pointer-row {
@@ -3882,8 +4145,24 @@ h3 {
   .channel-highlight-grid,
   .docs-list,
   .entry-tab-grid,
-  .doc-related-grid {
+  .doc-related-grid,
+  .repo-layout-figure,
+  .revision-range-figure {
     grid-template-columns: 1fr;
+  }
+
+  .split-figure,
+  .transfer-figure,
+  .history-figure,
+  .layers-figure {
+    grid-template-columns: 1fr;
+  }
+
+  .split-figure-divider,
+  .transfer-center,
+  .history-arrow,
+  .layers-arrow-stack {
+    justify-self: start;
   }
 
   .entry-tab-panel {

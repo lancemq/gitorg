@@ -90,6 +90,14 @@ When Git compares two lines of development, it does not only care that you named
 
 That is why revision syntax ties so naturally into commit-graph and merge-base understanding.
 
+<RevisionRangeFigure
+  title="What revision syntax is selecting"
+  caption="Whether you write `HEAD~3`, `A..B`, or `A...B`, you are really slicing the commit graph in different ways."
+  singleLabel="single revision"
+  rangeLabel="two-dot range"
+  mergeBaseLabel="three-dot / merge base"
+/>
+
 <MentalModelBox title="Revision syntax is a slicing language for the commit graph">
   <p>
     Expressions like `HEAD~3`, `A..B`, and `A...B` are easiest to understand as graph-slicing instructions rather than random command-line tricks.

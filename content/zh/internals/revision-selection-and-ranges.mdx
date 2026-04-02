@@ -92,6 +92,14 @@ export const metadata = {
 
 这也是 revision 语法和提交图、merge base 紧密绑定的原因。
 
+<RevisionRangeFigure
+  title="revision syntax 在选什么"
+  caption="无论是 `HEAD~3`、`A..B` 还是 `A...B`，本质上都在从提交图里切出某一部分。"
+  singleLabel="单修订"
+  rangeLabel="两点范围"
+  mergeBaseLabel="三点 / merge base"
+/>
+
 <MentalModelBox title="revision syntax 本质上是在给提交图做切片">
   <p>
     你可以把 `HEAD~3`、`A..B`、`A...B` 看成“提交图切片表达式”，而不是零散参数技巧。
