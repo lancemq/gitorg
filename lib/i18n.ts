@@ -87,6 +87,7 @@ export type BestPracticeSlug =
 export type WorkflowSlug =
   | "fetch-vs-pull"
   | "feature-branch-collaboration"
+  | "gitflow-workflow"
   | "multi-person-sync-routine"
   | "prepare-commits-before-pull-request"
   | "parallel-work-with-worktree"
@@ -274,6 +275,11 @@ type Dictionary = {
       action: string;
       items: ReadonlyArray<FaqItem>;
     };
+    latest: {
+      eyebrow: string;
+      title: string;
+      description: string;
+    };
   };
   faqPage: {
     eyebrow: string;
@@ -284,6 +290,18 @@ type Dictionary = {
       title: string;
       description: string;
       items: ReadonlyArray<FaqItem>;
+    }>;
+  };
+  updatesPage: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    entries: ReadonlyArray<{
+      id: string;
+      period: string;
+      title: string;
+      summary: string;
+      items: ReadonlyArray<string>;
     }>;
   };
   docsIndex: {
@@ -572,6 +590,7 @@ export const bestPracticeSlugs = [
 export const workflowSlugs = [
   "fetch-vs-pull",
   "feature-branch-collaboration",
+  "gitflow-workflow",
   "multi-person-sync-routine",
   "prepare-commits-before-pull-request",
   "parallel-work-with-worktree",
@@ -651,6 +670,11 @@ const zhDictionary: Dictionary = {
               label: "Git 历史",
               href: "/zh/history",
               active: activePath === "concepts/git-history",
+            },
+            {
+              label: "更新日志",
+              href: "/zh/updates",
+              active: activePath === "updates",
             },
             {
               label: "常见问题",
@@ -832,6 +856,11 @@ const zhDictionary: Dictionary = {
         },
       ],
     },
+    latest: {
+      eyebrow: "Changelog",
+      title: "最新更新",
+      description: "这里优先展示最近补入或扩写的教材入口，方便快速跟进新增内容。",
+    },
   },
   faqPage: {
     eyebrow: "FAQ Library",
@@ -932,6 +961,57 @@ const zhDictionary: Dictionary = {
             answer:
               "如果你只是短时间切任务、且当前改动还不适合形成提交，stash 往往最方便；如果这些改动已经具备明确边界，而且你希望保留上下文，直接 commit 到当前分支通常更清晰；如果改动既不适合进正式分支、又可能需要较长时间保留，切一个临时分支往往比长期堆 stash 更容易追踪。核心判断标准不是命令偏好，而是这些改动值不值得被长期命名和保留。",
           },
+        ],
+      },
+    ],
+  },
+  updatesPage: {
+    eyebrow: "Changelog",
+    title: "更新日志",
+    description: "按时间记录本站教材内容的新增与扩写，重点说明最近补了哪些命令、工作流、原理与恢复类教程。",
+    entries: [
+      {
+        id: "2026-q2",
+        period: "2026 Q2",
+        title: "工作流与恢复类教材继续扩充",
+        summary: "围绕真实协作与排障场景，继续补强 Gitflow、恢复排障和 AI agent 并行开发相关教程。",
+        items: [
+          "新增 Gitflow Workflow 教程，系统讲清 main、develop、feature、release、hotfix 的分工与适用边界。",
+          "扩充恢复与排障频道，覆盖 pull 后撤回、force push 影响判断、reset/rebase 后恢复等高频误操作场景。",
+          "补充 AI coding agent 下的 git worktree 使用场景，帮助理解并行任务和隔离工作目录的协作方式。",
+        ],
+      },
+      {
+        id: "2026-q1-content",
+        period: "2026 Q1",
+        title: "教程规模扩展到 100+ 主题",
+        summary: "大幅补齐 Git 命令、工作流、原理和最佳实践专题，让站点从入门到进阶的内容骨架基本成形。",
+        items: [
+          "命令教程显著扩展，补入 config、worktree、submodule、format-patch、show、rm、mv、reflog、bisect、blame 等专题。",
+          "原理频道继续补齐，新增对象、引用、提交图、垃圾回收、remote-tracking refs、merge-base 等底层知识点。",
+          "高风险命令如 rebase、reset、reflog、cherry-pick、stash、merge 增加更多图例、练习和风险说明。",
+        ],
+      },
+      {
+        id: "2026-q1-architecture",
+        period: "2026 Q1",
+        title: "频道型教材体系成形",
+        summary: "把原本零散的内容重组成更清晰的教材频道，让读者可以按主题连续学习。",
+        items: [
+          "建立 Git 命令、最佳实践、工作流、Git 原理、恢复与排障等独立教材频道。",
+          "把最佳实践拆成多个专题页，避免把协作建议堆成一篇过长文章。",
+          "把 Git 原理改造成专题频道，并拆出对象数据库、引用与 HEAD、提交图、packfiles 等详情页。",
+        ],
+      },
+      {
+        id: "2025-q4",
+        period: "2025 Q4",
+        title: "双语教材库起步",
+        summary: "完成 Markdown / MDX 教材内容源建设，并开始按中英文两套内容系统维护。",
+        items: [
+          "把教程内容迁移到 `content/` 下统一维护，形成可持续扩展的教材库。",
+          "建立 `/zh` 与 `/en` 两套内容路由，让核心教程同步支持中英文阅读。",
+          "最早的一批快速上手、rebase、fetch vs pull、reflog recovery、refs 与 HEAD 教材在这一阶段成形。",
         ],
       },
     ],
@@ -1288,6 +1368,11 @@ const enDictionary: Dictionary = {
               active: activePath === "concepts/git-history",
             },
             {
+              label: "Changelog",
+              href: "/en/updates",
+              active: activePath === "updates",
+            },
+            {
               label: "FAQ",
               href: "/en/faq",
               active: activePath === "faq",
@@ -1467,6 +1552,11 @@ const enDictionary: Dictionary = {
         },
       ],
     },
+    latest: {
+      eyebrow: "Changelog",
+      title: "Latest Updates",
+      description: "Start with the most recently added or expanded teaching entries to catch up quickly.",
+    },
   },
   faqPage: {
     eyebrow: "FAQ Library",
@@ -1567,6 +1657,57 @@ const enDictionary: Dictionary = {
             answer:
               "If the change is short-lived and not ready to become a named part of history, stash is often the lightest option. If the change already has a clear boundary and you want to preserve context, a normal commit is usually clearer. If the work may live longer, needs a name, or could turn into a real line of work, a temporary branch is often easier to track than a growing stash stack. The real decision is not command preference but whether the work deserves a durable name and place in history.",
           },
+        ],
+      },
+    ],
+  },
+  updatesPage: {
+    eyebrow: "Changelog",
+    title: "Changelog",
+    description: "A content-focused log of what teaching material was added or expanded, with emphasis on commands, workflows, internals, and recovery topics.",
+    entries: [
+      {
+        id: "2026-q2",
+        period: "2026 Q2",
+        title: "More workflow and recovery teaching material",
+        summary: "Expanded real collaboration and recovery scenarios, including Gitflow, incident rollback thinking, and AI-agent-oriented worktree usage.",
+        items: [
+          "Added a dedicated Gitflow Workflow guide covering main, develop, feature, release, and hotfix roles plus adoption boundaries.",
+          "Expanded the recovery channel with more realistic mistake-and-recovery scenarios such as undoing a pull and assessing force-push impact.",
+          "Added a workflow topic focused on using git worktree with AI coding agents and parallel task isolation.",
+        ],
+      },
+      {
+        id: "2026-q1-content",
+        period: "2026 Q1",
+        title: "The library grew past 100 topics",
+        summary: "Expanded the site into a much broader Git curriculum with deeper command, internals, workflow, and best-practice coverage.",
+        items: [
+          "Added many more command tutorials, including config, worktree, submodule, format-patch, show, rm, mv, reflog, bisect, and blame.",
+          "Expanded the internals channel with object storage, refs, commit graphs, garbage collection, remote-tracking refs, and merge-base topics.",
+          "Added more diagrams, practice labs, and risk guidance to higher-risk commands such as rebase, reset, reflog, stash, and cherry-pick.",
+        ],
+      },
+      {
+        id: "2026-q1-architecture",
+        period: "2026 Q1",
+        title: "The channel-based curriculum took shape",
+        summary: "Grouped teaching material into clearer channels so readers could learn by topic instead of browsing isolated pages.",
+        items: [
+          "Built dedicated channels for commands, best practices, workflows, internals, and recovery.",
+          "Split best-practices content into focused standalone lessons instead of a single oversized article.",
+          "Turned Git Internals into a topic channel with dedicated pages for objects, refs, commit graphs, and storage concepts.",
+        ],
+      },
+      {
+        id: "2025-q4",
+        period: "2025 Q4",
+        title: "The bilingual content library began",
+        summary: "Established the MDX-based content source and the first bilingual teaching set across foundational Git topics.",
+        items: [
+          "Moved teaching material into a unified `content/` tree backed by Markdown / MDX.",
+          "Established parallel `/zh` and `/en` reading paths for core tutorials.",
+          "Created the early foundational lessons such as quick start, rebase, fetch vs pull, reflog recovery, and refs / HEAD.",
         ],
       },
     ],

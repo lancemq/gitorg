@@ -1,0 +1,303 @@
+export const metadata = {
+  title: "Gitflow 工作流教程",
+  slug: "gitflow-workflow",
+  locale: "zh",
+  section: "workflows",
+  summary: "基于 Atlassian 对 Gitflow 的说明，梳理 main、develop、feature、release、hotfix 的职责，以及它在现代团队中的适用边界。",
+  sourceUrls: [
+    "https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow",
+    "https://git-scm.com/docs/git-branch",
+    "https://git-scm.com/docs/git-merge",
+    "https://git-scm.com/docs/git-tag",
+  ],
+};
+
+# Gitflow 工作流教程
+
+## 这篇内容适合什么人
+
+如果你正在这些场景里做判断，这篇值得认真看完：
+
+- 团队准备引入 `develop / release / hotfix` 这套分支模型
+- 你在维护版本化发布的软件，而不是每天都直接持续部署
+- 你经常听到 “Gitflow 很经典” 和 “Gitflow 太重了” 两种相反意见，想知道到底为什么
+
+## 先说结论
+
+Atlassian 现在把 Gitflow 明确描述成一种更偏“历史性”的工作流：它曾经很有影响力，也确实解决了很多以版本发布为中心的软件团队问题，但在现代持续交付和 CI/CD 场景下，它的分支数量、生命周期和合并成本，往往会比 trunk-based 之类更轻的模式重很多。
+
+这不代表 Gitflow 一定错，而是它更像一套**适合特定团队和发布节奏**的流程，而不是今天所有团队都该默认采用的标准答案。
+
+<MentalModelBox title="把 Gitflow 想成“带发布车道的功能分支模型”">
+  <p>
+    它不是只多了几个分支名字，而是给不同阶段的开发、发布准备和生产修复各自分配了一条独立车道。
+    代价是结构更清楚，成本也更高。
+  </p>
+</MentalModelBox>
+
+## Gitflow 的核心结构
+
+Gitflow 里最关键的不是单个命令，而是这些分支各自承担的职责：
+
+- `main`：正式发布历史，只记录已经对外发布或可视为稳定发布的版本
+- `develop`：日常集成主线，功能分支先合回这里
+- `feature/*`：单个功能开发
+- `release/*`：发布准备分支，只接收发布相关修复
+- `hotfix/*`：从 `main` 直接切出的生产紧急修复分支
+
+Atlassian 在原文里强调了两点：
+
+1. Gitflow 比 Feature Branch Workflow 多了多个“有明确角色的长期分支”
+2. 它本身没有发明新的 Git 概念，只是把分支职责和交互时机规定得更严格
+
+<GitflowOverviewFigure
+  title="Gitflow 的五类分支职责"
+  caption="main 记录发布历史，develop 承接日常集成，feature / release / hotfix 则分别服务于开发、发布准备和生产修复。"
+  releaseLabel="发布历史"
+  integrationLabel="日常集成"
+  featureLabel="feature/*"
+  releaseBranchLabel="release/*"
+  hotfixLabel="hotfix/*"
+/>
+
+## 这套模型是怎么运转的
+
+### 1. `main` 和 `develop` 同时存在
+
+Gitflow 不把 `main` 当成日常开发集成线。  
+`main` 更像“官方发布历史”，而 `develop` 才是日常开发合流的位置。
+
+最小初始化可以是：
+
+```bash
+git switch main
+git branch develop
+git push -u origin develop
+```
+
+或者如果团队在使用 `git-flow` 扩展，也可以通过 `git flow init` 创建基础结构。
+
+### 2. 功能从 `develop` 切出，再回到 `develop`
+
+```bash
+git switch develop
+git pull --ff-only
+git switch -c feature/login-audit
+```
+
+功能完成后：
+
+```bash
+git switch develop
+git merge feature/login-audit
+```
+
+在 Gitflow 里，功能分支不应该直接和 `main` 交互。`main` 保持“发布历史”身份，功能流先在 `develop` 上完成集成。
+
+### 3. 发布准备从 `develop` 切 `release/*`
+
+当一批功能已经足够形成一个版本，或者发布日期已接近，就从 `develop` 切出发布分支：
+
+```bash
+git switch develop
+git pull --ff-only
+git switch -c release/2.4.0
+```
+
+从这一步开始，重点不再是继续塞新功能，而是：
+
+- bug fix
+- 文档和版本说明
+- 配置修正
+- 打包和发布验证
+
+### 4. 发布完成后，`release/*` 同时回流 `main` 和 `develop`
+
+```bash
+git switch main
+git merge release/2.4.0
+git tag 2.4.0
+
+git switch develop
+git merge release/2.4.0
+```
+
+这一点很关键。  
+如果发布分支里产生了发布期修复，而这些修复没有回流到 `develop`，后面新功能开发线就会丢掉这部分修复。
+
+<GitflowReleaseFigure
+  title="Gitflow 最容易忘的地方：回流路径"
+  caption="release 和 hotfix 都不是只合一次就结束，它们产生的修复必须重新回到后续仍在前进的开发线。"
+  startLabel="起点"
+  releasePrepLabel="从 develop 切 release"
+  releaseBackmergeLabel="release 回流 main + develop"
+  hotfixBackmergeLabel="hotfix 回流 main + develop"
+/>
+
+### 5. 生产事故从 `main` 切 `hotfix/*`
+
+Gitflow 里，`hotfix` 是唯一一个应该直接从 `main` 切出来的支持型分支：
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c hotfix/login-timeout
+```
+
+修完后再同时回流：
+
+```bash
+git switch main
+git merge hotfix/login-timeout
+git tag 2.4.1
+
+git switch develop
+git merge hotfix/login-timeout
+```
+
+如果当前已经有正在准备的 `release/*` 分支，通常也需要评估是否一并把修复合进该发布分支。
+
+## 一条完整的 Gitflow 节奏示例
+
+```bash
+# 初始化 develop
+git switch main
+git branch develop
+git push -u origin develop
+
+# 开发功能
+git switch develop
+git switch -c feature/login-audit
+# work...
+git switch develop
+git merge feature/login-audit
+
+# 准备发布
+git switch -c release/2.4.0
+# only release fixes
+git switch main
+git merge release/2.4.0
+git tag 2.4.0
+git switch develop
+git merge release/2.4.0
+
+# 生产热修
+git switch main
+git switch -c hotfix/login-timeout
+# fix...
+git switch main
+git merge hotfix/login-timeout
+git tag 2.4.1
+git switch develop
+git merge hotfix/login-timeout
+```
+
+## Gitflow 适合什么团队
+
+Gitflow 最适合这些条件比较明显的团队：
+
+- 有清晰版本号和明确发布窗口
+- 一个版本进入测试后，希望把“发布准备”和“继续开发下一批功能”分开
+- 线上修复需要独立通道，不想等下一轮开发集成
+- 团队已经接受多分支并存和更重的合并管理成本
+
+典型例子包括：
+
+- 客户端或桌面软件版本发布
+- 企业软件的阶段性发行
+- 同时维护多个发布节奏和稳定版本的团队
+
+## 为什么很多现代团队不再默认选 Gitflow
+
+Atlassian 现在明确提醒：Gitflow 在现代持续软件开发里已经没有过去那么流行，原因通常就出在这里：
+
+- 分支太多，生命周期太长
+- 功能合并延迟，偏离主线的风险更高
+- `develop`、`release`、`hotfix` 都需要额外同步
+- 更难和高频 CI/CD、快速回滚、持续部署配合
+
+换句话说，Gitflow 的问题不是“不规范”，而是**规范得太重**。  
+当团队目标是“小步提交、持续合并、持续部署”时，这套结构往往会带来更多流程摩擦。
+
+<WarningBox title="别把 Gitflow 当成默认最佳实践">
+  <p>
+    Gitflow 今天更适合“版本化发布管理”问题，而不是所有团队的日常开发默认解。  
+    如果你的团队每天都在主线集成、自动化测试和快速部署，Gitflow 很可能会显得过重。
+  </p>
+</WarningBox>
+
+## Gitflow 和 trunk-based 的差别，最值得注意什么
+
+真正的差别不只是分支多少，而是“问题在哪一层解决”：
+
+- trunk-based 倾向更早合并、更短分支、更依赖自动化质量门
+- Gitflow 倾向通过不同分支隔离不同阶段，让发布、开发、热修各走不同车道
+
+所以你可以这么理解：
+
+- 如果你主要问题是“如何让多个版本和发布准备更清晰”，Gitflow 可能有帮助
+- 如果你主要问题是“如何更快集成、更快部署、更少合并债务”，trunk-based 往往更自然
+
+## 常见误区
+
+### 误区 1：有了 `develop`，团队就能自动更稳定
+
+不会。  
+`develop` 只是把不稳定集成和正式发布历史分开了，但冲突、回流遗漏、发布修复丢失这些问题仍然存在。
+
+### 误区 2：Gitflow 就等于“每个人都开很久的功能分支”
+
+长分支不是 Gitflow 的目标，只是它更容易诱发出来的问题。  
+即使用 Gitflow，也应该尽量缩短 feature 分支生命周期。
+
+### 误区 3：release 分支里还能继续塞功能
+
+这会直接破坏 Gitflow 的边界。  
+一旦进入 `release/*`，重点就应该转成发布准备，而不是继续加范围。
+
+### 误区 4：hotfix 合到 `main` 就够了
+
+不够。  
+如果 hotfix 没有回到 `develop`，后续开发线很容易再次失去这次修复。
+
+## 团队采用 Gitflow 前，最该问的几个问题
+
+1. 我们是不是有明确的版本发布节奏，而不是持续部署
+2. 我们能否承受 `develop / release / hotfix` 带来的额外回流成本
+3. 我们是否有稳定的分支治理规范，避免 release 和 hotfix 失控
+4. 我们是真的需要 Gitflow，还是只是因为它“听起来规范”
+
+如果这几个问题里有一半以上答不上来，通常说明团队更应该先把 feature branch、review、release branch、hotfix 流程做好，而不是直接上完整 Gitflow。
+
+<PracticeBox title="先用一轮桌面演练再决定要不要采用">
+  <p>
+    拿最近一次真实发布做复盘，分别画出：功能开发、发布准备、线上修复三条线。  
+    如果你发现这些线经常互相打断、版本窗口清晰、热修频繁回流，那么 Gitflow 可能有现实意义。  
+    如果你发现团队主要痛点是分支太久不合、评审慢、部署慢，那更可能是该朝更轻的流程走。
+  </p>
+</PracticeBox>
+
+## 与本站现有内容怎么配合着看
+
+如果你想真正理解 Gitflow，不建议只看这一页。更好的顺序是：
+
+1. `feature branch collaboration`
+2. `release branch workflow`
+3. `hotfix and urgent fixes`
+4. `backport with cherry-pick`
+
+因为 Gitflow 本质上就是把这些工作流组合成一套更完整、也更重的分支治理模型。
+
+## 相关命令
+
+- `git branch`
+- `git switch`
+- `git merge`
+- `git tag`
+- `git push`
+
+## 接下来建议继续学什么
+
+1. `release branch workflow`
+2. `hotfix and urgent fixes`
+3. `shared-branch-sync-boundaries`

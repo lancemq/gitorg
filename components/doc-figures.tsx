@@ -18,6 +18,146 @@ function FigureFrame({ title, caption, children }: FigureProps) {
   );
 }
 
+type GitflowOverviewFigureProps = {
+  title: string;
+  caption: string;
+  releaseLabel: string;
+  integrationLabel: string;
+  featureLabel: string;
+  releaseBranchLabel: string;
+  hotfixLabel: string;
+};
+
+export function GitflowOverviewFigure({
+  title,
+  caption,
+  releaseLabel,
+  integrationLabel,
+  featureLabel,
+  releaseBranchLabel,
+  hotfixLabel,
+}: GitflowOverviewFigureProps) {
+  return (
+    <FigureFrame title={title} caption={caption}>
+      <div className="gitflow-figure">
+        <section className="gitflow-lane gitflow-lane-main">
+          <div className="gitflow-lane-header">
+            <span>{releaseLabel}</span>
+            <strong>main</strong>
+          </div>
+          <div className="history-nodes">
+            <span className="history-node">1.9</span>
+            <span className="history-node">2.0</span>
+            <span className="history-node">2.1</span>
+          </div>
+        </section>
+
+        <section className="gitflow-lane gitflow-lane-develop">
+          <div className="gitflow-lane-header">
+            <span>{integrationLabel}</span>
+            <strong>develop</strong>
+          </div>
+          <div className="history-nodes">
+            <span className="history-node">D1</span>
+            <span className="history-node">D2</span>
+            <span className="history-node">D3</span>
+            <span className="history-node history-node-accent">D4</span>
+          </div>
+        </section>
+
+        <div className="gitflow-support-grid">
+          <section className="gitflow-support-card">
+            <span className="gitflow-support-label">{featureLabel}</span>
+            <div className="history-nodes">
+              <span className="history-node">F1</span>
+              <span className="history-node">F2</span>
+            </div>
+          </section>
+          <section className="gitflow-support-card">
+            <span className="gitflow-support-label">{releaseBranchLabel}</span>
+            <div className="history-nodes">
+              <span className="history-node">R1</span>
+              <span className="history-node history-node-accent">R2</span>
+            </div>
+          </section>
+          <section className="gitflow-support-card gitflow-support-card-hotfix">
+            <span className="gitflow-support-label">{hotfixLabel}</span>
+            <div className="history-nodes">
+              <span className="history-node history-node-accent">H1</span>
+            </div>
+          </section>
+        </div>
+      </div>
+    </FigureFrame>
+  );
+}
+
+type GitflowReleaseFigureProps = {
+  title: string;
+  caption: string;
+  startLabel: string;
+  releasePrepLabel: string;
+  releaseBackmergeLabel: string;
+  hotfixBackmergeLabel: string;
+};
+
+export function GitflowReleaseFigure({
+  title,
+  caption,
+  startLabel,
+  releasePrepLabel,
+  releaseBackmergeLabel,
+  hotfixBackmergeLabel,
+}: GitflowReleaseFigureProps) {
+  return (
+    <FigureFrame title={title} caption={caption}>
+      <div className="gitflow-release-figure">
+        <section className="gitflow-release-column">
+          <span className="gitflow-support-label">{startLabel}</span>
+          <div className="gitflow-release-card">
+            <strong>main</strong>
+            <div className="history-nodes">
+              <span className="history-node">2.0</span>
+              <span className="history-node">2.1</span>
+            </div>
+          </div>
+          <div className="gitflow-release-card gitflow-release-card-soft">
+            <strong>develop</strong>
+            <div className="history-nodes">
+              <span className="history-node">D1</span>
+              <span className="history-node">D2</span>
+              <span className="history-node">D3</span>
+            </div>
+          </div>
+        </section>
+
+        <div className="gitflow-release-arrow-stack" aria-hidden="true">
+          <span className="history-arrow">{releasePrepLabel}</span>
+          <span className="history-arrow">{releaseBackmergeLabel}</span>
+          <span className="history-arrow">{hotfixBackmergeLabel}</span>
+        </div>
+
+        <section className="gitflow-release-column">
+          <span className="gitflow-support-label">release / hotfix</span>
+          <div className="gitflow-release-card">
+            <strong>release/2.2.0</strong>
+            <div className="history-nodes">
+              <span className="history-node">R1</span>
+              <span className="history-node history-node-accent">R2</span>
+            </div>
+          </div>
+          <div className="gitflow-release-card gitflow-release-card-hotfix">
+            <strong>hotfix/login-timeout</strong>
+            <div className="history-nodes">
+              <span className="history-node history-node-accent">H1</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </FigureFrame>
+  );
+}
+
 type HistoryFigureProps = {
   title: string;
   caption: string;

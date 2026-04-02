@@ -80,6 +80,7 @@
 - `zh/best-practices/review-and-safe-push.mdx`
 - `zh/workflows/fetch-vs-pull.mdx`
 - `zh/workflows/feature-branch-collaboration.mdx`
+- `zh/workflows/gitflow-workflow.mdx`
 - `zh/workflows/sync-before-review.mdx`
 - `zh/workflows/hotfix-and-urgent-fixes.mdx`
 - `zh/workflows/multi-person-sync-routine.mdx`
@@ -138,6 +139,7 @@
 - `en/best-practices/review-and-safe-push.mdx`
 - `en/workflows/fetch-vs-pull.mdx`
 - `en/workflows/feature-branch-collaboration.mdx`
+- `en/workflows/gitflow-workflow.mdx`
 - `en/workflows/sync-before-review.mdx`
 - `en/workflows/hotfix-and-urgent-fixes.mdx`
 - `en/workflows/multi-person-sync-routine.mdx`

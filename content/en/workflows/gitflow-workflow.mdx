@@ -1,0 +1,305 @@
+export const metadata = {
+  title: "Gitflow Workflow",
+  slug: "gitflow-workflow",
+  locale: "en",
+  section: "workflows",
+  summary: "Use Atlassian's Gitflow explanation to clarify the roles of main, develop, feature, release, and hotfix branches, plus where Gitflow still fits today.",
+  sourceUrls: [
+    "https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow",
+    "https://git-scm.com/docs/git-branch",
+    "https://git-scm.com/docs/git-merge",
+    "https://git-scm.com/docs/git-tag",
+  ],
+};
+
+# Gitflow Workflow
+
+## Who this is for
+
+This guide is worth reading if you are trying to answer questions like:
+
+- Should our team adopt `develop / release / hotfix` branches?
+- Do we ship on a versioned release cadence rather than continuous deployment?
+- Why do some engineers call Gitflow "classic" while others call it "too heavy"?
+
+## The short version
+
+Atlassian now frames Gitflow as a more legacy workflow. It was influential and useful for many release-oriented teams, but it has lost favor against trunk-based development in modern CI/CD and continuous delivery environments.
+
+That does not mean Gitflow is automatically wrong. It means Gitflow is better treated as a **specific answer to a specific release-management problem**, not as the default branching model every team should copy.
+
+<MentalModelBox title="Think of Gitflow as feature branching plus dedicated release lanes">
+  <p>
+    Gitflow does not just add more branch names. It gives feature work, release prep, and production fixes
+    their own lanes. The structure is clearer, but the coordination cost is also higher.
+  </p>
+</MentalModelBox>
+
+## The core branch model
+
+The heart of Gitflow is the role assigned to each branch:
+
+- `main`: official release history
+- `develop`: the integration branch for day-to-day feature work
+- `feature/*`: isolated feature development
+- `release/*`: release preparation and stabilization
+- `hotfix/*`: urgent production fixes cut directly from `main`
+
+Atlassian's explanation highlights two important points:
+
+1. Gitflow is essentially the Feature Branch Workflow plus more long-lived branches with stricter roles
+2. It does not introduce new Git concepts so much as it formalizes when branches should be created and how they should flow back
+
+<GitflowOverviewFigure
+  title="The five branch roles in Gitflow"
+  caption="main records released history, develop carries ongoing integration, and feature / release / hotfix branches each serve a separate operational job."
+  releaseLabel="Release history"
+  integrationLabel="Daily integration"
+  featureLabel="feature/*"
+  releaseBranchLabel="release/*"
+  hotfixLabel="hotfix/*"
+/>
+
+## How Gitflow actually works
+
+### 1. `main` and `develop` both exist
+
+In Gitflow, `main` is not the everyday integration line.  
+It stores the release history, while `develop` is where features come together before a release is cut.
+
+A minimal setup can look like this:
+
+```bash
+git switch main
+git branch develop
+git push -u origin develop
+```
+
+Teams using the `git-flow` extension can also initialize the structure with `git flow init`.
+
+### 2. Features branch from `develop`, then merge back into `develop`
+
+```bash
+git switch develop
+git pull --ff-only
+git switch -c feature/login-audit
+```
+
+When the feature is ready:
+
+```bash
+git switch develop
+git merge feature/login-audit
+```
+
+In Gitflow, feature branches should not interact directly with `main`.  
+`main` stays focused on released history, while `develop` carries the current integration stream.
+
+### 3. Release prep happens on `release/*` branches
+
+Once `develop` contains enough work for a release, or a release date is approaching, cut a release branch:
+
+```bash
+git switch develop
+git pull --ff-only
+git switch -c release/2.4.0
+```
+
+From that point on, the release branch is supposed to accept only:
+
+- bug fixes
+- documentation and release notes
+- configuration adjustments
+- packaging and verification work
+
+### 4. When the release ships, merge it into both `main` and `develop`
+
+```bash
+git switch main
+git merge release/2.4.0
+git tag 2.4.0
+
+git switch develop
+git merge release/2.4.0
+```
+
+That second merge matters.  
+If the release branch collected release-only fixes and those fixes never flow back into `develop`, the active development line loses them.
+
+<GitflowReleaseFigure
+  title="The part teams forget most often: back-merges"
+  caption="Release and hotfix branches are not one-way lanes. Their fixes must flow back into the branches that continue moving after the release."
+  startLabel="Starting point"
+  releasePrepLabel="Cut release from develop"
+  releaseBackmergeLabel="Merge release into main + develop"
+  hotfixBackmergeLabel="Merge hotfix into main + develop"
+/>
+
+### 5. Production incidents use `hotfix/*` from `main`
+
+In Gitflow, `hotfix` is the only supporting branch that should fork directly from `main`:
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c hotfix/login-timeout
+```
+
+After the fix is ready:
+
+```bash
+git switch main
+git merge hotfix/login-timeout
+git tag 2.4.1
+
+git switch develop
+git merge hotfix/login-timeout
+```
+
+If a release branch is currently open, the team should also decide whether the hotfix needs to be merged there as well.
+
+## A full Gitflow sequence
+
+```bash
+# create develop
+git switch main
+git branch develop
+git push -u origin develop
+
+# feature work
+git switch develop
+git switch -c feature/login-audit
+# work...
+git switch develop
+git merge feature/login-audit
+
+# release prep
+git switch -c release/2.4.0
+# only release fixes
+git switch main
+git merge release/2.4.0
+git tag 2.4.0
+git switch develop
+git merge release/2.4.0
+
+# production hotfix
+git switch main
+git switch -c hotfix/login-timeout
+# fix...
+git switch main
+git merge hotfix/login-timeout
+git tag 2.4.1
+git switch develop
+git merge hotfix/login-timeout
+```
+
+## Where Gitflow still fits well
+
+Gitflow is most natural when these conditions are true:
+
+- the team ships on explicit versioned release cycles
+- release preparation needs a protected stabilization phase
+- production hotfixes need a dedicated lane
+- the team accepts the overhead of more branches and more merge points
+
+Examples include:
+
+- desktop or client software with release windows
+- enterprise products with formal release trains
+- teams supporting multiple stable versions at once
+
+## Why many modern teams do not choose Gitflow by default
+
+Atlassian explicitly points out that Gitflow has fallen in popularity because modern teams often optimize for faster integration and CI/CD.
+
+The tradeoffs usually show up here:
+
+- more long-lived branches
+- larger drift from the active trunk
+- more merges to coordinate
+- more chances to forget to back-merge release or hotfix fixes
+- more friction in high-frequency deployment models
+
+So the issue is not that Gitflow is "undisciplined."  
+The issue is that it can be **too structured and too heavy** for teams trying to merge small changes continuously.
+
+<WarningBox title="Do not treat Gitflow as the default best practice">
+  <p>
+    Gitflow is best viewed as a release-management workflow, not a universal day-to-day default.
+    If your team already relies on small batches, constant integration, and fast deployments, Gitflow may add more process weight than value.
+  </p>
+</WarningBox>
+
+## The most important difference from trunk-based development
+
+The real difference is not just branch count. It is where complexity gets handled.
+
+- trunk-based development handles complexity earlier, with shorter branches and faster integration
+- Gitflow handles complexity by separating stages into different branch lanes
+
+That leads to a useful rule of thumb:
+
+- if your main problem is release coordination, Gitflow may help
+- if your main problem is slow integration and merge debt, a lighter model is usually a better fit
+
+## Common mistakes
+
+### Mistake 1: assuming `develop` automatically makes the team safer
+
+It does not.  
+It only separates active integration from released history. Teams still need discipline around back-merges, release scope, and branch hygiene.
+
+### Mistake 2: letting feature branches live for too long
+
+That is not the goal of Gitflow, but Gitflow can make it easier to tolerate long-running branches if the team is not careful.
+
+### Mistake 3: adding new feature scope on a release branch
+
+That breaks the model.  
+Once a `release/*` branch exists, the point is to stabilize, not to keep expanding scope.
+
+### Mistake 4: merging a hotfix only into `main`
+
+That leaves the active development line behind and often causes the same fix to be rediscovered later.
+
+## Questions to ask before adopting Gitflow
+
+1. Are we actually release-based rather than continuously deploying?
+2. Can we afford the extra branch and merge coordination?
+3. Do we have a clear policy for release and hotfix back-merges?
+4. Are we choosing Gitflow for real release needs, or because it sounds formal?
+
+If a team cannot answer those clearly, it is usually better to strengthen feature branching, review flow, release branching, and hotfix handling first before adopting full Gitflow.
+
+<PracticeBox title="Run a release retrospective before choosing Gitflow">
+  <p>
+    Take your most recent release and map feature work, release prep, and production fixes as three separate streams.
+    If those streams frequently interfere and your release windows are real, Gitflow may be justified.
+    If the bigger problem is long-lived branches and slow integration, the team probably needs a lighter model instead.
+  </p>
+</PracticeBox>
+
+## What to read next on this site
+
+To really understand Gitflow, this page works best together with:
+
+1. `feature branch collaboration`
+2. `release branch workflow`
+3. `hotfix and urgent fixes`
+4. `backport with cherry-pick`
+
+Gitflow is basically those workflows combined into a heavier, more opinionated release model.
+
+## Related commands
+
+- `git branch`
+- `git switch`
+- `git merge`
+- `git tag`
+- `git push`
+
+## Next recommended reads
+
+1. `release branch workflow`
+2. `hotfix and urgent fixes`
+3. `shared-branch-sync-boundaries`

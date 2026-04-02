@@ -126,6 +126,7 @@ export const docPathRegistry = [
   "best-practices/small-batch-review",
   "workflows/fetch-vs-pull",
   "workflows/feature-branch-collaboration",
+  "workflows/gitflow-workflow",
   "workflows/multi-person-sync-routine",
   "workflows/prepare-commits-before-pull-request",
   "workflows/parallel-work-with-worktree",
@@ -255,6 +256,7 @@ const contentModules = {
     "best-practices/small-batch-review": () => import("@/content/zh/best-practices/small-batch-review.mdx"),
     "workflows/fetch-vs-pull": () => import("@/content/zh/workflows/fetch-vs-pull.mdx"),
     "workflows/feature-branch-collaboration": () => import("@/content/zh/workflows/feature-branch-collaboration.mdx"),
+    "workflows/gitflow-workflow": () => import("@/content/zh/workflows/gitflow-workflow.mdx"),
     "workflows/multi-person-sync-routine": () => import("@/content/zh/workflows/multi-person-sync-routine.mdx"),
     "workflows/prepare-commits-before-pull-request": () => import("@/content/zh/workflows/prepare-commits-before-pull-request.mdx"),
     "workflows/parallel-work-with-worktree": () => import("@/content/zh/workflows/parallel-work-with-worktree.mdx"),
@@ -381,6 +383,7 @@ const contentModules = {
     "best-practices/small-batch-review": () => import("@/content/en/best-practices/small-batch-review.mdx"),
     "workflows/fetch-vs-pull": () => import("@/content/en/workflows/fetch-vs-pull.mdx"),
     "workflows/feature-branch-collaboration": () => import("@/content/en/workflows/feature-branch-collaboration.mdx"),
+    "workflows/gitflow-workflow": () => import("@/content/en/workflows/gitflow-workflow.mdx"),
     "workflows/multi-person-sync-routine": () => import("@/content/en/workflows/multi-person-sync-routine.mdx"),
     "workflows/prepare-commits-before-pull-request": () => import("@/content/en/workflows/prepare-commits-before-pull-request.mdx"),
     "workflows/parallel-work-with-worktree": () => import("@/content/en/workflows/parallel-work-with-worktree.mdx"),
@@ -505,6 +508,7 @@ const coreDocPaths = new Set<DocPath>([
   "best-practices/atomic-commits",
   "workflows/fetch-vs-pull",
   "workflows/feature-branch-collaboration",
+  "workflows/gitflow-workflow",
   "workflows/multi-person-sync-routine",
   "workflows/sync-before-review",
   "workflows/release-branch-workflow",
@@ -539,6 +543,7 @@ const recommendedDocPaths = new Set<DocPath>([
   "best-practices/branch-naming",
   "workflows/prepare-commits-before-pull-request",
   "workflows/ai-agent-worktree-mode",
+  "workflows/gitflow-workflow",
   "workflows/hotfix-rollback-after-release",
   "workflows/backport-with-cherry-pick",
   "workflows/shared-branch-sync-boundaries",
@@ -1072,6 +1077,11 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
     "commands/git-worktree",
     "workflows/prepare-commits-before-pull-request",
   ],
+  "workflows/gitflow-workflow": [
+    "workflows/feature-branch-collaboration",
+    "workflows/release-branch-workflow",
+    "workflows/hotfix-and-urgent-fixes",
+  ],
   "workflows/multi-person-sync-routine": [
     "commands/git-fetch",
     "commands/git-pull",
@@ -1202,6 +1212,13 @@ const representativeSectionPaths = {
   ],
 } as const satisfies Partial<Record<DocSection, readonly DocPath[]>>;
 
+const latestHomeDocPaths = [
+  "workflows/gitflow-workflow",
+  "workflows/ai-agent-worktree-mode",
+  "recovery/undo-after-pull",
+  "commands/git-worktree",
+] as const satisfies readonly DocPath[];
+
 export async function getRelatedDocs(
   locale: Locale,
   docPath: DocPath,
@@ -1250,6 +1267,14 @@ export async function getRepresentativeSectionDocs(
 ): Promise<DocCard[]> {
   const paths = representativeSectionPaths[section] ?? [];
   const docs = await Promise.all(paths.slice(0, limit).map((docPath) => getDocByPath(locale, docPath)));
+  return docs.map((doc) => toDocCard(locale, doc));
+}
+
+export async function getLatestHomeDocs(locale: Locale, limit = 4): Promise<DocCard[]> {
+  const docs = await Promise.all(
+    latestHomeDocPaths.slice(0, limit).map((docPath) => getDocByPath(locale, docPath)),
+  );
+
   return docs.map((doc) => toDocCard(locale, doc));
 }
 

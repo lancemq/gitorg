@@ -1104,6 +1104,11 @@ h3 {
     linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(241, 249, 247, 0.94));
 }
 
+.section-latest .docs-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 248, 241, 0.95));
+}
+
 .section-recovery .scenario-link {
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(253, 244, 240, 0.98));
@@ -1293,6 +1298,84 @@ h3 {
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+
+.updates-section {
+  padding-top: 18px;
+}
+
+.updates-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.update-entry {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.update-period {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 100%;
+  padding-top: 4px;
+}
+
+.update-period::after {
+  content: "";
+  position: absolute;
+  top: 34px;
+  bottom: -18px;
+  left: 10px;
+  width: 1px;
+  background: rgba(17, 17, 17, 0.1);
+}
+
+.update-entry:last-child .update-period::after {
+  display: none;
+}
+
+.update-period span {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 999px;
+  background: rgba(248, 244, 237, 0.9);
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.update-body {
+  padding: 18px 20px;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(249, 246, 239, 0.95));
+}
+
+.update-body h2 {
+  margin: 0 0 8px;
+}
+
+.update-body p {
+  margin: 0 0 12px;
+  color: var(--text-muted);
+}
+
+.update-body ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.update-body li {
+  color: var(--text-muted);
 }
 
 .faq-item {
@@ -2617,6 +2700,114 @@ h3 {
   font-size: 0.8rem;
   font-weight: 600;
   white-space: nowrap;
+}
+
+.gitflow-figure {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.gitflow-lane {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #fff;
+}
+
+.gitflow-lane-main {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(251, 247, 240, 0.94));
+}
+
+.gitflow-lane-develop {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(245, 249, 247, 0.94));
+}
+
+.gitflow-lane-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.gitflow-lane-header span,
+.gitflow-support-label {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.gitflow-lane-header strong {
+  font-size: 0.94rem;
+}
+
+.gitflow-support-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.gitflow-support-card,
+.gitflow-release-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #fff;
+}
+
+.gitflow-support-card {
+  min-height: 100%;
+}
+
+.gitflow-support-card:nth-child(1) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(244, 249, 247, 0.94));
+}
+
+.gitflow-support-card:nth-child(2) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 249, 242, 0.95));
+}
+
+.gitflow-support-card-hotfix,
+.gitflow-release-card-hotfix {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(253, 244, 240, 0.95));
+}
+
+.gitflow-release-figure {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.gitflow-release-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gitflow-release-card-soft {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(245, 249, 247, 0.94));
+}
+
+.gitflow-release-arrow-stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
 }
 
 .reset-figure {

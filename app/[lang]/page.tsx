@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { FaqList } from "@/components/faq-list";
 import { SiteShell } from "@/components/site-shell";
 import { StructuredData } from "@/components/structured-data";
-import { getContentStats } from "@/lib/content";
+import { getContentStats, getLatestHomeDocs } from "@/lib/content";
 import {
   getDictionary,
   getSidebarContent,
@@ -79,6 +79,27 @@ const heroSignals = {
   en: ["Commands · Workflows · Internals", "Figures + Practice + Recovery", "Bilingual learning system"],
 } as const;
 
+const latestSectionLabels = {
+  zh: {
+    "learning-path": "学习路径",
+    commands: "命令专题",
+    "best-practices": "最佳实践",
+    workflows: "工作流",
+    internals: "Git 原理",
+    recovery: "恢复与排障",
+    concepts: "概念",
+  },
+  en: {
+    "learning-path": "Learning Path",
+    commands: "Commands",
+    "best-practices": "Best Practices",
+    workflows: "Workflows",
+    internals: "Git Internals",
+    recovery: "Recovery",
+    concepts: "Concepts",
+  },
+} as const;
+
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
@@ -110,7 +131,10 @@ export default async function LocalizedHomePage({ params }: Props) {
 
   const locale = lang as Locale;
   const dict = getDictionary(locale);
-  const stats = await getContentStats(locale);
+  const [stats, latestDocs] = await Promise.all([
+    getContentStats(locale),
+    getLatestHomeDocs(locale, 4),
+  ]);
   const moduleCount = Object.values(stats.sectionCounts).filter((count) => count > 0).length;
   const siteUrl = getSiteUrl();
   const pageUrl = `${siteUrl}/${locale}`;
@@ -118,6 +142,7 @@ export default async function LocalizedHomePage({ params }: Props) {
   const journeys = audiencePaths[locale];
   const scenarios = scenarioLinks[locale];
   const signals = heroSignals[locale];
+  const sectionLabels = latestSectionLabels[locale];
 
   return (
     <SiteShell locale={locale} sidebar={getSidebarContent(locale, { kind: "docs", activePath: "overview" })}>
@@ -241,6 +266,26 @@ export default async function LocalizedHomePage({ params }: Props) {
             <Link className="docs-card" href={`/${locale}${item.href}`} key={item.href}>
               <h3>{item.title}</h3>
               <p>{item.description}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="section section-latest" id="latest">
+        <div className="section-head">
+          <div>
+            <p className="eyebrow">{dict.home.latest.eyebrow}</p>
+            <h2>{dict.home.latest.title}</h2>
+          </div>
+          <p>{dict.home.latest.description}</p>
+        </div>
+
+        <div className="docs-list">
+          {latestDocs.map((doc) => (
+            <Link className="docs-card" href={doc.href} key={doc.href}>
+              <span className="card-kicker">{sectionLabels[doc.section]}</span>
+              <h3>{doc.title}</h3>
+              <p>{doc.summary}</p>
             </Link>
           ))}
         </div>

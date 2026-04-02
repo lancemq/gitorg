@@ -67,6 +67,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.75,
       }))(),
       (async () => ({
+        pathname: `/${locale}/updates`,
+        lastModified: await getLatestDocLastModified(locale),
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      }))(),
+      (async () => ({
         pathname: `/${locale}/learning-path`,
         lastModified: await getLatestDocLastModified(locale, "learning-path"),
         changeFrequency: "weekly" as const,
