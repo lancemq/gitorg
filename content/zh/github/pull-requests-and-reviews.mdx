@@ -1,0 +1,120 @@
+export const metadata = {
+  title: "Pull Request 与 Code Review 教程",
+  slug: "pull-requests-and-reviews",
+  locale: "zh",
+  section: "github",
+  summary: "理解 Pull Request、review、分支保护和合并策略在团队协作中的位置，而不只是学会界面操作。",
+  sourceUrls: [
+    "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests",
+    "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/about-pull-request-reviews",
+    "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches",
+  ],
+};
+
+# Pull Request 与 Code Review 教程
+
+## 为什么 PR 不只是“申请合并”
+
+很多团队会高频使用 Pull Request，但真正把它用好的人并不多。  
+PR 的价值不是单纯防止直接 push，而是把这几件事放到一个共享入口里：
+
+- 说明为什么要改
+- 展示改了什么
+- 让别人 review
+- 让 CI 和自动检查介入
+- 形成是否合并的共同判断
+
+所以如果你只把 PR 理解成“最后点 merge 的地方”，你就会错过它作为协作界面的最大价值。
+
+## review 到底在评什么
+
+一个成熟的 review，不只是找语法错误。它通常在看这些问题：
+
+- 这次改动的目标是否清楚
+- 提交历史和 PR 范围是否合理
+- 代码是否引入明显风险
+- 命名、边界和结构是否可维护
+- 自动检查是否已经覆盖最低质量门槛
+
+也就是说，review 不是替 CI 做格式检查，而是在做**工程判断与团队知识共享**。
+
+<MentalModelBox title="PR 是“变更讨论容器”，review 是“协作判断动作”">
+  <p>
+    把 review 想成团队对变更进行同步和判断的过程，而不只是审查者打钩。
+    这样你会更容易理解为什么描述、提交质量和测试说明都属于 PR 质量的一部分。
+  </p>
+</MentalModelBox>
+
+## GitHub 里的几种 review 结果
+
+GitHub 官方把 review 的结果区分得很清楚：
+
+- `Comment`：表达意见，但不阻塞合并
+- `Approve`：认可当前状态
+- `Request changes`：明确指出当前不建议合并
+
+这三者的意义不只是按钮差异，而是在帮助团队把反馈强度和合并决策区分开。
+
+## 一个更稳的 PR 节奏
+
+推荐用下面这条顺序来理解：
+
+1. 本地先整理提交
+2. 发起 PR，并把背景、目标、风险说清楚
+3. 自动检查先跑起来
+4. review 过程中继续 push 修正
+5. 收敛线程、确认风险和测试情况
+6. 用团队约定好的策略合并
+
+如果你把这条顺序反过来，比如“先随便开 PR，后面再慢慢想清楚”，review 体验通常会很差。
+
+## 分支保护为什么重要
+
+GitHub 的 protected branches 不是为了“增加流程感”，而是为了把团队约定落实成平台规则，比如：
+
+- 必须经过 review
+- 必须通过状态检查
+- 不允许直接 push
+- 合并前必须保持最新
+
+这类规则的价值在于：它们把“最好这样做”变成了“平台会帮你守住这条线”。
+
+<WarningBox title="平台规则不能替代判断，只能守住最低线">
+  <p>
+    即使分支保护和自动检查都通过了，也不代表这次改动就一定结构清楚、范围合理、历史健康。
+    PR 质量仍然依赖团队自己的 review 习惯。
+  </p>
+</WarningBox>
+
+## 怎么让 review 更容易成功
+
+最有效的办法不是“多催审几次”，而是先把 PR 做得更容易读：
+
+- 目标单一，不要一个 PR 里塞三件事
+- 描述清楚背景和改动范围
+- 提交数量适中，不把杂乱历史直接丢给 reviewer
+- 测试方式写清楚
+- 风险点和已知取舍提前说明
+
+这也是为什么“PR 前整理提交”和“小批次 review”会长期被视为高价值实践。
+
+## 常见反模式
+
+### 1. 巨型 PR
+
+一次改动几十个文件、几千行 diff，review 就很容易流于表面。
+
+### 2. 评论线程不收敛
+
+别人提了意见，但作者只是继续 push，没有明确回复或说明处理结果，review 成本就会一直堆积。
+
+### 3. 过度依赖 squash merge
+
+Squash 可以让主线更整洁，但如果每次都拿它掩盖混乱的提交过程，团队会失去很多调试和追踪价值。
+
+## 这篇之后适合继续看什么
+
+- `PR 前整理提交`
+- `共享历史边界`
+- `PR 合并策略与平台设置`
+- `小批次 review`

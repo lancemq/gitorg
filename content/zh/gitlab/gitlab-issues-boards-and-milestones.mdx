@@ -1,0 +1,52 @@
+export const metadata = {
+  title: "GitLab Issues、Boards 与 Milestones",
+  slug: "gitlab-issues-boards-and-milestones",
+  locale: "zh",
+  section: "gitlab",
+  summary: "理解 GitLab 如何把 issue、board、milestone 和交付节奏组织在一起，而不是把所有协作都丢进 Merge Request。",
+  sourceUrls: [
+    "https://docs.gitlab.com/user/project/issues/",
+    "https://docs.gitlab.com/user/project/issue_board/",
+    "https://docs.gitlab.com/user/project/milestones/",
+  ],
+};
+
+# GitLab Issues、Boards 与 Milestones
+
+## 为什么不能只看 Merge Request
+
+如果团队只围绕 Merge Request 工作，很容易把真正的任务管理和协作背景都丢失掉。  
+GitLab 的 issue、board 和 milestone，就是为了把“工作项”和“交付节奏”从代码 diff 里分离出来。
+
+## 这三者分别在做什么
+
+- `Issue`：记录需求、缺陷、任务和讨论入口
+- `Board`：把 issue 组织成一个可视化流程
+- `Milestone`：把一批工作和某个时间点或版本目标关联起来
+
+这样一来，Merge Request 更像是在完成 issue，而不是承担所有上下文。
+
+## 更成熟的协作线
+
+1. 先用 issue 承载问题或需求
+2. 用 board 管理当前流程状态
+3. 用 milestone 绑定阶段目标
+4. 最后通过 Merge Request 落地改动
+
+## 这套方式的价值
+
+- 需求、任务和代码变更分层更清晰
+- 交付节奏更容易被看见
+- 讨论不会全部挤进 Merge Request
+
+## 常见反模式
+
+- 只开 MR，不建 issue
+- board 长期不维护
+- milestone 设了名字但没有真实计划意义
+
+## 接下来建议继续看什么
+
+1. `GitLab Flow 与 Merge Request`
+2. `Issues、Projects 与 Discussions`
+3. `feature branch collaboration`

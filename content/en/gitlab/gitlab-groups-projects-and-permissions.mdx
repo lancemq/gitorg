@@ -1,0 +1,60 @@
+export const metadata = {
+  title: "GitLab Groups, Projects, and Permissions",
+  slug: "gitlab-groups-projects-and-permissions",
+  locale: "en",
+  section: "gitlab",
+  summary: "Understand how groups, projects, roles, and inherited permissions shape collaboration boundaries in GitLab before those boundaries become messy.",
+  sourceUrls: [
+    "https://docs.gitlab.com/user/group/",
+    "https://docs.gitlab.com/user/project/",
+    "https://docs.gitlab.com/auth/user_permissions/",
+  ],
+};
+
+# GitLab Groups, Projects, and Permissions
+
+## Why this topic matters early
+
+Teams new to GitLab often focus first on code flow and overlook the organizational model.  
+But in GitLab, groups, subgroups, projects, and roles directly affect:
+
+- who can view repositories
+- who can push
+- who can deploy
+- who can change CI/CD variables and protected settings
+
+So the permissions model is not merely admin work. It is part of the collaboration design.
+
+## Start with group versus project
+
+- `Group`: the organizational container
+- `Project`: the repository and its immediate collaboration surface
+
+Once subgroups are involved, membership and permissions may cascade downward.
+
+## Why inheritance needs care
+
+Permission inheritance is convenient, but careless structure can create problems quickly:
+
+- external collaborators may see too much
+- too many users may gain broad operating power
+- CI/CD and protected-branch boundaries can become unclear
+
+## Safer operating habits
+
+1. design group boundaries before scaling members
+2. place projects intentionally, not by convenience alone
+3. use more conservative access for external contributors and automation identities
+4. avoid over-assigning high roles
+
+## Common mistakes
+
+- treating GitLab as only code hosting and ignoring organization design
+- giving Maintainer or stronger access too freely
+- adding subgroups before understanding the inheritance chain
+
+## Good follow-up reads
+
+1. GitLab forks and contribution flow
+2. shared history boundaries
+3. GitLab CI/CD and runners

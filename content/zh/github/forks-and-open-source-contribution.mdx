@@ -1,0 +1,112 @@
+export const metadata = {
+  title: "Fork 与开源贡献教程",
+  slug: "forks-and-open-source-contribution",
+  locale: "zh",
+  section: "github",
+  summary: "把 fork、upstream、issue、贡献规范和 Pull Request 贡献节奏串成一条更真实的开源协作路径。",
+  sourceUrls: [
+    "https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-open-source",
+    "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks",
+  ],
+};
+
+# Fork 与开源贡献教程
+
+## 开源贡献为什么经常从 fork 开始
+
+在团队内部协作时，大家通常直接在同一个仓库里开分支、发 PR。  
+但在开源项目中，很多贡献者并没有主仓库写权限，所以 GitHub 常见的模式是：
+
+- 先 fork 项目
+- 在自己的 fork 上开分支
+- 把改动 push 到自己的仓库
+- 再向上游仓库发起 PR
+
+这套模式的关键，不是“多了一个仓库”，而是**权限、边界和协作责任**都更清晰了。
+
+## 先分清 origin 和 upstream
+
+在 fork 工作流里，最常见的边界是：
+
+- `origin`：你自己的 fork
+- `upstream`：原始项目仓库
+
+这个区分非常重要。  
+如果你一开始就把它们混掉，后面同步、开分支、推送和发 PR 都会乱。
+
+## 真实开源贡献的节奏
+
+一条更稳的节奏通常是：
+
+1. 先读贡献说明和 issue 规则
+2. 找到一个适合的新手任务或明确的修复点
+3. fork 仓库并 clone 到本地
+4. 添加 `upstream`
+5. 同步自己的主分支
+6. 从最新主线切任务分支
+7. 完成改动并 push 到 fork
+8. 发 PR，并说明背景、改动和测试方式
+
+## 为什么“先读规则”比“先改代码”更重要
+
+很多第一次参与开源的人，一上来就开始改代码，但实际更容易出问题的是这些地方：
+
+- 项目有特定分支策略
+- 提交信息格式有要求
+- 维护者希望先开 issue 讨论
+- 文档、测试、变更说明有额外要求
+
+所以开源贡献里，理解项目习惯和期望，往往比会不会写那几行代码更重要。
+
+<TipBox title="先理解维护者的工作负担">
+  <p>
+    一个好的开源贡献者，不只是“把代码写出来”，而是会主动降低维护者接收这次改动的成本。
+    清楚的描述、干净的提交和合适的范围，本身就是贡献质量的一部分。
+  </p>
+</TipBox>
+
+## Fork 工作流最常见的几个错误
+
+### 1. 从过期分支切新任务
+
+如果你的 fork 主分支已经落后很多，再从它切新分支，后面 PR 冲突和噪声都会更多。
+
+### 2. 不同步 upstream
+
+只 push 自己的 fork，却长期不把 upstream 的更新同步回来，最终会让你的贡献越来越难合。
+
+### 3. 一次改太多
+
+开源维护者通常更容易接受一条小而清楚的贡献，而不是一大包顺手做完的修改。
+
+## 开源 PR 和团队内 PR 的差别
+
+团队内 PR 更偏向协作收敛；  
+开源 PR 往往还带着额外的“信任建立”和“沟通成本”。
+
+这意味着你需要更重视：
+
+- 背景说明
+- 复现方式
+- 测试步骤
+- 是否和既有 issue 对齐
+- 是否符合维护者的路线判断
+
+## 一条最小命令流
+
+```bash
+git remote add upstream <upstream-url>
+git fetch upstream
+git switch main
+git rebase upstream/main
+git push origin main
+git switch -c feature/fix-docs-link
+git push -u origin feature/fix-docs-link
+```
+
+## 继续往下学什么
+
+- `fork upstream sync`
+- `开源 fork + PR 完整提交流程`
+- `PR 前整理提交`
+- `topic branch`

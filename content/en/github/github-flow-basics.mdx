@@ -1,0 +1,138 @@
+export const metadata = {
+  title: "GitHub Flow Basics",
+  slug: "github-flow-basics",
+  locale: "en",
+  section: "github",
+  summary: "Use GitHub's own lightweight collaboration model to understand branches, pull requests, reviews, and merges as one practical loop.",
+  sourceUrls: [
+    "https://docs.github.com/en/get-started/using-github/github-flow",
+    "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests",
+  ],
+};
+
+# GitHub Flow Basics
+
+## What it actually is
+
+GitHub Flow is not a heavy branching framework.  
+It is a deliberately lightweight collaboration rhythm built around a short loop:
+
+1. create a branch from the main line
+2. commit work on that branch
+3. open a pull request
+4. review and refine
+5. merge back
+
+If you already know Git but still treat GitHub as "just where the repo lives," this is the best place to start.
+
+<MentalModelBox title="Think of GitHub Flow as branch work organized around the pull request">
+  <p>
+    The branch matters, but the collaboration center is really the pull request.
+    That is where discussion, checks, review, and merge decisions all come together.
+  </p>
+</MentalModelBox>
+
+## Why teams like it
+
+GitHub promotes this model because it solves real day-to-day collaboration problems without adding much ceremony:
+
+- it avoids maintaining multiple long-lived coordination branches
+- it fits continuous delivery and small-batch shipping well
+- it makes pull requests the natural place for review and automation
+- it is easy for new teammates to learn
+
+It is not the only model, but it is often the easiest one to adopt well.
+
+## The smallest useful rhythm
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c feature/login-copy
+# edit files
+git add .
+git commit -m "Refine login copy"
+git push -u origin feature/login-copy
+```
+
+After that, the platform-side flow matters:
+
+- open the pull request
+- explain the intent
+- request review
+- keep refining through new commits
+- merge after checks and discussion
+
+## Why the pull request is the center
+
+From the command line alone, GitHub Flow can look like "branch, then merge."  
+But the pull request is what turns that into a real collaboration model because it combines:
+
+- context
+- diff view
+- review discussion
+- automated checks
+- merge decisions
+
+That is why many teams still insist on PRs even when they technically could push straight to the default branch.
+
+<TipBox title="Treat the PR as a discussion surface first">
+  <p>
+    If a team sees pull requests only as merge buttons, it loses much of the value of GitHub Flow.
+    The real gain is shared context and visible review around a change.
+  </p>
+</TipBox>
+
+## Where this model fits best
+
+GitHub Flow is a good default when:
+
+- the main branch is expected to stay releasable
+- changes are small and frequent
+- reviews and CI checks act as quality gates
+- the team does not want a heavy branch model
+
+If your release process depends on formal release trains, long validation windows, or multiple maintained release lines, a release-branch or Gitflow-style model may be more realistic.
+
+## Common misunderstandings
+
+### "Lightweight" does not mean "no rules"
+
+You still want a few clear boundaries:
+
+- avoid direct pushes to main
+- merge through pull requests
+- define review and CI expectations
+- keep branch lifetimes short
+
+### Long-lived feature branches are not safer
+
+In GitHub Flow, long-lived branches usually mean:
+
+- more drift from main
+- larger reviews
+- more conflict cost
+
+The model works best with small, mergeable slices.
+
+### Opening a PR does not freeze the branch
+
+A pull request is not a static submission.  
+Continuing to push fixes, clarification commits, and review responses is part of the normal flow.
+
+## What teams should define explicitly
+
+If GitHub Flow becomes your default, write down at least these rules:
+
+1. main changes land through pull requests
+2. sync before opening the PR when needed
+3. each PR should serve one clear goal
+4. checks must pass before merge
+5. merge strategy should be consistent
+
+## Good follow-up reads
+
+- prepare commits before a pull request
+- shared history boundaries
+- pull requests and reviews
+- feature-branch collaboration

@@ -1,0 +1,55 @@
+export const metadata = {
+  title: "GitLab Fork 与贡献流程",
+  slug: "gitlab-forks-and-contributions",
+  locale: "zh",
+  section: "gitlab",
+  summary: "把 GitLab 上的 fork、贡献分支、合并请求和上游同步串成一条更真实的外部协作路径。",
+  sourceUrls: [
+    "https://docs.gitlab.com/user/project/repository/forking_workflow/",
+    "https://docs.gitlab.com/user/project/merge_requests/",
+  ],
+};
+
+# GitLab Fork 与贡献流程
+
+## 什么时候会用到这条路径
+
+当你没有目标项目直接写权限，或者希望把外部贡献和内部协作隔离开时，GitLab 的 fork 工作流就很常见。
+
+它和站内已经有的 Git fork 工作流思路相近，但 GitLab 上你还会更频繁地遇到：
+
+- 组和项目权限差异
+- Merge Request 目标项目设置
+- pipeline 在 fork 场景下的边界
+
+## 一条更稳的节奏
+
+1. fork 项目
+2. clone 自己的 fork
+3. 添加上游 remote
+4. 同步主线
+5. 切任务分支
+6. push 到自己的 fork
+7. 向上游发起 Merge Request
+
+## 为什么要特别注意权限和 pipeline
+
+在 GitLab 的 fork 场景里，很多团队最容易忽略的是：
+
+- 你是否有权触发某些 pipeline
+- 变量、密钥和 runner 是否会暴露
+- Merge Request 是向哪个项目发起
+
+这就是为什么外部贡献场景需要比内部团队协作更保守。
+
+## 常见错误
+
+- fork 后不持续同步上游
+- 分不清自己的项目和目标项目
+- 在不了解 CI 权限边界时直接依赖 pipeline 结果
+
+## 接下来建议继续看什么
+
+1. `GitLab Groups / Projects / Permissions`
+2. `开源贡献 / fork + PR 完整提交流程`
+3. `GitLab CI/CD 与 Runners`

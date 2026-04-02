@@ -1,0 +1,141 @@
+export const metadata = {
+  title: "GitHub Flow 基础教程",
+  slug: "github-flow-basics",
+  locale: "zh",
+  section: "github",
+  summary: "用 GitHub 官方的轻量协作模型理解 branch、pull request、review 与 merge 的最小闭环。",
+  sourceUrls: [
+    "https://docs.github.com/en/get-started/using-github/github-flow",
+    "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests",
+  ],
+};
+
+# GitHub Flow 基础教程
+
+## 先理解它到底是什么
+
+GitHub Flow 不是一套复杂的分支治理模型，而是一种**尽量轻量的日常协作方式**。  
+它的核心节奏非常短：
+
+1. 从主线切出一个分支
+2. 在分支上提交改动
+3. 发起 Pull Request
+4. 讨论、review、补充提交
+5. 合并回主线
+
+如果你已经会 Git，但对 GitHub 协作界面、PR 节奏和 review 的角色还不够熟，这一页就是最好的起点。
+
+<MentalModelBox title="把 GitHub Flow 想成“以 Pull Request 为中心的轻量协作”">
+  <p>
+    它和只会在本地切分支、提交、push 的差别在于：真正的协作中心不再是分支本身，而是 Pull Request 这个讨论与合并入口。
+  </p>
+</MentalModelBox>
+
+## 为什么很多团队喜欢它
+
+GitHub 官方长期强调这套方式，是因为它有几个非常现实的优点：
+
+- 结构轻，不需要长期维护 `develop / release / hotfix` 这类复杂角色分支
+- 很适合持续交付或高频上线节奏
+- 团队容易围绕 PR 做 review、讨论、CI 检查和合并决策
+- 对新成员更友好，规则少、路径短、学习曲线低
+
+它不是唯一答案，但它往往是最容易开始的一种答案。
+
+## 一条最小可用节奏
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c feature/login-copy
+# edit files
+git add .
+git commit -m "Refine login copy"
+git push -u origin feature/login-copy
+```
+
+接下来就进入 GitHub 页面侧的动作：
+
+- 打开 Pull Request
+- 描述改动目的
+- 请求 review
+- 根据反馈继续提交
+- 通过检查后合并
+
+## Pull Request 为什么是这个流程的核心
+
+如果只看命令，GitHub Flow 看起来像“切分支然后合并”。  
+但真正让它成立的，是 Pull Request 把以下几件事放进了同一个上下文：
+
+- 变更说明
+- 代码对比
+- review 评论
+- 自动化检查
+- 合并策略
+
+这也是为什么很多团队即使技术上可以直接 push，也依然会坚持通过 PR 合并主线。
+
+<TipBox title="先把 PR 当成“讨论入口”，再把它当成“合并按钮”">
+  <p>
+    如果团队只把 PR 当作最后点一下 merge 的地方，那 GitHub Flow 的价值会只剩一半。
+    真正的收益在于把背景、上下文、review 和最终合并收束在同一个协作节点里。
+  </p>
+</TipBox>
+
+## 什么团队最适合先用这套方式
+
+GitHub Flow 通常很适合这些场景：
+
+- 主线保持随时可发布
+- 团队习惯小批次改动
+- review 和 CI 是主线准入门槛
+- 不想维护太多长期分支
+
+如果你的团队是明确版本发布驱动、长期并行维护多个发布线，那 Gitflow 或 release branch 一类模型可能更贴近现实。
+
+## 最常见的误解
+
+### 误解 1：GitHub Flow 就是不需要规则
+
+不是。  
+GitHub Flow 很轻，但轻不等于没有边界。最少也要有这些约束：
+
+- 主线不要直接乱推
+- 改动通过 PR 合并
+- review 和 CI 要有明确准入规则
+- 分支尽量短生命周期
+
+### 误解 2：分支越长越安全
+
+恰恰相反。  
+在 GitHub Flow 里，分支太长意味着：
+
+- 偏离主线越来越远
+- review 成本越来越大
+- 冲突积累越来越重
+
+所以它更偏向“小批次、快合并”。
+
+### 误解 3：PR 开了就不该继续 push
+
+这也是误区。  
+PR 不是一次性提交物，而是持续收敛的工作区。review 之后继续补提交、修问题、更新描述，正是这个流程的一部分。
+
+## 团队落地时要补哪几条规则
+
+如果你准备把 GitHub Flow 作为默认协作方式，建议最少补这几条：
+
+1. 主线只能通过 PR 合并
+2. PR 开始前先同步主线
+3. 每个 PR 只解决一个清晰目标
+4. 合并前必须通过自动检查
+5. 合并策略统一，比如统一 squash merge 或统一 merge commit
+
+## 和站内哪些内容一起看最合适
+
+- `PR 前整理提交`
+- `小批次 review`
+- `Git pull / fetch 的边界`
+- `共享历史边界`
+
+这样你看到的就不只是“GitHub 界面怎么点”，而是完整的协作闭环。

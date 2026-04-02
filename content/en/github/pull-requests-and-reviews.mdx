@@ -1,0 +1,120 @@
+export const metadata = {
+  title: "Pull Requests and Code Review",
+  slug: "pull-requests-and-reviews",
+  locale: "en",
+  section: "github",
+  summary: "Understand pull requests, reviews, protected branches, and merge decisions as collaboration mechanics rather than just UI actions.",
+  sourceUrls: [
+    "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests",
+    "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/about-pull-request-reviews",
+    "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches",
+  ],
+};
+
+# Pull Requests and Code Review
+
+## Why a PR is more than a merge request
+
+Many teams use pull requests every day but still underuse them.  
+A good PR is not only a gate before merge. It is also where a team:
+
+- explains why the change exists
+- inspects what changed
+- reviews tradeoffs
+- runs platform checks
+- makes a merge decision together
+
+That is why understanding review quality matters just as much as understanding the GitHub interface.
+
+## What review is really evaluating
+
+A mature review is rarely just about syntax or style. It usually asks:
+
+- is the goal clear?
+- is the scope reasonable?
+- does the change introduce obvious risk?
+- is the structure maintainable?
+- have the right checks already run?
+
+In other words, review is not just "spot bugs." It is a collaborative engineering judgment.
+
+<MentalModelBox title="A PR is the container; review is the team judgment inside it">
+  <p>
+    Once you see a PR as a shared decision surface instead of a merge form, many best practices start to make more sense.
+    Description quality, commit hygiene, and testing notes all become part of review quality.
+  </p>
+</MentalModelBox>
+
+## GitHub's review outcomes matter
+
+GitHub distinguishes among:
+
+- `Comment`
+- `Approve`
+- `Request changes`
+
+Those are not cosmetic buttons. They help teams distinguish between light feedback, approval, and blocking concerns.
+
+## A healthier PR rhythm
+
+This sequence is usually more stable:
+
+1. clean up local history first
+2. open the PR with strong context
+3. let checks run early
+4. keep pushing review fixes as needed
+5. resolve threads and confirm risk areas
+6. merge with the agreed strategy
+
+Teams struggle when they reverse that order and use the PR as a place to figure out the change after the fact.
+
+## Why protected branches matter
+
+Protected branches help turn team expectations into platform rules, such as:
+
+- required reviews
+- required status checks
+- blocked direct pushes
+- branch freshness before merge
+
+That is useful because it lets GitHub enforce the minimum quality line consistently.
+
+<WarningBox title="Platform rules enforce a floor, not engineering judgment">
+  <p>
+    Passing checks and satisfying branch rules does not automatically make a change well scoped or well reasoned.
+    Good pull requests still depend on team habits.
+  </p>
+</WarningBox>
+
+## What makes a PR easier to review
+
+The best way to improve review is usually not "ask for review sooner." It is to reduce reviewer cost:
+
+- keep the goal narrow
+- write the background clearly
+- avoid messy commit stacks
+- explain how the change was verified
+- call out known risks and tradeoffs
+
+That is why topics like pull-request prep and small-batch review stay valuable across teams.
+
+## Common anti-patterns
+
+### Giant PRs
+
+When the review surface is too large, reviews become shallow.
+
+### Unresolved discussion flow
+
+If the author keeps pushing changes but never resolves or answers review threads clearly, review cost accumulates fast.
+
+### Using squash to hide process problems
+
+Squash merge can be useful, but it should not become a way to hide chaotic change preparation every time.
+
+## Good follow-up reads
+
+- prepare commits before a pull request
+- pull-request prep
+- small-batch review
+- merge strategy and platform settings

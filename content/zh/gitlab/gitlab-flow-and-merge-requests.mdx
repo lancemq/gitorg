@@ -1,0 +1,72 @@
+export const metadata = {
+  title: "GitLab Flow 与 Merge Request 教程",
+  slug: "gitlab-flow-and-merge-requests",
+  locale: "zh",
+  section: "gitlab",
+  summary: "理解 GitLab Flow、分支环境和 Merge Request 在团队协作里的关系，而不只是学会在哪点合并。",
+  sourceUrls: [
+    "https://docs.gitlab.com/topics/gitlab_flow/",
+    "https://docs.gitlab.com/user/project/merge_requests/",
+  ],
+};
+
+# GitLab Flow 与 Merge Request 教程
+
+## 先理解 GitLab Flow 的位置
+
+GitLab Flow 不是对 GitHub Flow 的简单复制，也不是 Gitflow 的直接替代。  
+它更强调把分支策略和团队的发布、环境、部署节奏联系起来。
+
+也就是说，它问的不只是“代码怎么合并”，还包括：
+
+- 你们是按环境推进，还是按版本推进
+- Merge Request 在协作和审核里扮演什么角色
+- 默认分支、稳定分支和部署分支之间怎么配合
+
+## Merge Request 为什么是核心
+
+在 GitLab 里，Merge Request 不只是代码比对页，它通常还是这些事情的收束点：
+
+- 变更说明
+- review 反馈
+- pipeline 结果
+- approvals
+- 合并门槛
+
+所以学习 GitLab 协作时，理解 Merge Request 比记住某个按钮位置更重要。
+
+<MentalModelBox title="把 GitLab Flow 想成“和发布/环境联动的分支协作模型”">
+  <p>
+    它和更纯粹的 GitHub Flow 相比，往往更强调环境、部署和持续交付场景下的团队边界。
+  </p>
+</MentalModelBox>
+
+## 一条常见节奏
+
+1. 从默认分支切工作分支
+2. 在分支上提交改动
+3. 打开 Merge Request
+4. 跑 pipeline 并等待 review / approval
+5. 条件满足后合并
+
+如果团队有环境分支或稳定分支，这条线会继续延伸到部署和回流。
+
+## GitLab Flow 适合什么团队
+
+它尤其适合这些情况：
+
+- 团队已经把 CI/CD 深度接进协作流程
+- 环境推进和部署状态很重要
+- 想把 review、pipeline、approval 放在同一平台里收束
+
+## 常见误区
+
+- 把 GitLab Flow 误解成“只是换了个名字的 feature branch”
+- 只看 Merge Request，不看 pipeline 和审批规则
+- 让分支存在太久，导致 review 和合并成本越来越大
+
+## 接下来建议继续看什么
+
+1. `GitLab CI/CD 与 Runners`
+2. `Pull Request 与 Code Review`
+3. `PR 合并策略与平台设置`

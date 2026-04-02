@@ -1,0 +1,60 @@
+export const metadata = {
+  title: "GitLab Groups、Projects 与权限模型",
+  slug: "gitlab-groups-projects-and-permissions",
+  locale: "zh",
+  section: "gitlab",
+  summary: "理解 GitLab 里 group、project、role 和权限继承的关系，避免团队协作一开始就把访问边界做乱。",
+  sourceUrls: [
+    "https://docs.gitlab.com/user/group/",
+    "https://docs.gitlab.com/user/project/",
+    "https://docs.gitlab.com/auth/user_permissions/",
+  ],
+};
+
+# GitLab Groups、Projects 与权限模型
+
+## 为什么这个主题很重要
+
+很多团队刚开始用 GitLab 时，最容易忽视的不是代码流程，而是组织结构。  
+但在 GitLab 里，group、project、subgroup 和 role 会直接影响：
+
+- 谁能看仓库
+- 谁能 push
+- 谁能发版
+- 谁能改 CI/CD 变量和配置
+
+所以权限模型并不是后台配置问题，而是协作模型的一部分。
+
+## 先分清 group 和 project
+
+- `Group`：更像组织容器，可以管理多个项目和成员
+- `Project`：具体仓库与其协作空间
+
+一旦有 subgroup，权限和成员关系还会继续往下继承。
+
+## 为什么继承关系要谨慎
+
+权限继承很方便，但如果团队一开始不规划好：
+
+- 外部协作者可能看到不该看到的项目
+- 某些人可能获得过宽的操作权限
+- 变量、部署和受保护分支的边界会变得模糊
+
+## 更稳的实践
+
+1. 先按团队/业务划清 group 边界
+2. 再决定哪些项目适合放在同一个 group 下
+3. 对外部协作者和自动化账户用更保守权限
+4. 不要轻易把高权限角色给到过多成员
+
+## 常见误区
+
+- 把 GitLab 当纯代码托管，忽视组织层设计
+- 为了省事让太多人拥有 Maintainer 或更高权限
+- 不清楚权限继承链就开始加 subgroup
+
+## 接下来建议继续看什么
+
+1. `GitLab Fork 与贡献流程`
+2. `共享历史边界`
+3. `GitLab CI/CD 与 Runners`

@@ -1,0 +1,110 @@
+export const metadata = {
+  title: "Issues、Projects 与 Discussions 教程",
+  slug: "issues-projects-and-discussions",
+  locale: "zh",
+  section: "github",
+  summary: "理解 GitHub 上需求、任务、讨论和协作节奏的组织方式，而不把所有沟通都堆进 PR。",
+  sourceUrls: [
+    "https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues",
+    "https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects",
+    "https://docs.github.com/en/discussions/quickstart",
+  ],
+};
+
+# Issues、Projects 与 Discussions 教程
+
+## 为什么不能把所有协作都塞进 PR
+
+很多团队一开始使用 GitHub 时，会自然把 Pull Request 当成所有讨论的中心。  
+但真正成熟的协作不会只靠 PR，因为有很多话题其实不属于“这次代码改了什么”，比如：
+
+- 需求讨论
+- 缺陷记录
+- 技术选型
+- 迭代计划
+- 社区问答
+
+GitHub 的 Issues、Projects 和 Discussions，就是为这些不同类型的协作而存在的。
+
+## Issue 更像“工作项入口”
+
+Issue 不是只能记 bug。它通常可以承接：
+
+- 缺陷
+- 功能请求
+- 技术债
+- 待办任务
+- 需要决策的问题
+
+把 Issue 理解成“可被追踪和讨论的工作项”，会比把它当成简单待办列表更贴近真实使用方式。
+
+## Project 的价值是什么
+
+Projects 的作用是把多个工作项组织成更可管理的节奏，比如：
+
+- 当前迭代有哪些任务
+- 哪些还在待办
+- 哪些已经进入 review
+- 哪些已经上线完成
+
+也就是说，Issue 是单点，Project 更像全局视图。
+
+## Discussions 为什么值得单独存在
+
+并不是所有问题都适合进 Issue。  
+比如这些情况更适合放在 Discussions：
+
+- 新手提问
+- 使用经验交流
+- 想法探索
+- 社区反馈
+
+如果把这些都塞进 Issue，Issue 列表就很容易变得噪声很大，也不利于工作项管理。
+
+<MentalModelBox title="Issue 负责跟踪，Project 负责编排，Discussion 负责交流">
+  <p>
+    三者并不是互相替代，而是分别承担工作项、流程视图和开放交流的角色。
+    分清楚之后，GitHub 才会像一个协作平台，而不只是代码托管界面。
+  </p>
+</MentalModelBox>
+
+## 一个更稳的协作分工
+
+你可以把它理解成下面这条线：
+
+1. 需求或问题先进入 Issue
+2. 多个 Issue 被拉进 Project 做计划和状态跟踪
+3. 不适合立刻当工作项的问题，先放在 Discussion
+4. 需要落地的工作，再关联到分支和 Pull Request
+
+这样协作语义会更清楚，也能避免“所有讨论最后都只剩一个 PR 链接”。
+
+## 常见反模式
+
+### 1. 用 PR 代替 Issue
+
+如果一个需求没有前置背景，只在 PR 里解释，reviewer 会缺少大量上下文。
+
+### 2. Discussion 太弱，Issue 太重
+
+所有问题都开 Issue，会让仓库看起来永远有大量“任务”，但其中很多其实只是交流。
+
+### 3. Projects 只建不维护
+
+如果看板状态长期不更新，它很快就会变成“大家都知道不可信”的面子工程。
+
+## 落地时最少需要什么规则
+
+可以先从这几条轻规则开始：
+
+1. 需求和缺陷先建 Issue
+2. PR 尽量关联 Issue
+3. 迭代工作放进 Project 跟踪
+4. 讨论性问题优先进 Discussions
+
+## 这篇之后适合继续看什么
+
+- `feature branch collaboration`
+- `Pull Request 与 Code Review`
+- `small batch review`
+- `merge queue`

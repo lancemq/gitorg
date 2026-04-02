@@ -1,0 +1,111 @@
+export const metadata = {
+  title: "Forks and Open Source Contribution",
+  slug: "forks-and-open-source-contribution",
+  locale: "en",
+  section: "github",
+  summary: "Connect forks, upstream sync, contribution expectations, and pull-request etiquette into a realistic open-source workflow.",
+  sourceUrls: [
+    "https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-open-source",
+    "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks",
+  ],
+};
+
+# Forks and Open Source Contribution
+
+## Why contribution often starts with a fork
+
+Inside a product team, people often create branches in the same repository and open pull requests directly.  
+In open source, many contributors do not have write access to the canonical repository, so the common path is:
+
+- fork the repository
+- work in your own copy
+- push your branch to your fork
+- open a PR back to the upstream project
+
+The point is not just "an extra repo." The point is clearer permission boundaries and contribution ownership.
+
+## Keep `origin` and `upstream` distinct
+
+In most fork-based workflows:
+
+- `origin` is your fork
+- `upstream` is the canonical project
+
+That distinction matters.  
+If you blur it early, syncing, pushing, and opening PRs get confusing fast.
+
+## A realistic contribution rhythm
+
+The healthier open-source rhythm usually looks like this:
+
+1. read contribution rules and issue expectations
+2. pick a suitable issue or narrow change
+3. fork and clone
+4. add `upstream`
+5. sync your default branch
+6. create a focused working branch
+7. push the branch to your fork
+8. open the PR with context and verification notes
+
+## Why reading project rules matters first
+
+New contributors often rush into code changes, but many failures actually come from missing project norms:
+
+- branch targeting expectations
+- commit message conventions
+- issue-first discussion policies
+- testing or docs requirements
+
+In open source, understanding maintainer expectations is part of contribution quality.
+
+<TipBox title="Good contributors reduce maintainer load">
+  <p>
+    Strong open-source contribution is not just about writing the code.
+    It is also about making the change easier to review, trust, and integrate.
+  </p>
+</TipBox>
+
+## Common fork-workflow mistakes
+
+### Starting from stale branch state
+
+If your fork's main line is far behind upstream, every new contribution gets noisier.
+
+### Never syncing upstream
+
+Keeping your fork active without regularly syncing from upstream eventually creates avoidable conflict and drift.
+
+### Submitting overly broad change sets
+
+Maintainers usually accept small, well-focused contributions more easily than broad "while I was here" change bundles.
+
+## How open-source PRs differ from internal PRs
+
+Internal PRs are usually about coordination among known teammates.  
+Open-source PRs also involve trust, context transfer, and maintainer cost.
+
+That makes these elements especially important:
+
+- background
+- reproduction or verification steps
+- issue linkage
+- alignment with the project's stated direction
+
+## A minimal command loop
+
+```bash
+git remote add upstream <upstream-url>
+git fetch upstream
+git switch main
+git rebase upstream/main
+git push origin main
+git switch -c feature/fix-docs-link
+git push -u origin feature/fix-docs-link
+```
+
+## Good follow-up reads
+
+- fork upstream sync
+- open-source fork plus PR contribution
+- topic branches
+- prepare commits before a pull request

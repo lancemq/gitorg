@@ -1,0 +1,78 @@
+export const metadata = {
+  title: "GitLab CI/CD and Runners",
+  slug: "gitlab-ci-and-runners",
+  locale: "en",
+  section: "gitlab",
+  summary: "Build the smallest useful mental model for GitLab CI/CD, pipelines, jobs, and runners, and understand how they work with merge requests.",
+  sourceUrls: [
+    "https://docs.gitlab.com/ci/quick_start/",
+    "https://docs.gitlab.com/ci/runners/",
+    "https://docs.gitlab.com/ci/pipelines/merge_request_pipelines/",
+  ],
+};
+
+# GitLab CI/CD and Runners
+
+## Why GitLab learning needs CI/CD
+
+One major difference in GitLab is how strongly it ties collaboration and automation together.  
+If you understand merge requests but not pipelines and runners, much of the platform will still feel opaque.
+
+## The smallest useful model
+
+Start by separating these ideas:
+
+- `pipeline`
+- `job`
+- `runner`
+- `.gitlab-ci.yml`
+
+You do not need advanced syntax first. You need role clarity first.
+
+## Why merge requests and pipelines belong together
+
+In GitLab, a merge request is often not only a review surface. It is also where the team sees whether the pipeline has satisfied the minimum merge bar.
+
+That often means tests, linting, builds, and policy checks all feed directly into MR readiness.
+
+<MentalModelBox title="GitLab CI/CD is often part of merge readiness, not only post-merge automation">
+  <p>
+    Teams often rely on pipeline status before they decide a merge request is ready, which makes CI/CD part of the collaboration loop itself.
+  </p>
+</MentalModelBox>
+
+## What a minimal configuration looks like
+
+```yaml
+stages:
+  - test
+
+test:
+  stage: test
+  script:
+    - npm ci
+    - npm test
+```
+
+That is enough to understand:
+
+- where work is defined
+- how it runs
+- how the result flows back into the merge request
+
+## Why runners matter
+
+Many beginners focus only on `.gitlab-ci.yml`, but runners are the execution layer.  
+Without the right runner setup, a pipeline definition cannot actually help the team.
+
+## Common misunderstandings
+
+- memorizing config syntax before understanding the model
+- ignoring runner and permission boundaries
+- treating pipelines as separate from merge-request collaboration
+
+## Good follow-up reads
+
+1. GitLab Flow and merge requests
+2. GitHub Actions and GitHub Skills
+3. merge strategy and platform settings

@@ -1,0 +1,52 @@
+export const metadata = {
+  title: "GitLab Issues, Boards, and Milestones",
+  slug: "gitlab-issues-boards-and-milestones",
+  locale: "en",
+  section: "gitlab",
+  summary: "Learn how GitLab organizes issues, boards, and milestones so planning and delivery do not collapse into merge requests alone.",
+  sourceUrls: [
+    "https://docs.gitlab.com/user/project/issues/",
+    "https://docs.gitlab.com/user/project/issue_board/",
+    "https://docs.gitlab.com/user/project/milestones/",
+  ],
+};
+
+# GitLab Issues, Boards, and Milestones
+
+## Why merge requests are not enough
+
+If a team relies only on merge requests, it often loses the planning and problem context around the code.  
+GitLab's issues, boards, and milestones separate work management from diff review.
+
+## What each one does
+
+- `Issue`: a trackable task, bug, request, or discussion entry
+- `Board`: a visual flow for issue state
+- `Milestone`: a time- or release-oriented grouping of work
+
+That makes merge requests part of the delivery loop, not the only collaboration surface.
+
+## A healthier project rhythm
+
+1. create or clarify the issue
+2. move it through a board
+3. connect it to a milestone when timing matters
+4. implement through a merge request
+
+## Why this matters
+
+- work and code stay connected but distinct
+- delivery rhythm becomes visible
+- reviewers do not need to reconstruct all context from the MR alone
+
+## Common anti-patterns
+
+- opening merge requests without issues
+- leaving boards stale
+- creating milestones that have no real planning meaning
+
+## Good follow-up reads
+
+1. GitLab Flow and merge requests
+2. issues, projects, and discussions
+3. feature-branch collaboration

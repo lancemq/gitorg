@@ -1,0 +1,116 @@
+export const metadata = {
+  title: "GitHub Actions and GitHub Skills",
+  slug: "github-actions-and-skills",
+  locale: "en",
+  section: "github",
+  summary: "Build a practical mental model for GitHub Actions and use GitHub Skills as a lower-risk practice path for platform learning.",
+  sourceUrls: [
+    "https://docs.github.com/en/actions/get-started/quickstart",
+    "https://skills.github.com",
+  ],
+};
+
+# GitHub Actions and GitHub Skills
+
+## Why GitHub learning should include practice
+
+One of the easiest ways to misunderstand GitHub is to read about automation without ever running it.  
+You may recognize workflow files and job names, but still have weak operational intuition.
+
+That is where GitHub Skills helps: it gives people a safer, more guided path to practice than jumping straight into a production repository.
+
+## The smallest useful Actions model
+
+GitHub's quickstart is really helping you understand a few core pieces:
+
+- `workflow`
+- `event`
+- `job`
+- `runner`
+- `step`
+
+You do not need every YAML detail first.  
+You do need to understand the role each piece plays.
+
+## Why Actions matters for collaboration
+
+In real teams, Actions often becomes the place where GitHub enforces:
+
+- tests
+- linting and formatting
+- builds
+- deployments
+- pull-request quality gates
+
+So Actions is not just extra automation. It is often the operational layer behind review quality.
+
+<TipBox title="See Actions as the execution layer behind team standards">
+  <p>
+    A workflow is valuable not only because it runs commands automatically, but because it turns agreed review gates into visible and repeatable platform behavior.
+  </p>
+</TipBox>
+
+## What a minimal workflow looks like
+
+```yaml
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm test
+```
+
+That is already enough to build the core intuition:
+
+- what triggers the workflow
+- where it runs
+- what happens step by step
+
+## Why GitHub Skills belongs in the same conversation
+
+GitHub Skills is not just a marketing surface. It is an official hands-on learning path that is especially useful when you want to practice:
+
+- pull requests
+- merge conflicts
+- GitHub Actions
+- collaboration tasks without production risk
+
+## Common learning mistakes
+
+### Starting with YAML memorization
+
+The model and triggers matter before syntax trivia.
+
+### Building a complex pipeline too early
+
+A better order is:
+
+1. run one test job
+2. add lint
+3. add caching, matrix builds, or deploy steps later
+
+### Forgetting the PR connection
+
+Actions becomes far more valuable when it participates in pull-request rules and branch protection, not when it only runs in isolation.
+
+## A healthier order for platform learning
+
+1. understand GitHub Flow
+2. learn pull requests and review
+3. add a minimal Actions workflow
+4. use GitHub Skills for guided practice
+
+## Good follow-up reads
+
+- merge strategy and platform settings
+- merge queue workflow
+- GitHub Flow basics
+- pull requests and reviews

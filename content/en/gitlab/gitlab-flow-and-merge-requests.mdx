@@ -1,0 +1,72 @@
+export const metadata = {
+  title: "GitLab Flow and Merge Requests",
+  slug: "gitlab-flow-and-merge-requests",
+  locale: "en",
+  section: "gitlab",
+  summary: "Understand GitLab Flow, environment-aware branching, and merge requests as one collaboration model instead of a collection of UI features.",
+  sourceUrls: [
+    "https://docs.gitlab.com/topics/gitlab_flow/",
+    "https://docs.gitlab.com/user/project/merge_requests/",
+  ],
+};
+
+# GitLab Flow and Merge Requests
+
+## Where GitLab Flow fits
+
+GitLab Flow is not just GitHub Flow under a different name, and it is not a direct Gitflow replacement either.  
+Its value comes from connecting branching to release, environment, and deployment realities.
+
+That means the real question is not only "how do we merge code?" but also:
+
+- how does the team move through environments?
+- what role do merge requests play in approval and release readiness?
+- how do default, stable, or environment-facing branches interact?
+
+## Why the merge request is central
+
+On GitLab, a merge request often becomes the place where teams bring together:
+
+- change context
+- review conversation
+- CI pipeline results
+- approvals
+- merge readiness
+
+So learning GitLab well means understanding merge requests as collaboration surfaces, not only code comparison pages.
+
+<MentalModelBox title="Think of GitLab Flow as branch collaboration tied more closely to environments and delivery">
+  <p>
+    Compared with simpler branch models, GitLab Flow often cares more explicitly about where code is going next, not only where it came from.
+  </p>
+</MentalModelBox>
+
+## A common rhythm
+
+1. branch from the default line
+2. commit on the working branch
+3. open a merge request
+4. run pipelines and gather review or approval
+5. merge when requirements are satisfied
+
+Teams with environment branches or release branches extend that rhythm further.
+
+## Where it fits best
+
+GitLab Flow is especially useful when:
+
+- CI/CD is deeply integrated into collaboration
+- environment movement matters
+- approvals, pipelines, and review need to meet in one place
+
+## Common misunderstandings
+
+- treating GitLab Flow as only a renamed feature-branch workflow
+- focusing on the merge request page while ignoring pipelines and approval rules
+- allowing branches to live too long and inflate review cost
+
+## Good follow-up reads
+
+1. GitLab CI/CD and runners
+2. pull requests and reviews
+3. merge strategy and platform settings

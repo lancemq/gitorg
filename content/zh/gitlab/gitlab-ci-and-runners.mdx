@@ -1,0 +1,82 @@
+export const metadata = {
+  title: "GitLab CI/CD 与 Runners 入门",
+  slug: "gitlab-ci-and-runners",
+  locale: "zh",
+  section: "gitlab",
+  summary: "建立 GitLab CI/CD、pipeline、job、runner 的最小心智模型，理解它们怎样和 Merge Request 协作。",
+  sourceUrls: [
+    "https://docs.gitlab.com/ci/quick_start/",
+    "https://docs.gitlab.com/ci/runners/",
+    "https://docs.gitlab.com/ci/pipelines/merge_request_pipelines/",
+  ],
+};
+
+# GitLab CI/CD 与 Runners 入门
+
+## 为什么 GitLab 学习离不开 CI/CD
+
+GitLab 和很多平台的一个显著差别，是它特别强调把协作、代码和流水线放在一起。  
+所以如果你只理解 Merge Request，却不了解 pipeline 和 runner，很多平台行为都会显得很抽象。
+
+## 最小模型是什么
+
+你可以先把这几个词分开：
+
+- `pipeline`：一次完整流水线执行
+- `job`：流水线里的单个任务
+- `runner`：执行任务的环境
+- `.gitlab-ci.yml`：定义规则的入口文件
+
+## 为什么 Merge Request 和 pipeline 要一起看
+
+在 GitLab 中，Merge Request 经常不仅是 review 页面，还是 pipeline 结果的展示和准入门槛。  
+这意味着团队通常会把：
+
+- 测试
+- lint
+- build
+- 部署前检查
+
+都收束到 MR 协作里。
+
+<MentalModelBox title="GitLab CI/CD 是 Merge Request 质量门槛的一部分">
+  <p>
+    它不是“代码合并后再跑的附加动作”，而是很多团队在合并前就已经依赖的自动化判断层。
+  </p>
+</MentalModelBox>
+
+## 一个最小配置长什么样
+
+```yaml
+stages:
+  - test
+
+test:
+  stage: test
+  script:
+    - npm ci
+    - npm test
+```
+
+先从这种最小示例理解：
+
+- 任务在哪定义
+- 怎么执行
+- 结果怎么反馈回 Merge Request
+
+## Runner 为什么关键
+
+很多新手只看 `.gitlab-ci.yml`，却忽略 runner 才是真正执行任务的地方。  
+没有合适的 runner，pipeline 就算定义好了也跑不起来。
+
+## 常见误区
+
+- 先背 CI 配置语法，而不是先理解模型
+- 忽视 runner 和权限边界
+- 把 pipeline 当成独立系统，不和 Merge Request 协作放在一起看
+
+## 接下来建议继续看什么
+
+1. `GitLab Flow 与 Merge Request`
+2. `GitHub Actions 与 GitHub Skills`
+3. `PR 合并策略与平台设置`

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { FaqList } from "@/components/faq-list";
+import { HomeEntryTabs } from "@/components/home-entry-tabs";
 import { SiteShell } from "@/components/site-shell";
 import { StructuredData } from "@/components/structured-data";
 import { getContentStats, getLatestHomeDocs } from "@/lib/content";
@@ -79,12 +80,33 @@ const heroSignals = {
   en: ["Commands · Workflows · Internals", "Figures + Practice + Recovery", "Bilingual learning system"],
 } as const;
 
+const entryHubCopy = {
+  zh: {
+    title: "先选一种进入方式",
+    description: "有些读者带着目标来，有些读者带着问题来。把两种入口合成一个更紧凑的导航舱。",
+    journeysLabel: "按目标进入",
+    journeysIntro: "如果你想顺着一条学习路径往前走，从目标出发会更稳。",
+    scenariosLabel: "按问题进入",
+    scenariosIntro: "如果你现在正卡在一个具体问题里，直接从场景切入通常更快。",
+  },
+  en: {
+    title: "Choose How You Want to Enter",
+    description: "Some readers arrive with a goal, others with a concrete problem. This keeps both entry modes in one tighter navigation surface.",
+    journeysLabel: "By Goal",
+    journeysIntro: "If you want to follow a learning track, start from the job you need to accomplish.",
+    scenariosLabel: "By Problem",
+    scenariosIntro: "If you are stuck on a concrete Git issue right now, scenario-based shortcuts usually get you there faster.",
+  },
+} as const;
+
 const latestSectionLabels = {
   zh: {
     "learning-path": "学习路径",
     commands: "命令专题",
     "best-practices": "最佳实践",
     workflows: "工作流",
+    github: "GitHub 专题",
+    gitlab: "GitLab 专题",
     internals: "Git 原理",
     recovery: "恢复与排障",
     concepts: "概念",
@@ -94,6 +116,8 @@ const latestSectionLabels = {
     commands: "Commands",
     "best-practices": "Best Practices",
     workflows: "Workflows",
+    github: "GitHub",
+    gitlab: "GitLab",
     internals: "Git Internals",
     recovery: "Recovery",
     concepts: "Concepts",
@@ -143,6 +167,7 @@ export default async function LocalizedHomePage({ params }: Props) {
   const scenarios = scenarioLinks[locale];
   const signals = heroSignals[locale];
   const sectionLabels = latestSectionLabels[locale];
+  const entryCopy = entryHubCopy[locale];
 
   return (
     <SiteShell locale={locale} sidebar={getSidebarContent(locale, { kind: "docs", activePath: "overview" })}>
@@ -248,28 +273,28 @@ export default async function LocalizedHomePage({ params }: Props) {
         </div>
       </section>
 
-      <section className="section section-learning" id="journeys">
-        <div className="section-head">
-          <div>
-            <p className="eyebrow">{locale === "zh" ? "Start Here" : "Start Here"}</p>
-            <h2>{locale === "zh" ? "按你的目标进入" : "Choose Your Track"}</h2>
-          </div>
-          <p>
-            {locale === "zh"
-              ? "把首页从内容目录变成行动入口，先选学习目标，再进入对应路径。"
-              : "Use the homepage as an entry point, not just a content shelf. Pick the job you need to do next."}
-          </p>
-        </div>
-
-        <div className="docs-list">
-          {journeys.map((item) => (
-            <Link className="docs-card" href={`/${locale}${item.href}`} key={item.href}>
-              <h3>{item.title}</h3>
-              <p>{item.description}</p>
-            </Link>
-          ))}
-        </div>
-      </section>
+      <HomeEntryTabs
+        locale={locale}
+        title={entryCopy.title}
+        description={entryCopy.description}
+        tabs={[
+          {
+            id: "journeys",
+            label: entryCopy.journeysLabel,
+            intro: entryCopy.journeysIntro,
+            items: journeys,
+          },
+          {
+            id: "scenarios",
+            label: entryCopy.scenariosLabel,
+            intro: entryCopy.scenariosIntro,
+            items: scenarios.map((item) => ({
+              title: item.label,
+              href: item.href,
+            })),
+          },
+        ]}
+      />
 
       <section className="section section-latest" id="latest">
         <div className="section-head">
@@ -286,28 +311,6 @@ export default async function LocalizedHomePage({ params }: Props) {
               <span className="card-kicker">{sectionLabels[doc.section]}</span>
               <h3>{doc.title}</h3>
               <p>{doc.summary}</p>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <section className="section section-recovery" id="scenarios">
-        <div className="section-head">
-          <div>
-            <p className="eyebrow">{locale === "zh" ? "Scenarios" : "Scenarios"}</p>
-            <h2>{locale === "zh" ? "按问题直接进入" : "Jump In By Scenario"}</h2>
-          </div>
-          <p>
-            {locale === "zh"
-              ? "很多人不是按目录学习，而是带着问题来。把高频问题直接变成入口。"
-              : "Many readers arrive with a concrete problem. These shortcuts get them to the right answer faster."}
-          </p>
-        </div>
-
-        <div className="scenario-grid">
-          {scenarios.map((item) => (
-            <Link className="scenario-link" href={`/${locale}${item.href}`} key={item.href}>
-              <span>{item.label}</span>
             </Link>
           ))}
         </div>

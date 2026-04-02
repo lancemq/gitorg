@@ -1,0 +1,110 @@
+export const metadata = {
+  title: "Issues, Projects, and Discussions",
+  slug: "issues-projects-and-discussions",
+  locale: "en",
+  section: "github",
+  summary: "Learn how GitHub organizes requests, work tracking, and community discussion so collaboration does not collapse into pull requests alone.",
+  sourceUrls: [
+    "https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues",
+    "https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects",
+    "https://docs.github.com/en/discussions/quickstart",
+  ],
+};
+
+# Issues, Projects, and Discussions
+
+## Why PRs should not carry every conversation
+
+Teams new to GitHub often let pull requests absorb nearly all communication.  
+That works badly because many conversations are not really "about this diff," such as:
+
+- feature requests
+- bug tracking
+- technical decisions
+- iteration planning
+- community questions
+
+GitHub's issues, projects, and discussions exist to separate those collaboration modes.
+
+## Issues as work-entry points
+
+Issues are not only for bugs. They can represent:
+
+- defects
+- feature requests
+- technical debt
+- tasks
+- decisions that still need discussion
+
+Thinking of an issue as a trackable work item is more useful than treating it as a simple todo entry.
+
+## What Projects adds
+
+Projects helps teams turn many work items into an operational view:
+
+- what is planned
+- what is in progress
+- what is waiting for review
+- what is already done
+
+So issues are individual units, while Projects gives you planning structure.
+
+## Why Discussions deserves its own place
+
+Not every question should become an issue.  
+These often fit Discussions better:
+
+- community questions
+- exploratory ideas
+- feedback threads
+- user support exchanges
+
+If everything becomes an issue, the issue queue becomes noisy and less trustworthy.
+
+<MentalModelBox title="Issues track work, Projects organize flow, Discussions hold open conversation">
+  <p>
+    These tools are strongest when they play distinct roles instead of replacing one another.
+    That is what makes GitHub feel like a collaboration platform rather than only a code host.
+  </p>
+</MentalModelBox>
+
+## A steadier collaboration model
+
+One useful way to think about the flow is:
+
+1. ideas, bugs, and requests start as issues
+2. projects group important work into a visible planning rhythm
+3. discussions handle questions and exploratory conversation
+4. pull requests implement and close the loop
+
+That keeps context cleaner than forcing every conversation into code review.
+
+## Common anti-patterns
+
+### Using PRs instead of issues
+
+If a change has no prior context outside the PR, reviewers must reverse-engineer the problem from the diff itself.
+
+### Treating every conversation as an issue
+
+That makes the issue list noisy and less actionable.
+
+### Creating projects but not maintaining them
+
+A stale project board quickly becomes a surface nobody trusts.
+
+## Minimum team rules worth adding
+
+You can start small:
+
+1. bugs and requests begin as issues
+2. PRs should link to the relevant issue when possible
+3. iteration work belongs in Projects
+4. open-ended questions go to Discussions first
+
+## Good follow-up reads
+
+- feature-branch collaboration
+- pull requests and reviews
+- small-batch review
+- merge queue workflow

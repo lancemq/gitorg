@@ -110,6 +110,20 @@ export type WorkflowSlug =
   | "long-lived-branch-conflict-governance"
   | "submodule-update-flow";
 
+export type GithubSlug =
+  | "github-flow-basics"
+  | "pull-requests-and-reviews"
+  | "forks-and-open-source-contribution"
+  | "issues-projects-and-discussions"
+  | "github-actions-and-skills";
+
+export type GitlabSlug =
+  | "gitlab-flow-and-merge-requests"
+  | "gitlab-forks-and-contributions"
+  | "gitlab-issues-boards-and-milestones"
+  | "gitlab-groups-projects-and-permissions"
+  | "gitlab-ci-and-runners";
+
 export type InternalsSlug =
   | "object-database"
   | "index-and-working-tree"
@@ -204,6 +218,16 @@ type Dictionary = {
     description: string;
   };
   recoveryIndex: {
+    eyebrow: string;
+    title: string;
+    description: string;
+  };
+  githubIndex: {
+    eyebrow: string;
+    title: string;
+    description: string;
+  };
+  gitlabIndex: {
     eyebrow: string;
     title: string;
     description: string;
@@ -324,6 +348,8 @@ type Dictionary = {
       commands: string;
       bestPractices: string;
       workflows: string;
+      github: string;
+      gitlab: string;
       internals: string;
       concepts: string;
       faq: string;
@@ -400,6 +426,30 @@ function buildInternalsNavItem(locale: Locale, activePath?: string): NavItem {
   };
 }
 
+function buildGithubNavItem(locale: Locale, activePath?: string): NavItem {
+  const parentActive =
+    activePath === "github-index" ||
+    githubSlugs.some((slug) => activePath === `github/${slug}`);
+
+  return {
+    label: locale === "zh" ? "GitHub 专题" : "GitHub",
+    href: `/${locale}/github`,
+    active: parentActive || activePath === "github",
+  };
+}
+
+function buildGitlabNavItem(locale: Locale, activePath?: string): NavItem {
+  const parentActive =
+    activePath === "gitlab-index" ||
+    gitlabSlugs.some((slug) => activePath === `gitlab/${slug}`);
+
+  return {
+    label: locale === "zh" ? "GitLab 专题" : "GitLab",
+    href: `/${locale}/gitlab`,
+    active: parentActive || activePath === "gitlab",
+  };
+}
+
 export const learningPathSlugs = [
   "quick-start",
   "setup-and-clone",
@@ -407,6 +457,22 @@ export const learningPathSlugs = [
   "sync-with-remote",
   "first-feature-branch",
 ] as const satisfies readonly LearningPathSlug[];
+
+export const githubSlugs = [
+  "github-flow-basics",
+  "pull-requests-and-reviews",
+  "forks-and-open-source-contribution",
+  "issues-projects-and-discussions",
+  "github-actions-and-skills",
+] as const satisfies readonly GithubSlug[];
+
+export const gitlabSlugs = [
+  "gitlab-flow-and-merge-requests",
+  "gitlab-forks-and-contributions",
+  "gitlab-issues-boards-and-milestones",
+  "gitlab-groups-projects-and-permissions",
+  "gitlab-ci-and-runners",
+] as const satisfies readonly GitlabSlug[];
 
 function buildLearningPathNavItem(locale: Locale, activePath?: string): NavItem {
   const parentActive = learningPathSlugs.some((slug) => activePath === `learning-path/${slug}`);
@@ -660,6 +726,8 @@ const zhDictionary: Dictionary = {
           items: [
             buildBestPracticeNavItem("zh", activePath),
             buildInternalsNavItem("zh", activePath),
+            buildGithubNavItem("zh", activePath),
+            buildGitlabNavItem("zh", activePath),
             buildRecoveryNavItem("zh", activePath),
           ],
         },
@@ -704,6 +772,16 @@ const zhDictionary: Dictionary = {
     eyebrow: "Recovery",
     title: "Git 恢复与排障频道",
     description: "把最常见的 Git 误操作和恢复路径拆成多个专题，包括 reset、rebase、误删分支、detached HEAD 与 reflog 自救。",
+  },
+  githubIndex: {
+    eyebrow: "GitHub Topic",
+    title: "GitHub 协作专题",
+    description: "把 GitHub 常见能力拆成本地教程，从 GitHub Flow、PR 与 review，到 fork 贡献、Issues、Projects、Discussions 与 Actions。",
+  },
+  gitlabIndex: {
+    eyebrow: "GitLab Topic",
+    title: "GitLab 协作专题",
+    description: "把 GitLab 常见能力拆成本地教程，从 GitLab Flow、Merge Request，到 Issues / Boards、Groups / 权限与 CI/CD 基础。",
   },
   learningPathIndex: {
     eyebrow: "Quick Start",
@@ -1067,6 +1145,8 @@ const zhDictionary: Dictionary = {
       commands: "命令",
       bestPractices: "最佳实践",
       workflows: "工作流",
+      github: "GitHub 专题",
+      gitlab: "GitLab 专题",
       internals: "Git 原理",
       concepts: "概念",
       faq: "常见问题",
@@ -1356,6 +1436,8 @@ const enDictionary: Dictionary = {
           items: [
             buildBestPracticeNavItem("en", activePath),
             buildInternalsNavItem("en", activePath),
+            buildGithubNavItem("en", activePath),
+            buildGitlabNavItem("en", activePath),
             buildRecoveryNavItem("en", activePath),
           ],
         },
@@ -1400,6 +1482,16 @@ const enDictionary: Dictionary = {
     eyebrow: "Recovery",
     title: "Git Recovery Channel",
     description: "Turn common Git mistakes into focused rescue guides covering reset, rebase, deleted branches, detached HEAD, and reflog-first recovery.",
+  },
+  githubIndex: {
+    eyebrow: "GitHub Topic",
+    title: "GitHub Collaboration Guide",
+    description: "Turn core GitHub platform abilities into local tutorials, from GitHub Flow and pull-request review to forks, projects, discussions, and Actions.",
+  },
+  gitlabIndex: {
+    eyebrow: "GitLab Topic",
+    title: "GitLab Collaboration Guide",
+    description: "Turn core GitLab platform abilities into local tutorials, from GitLab Flow and merge requests to issues, boards, groups, permissions, and CI/CD basics.",
   },
   learningPathIndex: {
     eyebrow: "Quick Start",
@@ -1763,6 +1855,8 @@ const enDictionary: Dictionary = {
       commands: "Commands",
       bestPractices: "Best Practices",
       workflows: "Workflows",
+      github: "GitHub",
+      gitlab: "GitLab",
       internals: "Git Internals",
       concepts: "Concepts",
       faq: "FAQ",

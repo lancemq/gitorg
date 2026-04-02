@@ -1,0 +1,55 @@
+export const metadata = {
+  title: "GitLab Forks and Contribution Flow",
+  slug: "gitlab-forks-and-contributions",
+  locale: "en",
+  section: "gitlab",
+  summary: "Connect GitLab forks, contribution branches, merge requests, and upstream sync into a more realistic external collaboration flow.",
+  sourceUrls: [
+    "https://docs.gitlab.com/user/project/repository/forking_workflow/",
+    "https://docs.gitlab.com/user/project/merge_requests/",
+  ],
+};
+
+# GitLab Forks and Contribution Flow
+
+## When this workflow shows up
+
+Use this path when contributors do not have direct write access to the target project, or when teams want external contribution separated from internal branches.
+
+In GitLab, that usually also means thinking about:
+
+- group and project permission boundaries
+- merge-request targets
+- CI and variable behavior in forked contexts
+
+## A steadier contribution rhythm
+
+1. fork the project
+2. clone your fork
+3. add the upstream remote
+4. sync the main line
+5. create a working branch
+6. push to your fork
+7. open the merge request back upstream
+
+## Why permissions and CI matter here
+
+Fork-based contribution on GitLab often becomes tricky because teams overlook:
+
+- who can trigger which pipelines
+- whether variables or secrets are available
+- which project the merge request actually targets
+
+That is why external contribution flows need stronger operational caution than internal team branching.
+
+## Common mistakes
+
+- never syncing upstream
+- confusing the contributor fork with the target project
+- trusting CI results without understanding fork-related runner and variable limits
+
+## Good follow-up reads
+
+1. GitLab groups, projects, and permissions
+2. open source fork plus PR contribution
+3. GitLab CI/CD and runners

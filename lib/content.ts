@@ -6,6 +6,8 @@ import { cache } from "react";
 import {
   bestPracticeSlugs,
   commandSlugs,
+  githubSlugs,
+  gitlabSlugs,
   internalsSlugs,
   learningPathSlugs,
   recoverySlugs,
@@ -21,6 +23,8 @@ export type DocSection =
   | "commands"
   | "best-practices"
   | "workflows"
+  | "github"
+  | "gitlab"
   | "internals"
   | "recovery"
   | "concepts";
@@ -148,6 +152,16 @@ export const docPathRegistry = [
   "workflows/long-lived-branch-maintenance",
   "workflows/long-lived-branch-conflict-governance",
   "workflows/submodule-update-flow",
+  "github/github-flow-basics",
+  "github/pull-requests-and-reviews",
+  "github/forks-and-open-source-contribution",
+  "github/issues-projects-and-discussions",
+  "github/github-actions-and-skills",
+  "gitlab/gitlab-flow-and-merge-requests",
+  "gitlab/gitlab-forks-and-contributions",
+  "gitlab/gitlab-issues-boards-and-milestones",
+  "gitlab/gitlab-groups-projects-and-permissions",
+  "gitlab/gitlab-ci-and-runners",
   "internals/object-database",
   "internals/index-and-working-tree",
   "internals/refs-and-head",
@@ -278,6 +292,22 @@ const contentModules = {
     "workflows/long-lived-branch-maintenance": () => import("@/content/zh/workflows/long-lived-branch-maintenance.mdx"),
     "workflows/long-lived-branch-conflict-governance": () => import("@/content/zh/workflows/long-lived-branch-conflict-governance.mdx"),
     "workflows/submodule-update-flow": () => import("@/content/zh/workflows/submodule-update-flow.mdx"),
+    "github/github-flow-basics": () => import("@/content/zh/github/github-flow-basics.mdx"),
+    "github/pull-requests-and-reviews": () => import("@/content/zh/github/pull-requests-and-reviews.mdx"),
+    "github/forks-and-open-source-contribution": () =>
+      import("@/content/zh/github/forks-and-open-source-contribution.mdx"),
+    "github/issues-projects-and-discussions": () =>
+      import("@/content/zh/github/issues-projects-and-discussions.mdx"),
+    "github/github-actions-and-skills": () => import("@/content/zh/github/github-actions-and-skills.mdx"),
+    "gitlab/gitlab-flow-and-merge-requests": () =>
+      import("@/content/zh/gitlab/gitlab-flow-and-merge-requests.mdx"),
+    "gitlab/gitlab-forks-and-contributions": () =>
+      import("@/content/zh/gitlab/gitlab-forks-and-contributions.mdx"),
+    "gitlab/gitlab-issues-boards-and-milestones": () =>
+      import("@/content/zh/gitlab/gitlab-issues-boards-and-milestones.mdx"),
+    "gitlab/gitlab-groups-projects-and-permissions": () =>
+      import("@/content/zh/gitlab/gitlab-groups-projects-and-permissions.mdx"),
+    "gitlab/gitlab-ci-and-runners": () => import("@/content/zh/gitlab/gitlab-ci-and-runners.mdx"),
     "internals/object-database": () => import("@/content/zh/internals/object-database.mdx"),
     "internals/index-and-working-tree": () => import("@/content/zh/internals/index-and-working-tree.mdx"),
     "internals/refs-and-head": () => import("@/content/zh/internals/refs-and-head.mdx"),
@@ -405,6 +435,22 @@ const contentModules = {
     "workflows/long-lived-branch-maintenance": () => import("@/content/en/workflows/long-lived-branch-maintenance.mdx"),
     "workflows/long-lived-branch-conflict-governance": () => import("@/content/en/workflows/long-lived-branch-conflict-governance.mdx"),
     "workflows/submodule-update-flow": () => import("@/content/en/workflows/submodule-update-flow.mdx"),
+    "github/github-flow-basics": () => import("@/content/en/github/github-flow-basics.mdx"),
+    "github/pull-requests-and-reviews": () => import("@/content/en/github/pull-requests-and-reviews.mdx"),
+    "github/forks-and-open-source-contribution": () =>
+      import("@/content/en/github/forks-and-open-source-contribution.mdx"),
+    "github/issues-projects-and-discussions": () =>
+      import("@/content/en/github/issues-projects-and-discussions.mdx"),
+    "github/github-actions-and-skills": () => import("@/content/en/github/github-actions-and-skills.mdx"),
+    "gitlab/gitlab-flow-and-merge-requests": () =>
+      import("@/content/en/gitlab/gitlab-flow-and-merge-requests.mdx"),
+    "gitlab/gitlab-forks-and-contributions": () =>
+      import("@/content/en/gitlab/gitlab-forks-and-contributions.mdx"),
+    "gitlab/gitlab-issues-boards-and-milestones": () =>
+      import("@/content/en/gitlab/gitlab-issues-boards-and-milestones.mdx"),
+    "gitlab/gitlab-groups-projects-and-permissions": () =>
+      import("@/content/en/gitlab/gitlab-groups-projects-and-permissions.mdx"),
+    "gitlab/gitlab-ci-and-runners": () => import("@/content/en/gitlab/gitlab-ci-and-runners.mdx"),
     "internals/object-database": () => import("@/content/en/internals/object-database.mdx"),
     "internals/index-and-working-tree": () => import("@/content/en/internals/index-and-working-tree.mdx"),
     "internals/refs-and-head": () => import("@/content/en/internals/refs-and-head.mdx"),
@@ -548,6 +594,10 @@ const recommendedDocPaths = new Set<DocPath>([
   "workflows/backport-with-cherry-pick",
   "workflows/shared-branch-sync-boundaries",
   "workflows/submodule-update-flow",
+  "github/github-flow-basics",
+  "github/pull-requests-and-reviews",
+  "gitlab/gitlab-flow-and-merge-requests",
+  "gitlab/gitlab-ci-and-runners",
   "internals/merge-base-and-ancestry",
   "internals/reachability-and-garbage-collection",
   "internals/packfiles-and-storage",
@@ -570,6 +620,14 @@ const sectionSearchSuggestionDefaults: Partial<
   },
   workflows: {
     prerequisite: "learning-path/sync-with-remote",
+    risk: "best-practices/shared-history-boundaries",
+  },
+  github: {
+    prerequisite: "learning-path/first-feature-branch",
+    risk: "best-practices/shared-history-boundaries",
+  },
+  gitlab: {
+    prerequisite: "learning-path/first-feature-branch",
     risk: "best-practices/shared-history-boundaries",
   },
   internals: {
@@ -644,6 +702,16 @@ const primerDefaults: Record<Locale, Record<DocSection, DocPrimerSeed>> = {
       prerequisites: ["知道 fetch / pull / push / branch 的基本作用", "能理解一条分支为什么会分叉"],
       risks: ["照抄流程却没确认当前分支关系", "在共享分支上用错整合方式"],
     },
+    github: {
+      audience: ["已经会基础 Git、准备系统学习 GitHub 协作的人", "要在团队里使用 PR、Issue、Actions 的开发者"],
+      prerequisites: ["知道 branch、commit、push、remote 的基本作用", "愿意把平台功能和 Git 操作一起理解"],
+      risks: ["只记 GitHub 按钮流程却忽略底层 Git 边界", "把平台规则当成可以替代本地历史判断"],
+    },
+    gitlab: {
+      audience: ["已经会基础 Git、准备系统学习 GitLab 协作的人", "要在团队里使用 Merge Request、Issue Board 和 CI/CD 的开发者"],
+      prerequisites: ["知道 branch、commit、push、remote 的基本作用", "愿意把平台功能和 Git 操作一起理解"],
+      risks: ["只记 GitLab 页面操作却忽略底层 Git 边界", "把平台策略误当成可以替代本地历史判断"],
+    },
     internals: {
       audience: ["想建立稳定 Git 心智模型的学习者", "经常遇到历史、引用、恢复问题的开发者"],
       prerequisites: ["会看基础命令输出", "知道提交、分支、HEAD 这些名词"],
@@ -680,6 +748,16 @@ const primerDefaults: Record<Locale, Record<DocSection, DocPrimerSeed>> = {
       audience: ["Teams turning commands into repeatable routines", "Readers who need sequencing, branch, and sync discipline"],
       prerequisites: ["Basic understanding of fetch, pull, push, and branches", "A sense of how and why branches diverge"],
       risks: ["Copying a workflow without checking branch state", "Choosing the wrong integration path on shared branches"],
+    },
+    github: {
+      audience: ["Readers who know basic Git and now need GitHub collaboration fluency", "Developers using pull requests, issues, and Actions in real teams"],
+      prerequisites: ["A basic sense of branches, commits, pushes, and remotes", "Willingness to connect platform features back to Git behavior"],
+      risks: ["Memorizing GitHub UI steps without understanding the Git boundary underneath", "Assuming platform policy replaces local history judgment"],
+    },
+    gitlab: {
+      audience: ["Readers who know basic Git and now need GitLab collaboration fluency", "Developers using merge requests, issue boards, and CI/CD in real teams"],
+      prerequisites: ["A basic sense of branches, commits, pushes, and remotes", "Willingness to connect platform features back to Git behavior"],
+      risks: ["Memorizing GitLab UI steps without understanding the Git boundary underneath", "Assuming platform policy replaces local history judgment"],
     },
     internals: {
       audience: ["Readers building a durable Git mental model", "Developers who keep running into history, ref, or recovery confusion"],
@@ -874,6 +952,10 @@ function getOrderedPathSeries(section: DocSection): DocPath[] {
       return bestPracticeSlugs.map((slug) => `best-practices/${slug}` as DocPath);
     case "workflows":
       return workflowSlugs.map((slug) => `workflows/${slug}` as DocPath);
+    case "github":
+      return githubSlugs.map((slug) => `github/${slug}` as DocPath);
+    case "gitlab":
+      return gitlabSlugs.map((slug) => `gitlab/${slug}` as DocPath);
     case "internals":
       return [
         "concepts/git-history",
@@ -897,6 +979,8 @@ function sortBySeriesOrder<T extends { path: DocPath }>(docs: T[]) {
       ...getOrderedPathSeries("commands"),
       ...getOrderedPathSeries("best-practices"),
       ...getOrderedPathSeries("workflows"),
+      ...getOrderedPathSeries("github"),
+      ...getOrderedPathSeries("gitlab"),
       ...getOrderedPathSeries("internals"),
       ...getOrderedPathSeries("recovery"),
       ...getOrderedPathSeries("concepts"),
@@ -937,6 +1021,16 @@ export async function getLearningPathDocs(locale: Locale) {
   return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("learning-path/")));
 }
 
+export async function getGithubDocs(locale: Locale) {
+  const docs = await getIndexedDocs(locale);
+  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("github/")));
+}
+
+export async function getGitlabDocs(locale: Locale) {
+  const docs = await getIndexedDocs(locale);
+  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("gitlab/")));
+}
+
 export async function getInternalsDocs(locale: Locale) {
   const docs = await getIndexedDocs(locale);
   return sortBySeriesOrder(docs.filter((doc) => doc.metadata.section === "internals"));
@@ -962,6 +1056,14 @@ export function getDocHref(locale: Locale, docPath: DocPath) {
 
   if (docPath.startsWith("workflows/")) {
     return `/${locale}/workflows/${docPath.replace("workflows/", "")}`;
+  }
+
+  if (docPath.startsWith("github/")) {
+    return `/${locale}/github/${docPath.replace("github/", "")}`;
+  }
+
+  if (docPath.startsWith("gitlab/")) {
+    return `/${locale}/gitlab/${docPath.replace("gitlab/", "")}`;
   }
 
   if (docPath.startsWith("internals/")) {
@@ -1082,6 +1184,56 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
     "workflows/release-branch-workflow",
     "workflows/hotfix-and-urgent-fixes",
   ],
+  "github/github-flow-basics": [
+    "workflows/feature-branch-collaboration",
+    "workflows/prepare-commits-before-pull-request",
+    "github/pull-requests-and-reviews",
+  ],
+  "github/pull-requests-and-reviews": [
+    "best-practices/pull-request-prep",
+    "workflows/pr-merge-strategy-and-platform-settings",
+    "github/issues-projects-and-discussions",
+  ],
+  "github/forks-and-open-source-contribution": [
+    "workflows/open-source-fork-pr-contribution",
+    "workflows/fork-upstream-sync",
+    "best-practices/topic-branches",
+  ],
+  "github/issues-projects-and-discussions": [
+    "workflows/feature-branch-collaboration",
+    "best-practices/small-batch-review",
+    "github/github-actions-and-skills",
+  ],
+  "github/github-actions-and-skills": [
+    "workflows/merge-queue-workflow",
+    "workflows/pr-merge-strategy-and-platform-settings",
+    "commands/git-worktree",
+  ],
+  "gitlab/gitlab-flow-and-merge-requests": [
+    "workflows/feature-branch-collaboration",
+    "github/pull-requests-and-reviews",
+    "best-practices/pull-request-prep",
+  ],
+  "gitlab/gitlab-forks-and-contributions": [
+    "workflows/open-source-fork-pr-contribution",
+    "workflows/fork-upstream-sync",
+    "best-practices/topic-branches",
+  ],
+  "gitlab/gitlab-issues-boards-and-milestones": [
+    "github/issues-projects-and-discussions",
+    "workflows/feature-branch-collaboration",
+    "best-practices/small-batch-review",
+  ],
+  "gitlab/gitlab-groups-projects-and-permissions": [
+    "best-practices/shared-history-boundaries",
+    "workflows/shared-branch-sync-boundaries",
+    "github/forks-and-open-source-contribution",
+  ],
+  "gitlab/gitlab-ci-and-runners": [
+    "github/github-actions-and-skills",
+    "workflows/merge-queue-workflow",
+    "workflows/pr-merge-strategy-and-platform-settings",
+  ],
   "workflows/multi-person-sync-routine": [
     "commands/git-fetch",
     "commands/git-pull",
@@ -1200,6 +1352,16 @@ const representativeSectionPaths = {
     "workflows/sync-before-review",
     "workflows/hotfix-and-urgent-fixes",
   ],
+  github: [
+    "github/github-flow-basics",
+    "github/pull-requests-and-reviews",
+    "github/github-actions-and-skills",
+  ],
+  gitlab: [
+    "gitlab/gitlab-flow-and-merge-requests",
+    "gitlab/gitlab-issues-boards-and-milestones",
+    "gitlab/gitlab-ci-and-runners",
+  ],
   internals: [
     "internals/object-database",
     "internals/refs-and-head",
@@ -1241,7 +1403,7 @@ export async function getRelatedDocs(
 
 export async function getFeaturedSectionDocs(
   locale: Locale,
-  section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "internals" | "recovery">,
+  section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "github" | "gitlab" | "internals" | "recovery">,
   limit = 3,
 ): Promise<DocCard[]> {
   const docs =
@@ -1253,16 +1415,20 @@ export async function getFeaturedSectionDocs(
         ? await getBestPracticeDocs(locale)
         : section === "workflows"
           ? await getWorkflowDocs(locale)
-          : section === "internals"
-            ? await getInternalsDocs(locale)
-            : await getRecoveryDocs(locale);
+          : section === "github"
+            ? await getGithubDocs(locale)
+            : section === "gitlab"
+              ? await getGitlabDocs(locale)
+            : section === "internals"
+              ? await getInternalsDocs(locale)
+              : await getRecoveryDocs(locale);
 
   return sortByTierAndSeriesOrder(docs).slice(0, limit).map((doc) => toIndexedDocCard(locale, doc));
 }
 
 export async function getRepresentativeSectionDocs(
   locale: Locale,
-  section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "internals" | "recovery">,
+  section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "github" | "gitlab" | "internals" | "recovery">,
   limit = 3,
 ): Promise<DocCard[]> {
   const paths = representativeSectionPaths[section] ?? [];
@@ -1290,6 +1456,8 @@ export async function getContentStats(locale: Locale): Promise<ContentStats> {
       commands: 0,
       "best-practices": 0,
       workflows: 0,
+      github: 0,
+      gitlab: 0,
       internals: 0,
       recovery: 0,
       concepts: 0,

@@ -1,0 +1,116 @@
+export const metadata = {
+  title: "GitHub Actions 与 GitHub Skills 入门",
+  slug: "github-actions-and-skills",
+  locale: "zh",
+  section: "github",
+  summary: "理解 GitHub Actions 的最小自动化模型，并用 GitHub Skills 建立更低成本的动手练习路径。",
+  sourceUrls: [
+    "https://docs.github.com/en/actions/get-started/quickstart",
+    "https://skills.github.com",
+  ],
+};
+
+# GitHub Actions 与 GitHub Skills 入门
+
+## 为什么学 GitHub 不能只停留在文档阅读
+
+GitHub 平台里最容易让人“看懂但不会用”的部分，就是自动化。  
+如果你只是看别人仓库里有个 workflow 文件，却没自己跑过，很难真正建立直觉。
+
+而 GitHub Skills 的价值，则在于它让你可以用更低成本做练习，而不是只在真实仓库里硬试。
+
+## Actions 最小模型是什么
+
+GitHub 官方的 quickstart 其实在帮助你建立一个最小模型：
+
+- `workflow`：一整套自动化流程
+- `event`：什么事情触发它
+- `job`：一组任务
+- `runner`：执行任务的环境
+- `step`：job 里的具体动作
+
+你不需要一开始就理解所有 YAML 细节，但一定要先理解它们各自是什么角色。
+
+## 为什么它对团队很重要
+
+在 GitHub 协作里，Actions 最常承担的工作包括：
+
+- 自动测试
+- lint / format 检查
+- 构建产物
+- 部署
+- PR 门槛控制
+
+也就是说，它不是锦上添花，而是很多团队把“质量检查”真正接入协作流程的关键。
+
+<TipBox title="先把 Actions 当成“协作规则执行器”">
+  <p>
+    它的价值不只是自动跑命令，而是把团队说好的检查真正放到平台里自动执行。
+    这样 review 才不会被大量机械检查淹没。
+  </p>
+</TipBox>
+
+## 一条最小 workflow 会长什么样
+
+```yaml
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm test
+```
+
+这已经足够让你建立最小直觉：
+
+- 什么时候触发
+- 在什么环境跑
+- 按什么顺序执行
+
+## GitHub Skills 为什么值得一起学
+
+GitHub Skills 不是一般的文档页，而是官方设计的交互式训练路线。  
+它很适合这些情况：
+
+- 刚开始接触 GitHub，不想直接在工作仓库里试
+- 想练 PR、冲突处理、Actions 等操作
+- 想用课程而不是零散资料来建立信心
+
+## Actions 学习里最常见的误区
+
+### 1. 先背 YAML 语法
+
+真正应该先理解的是模型和触发逻辑，而不是记多少字段。
+
+### 2. 一上来就搭复杂流水线
+
+更稳的方式是：
+
+1. 先跑单个测试 job
+2. 再加 lint
+3. 再加缓存、矩阵和部署
+
+### 3. 忽略和 PR 规则的关系
+
+如果 Actions 只是“跑一下”，但没有和 PR、review、branch protection 结合，它的协作价值会大打折扣。
+
+## 更好的学习顺序
+
+1. 先会 GitHub Flow
+2. 再理解 Pull Request 和 review
+3. 再学最小 Actions workflow
+4. 最后用 GitHub Skills 做交互式练习
+
+## 这篇之后适合继续看什么
+
+- `PR 合并策略与平台设置`
+- `merge queue workflow`
+- `GitHub Flow`
+- `PR 与 review`
