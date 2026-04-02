@@ -12,23 +12,117 @@ export const metadata = {
 
 # PR Merge Strategy and Platform Settings
 
+Teams often debate squash versus rebase merge in abstract terms, but the real outcome depends on what the hosting platform actually allows.  
+This topic is therefore not only about Git semantics. It is about whether your repository settings truly enforce the history shape your team claims to want.
+
+<CommandFlowFigure
+  title="Choose history policy before choosing settings"
+  caption="First decide what main should preserve, then expose only the merge methods that match that policy, together with branch protection and queue rules."
+  inputsLabel="Decide first"
+  inputs="main history shape|shared-history boundaries|review style"
+  commandLabel="policy → settings → enforcement"
+  outputsLabel="Platform should reflect"
+  outputs="allowed merge methods|branch protections|consistent defaults"
+  note="If platform settings disagree with team policy, platform settings will win in practice."
+/>
+
 ## Why these two decisions belong together
 
-Teams often debate squash versus rebase merge in abstract terms, but the real outcome depends on what the hosting platform actually allows.
+The team does not ultimately execute the policy written in a handbook. It executes the paths the platform leaves open.
 
-This workflow keeps two questions together:
+If the team says:
 
-- what shape of history does the team want
-- what merge methods and branch protections does the platform enforce
+- “we only squash merge”
+- “main should stay linear”
+- “all PRs must pass required checks”
+
+but the platform leaves every merge option enabled and protection rules weak, the real workflow will drift quickly.
 
 ## A steadier decision order
 
-1. decide whether main should preserve PR granularity or commit granularity
-2. decide how much history rewriting is acceptable after review
-3. configure the platform to expose only the approved merge methods
+### 1. Decide whether main should preserve PR granularity or commit granularity
+
+- if you want each PR represented as one clean main-line entry, squash merge is often the best fit
+- if you want to preserve original commit granularity while staying mostly linear, rebase merge may fit better
+- if you want explicit join points and branch-shape visibility, merge commits are often the better expression
+
+### 2. Decide how much shared-history rewriting is acceptable
+
+If the team is conservative about shared history, repository settings should not expose broad rewrite-adjacent behavior casually.
+
+### 3. Configure the platform to expose only the approved merge methods
+
+Avoid “everything enabled” as the default.  
+That effectively delegates main-line history shape to personal preference on each PR.
+
+## A practical merge-method lens
+
+### Prefer squash merge when
+
+- you want the shortest main history
+- each PR should become one deliberate main-line unit
+- the team prefers less main-branch noise
+
+### Prefer rebase merge when
+
+- you want to keep original commits
+- you still want the main line to look linear
+- the team maintains good commit hygiene before review
+
+### Prefer merge commit when
+
+- you want explicit integration points
+- the branch structure itself is meaningful
+- the team accepts a more graph-like main history
+
+The bigger danger is rarely choosing “wrong” once. It is having no shared default at all.
+
+## What platform settings should align with
+
+At minimum, align:
+
+- enabled merge methods
+- branch protection rules
+- required checks
+- bypass permissions
+- auto-delete branch behavior
+- merge queue rules, if used
+
+## Why platform defaults deserve scrutiny
+
+Defaults are usually product-general choices, not your team’s ideal workflow. If you do not shape them actively, you will see problems like:
+
+- the handbook says squash, but merge commits keep appearing
+- the team says main is protected, but too many people can bypass it
+- the team says review is required, but the platform allows wider shortcuts than intended
+
+<WarningBox title="The platform UI is more enforceable than the team wiki">
+  If a merge path remains visible and available, someone will eventually use it. Real consistency comes from making the repository settings and the documented policy reinforce each other.
+</WarningBox>
 
 ## Common mistakes
 
-- assuming the platform default equals the team default
-- documenting one merge rule while leaving three methods enabled
-- discussing Git semantics without checking repository settings and protections
+### Assuming the platform default equals the team default
+
+Defaults are convenient, not necessarily correct for your collaboration model.
+
+### Documenting one merge rule while leaving three methods enabled
+
+That guarantees history style drift.
+
+### Discussing Git semantics without checking repository settings
+
+PR merge strategy is a platform workflow question as much as a Git theory question.
+
+<PracticeBox title="Run a quick merge-strategy audit with your team">
+  1. Should main preserve PR units, commit units, or explicit integration nodes?
+  2. Which merge methods are actually enabled today?
+  3. Do branch protection and required checks match the written policy?
+  4. Are bypass, auto-delete, and merge queue rules intentionally configured?
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `Squash vs rebase merge`
+2. `Merge queue workflow`
+3. `Sync before review`

@@ -13,14 +13,65 @@ export const metadata = {
 
 # Prepare commit history before opening a pull request
 
-Pre-PR cleanup is not about making history look clever. It is about making review easier.
+Pre-PR cleanup is not about making history look clever. It is about making review easier, rollback cleaner, and future debugging less painful.  
+The best pull requests often feel clear because the history was shaped before review started.
+
+<CommandFlowFigure
+  title="A stable pre-PR cleanup sequence"
+  caption="Sync first, clean obvious noise, verify commit boundaries, then confirm there is no shared-history risk."
+  inputsLabel="Confirm first"
+  inputs="latest main state|local commit list|working tree boundaries"
+  commandLabel="sync → clean up → verify"
+  outputsLabel="A good PR should give"
+  outputs="clear intent|clean diff scope|controlled history risk"
+  note="History cleanup is not performance art. It is preparation for better review."
+/>
+
+## Why pre-PR cleanup matters
+
+Many reviews feel harder than they should because the history is noisy:
+
+- temporary fixup commits remain in place
+- commit titles do not express intent clearly
+- unrelated changes are mixed together
+- the branch is still based on stale main-line state
+
+Once that noise enters review, reviewers spend attention reconstructing your intent instead of evaluating the change itself.
 
 ## A practical order
 
-1. sync with the current main line
-2. remove obvious noise commits
-3. check commit messages and change boundaries
-4. confirm there is no shared-history risk
+### 1. Sync with the current main line
+
+```bash
+git fetch origin
+git rebase origin/main
+```
+
+If your team prefers merge here, that can still be valid.  
+The essential point is not “always rebase.” It is “understand the relationship between this branch and main before you publish it.”
+
+### 2. Remove obvious noise commits
+
+Typical noise includes:
+
+- `fix typo`
+- `oops`
+- `review fix`
+- “trying to make CI green” style commits
+
+If those can be consolidated safely before review, they usually should be.
+
+### 3. Re-check commit messages and change boundaries
+
+Ask:
+
+- does each commit represent one understandable intent
+- do the commit boundaries match the code intent
+- were formatting, renaming, and feature work mixed together unnecessarily
+
+### 4. Confirm there is no shared-history risk
+
+If other people already depend on the current branch history, rebase and commit rewriting stop being simple cleanup and start becoming coordination changes.
 
 ## A conservative flow
 
@@ -28,16 +79,57 @@ Pre-PR cleanup is not about making history look clever. It is about making revie
 git fetch origin
 git rebase origin/main
 git log --oneline --decorate -n 10
+git diff --stat origin/main...
 ```
 
-If your team prefers merge over rebase at this step, the principle still holds: understand the branch relationship before publishing the PR.
+This helps answer:
+
+- whether the base is current
+- whether recent commits still contain noise
+- whether the visible diff matches the story the PR is about to tell
 
 ## Four things worth checking
 
-- whether there are obvious “fixup” style commits to consolidate
-- whether each commit message carries a clear intent
-- whether unrelated changes were mixed together
-- whether someone else may already depend on this history
+1. whether obvious fixup-style commits can still be cleaned
+2. whether each commit title carries an understandable intent
+3. whether unrelated changes were mixed into the branch
+4. whether this history may already be shared with someone else
+
+## When not cleaning further is actually safer
+
+Not every moment is the right moment to rewrite history. Be more conservative when:
+
+- the branch is already shared
+- review is already active and comments depend on current commit structure
+- the team discourages rewriting history during review
+- shipping speed matters more than further polish
+
+History cleanup is a tool, not a moral rule.
+
+<WarningBox title="Do not heavily rewrite history once review context depends on it">
+  If reviewers already commented against the current commit structure, aggressive rebasing can invalidate discussion context quickly. Pre-review cleanup is high value. Mid-review cleanup should be deliberate and limited.
+</WarningBox>
+
+## Common mistakes
+
+### Assuming “fewer commits” automatically means “better PR”
+
+The goal is not fewer commits. The goal is clearer intent.
+
+### Rewriting titles but not commit boundaries
+
+A polished title cannot rescue a commit that still mixes three unrelated changes.
+
+### Cleaning history before checking branch freshness
+
+If the base is stale, you may end up reorganizing the branch twice.
+
+<PracticeBox title="Use these four questions before opening a PR">
+  1. Can a reviewer infer intent from the commit titles?
+  2. Does the branch still contain obvious noise commits?
+  3. Does the diff scope match the PR story?
+  4. Will more cleanup now affect already-shared history?
+</PracticeBox>
 
 ## One principle
 

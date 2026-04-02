@@ -13,15 +13,30 @@ export const metadata = {
 
 # 评审前同步主线
 
+如果一个分支已经和主线分叉太久，reviewer 看到的内容就会混入很多噪声：已经被主线解决的差异、过期基底带来的冲突上下文、以及不必要的 merge 历史。  
+评审前同步主线，本质上是在替 reviewer 先做一轮清理。
+
+<CommandFlowFigure
+  title="评审前同步的真正价值"
+  caption="先更新你对主线的认知，再整合主线变化，最后重新检查 diff。这样 reviewer 看到的是当前问题，而不是旧基底遗留的噪声。"
+  inputsLabel="先确认"
+  inputs="主线最新状态|当前分支差异|review 目标范围"
+  commandLabel="fetch → integrate → recheck diff"
+  outputsLabel="review 获得"
+  outputs="更新的基底|更干净的 diff|更少上下文噪声"
+  note="这一步不是礼貌动作，而是 review 质量的一部分。"
+/>
+
 ## 为什么评审前一定要做这一步
 
-如果一个分支已经和主线分叉太久，reviewer 看到的内容会混入：
+review 的成本不只是看代码，还包括理解代码处在哪个基底上。  
+如果分支和主线漂移太久，reviewer 会被迫同时处理：
 
-- 已经被主线解决的差异
-- 基底落后导致的噪声冲突
-- 不必要的 merge 噪声
+- 已经过期的差异
+- 本该你自己先解决的同步冲突
+- 和当前任务无关的历史噪声
 
-评审前同步主线，本质上是在替 reviewer 先做一轮清理。
+这会直接稀释对真正业务改动的注意力。
 
 ## 推荐流程
 
@@ -38,6 +53,8 @@ git fetch origin
 git merge origin/main
 ```
 
+关键不是必须 rebase，而是要把“更新主线认知”和“重新确认 PR 范围”都做完。
+
 ## 为什么这套流程更稳
 
 因为它固定了一个关键顺序：
@@ -46,6 +63,8 @@ git merge origin/main
 2. 再把主线变化整合进当前分支
 3. 最后重新检查 diff 是否还是你打算送审的那部分
 
+这个顺序最大的价值，是把“同步动作”变成“review 准备动作”，而不是额外负担。
+
 ## 关键检查点
 
 在真正发起评审前，至少确认：
@@ -53,6 +72,7 @@ git merge origin/main
 1. 最近主线更新已经纳入
 2. diff 范围仍然是你预期的那部分改动
 3. 最近几个提交没有明显噪声
+4. 当前分支如果共享，是否符合团队对 rebase 的约定
 
 建议配合：
 
@@ -67,31 +87,44 @@ git log --oneline --decorate -8
 - 少看无关差异
 - 少处理已经过期的冲突上下文
 - 更容易聚焦真正的业务改动
+- 更快判断这次改动是否真的 ready for review
+
+## 什么时候同步前就该先停下来
+
+有时“评审前同步”会暴露一个更根本的问题：
+
+- 分支太大
+- 主题太混
+- 提交边界太乱
+
+这时不应该只是同步完就直接提 review，而应该先回到“整理提交和边界”那一步。
+
+<WarningBox title="同步完主线后，一定重新看一次 diff">
+  很多人会在同步之后直接发起 review，默认认为“我只是把主线纳进来了”。但整合动作本身可能已经改变 diff 结构，如果不重新看一遍，你很容易把额外噪声也送进 review。
+</WarningBox>
 
 ## 常见误区
 
-### 误区 1：等 reviewer 提出来再同步主线
+### 等 reviewer 提出来再同步主线
 
 这会把本该自己解决的问题转嫁给 reviewer。
 
-### 误区 2：同步完主线后不再重新看 diff
+### 同步完主线后不再重新看 diff
 
 整合动作可能已经改变了 diff 结构，最好重新确认一次。
 
-### 误区 3：把评审前同步当成“顺手做一下”
+### 把评审前同步当成“顺手做一下”
 
 这一步其实是评审质量的一部分。
 
-## 特殊情况
-
-- 如果分支已经共享给多人，rebase 前先确认团队约定
-- 如果当前任务跨度很大，评审前同步可能暴露出“分支太大”的根本问题
-- 如果团队使用 squash merge，也仍然需要在评审前先控制 diff 噪声
+<PracticeBox title="发起 review 前先问自己">
+  1. 当前分支和主线的关系我解释得清楚吗？
+  2. 同步之后的 diff 还是不是我要 reviewer 看的那部分？
+  3. 最近提交会不会让 reviewer 先处理历史噪声，而不是看业务问题？
+</PracticeBox>
 
 ## 接下来建议继续学什么
 
-这一页之后，最适合继续看：
-
-1. `feature branch collaboration`
-2. `squash vs rebase merge`
-3. `fetch vs pull`
+1. `Feature branch collaboration`
+2. `Squash vs rebase merge`
+3. `Fetch vs pull`

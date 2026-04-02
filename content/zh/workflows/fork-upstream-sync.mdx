@@ -13,8 +13,6 @@ export const metadata = {
 
 # Fork 与上游同步教程
 
-## 这个工作流解决什么问题
-
 在 fork 协作模式里，你通常同时面对两个远端：
 
 - `origin`：你自己的 fork
@@ -22,11 +20,26 @@ export const metadata = {
 
 很多同步混乱，不是 Git 命令本身太难，而是这两个远端角色没有分清楚。
 
-这一页的目标，就是把下面这条边界固定下来：
+<CommandFlowFigure
+  title="fork 模式下的远端职责"
+  caption="从 upstream 读取和同步主仓库状态，在本地整理后，再把结果推回自己的 origin。角色一旦混淆，后面的分支和 PR 都会跟着混乱。"
+  inputsLabel="远端角色"
+  inputs="origin=我的 fork|upstream=主仓库|local main=同步基底"
+  commandLabel="fetch upstream → update local → push origin"
+  outputsLabel="最终得到"
+  outputs="fork 对齐上游|新分支基底干净|PR 差异更清楚"
+  note="fork 工作流的稳定性，首先来自远端职责清楚。"
+/>
+
+## 这个工作流解决什么问题
+
+这一页的目标，是把下面这条边界固定下来：
 
 - 从 `upstream` 拉最新主线
 - 把同步结果更新到本地
 - 再把自己的分支推回 `origin`
+
+只要这条边界清楚，fork 模式下的大多数混乱都会明显减少。
 
 ## 什么时候适合这个流程
 
@@ -120,39 +133,43 @@ git log --oneline --decorate --graph --all -10
 2. 当前分支是不是你以为的那个分支
 3. 本地主分支同步完成后，是否真的已经和 `upstream/main` 对齐
 
+## 为什么很多 fork PR 会带着噪声
+
+根本原因通常不是代码写得乱，而是：
+
+- 从过期的 fork 主分支切了新分支
+- 上游同步完却没把结果推回 `origin`
+- 远端角色长期混淆
+
+这些问题会让 PR 天然夹带旧差异。
+
+<WarningBox title="不要从落后的 fork 主分支上继续切新任务">
+  这会让你的 PR 自带历史噪声，reviewer 需要先帮你过滤旧差异，才能看见真正的新改动。fork 工作流里，一个最值钱的习惯就是先同步再开新分支。
+</WarningBox>
+
 ## 常见误区
 
-### 误区 1：把 `origin` 当成上游主仓库
+### 把 `origin` 当成上游主仓库
 
 在 fork 工作流里，`origin` 往往是你的个人 fork，不是团队主仓库。
 
-### 误区 2：直接在落后的 fork 主分支上切新分支
+### 直接在落后的 fork 主分支上切新分支
 
 这样会把旧历史也一起带进新任务。
 
-### 误区 3：同步 upstream 之后忘了把结果推回 origin
+### 同步 upstream 之后忘了把结果推回 origin
 
 这样你自己的 fork 还停在旧状态，后面再开分支时容易继续从旧基底出发。
 
-## 特殊情况
-
-- 如果默认分支不是 `main`，要把命令中的目标分支改成真实分支名
-- 如果你本地主分支已经有自己的额外提交，rebase 或 merge 前先确认这些提交是否应该保留
-- 如果团队使用受保护分支，`origin/main` 的更新策略可能也有额外要求
-
-## 相关命令
-
-- `git remote`
-- `git fetch`
-- `git switch`
-- `git rebase`
-- `git merge`
-- `git push`
+<PracticeBox title="fork 同步前先问自己 4 个问题">
+  1. `origin` 和 `upstream` 角色是否清楚？
+  2. 我的本地主分支是不是已经对齐 `upstream/main`？
+  3. 同步结果是否需要回推到 `origin/main`？
+  4. 我接下来切的新分支，是不是应该从最新同步后的主分支出发？
+</PracticeBox>
 
 ## 接下来建议继续学什么
 
-这一页之后，最适合继续看：
-
-1. `feature branch collaboration`
-2. `sync before review`
-3. `fetch vs pull`
+1. `Feature branch collaboration`
+2. `Sync before review`
+3. `Fetch vs pull`

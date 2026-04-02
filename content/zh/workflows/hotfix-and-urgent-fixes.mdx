@@ -13,9 +13,39 @@ export const metadata = {
 
 # 紧急修复工作流
 
+线上故障、发布阻塞、严重回归，都是典型的 hotfix 场景。此时目标不是“顺便清理很多历史”，而是尽快在稳定基底上做出最小修复，并把修复安全带回主线。
+
+<CommandFlowFigure
+  title="Hotfix 的正确优先级"
+  caption="先从稳定分支切出最小修复，再独立验证，最后把修复有序回流到主线和维护线。紧急修复最怕的是一边救火一边扩大改动面。"
+  inputsLabel="先锁定"
+  inputs="稳定分支|事故范围|最小修复面"
+  commandLabel="branch → fix → validate → flow back"
+  outputsLabel="最终目标"
+  outputs="线上恢复|历史可解释|主线对齐"
+  note="越紧急，越要缩小 diff，而不是顺手多改。"
+/>
+
 ## 适用场景
 
-线上故障、发布阻塞、严重回归，都是典型的 hotfix 场景。此时目标不是“顺便清理很多历史”，而是尽快在稳定基底上做出最小修复，并把修复安全带回主线。
+hotfix 最适合这些情况：
+
+- 线上故障需要尽快恢复
+- 发布链路被关键 bug 阻塞
+- 刚上线的版本出现严重回归
+- 已发布版本必须补一个高优先级修复
+
+它和普通功能开发最大的不同是：  
+此时首要目标是恢复稳定，而不是优化长期架构。
+
+## 为什么 hotfix 应该从稳定分支切出
+
+因为紧急修复最怕把“本来已经稳定的东西”和“正在开发中的变化”混在一起。  
+从稳定分支切出 hotfix，能带来三个直接好处：
+
+- diff 更小，验证更快
+- 回滚更容易
+- 主线和发布线的关系更清楚
 
 ## 推荐顺序
 
@@ -43,7 +73,7 @@ git commit -m "fix: handle login timeout"
 git push -u origin hotfix/login-timeout
 ```
 
-修复落地后，再明确把它回流到需要的主线或维护线。
+这一套的重点不是命令本身，而是把修复、验证、回流分成了三个清楚阶段。
 
 ## 为什么 hotfix 要避免顺手带功能改动
 
@@ -55,6 +85,10 @@ git push -u origin hotfix/login-timeout
 
 如果某个“顺手改动”不是为了让 hotfix 生效，它通常就不应该出现在 hotfix 里。
 
+<WarningBox title="不要把 hotfix 分支变成临时功能分支">
+  很多事故会在第二层变坏，不是因为原始 bug 太难修，而是因为团队在 hotfix 分支上继续顺手修改 unrelated 代码，最后既难验证，也难回滚。
+</WarningBox>
+
 ## 关键检查点
 
 在 hotfix 发布前，至少确认：
@@ -62,6 +96,7 @@ git push -u origin hotfix/login-timeout
 1. 修复是否建立在稳定分支上
 2. 本次 diff 是否只覆盖事故相关内容
 3. 回流目标分支是否都已经明确
+4. 如果失败，是否知道怎么快速回滚
 
 推荐配合：
 
@@ -70,22 +105,40 @@ git diff --stat main...
 git log --oneline --decorate -5
 ```
 
+## 回流为什么和修复同样重要
+
+只修线上、不回流主线，是 hotfix 工作流里最贵的错误之一。  
+因为这样会导致：
+
+- 下一次发布重新把 bug 带回来
+- 主线和稳定线表达不同事实
+- 团队没人能说清“真正正确的版本”在哪条线上
+
+所以 hotfix 成功不只等于“线上好了”，还要等于“后续分支关系也重新一致了”。
+
 ## 常见误区
 
-- 在 hotfix 里顺手改 unrelated 代码
-- 修完后只发布，不回流主线
-- 用 hotfix 分支继续承载后续功能开发
+### 在 hotfix 里顺手改 unrelated 代码
 
-## 特殊情况
+会明显放大验证和回滚成本。
 
-- 如果线上修复需要同时进入多个维护版本，先固定回流顺序
-- 如果修复依赖未发布功能，应该重新评估是 hotfix 还是普通发布问题
-- 如果团队有发布审批流程，hotfix 分支也要纳入标准验证链路
+### 修完后只发布，不回流主线
+
+这会把今天的修复变成下次发布的回归来源。
+
+### 用 hotfix 分支继续承载后续功能开发
+
+hotfix 分支应该短、专、快，不应该变成第二主线。
+
+<PracticeBox title="做 hotfix 前先确认 4 件事">
+  1. 我现在站的是稳定分支吗？
+  2. 这次修复的最小必要范围是什么？
+  3. 修复完需要回流哪些分支？
+  4. 如果修复本身失败，我要怎么快速撤回？
+</PracticeBox>
 
 ## 接下来建议继续学什么
 
-这一页之后，最适合继续看：
-
-1. `release branch workflow`
-2. `backport with cherry-pick`
-3. `fetch vs pull`
+1. `Release branch workflow`
+2. `Backport with cherry-pick`
+3. `Fetch vs pull`

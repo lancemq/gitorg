@@ -12,9 +12,28 @@ export const metadata = {
 
 # 开源贡献 / fork + PR 完整提交流程
 
+当你没有主仓库直接写权限，而是通过 fork + PR 参与协作时，真正重要的不是“会不会 push”，而是你能不能把 `upstream`、`origin`、功能分支和 PR 这几层关系始终分清楚。
+
+<CommandFlowFigure
+  title="fork 工作流的主干节奏"
+  caption="先保持 fork 与 upstream 对齐，再从干净基底切分支、提交、推送到自己的仓库，最后由 PR 回到主仓库。"
+  inputsLabel="先准备"
+  inputs="fork 仓库|upstream 远端|干净主分支"
+  commandLabel="sync fork → branch → push → PR"
+  outputsLabel="最终形成"
+  outputs="清楚的来源关系|review 友好的 PR|可持续同步"
+  note="origin 和 upstream 的角色越清楚，后面的协作越轻松。"
+/>
+
 ## 这个工作流适合什么场景
 
-当你没有主仓库直接写权限，而是通过 fork + PR 参与协作时，这页就是最标准的工作流骨架。
+它最适合这些情况：
+
+- 你没有主仓库直接写权限
+- 通过 fork 的仓库承载自己的工作分支
+- 最终通过 pull request / merge request 回到主仓库
+
+这种模式在开源项目里非常常见，因为它能让贡献者自由推进，也能让主仓库维持清晰的写权限边界。
 
 ## 一条完整节奏
 
@@ -28,12 +47,12 @@ export const metadata = {
 
 ## 为什么这个顺序重要
 
-因为 fork 工作流的核心边界是：
+fork 工作流最核心的边界是：
 
-- `upstream` 用来读
+- `upstream` 用来读和同步主仓库
 - `origin` 用来推自己的分支
 
-一旦这层边界混了，后面同步、开分支和发 PR 都会变得混乱。
+一旦这层边界混了，后面同步、切分支和发 PR 都会变得混乱。
 
 ## 最小可用命令流
 
@@ -47,14 +66,55 @@ git switch -c feature/fix-docs
 git push -u origin feature/fix-docs
 ```
 
+这条流程的重点不在于背命令，而在于维持两个远端的职责清晰。
+
+## 为什么要先同步 fork 主分支，再开新任务
+
+很多开源贡献出问题，不是代码写错，而是从过期的 fork 主分支上切了新分支。  
+这样会导致：
+
+- PR 带上不必要的旧差异
+- reviewer 很难看清你真正的改动
+- 你后面还得额外处理同步冲突
+
+所以 fork 工作流里，一个很值钱的习惯是：  
+每次新任务开始前，先把自己的 `main` 对齐到 `upstream/main`。
+
+## PR 发起前最值得检查的几件事
+
+1. 你的分支是不是从最新上游主分支切出来的
+2. `origin` 和 `upstream` 有没有搞反
+3. diff 范围是不是只包含本次贡献
+4. 提交标题和 PR 说明能不能独立表达意图
+
 ## 常见误区
 
-- 从过期的 fork 主分支切新任务
-- 把 `origin` 和 `upstream` 角色搞反
-- PR 前不先同步上游主线
+### 从过期的 fork 主分支切新任务
+
+这是最常见的问题来源之一。
+
+### 把 `origin` 和 `upstream` 角色搞反
+
+一旦角色混乱，你会很难解释“自己到底在同步谁、推送谁”。
+
+### PR 前不先同步上游主线
+
+这样 reviewer 往往要先帮你过滤掉一层过期差异。
+
+### 在 fork 主分支上直接堆多个任务
+
+fork 工作流依然适合用 topic branch。  
+不要把 fork 当成“我自己的主工作分支合集”。
+
+<PracticeBox title="开源贡献前先确认这 4 件事">
+  1. 我的本地 `main` 是否已经对齐 `upstream/main`？
+  2. 我要 push 的远端是不是 `origin`？
+  3. 这个任务是否应该单独开一个功能分支？
+  4. 当前 PR diff 是否只包含本次贡献范围？
+</PracticeBox>
 
 ## 接下来建议继续学什么
 
-1. `fork upstream sync`
-2. `sync before review`
-3. `feature branch collaboration`
+1. `Fork upstream sync`
+2. `Sync before review`
+3. `Feature branch collaboration`

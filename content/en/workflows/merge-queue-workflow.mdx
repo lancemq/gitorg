@@ -11,18 +11,109 @@ export const metadata = {
 
 # Merge Queue Workflow
 
+When many pull requests compete for the same protected branch, the bottleneck is often no longer review quality alone. It becomes branch freshness, merge ordering, and repeated CI reruns on a moving base.  
+Merge queue matters because it turns that chaos into a controlled integration lane.
+
+<CommandFlowFigure
+  title="What merge queue actually coordinates"
+  caption="Approved pull requests enter a managed queue, are revalidated against an up-to-date base, and then merged in a predictable order."
+  inputsLabel="Before queueing"
+  inputs="approved PR|protected branch rules|required checks"
+  commandLabel="enqueue → revalidate → merge"
+  outputsLabel="Main branch gets"
+  outputs="predictable order|fresh base|less merge-window contention"
+  note="Queue coordinates integration. It does not replace review, ownership, or CI quality."
+/>
+
 ## Where this workflow fits
 
-Merge queue becomes valuable when many pull requests are competing for the same protected branch and branch freshness keeps expiring between review and merge.
+Merge queue becomes useful when several patterns show up regularly:
 
-## What it solves
+- multiple approved PRs race for the same branch
+- branch freshness expires between approval and merge
+- CI reruns pile up because main keeps moving
+- developers spend too much effort coordinating merge timing by hand
 
-- repeated "base changed, re-run checks" cycles
-- race conditions between multiple approved PRs
-- human coordination overhead around who merges next
+In a very small team, merge queue may feel like extra ceremony. In a busy protected-branch workflow, it often becomes a major stability improvement.
+
+## What it really solves
+
+### 1. “Checks passed” is time-sensitive
+
+A PR that passed CI twenty minutes ago may no longer reflect the latest main branch state. When many PRs are waiting, that gap matters.
+
+### 2. Manual merge ordering does not scale well
+
+Without queueing, teams drift into:
+
+- racing to click merge first
+- repeatedly rebasing or updating branches
+- rerunning checks on slightly different bases
+- blaming “timing” instead of clarifying process
+
+### 3. Protected branches benefit from one controlled entry path
+
+The deeper value of merge queue is not just serialization. It is that the protected branch gets one deliberate, explainable integration path.
+
+## Preconditions for a healthy merge queue
+
+Queue is most useful when these are already reasonably stable:
+
+- pull request review flow
+- required checks
+- branch protection rules
+- team willingness to let process, not individual timing, control merge order
+
+If those basics are still unstable, merge queue can end up packaging confusion rather than reducing it.
+
+<WarningBox title="Merge queue cannot compensate for weak review discipline">
+  Queue only governs how approved changes enter the branch. It cannot decide whether the change deserved approval, whether the tests are meaningful, or whether the team’s release expectations are coherent.
+</WarningBox>
+
+## What teams should define explicitly
+
+At minimum, define:
+
+1. which checks are required before queue entry
+2. what review state is required before queue entry
+3. how failed queue items are triaged and re-enqueued
+4. whether emergency fixes may bypass queue under specific rules
+5. whether direct manual merges to main are still allowed
+
+Without these agreements, queue risks becoming “just another merge button.”
+
+## A steadier queue usage rhythm
+
+1. sync and inspect the branch before asking for final review
+2. queue the PR after review approval, not during unresolved review churn
+3. if the queue fails, identify the failure category first
+4. fix the cause and re-enqueue instead of bypassing the system casually
+
+This keeps queue focused on integration control rather than becoming a generic recovery lane.
 
 ## Common mistakes
 
-- assuming merge queue replaces review quality
-- enabling queue before CI and branch rules are stable
-- treating queue as a universal default for very small teams
+### Assuming queue replaces pre-review sync
+
+It does not. A branch that is already noisy or outdated will still be noisy when queue tries to merge it.
+
+### Treating queue as the default for every team size
+
+It brings the most value when the integration branch actually has throughput pressure.
+
+### Bypassing queue the moment it becomes inconvenient
+
+That breaks the very predictability the queue was introduced to provide.
+
+<PracticeBox title="Ask these questions before enabling merge queue">
+  1. Is protected-branch merge concurrency high enough to justify queueing?
+  2. Are required checks stable and trustworthy?
+  3. Are branch protection rules already clear?
+  4. Is the team willing to let system order replace merge-timing negotiation?
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `PR merge strategy and platform settings`
+2. `Sync before review`
+3. `Sync boundaries on shared branches`

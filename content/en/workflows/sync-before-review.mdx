@@ -13,13 +13,30 @@ export const metadata = {
 
 # Sync Before Review
 
+When a branch drifts too far from main, review gets noisier: already-resolved upstream changes reappear, stale-base conflicts distort the context, and the real scope of the change becomes harder to see.  
+Syncing before review is essentially reviewer empathy expressed as branch hygiene.
+
+<CommandFlowFigure
+  title="What pre-review sync really buys you"
+  caption="Refresh your view of main, integrate those changes, then inspect the resulting diff again. Reviewers get the current problem instead of old-base noise."
+  inputsLabel="Confirm first"
+  inputs="latest main state|current branch diff|intended review scope"
+  commandLabel="fetch → integrate → recheck diff"
+  outputsLabel="Review receives"
+  outputs="fresh base|cleaner diff|less context noise"
+  note="This is not courtesy polish. It is part of review quality."
+/>
+
 ## Why this step matters
 
-When a branch drifts too far from main, review gets noisier:
+Review cost is not only about reading code. It is also about understanding which base the code is being compared against.  
+If the branch drifted for too long, reviewers are forced to process:
 
-- already-resolved upstream changes reappear as local context
-- stale base conflicts confuse the review
-- the stack becomes harder to interpret
+- outdated differences
+- sync conflicts you could have resolved earlier
+- extra history noise unrelated to the actual task
+
+That dilutes attention away from the real change.
 
 ## Recommended flow
 
@@ -36,6 +53,8 @@ git fetch origin
 git merge origin/main
 ```
 
+The important part is not mandatory rebase. It is completing both the main-line update and the post-sync diff review.
+
 ## Why this workflow is safer
 
 It fixes the order:
@@ -44,14 +63,66 @@ It fixes the order:
 2. integrate main into your branch
 3. re-check whether the diff still matches the intended review scope
 
+That sequence turns syncing from an afterthought into review preparation.
+
 ## What to confirm before review
 
 1. your branch includes the latest mainline state
 2. the diff still matches the intended scope
 3. the latest commits are clean enough for reviewers to follow
+4. if the branch is shared, the chosen integration method matches team expectations
+
+Useful commands:
+
+```bash
+git branch -vv
+git diff --stat origin/main...
+git log --oneline --decorate -8
+```
+
+## What this saves reviewers from
+
+- irrelevant differences
+- stale-base conflict context
+- extra effort just to recover the real scope of the change
+- uncertainty about whether the branch is actually review-ready
+
+## When pre-review sync reveals a deeper problem
+
+Sometimes the sync step exposes something more fundamental:
+
+- the branch is too large
+- the topic boundary is too broad
+- the commit structure is too noisy
+
+In those cases, do not stop at syncing. Go back and clean the branch before asking for serious review.
+
+<WarningBox title="Always inspect the diff again after syncing main">
+  Many people sync and immediately open review, assuming they only “brought main in.” But integration can change the diff structure in important ways. If you do not re-check, you may send new noise straight into review.
+</WarningBox>
 
 ## Common mistakes
 
-- waiting for reviewers to point out that the base is stale
-- syncing main but never re-checking the final diff
-- treating pre-review sync as optional cleanup instead of review preparation
+### Waiting for reviewers to point out that the base is stale
+
+That offloads preventable cleanup onto reviewers.
+
+### Syncing main but never re-checking the final diff
+
+The integration step may have changed more than expected.
+
+### Treating pre-review sync as optional cleanup
+
+It is usually part of the review-quality bar itself.
+
+<PracticeBox title="Ask yourself these questions before opening review">
+  1. Can I explain the current relationship between this branch and main?
+  2. After syncing, does the diff still represent the change I want reviewed?
+  3. Will reviewers spend their time on business logic, or on history noise I should have cleaned first?
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `Feature branch collaboration`
+2. `Squash vs rebase merge`
+3. `Fetch vs pull`

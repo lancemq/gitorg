@@ -12,6 +12,19 @@ export const metadata = {
 
 # fetch vs pull
 
+Many Git sync mistakes do not come from hard commands. They come from collapsing two different intentions into one move: “tell me what changed remotely” and “change my current branch now.”
+
+<CommandFlowFigure
+  title="Why fetch-first creates better control"
+  caption="Update your understanding of remote state first, then decide whether and how to integrate it. This turns syncing from reflex into reasoning."
+  inputsLabel="See first"
+  inputs="remote ref movement|branch divergence|local unpublished commits"
+  commandLabel="fetch → inspect → choose"
+  outputsLabel="Then decide"
+  outputs="ff-only|merge|rebase|wait"
+  note="The expensive sync mistake is often not missing updates. It is mutating the branch before understanding the state."
+/>
+
 ## The core difference
 
 - `git fetch`: download remote refs and objects without directly changing your current branch
@@ -26,19 +39,39 @@ git fetch origin
 
 ## Why fetch is a better default habit
 
-Fetch separates "sync remote state" from "modify my branch".
+Fetch separates two different actions:
 
-That gives you room to inspect:
+1. updating your knowledge of remote state
+2. mutating the current branch
+
+Once those are separate, you have room to inspect:
 
 - whether the remote moved ahead
 - whether your branch diverged
 - whether merge, rebase, or fast-forward is the better next step
+
+## What pull may actually do
+
+People often think of `pull` as “safe sync,” but it really contains at least two phases:
+
+- fetch
+- integration
+
+That integration phase may result in:
+
+- fast-forward
+- merge
+- rebase
+
+So the risk is not that `pull` is inherently bad. The risk is that it combines observation and mutation into one command.
 
 ## A safer decision order
 
 1. do I only need updated information
 2. am I ready to integrate that information
 3. if yes, should the integration be ff-only, merge, or rebase
+
+Once those questions are separated, many Git sync problems become easier to reason about.
 
 ## Suggested usage
 
@@ -55,8 +88,69 @@ git rebase origin/main
 git pull --ff-only
 ```
 
+`--ff-only` is valuable because if the branch already diverged, it fails instead of performing a hidden integration you did not intend.
+
+## A realistic scenario
+
+You open a repository in the morning and want to understand how to sync:
+
+```bash
+git status
+git fetch origin
+git branch -vv
+```
+
+If the branch is only behind and not diverged:
+
+```bash
+git pull --ff-only
+```
+
+If it is a personal feature branch and you want a linear history:
+
+```bash
+git rebase origin/main
+```
+
+## Why this matters even more in teams
+
+In collaboration, the most expensive outcome is often not “I forgot to sync.” It is “my sync changed the branch history and I did not fully realize how.”  
+Fetch-first gives you a thinking step before that mutation happens.
+
+<WarningBox title="Do not use pull as your default “let me just check remote state” command">
+  If your goal is only to inspect what changed upstream, `pull` is often too heavy. Start with `fetch`, then decide whether branch mutation is actually appropriate.
+</WarningBox>
+
 ## Common mistakes
 
-- assuming pull is always the safer beginner shortcut
-- forgetting that pull may create merge or rebase side effects
-- treating fetch as optional instead of as an inspection step
+### Assuming pull is the easier beginner shortcut
+
+Beginners benefit more from observation space than from a one-command mutation.
+
+### Assuming a successful pull always means history stayed simple
+
+Not necessarily. Pull may already have merged or rebased your branch.
+
+### Pulling first and asking questions later
+
+A steadier habit is to fetch first and make the branch decision second.
+
+<PracticeBox title="Ask yourself these three questions before syncing">
+  1. Do I only need updated information, or do I intend to integrate now?
+  2. Is this a shared branch or a personal one?
+  3. Is ff-only, merge, rebase, or waiting the safer next step?
+</PracticeBox>
+
+## Team guidance
+
+If you are writing a Git team policy, a healthy baseline is:
+
+- prefer `fetch` before developer-branch integration
+- use `pull --ff-only` by default on shared branches
+- document whether `pull.rebase` is allowed or expected
+
+## Good follow-up reads
+
+1. `Sync before review`
+2. `Feature branch collaboration`
+3. `Hotfix and urgent fixes`

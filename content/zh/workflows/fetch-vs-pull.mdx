@@ -12,6 +12,19 @@ export const metadata = {
 
 # fetch 与 pull 的区别
 
+很多 Git 同步困惑，根源不是命令难，而是把“先知道远端变了什么”和“立刻把变化整合进当前分支”混成了一件事。
+
+<CommandFlowFigure
+  title="fetch-first 为什么更稳"
+  caption="先更新你对远端状态的认知，再决定是否以及如何整合。这样同步动作会从习惯性反射变成可解释的判断。"
+  inputsLabel="先拿到"
+  inputs="远端引用变化|分支是否分叉|本地未发布提交"
+  commandLabel="fetch → inspect → choose"
+  outputsLabel="再决定"
+  outputs="ff-only|merge|rebase|先不动"
+  note="同步最贵的错误，往往不是没拉到，而是没看清就改了当前分支。"
+/>
+
 ## 先记住结论
 
 - `git fetch`：下载远端最新信息，但不直接改你的当前分支
@@ -26,24 +39,31 @@ git fetch origin
 
 ## 为什么 fetch 更适合作为默认习惯
 
-因为它把“同步远端状态”和“修改当前分支”拆成了两个动作。
+因为它把两类动作拆开了：
 
-这意味着你可以先观察：
+1. 更新你对远端状态的认知
+2. 改变当前分支
+
+一旦拆开，你就能先观察：
 
 - 远端是否比本地更新
 - 当前分支是否已经分叉
 - 接下来更适合 merge、rebase，还是只做 fast-forward
 
-## pull 的四种常见整合结果
+## pull 到底可能做出什么
 
-根据官方文档，pull 在下载完成后，整合阶段可能表现为：
+很多人把 `pull` 理解成“安全同步一下”，但它其实至少包含两段：
 
-1. fast-forward
-2. rebase
-3. merge
-4. squash merge
+- fetch
+- 整合
 
-所以，pull 不应该被简单理解成“安全同步一下”。
+整合阶段可能表现为：
+
+- fast-forward
+- merge
+- rebase
+
+所以 `pull` 的风险不在于它“危险”，而在于它把观察和修改捆绑在一起。
 
 ## 一个更稳的判断顺序
 
@@ -94,19 +114,35 @@ git pull --ff-only
 git rebase origin/main
 ```
 
+## 为什么这对团队尤其重要
+
+在团队协作里，最贵的代价常常不是“没同步”，而是“同步动作把历史改了，但本人并没有意识到”。  
+fetch-first 的价值就在这里：  
+它给你一个先理解再动作的缓冲带。
+
+<WarningBox title="不要把 pull 当成默认的“看看最新状态”命令">
+  如果你只是想知道远端有没有前进，`pull` 往往动作过重。更保守的做法是先 `fetch`，看清楚再决定是否真的要改变当前分支。
+</WarningBox>
+
 ## 常见误区
 
-### 误区 1：pull 比 fetch 更省事，所以更适合初学者
+### 以为 pull 更省事，所以更适合初学者
 
 恰恰相反。初学者更需要观察空间，而不是在一个命令里同时发生“下载 + 整合”。
 
-### 误区 2：只要 pull 成功，就说明历史一定干净
+### 只要 pull 成功，就说明历史一定干净
 
 不一定。它可能已经帮你做了 merge 或 rebase，只是你没有立刻意识到。
 
-### 误区 3：先 pull，出了问题再说
+### 先 pull，出了问题再说
 
 更稳的方式是：先 fetch，把远端状态看清楚。
+
+<PracticeBox title="同步前先问自己 3 个问题">
+  1. 我现在只是想知道远端状态，还是准备真正整合？
+  2. 当前分支是共享分支还是个人分支？
+  3. 这次整合更适合 ff-only、merge、rebase，还是先不动？
+</PracticeBox>
 
 ## 团队建议
 
@@ -118,8 +154,6 @@ git rebase origin/main
 
 ## 接下来建议继续学什么
 
-这一页之后，最适合继续看：
-
-1. `sync before review`
-2. `feature branch collaboration`
-3. `hotfix and urgent fixes`
+1. `Sync before review`
+2. `Feature branch collaboration`
+3. `Hotfix and urgent fixes`

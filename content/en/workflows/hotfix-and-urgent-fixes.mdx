@@ -13,9 +13,38 @@ export const metadata = {
 
 # Hotfix and Urgent Fixes
 
+Production incidents, release blockers, and severe regressions are classic hotfix situations. The goal is not to clean up everything. The goal is to repair one critical issue on the safest possible base and flow that fix back cleanly.
+
+<CommandFlowFigure
+  title="The hotfix priority order"
+  caption="Start from a stable branch, make the smallest necessary repair, validate it in isolation, then flow it back into the branches that must stay correct."
+  inputsLabel="Lock down first"
+  inputs="stable branch|incident scope|minimal repair surface"
+  commandLabel="branch → fix → validate → flow back"
+  outputsLabel="Aim for"
+  outputs="restored stability|clear history|aligned mainline"
+  note="The more urgent the incident, the more valuable small diffs become."
+/>
+
 ## Where this workflow fits
 
-Production incidents, release blockers, and severe regressions are classic hotfix situations. The goal is not to clean up everything. The goal is to repair one critical issue on the safest possible base and flow that fix back cleanly.
+Use a hotfix workflow when:
+
+- production needs fast recovery
+- a release is blocked by a critical issue
+- a newly shipped version introduced a severe regression
+- an already released version needs an urgent repair
+
+The difference from ordinary feature work is simple: recovery speed and change isolation matter more than broader cleanup.
+
+## Why a hotfix should branch from a stable line
+
+Because urgent repair work is most dangerous when it mixes stable context with unrelated in-flight development. A stable branch base gives you:
+
+- smaller diffs
+- faster validation
+- cleaner rollback options
+- clearer relationships between release and main branches
 
 ## Recommended sequence
 
@@ -43,6 +72,8 @@ git commit -m "fix: handle login timeout"
 git push -u origin hotfix/login-timeout
 ```
 
+The important thing is not the command sequence alone. It is that repair, validation, and propagation remain separate decisions.
+
 ## Why hotfixes should avoid "while we are here" changes
 
 Urgent fixes work best when the change surface stays small:
@@ -51,8 +82,61 @@ Urgent fixes work best when the change surface stays small:
 - rollback is simpler
 - incident analysis stays clearer
 
+If a change is not necessary for the urgent repair to work, it usually does not belong in the hotfix.
+
+<WarningBox title="Do not turn the hotfix branch into a temporary feature branch">
+  Many incidents get worse not because the original bug was too hard, but because teams keep layering unrelated cleanup and improvements into the same urgent fix branch.
+</WarningBox>
+
+## What to check before shipping the hotfix
+
+At minimum, confirm:
+
+1. the repair started from a stable branch
+2. the diff contains only incident-related scope
+3. the follow-up branches that need the fix are already identified
+4. the rollback path is understood if the hotfix itself fails
+
+Useful commands:
+
+```bash
+git diff --stat main...
+git log --oneline --decorate -5
+```
+
+## Why flowing the fix back matters as much as shipping it
+
+One of the most expensive hotfix mistakes is stopping after production recovery. If the fix does not flow back:
+
+- the next release can reintroduce the bug
+- main and stable branches begin describing different truths
+- the team loses confidence about which line is actually correct
+
+A hotfix is only fully successful when both production and branch relationships are stable again.
+
 ## Common mistakes
 
-- mixing unrelated cleanup into the hotfix
-- shipping the fix without flowing it back to main
-- treating the hotfix branch like a normal feature branch
+### Mixing unrelated cleanup into the hotfix
+
+This inflates validation and rollback cost.
+
+### Shipping the fix without flowing it back to main
+
+That turns today’s repair into tomorrow’s regression source.
+
+### Treating the hotfix branch like a normal long-running branch
+
+Hotfix branches should stay narrow, short, and purposeful.
+
+<PracticeBox title="Ask these questions before starting a hotfix">
+  1. Am I branching from a truly stable line?
+  2. What is the smallest repair scope that restores service?
+  3. Which branches need the fix after production recovers?
+  4. If this repair fails, how will I back it out quickly?
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `Release branch workflow`
+2. `Backport with cherry-pick`
+3. `Fetch vs pull`

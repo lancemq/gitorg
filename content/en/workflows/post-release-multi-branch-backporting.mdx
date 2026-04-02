@@ -12,17 +12,125 @@ export const metadata = {
 
 # Post-release Multi-branch Backporting
 
-## What this workflow solves
+After release, a single fix may need to land on several maintained versions. At that point the question is no longer just “can we backport it?” It becomes:
 
-After release, one fix may need to land on multiple supported versions. The problem is no longer just "can we backport it" but:
+- which maintained lines actually need it
+- which line should receive it first
+- whether the same patch still means the same thing on every line
+- how to record which versions now carry the fix
 
-- which maintained lines really need it
-- in what order they should receive it
-- whether each line can absorb the same patch cleanly
+<CommandFlowFigure
+  title="How to think about multi-line backporting"
+  caption="Backporting is not copy-paste history reuse. It is branch-by-branch validation of whether the fix still applies cleanly and meaningfully."
+  inputsLabel="Confirm first"
+  inputs="affected versions|maintenance branch priority|fix dependencies"
+  commandLabel="select → backport → verify"
+  outputsLabel="Aim for"
+  outputs="clear branch state|traceable fix coverage|clean release communication"
+  note="The hard part is rarely the command itself. It is choosing and validating well."
+/>
+
+## What this workflow really solves
+
+A fix that works on main does not automatically belong in every maintenance line. Released branches often diverge in:
+
+- dependency versions
+- configuration state
+- code structure
+- risk tolerance
+
+That means the central question is not “did cherry-pick apply?” but “does this line need the fix, and is this still the right expression of it?”
 
 ## A steadier order
 
-1. decide which released lines are affected
-2. rank the maintenance lines
-3. backport and validate one line at a time
-4. record which lines are done and which are intentionally skipped
+### 1. Decide which released lines are truly affected
+
+Do not assume every supported version needs the change. First determine:
+
+- which versions can actually hit the bug
+- which versions still matter enough to justify the backport
+- which versions are already near end-of-support
+
+### 2. Rank the maintenance lines
+
+A safer default is often:
+
+- start with the line closest to main
+- then move gradually toward older maintenance lines
+
+The closer a line is to main, the more likely the original fix context still resembles the current one.
+
+### 3. Backport and validate one line at a time
+
+Avoid “apply everywhere first, understand later.” Each line deserves its own check for:
+
+- clean cherry-pick behavior
+- dependency compatibility
+- configuration impact
+- test and runtime validation
+
+### 4. Record what is done and what is intentionally skipped
+
+One of the hidden costs of multi-line maintenance is that teams later forget:
+
+- which lines got the fix
+- which lines did not
+- which lines were intentionally skipped
+
+That record is part of the workflow, not optional paperwork.
+
+## Why you should not “just move the same commit everywhere”
+
+Because maintenance branches are rarely identical contexts. Over time they drift in:
+
+- structure
+- dependencies
+- config
+- acceptable operational risk
+
+Backporting is therefore less about moving a commit and more about preserving a repair intention across different branch realities.
+
+## Why cherry-pick is common here, but still not enough
+
+`git cherry-pick` is often the practical transport tool for backports because it can move one focused fix at a time. But success is layered:
+
+- command success is only the first layer
+- semantic correctness is the second layer
+- actual necessity on that branch is the higher-level decision
+
+If a cherry-pick applies cleanly but the branch never needed the fix, or now needs it expressed differently, the workflow still failed.
+
+## A lightweight team backport policy
+
+1. determine affected versions before touching branches
+2. backport in a deliberate priority order
+3. validate every line independently
+4. record completed, skipped, and pending lines
+5. keep release notes or support guidance synchronized
+
+## Common mistakes
+
+### Assuming one successful cherry-pick proves every line can take the same fix
+
+This is the most common false shortcut.
+
+### Skipping prioritization
+
+Without an order, teams often start with the oldest or hardest line and lose momentum immediately.
+
+### Forgetting the communication layer
+
+A backport that is not reflected in release notes, support docs, or changelog communication creates downstream confusion even if the code change itself was correct.
+
+<PracticeBox title="Questions to answer before a multi-line backport">
+  1. Which maintenance lines truly need the fix?
+  2. Which line is closest to main and safest to validate first?
+  3. Does the fix depend on newer code, config, or infrastructure assumptions?
+  4. How will the team record which versions now include the repair?
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `Backport with cherry-pick`
+2. `Release branch workflow`
+3. `Hotfix and urgent fixes`

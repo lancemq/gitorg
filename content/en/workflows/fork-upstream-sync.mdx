@@ -13,8 +13,6 @@ export const metadata = {
 
 # Fork and Upstream Sync
 
-## Where this workflow fits
-
 In a fork workflow you usually manage two remotes:
 
 - `origin`: your fork
@@ -22,9 +20,40 @@ In a fork workflow you usually manage two remotes:
 
 Most confusion comes from blurring those two roles.
 
+<CommandFlowFigure
+  title="Remote responsibilities in a fork workflow"
+  caption="Read and sync from upstream, stabilize locally, then push the synchronized result back to your own origin. Once those roles blur, branch and PR quality usually suffer too."
+  inputsLabel="Remote roles"
+  inputs="origin=my fork|upstream=canonical repo|local main=sync base"
+  commandLabel="fetch upstream → update local → push origin"
+  outputsLabel="You end up with"
+  outputs="fork aligned upstream|clean branch base|cleaner PR diffs"
+  note="Fork workflow stability starts with remote-role clarity."
+/>
+
+## Where this workflow fits
+
+This workflow is useful when:
+
+- you contribute to open source
+- you work through an internal mirror or fork-based collaboration model
+- you do not have direct write access to the canonical repository
+
+If you push directly to the shared team repository, a normal feature-branch workflow is often the better mental model.
+
+## The problem this workflow solves
+
+The goal is to keep this boundary stable:
+
+- read from `upstream`
+- update local state safely
+- publish to `origin`
+
+Once that boundary stays clear, most fork sync mistakes become much easier to avoid.
+
 ## Suggested sequence
 
-### 1. make sure the remotes are mapped correctly
+### 1. Make sure the remotes are mapped correctly
 
 ```bash
 git remote -v
@@ -32,37 +61,111 @@ git remote add upstream <upstream-url>
 git remote -v
 ```
 
-### 2. fetch upstream first
+The healthy default is usually:
+
+- `origin` points to your fork
+- `upstream` points to the canonical repository
+
+### 2. Fetch upstream first
 
 ```bash
 git fetch upstream
 ```
 
-### 3. sync your local main branch
+This gives you updated information without mutating the current branch yet.
+
+### 3. Sync your local main branch
 
 ```bash
 git switch main
 git rebase upstream/main
 ```
 
-If your team prefers not to rewrite local history, use merge instead.
+If your team prefers not to rewrite local history, use merge instead:
 
-### 4. push the updated main back to your fork
+```bash
+git merge upstream/main
+```
+
+### 4. Push the updated main back to your fork
 
 ```bash
 git push origin main
 ```
 
-## Why this order is safer
+That step matters because future topic branches are often cut from `origin/main`, not only from local memory.
 
-It fixes the remote boundary:
+### 5. Branch from the refreshed base
 
-- read from upstream
-- stabilize locally
-- publish back to origin
+```bash
+git switch -c feature/update-docs
+```
+
+## A steady day-to-day rhythm
+
+If you contribute regularly to the same project, a good repeatable loop is:
+
+```bash
+git fetch upstream
+git switch main
+git rebase upstream/main
+git push origin main
+git switch -c feature/small-fix
+```
+
+The value is simple: new work starts from a current base instead of stale fork state.
+
+## Useful checks before and after syncing
+
+```bash
+git remote -v
+git branch -vv
+git log --oneline --decorate --graph --all -10
+```
+
+Look for:
+
+1. whether `origin` and `upstream` are still correct
+2. whether you are really on the branch you think you are on
+3. whether local main actually aligns with `upstream/main`
+
+## Why many fork-based PRs contain noise
+
+Usually not because the code is messy, but because:
+
+- the feature branch came from stale fork main
+- upstream sync happened locally but was never pushed back to origin
+- remote roles remained conceptually fuzzy
+
+Those mistakes make old divergence show up in new pull requests.
+
+<WarningBox title="Do not branch from stale fork main if you can avoid it">
+  A noisy PR often starts days earlier, when the new branch was created from outdated fork state. In fork workflows, syncing before branching is one of the highest-value habits you can build.
+</WarningBox>
 
 ## Common mistakes
 
-- treating `origin` as the canonical repo
-- cutting new branches from an outdated fork main
-- forgetting to push the synced result back to your fork
+### Treating `origin` as the canonical repository
+
+In fork workflows, `origin` is often your personal fork, not the team’s main repo.
+
+### Cutting new branches from outdated fork main
+
+That drags old divergence into new work.
+
+### Syncing upstream locally but never pushing the result to origin
+
+Then your fork still lags, and later branches keep starting from stale state.
+
+<PracticeBox title="Ask these questions before syncing a fork">
+  1. Are `origin` and `upstream` roles still clear?
+  2. Is local main actually aligned with `upstream/main`?
+  3. Should the synchronized result be pushed back to `origin/main`?
+  4. Is the next branch being created from that refreshed base?
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `Feature branch collaboration`
+2. `Sync before review`
+3. `Fetch vs pull`

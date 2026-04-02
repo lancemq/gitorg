@@ -13,16 +13,36 @@ export const metadata = {
 
 # Submodule Update Flow
 
-## Why this workflow is easy to misread
-
-A submodule update looks like "changing a directory," but it is really two repositories interacting:
+A submodule update often looks like “changing a directory,” but that is misleading. You are really handling two repositories at once:
 
 - the submodule repository itself
 - the parent repository that records which submodule commit should be used
 
+If those two layers are not kept separate in your head, submodule work quickly becomes confusing.
+
+<CommandFlowFigure
+  title="The two layers of a submodule update"
+  caption="First move the child repository to the intended commit. Then commit the parent repository’s pointer change. Both layers matter if the team is supposed to reproduce the same state."
+  inputsLabel="Handle first"
+  inputs="submodule repo|target commit|recursive init state"
+  commandLabel="update child → record pointer"
+  outputsLabel="End state"
+  outputs="child at target SHA|parent records new pointer|others can sync recursively"
+  note="The parent repository records a submodule commit reference, not the child repository’s full file history."
+/>
+
+## Why this workflow is easy to misread
+
+A submodule is not just a normal folder. It is closer to “a repository state referenced by another repository.” That means every update has two separate questions:
+
+1. where does the submodule repository point now
+2. which submodule commit should the parent repository record as the shared baseline
+
+Ignoring either layer creates confusing results later.
+
 ## Suggested sequence
 
-### 1. move the submodule to the intended commit
+### 1. Move the submodule to the intended commit
 
 ```bash
 git submodule update --init --recursive
@@ -32,7 +52,9 @@ git switch main
 git pull --ff-only
 ```
 
-### 2. commit the pointer update in the parent repo
+This step is about making sure the child repository itself is at the intended state.
+
+### 2. Commit the pointer update in the parent repo
 
 ```bash
 cd ../..
@@ -41,14 +63,82 @@ git add path/to/submodule
 git commit -m "chore: update submodule pointer"
 ```
 
-### 3. verify init and recursive update behavior
+The parent repository is not committing the child repository’s contents. It is committing which child commit should be used.
+
+### 3. Verify init and recursive update behavior
 
 ```bash
 git submodule update --init --recursive
 ```
 
+This is the sanity check that tells you another developer can clone or update the parent repository and still land on the same child revision you intended.
+
+## A fuller example
+
+```bash
+git submodule update --init --recursive
+cd path/to/submodule
+git fetch origin
+git switch main
+git pull --ff-only
+cd ../..
+git status
+git diff --submodule
+git add path/to/submodule
+git commit -m "chore: update submodule pointer"
+```
+
+The key value of this flow is separation: first update the child repository, then deliberately record the parent pointer.
+
+## Checks worth keeping every time
+
+At minimum, confirm:
+
+1. the submodule repository really reached the target commit
+2. the parent repository shows only the expected submodule pointer change
+3. `git diff --submodule` tells a story you can explain
+4. recursive update commands still reproduce the intended state
+
+## When submodule workflows become especially risky
+
+- the child repository is still on unstable branch work
+- the team does not use a consistent recursive initialization routine
+- nested submodules exist but people forget `--recursive`
+- access or branch policy differs sharply between parent and child repositories
+
+These are the moments when submodules stop feeling like dependency management and start becoming coordination debt.
+
+<WarningBox title="Do not treat a submodule path like an ordinary dependency folder">
+  The visible directory contents are only the surface. What the parent repository truly records is a commit pointer. If you look only at files and not at the referenced child commit, you may think you changed one thing while actually shipping another.
+</WarningBox>
+
 ## Common mistakes
 
-- assuming the parent repo stores full submodule file history
-- updating the submodule but forgetting to commit the pointer change
-- forgetting initialization and then treating the submodule state as broken
+### Assuming the parent repository stores the submodule’s full file history
+
+Usually it does not. It stores the child commit reference.
+
+### Updating the submodule but forgetting to commit the pointer change
+
+Then teammates cannot reproduce the intended child version from the parent repository alone.
+
+### Forgetting initialization and treating the state as broken
+
+Many “submodule is empty or weird” moments are just missing initialization.
+
+### Assuming submodule pointer changes do not need review
+
+They do. A pointer change is a dependency baseline change and should be reviewed as such.
+
+<PracticeBox title="Ask these questions before updating a submodule">
+  1. Is the child repository already on a stable commit?
+  2. Does the update bring API, config, or runtime implications?
+  3. Should the parent repository end with exactly one expected submodule pointer change?
+  4. Can another developer reproduce the same state with recursive update commands?
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `Release branch workflow`
+2. `Feature branch collaboration`
+3. `Sync before review`

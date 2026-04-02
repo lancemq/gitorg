@@ -12,9 +12,28 @@ export const metadata = {
 
 # Open Source Contribution with Fork + PR
 
+When you do not have direct write access to the canonical repository, the important skill is not merely “how to push.” It is knowing how `upstream`, `origin`, topic branches, and pull requests relate without mixing their roles.
+
+<CommandFlowFigure
+  title="The fork contribution backbone"
+  caption="Keep your fork aligned with upstream, branch from a clean base, push only to your fork, then contribute back through a PR."
+  inputsLabel="Prepare first"
+  inputs="fork repository|upstream remote|clean main branch"
+  commandLabel="sync fork → branch → push → PR"
+  outputsLabel="You get"
+  outputs="clear remote roles|review-friendly PR|repeatable contribution flow"
+  note="The clearer origin and upstream stay in your head, the smoother the contribution loop becomes."
+/>
+
 ## Where this workflow fits
 
-Use this flow when you do not have direct write access to the canonical repository and contribute through a fork plus pull request model.
+Use this flow when:
+
+- you do not have direct write access to the canonical repository
+- your personal fork holds your work branches
+- the final contribution goes back through a pull request or merge request
+
+This model is common in open source because it balances contributor freedom with repository protection.
 
 ## The complete rhythm
 
@@ -30,7 +49,70 @@ Use this flow when you do not have direct write access to the canonical reposito
 
 In this model:
 
-- `upstream` is usually where you read from
-- `origin` is usually where you push your work
+- `upstream` is where you usually read from and sync from
+- `origin` is where you push your own work
 
-Confusing those two roles is the source of many fork-workflow mistakes.
+Once those roles get blurred, every later step becomes harder to reason about.
+
+## A minimal working command flow
+
+```bash
+git remote add upstream <upstream-url>
+git fetch upstream
+git switch main
+git rebase upstream/main
+git push origin main
+git switch -c feature/fix-docs
+git push -u origin feature/fix-docs
+```
+
+The point is not memorizing the exact sequence. The point is preserving clean remote responsibility.
+
+## Why you should sync the fork before starting a new task
+
+Many open-source contribution problems are not code problems at all. They start when a contributor branches from an outdated fork main. That leads to:
+
+- noisy PRs
+- unnecessary divergence
+- avoidable sync conflicts later
+- extra reviewer effort just to identify the real change
+
+That is why a very healthy fork habit is: before starting new work, bring your local `main` in line with `upstream/main`.
+
+## What to check before opening the PR
+
+1. was the branch created from current upstream main
+2. are `origin` and `upstream` still clearly separated
+3. does the diff contain only this contribution
+4. do commit titles and PR text explain intent clearly
+
+## Common mistakes
+
+### Starting from a stale fork main
+
+This is one of the most common sources of noisy pull requests.
+
+### Confusing `origin` and `upstream`
+
+Once remote roles are blurred, sync and push behavior become harder to reason about.
+
+### Opening the PR without syncing upstream first
+
+That makes reviewers filter stale divergence before they can evaluate your actual change.
+
+### Stacking multiple unrelated tasks on fork main
+
+Fork workflows still benefit from topic branches. Your fork is not a reason to stop using branch boundaries.
+
+<PracticeBox title="Ask these questions before contributing through a fork">
+  1. Is my local `main` aligned with `upstream/main`?
+  2. Am I pushing to `origin`, not to the canonical repo?
+  3. Does this task deserve its own branch?
+  4. Does the PR diff contain only the intended contribution scope?
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `Fork upstream sync`
+2. `Sync before review`
+3. `Feature branch collaboration`

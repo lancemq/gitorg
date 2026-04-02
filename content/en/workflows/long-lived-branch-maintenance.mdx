@@ -13,19 +13,78 @@ export const metadata = {
 
 # Maintaining Long-lived Branches
 
+The longer a branch stays alive, the easier it is for drift, repeated conflicts, and noisy integration history to pile up.  
+The goal is not “never conflict.” The goal is to keep drift visible, sync batches small, and branch debt under control.
+
+<CommandFlowFigure
+  title="A healthier long-lived branch rhythm"
+  caption="Set a recurring sync cadence, integrate main in smaller batches, and inspect conflict hotspots before they accumulate into a final merge event."
+  inputsLabel="Keep watching"
+  inputs="branch age|main drift|conflict hotspots"
+  commandLabel="sync regularly → validate → pay down debt"
+  outputsLabel="Aim for"
+  outputs="smaller conflicts|clearer history|lower merge shock"
+  note="A long-lived branch becomes dangerous when the team stops checking drift until the very end."
+/>
+
 ## Why long-lived branches get expensive
 
-The longer a branch stays alive, the easier it is for divergence, repeated conflicts, and noisy integration history to pile up.
+Short-lived branches have one huge advantage: their drift window stays small.  
+Long-lived branches invert that:
 
-The real goal is not "never conflict." The goal is to keep sync batches small and regular.
+- divergence keeps increasing
+- integration gets progressively more painful
+- the same conflict areas repeat
+- history fills with noisy “sync for sync’s sake” commits
+
+That is why the core objective is not conflict elimination. It is conflict control.
+
+## When a long-lived branch is actually justified
+
+It is usually worth keeping only when the branch maps to a real long-running boundary, such as:
+
+- a release maintenance line
+- a customer-specific line
+- a large migration track
+- a theme that must intentionally progress in parallel for a long time
+
+If the branch is merely normal feature work that never gets integrated, the problem is often process design, not branch duration.
 
 ## Suggested sequence
 
-1. set a recurring sync cadence
-2. keep each integration batch small
-3. pay down conflict and history debt regularly
+### 1. Set a recurring sync cadence
 
-## A realistic maintenance rhythm
+Do not wait until the final merge window to remember synchronization. Healthier options include:
+
+- sync weekly
+- sync at each milestone
+- sync before large batch work
+
+### 2. Keep each integration batch small
+
+```bash
+git fetch origin
+git rebase origin/main
+```
+
+or
+
+```bash
+git fetch origin
+git merge origin/main
+```
+
+The key is not mandatory command choice. It is avoiding huge accumulated distance.
+
+### 3. Pay down branch debt regularly
+
+The long-lived-branch problem is not only conflicts. It is old unresolved structure debt:
+
+- recurring conflict zones
+- obsolete temporary commits
+- noise left behind by emergency integration work
+
+## A realistic maintenance loop
 
 ```bash
 git switch migration/auth-refactor
@@ -35,10 +94,59 @@ git status
 git log --oneline --decorate -8
 ```
 
-After each sync, validate the branch before drift builds again.
+After each sync, do two more things:
+
+1. run the critical validation suite
+2. note which files or areas caused friction this time
+
+Over time, that reveals where the branch is structurally expensive.
+
+## How to think about merge versus rebase here
+
+Both can be reasonable, but they optimize for different things:
+
+- `merge`: preserves visible integration points and suits teams that want explicit sync history
+- `rebase`: keeps the branch more linear, but requires clearer rewrite boundaries
+
+If the long-lived branch is shared by many people, frequent rebase needs much more coordination.
+
+## Checks worth keeping around every sync
+
+```bash
+git branch -vv
+git diff --stat origin/main...
+git log --oneline --decorate --graph -12
+```
+
+Look for:
+
+1. whether the branch distance actually shrank
+2. whether new high-cost conflicts appeared
+3. whether history is becoming sync noise instead of useful progress
 
 ## Common mistakes
 
-- waiting until the final merge to sync
-- letting one long-lived branch absorb multiple unrelated themes
-- syncing repeatedly but never cleaning the resulting history
+### Waiting until the final merge to synchronize
+
+That usually turns routine integration cost into an event-sized problem.
+
+### Letting one long-lived branch absorb multiple unrelated themes
+
+The longer the branch lives, the more important topic clarity becomes.
+
+### Synchronizing repeatedly but never cleaning the result
+
+A branch can remain “active” while still becoming harder and harder to understand.
+
+<PracticeBox title="Questions to ask during long-lived branch maintenance">
+  1. Does this branch still represent one coherent theme?
+  2. Is drift shrinking or silently growing?
+  3. Which files are repeated conflict hotspots?
+  4. Is the branch history still describing progress, or mostly describing synchronization effort?
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `Release branch workflow`
+2. `Hotfix and urgent fixes`
+3. `Squash vs rebase merge`

@@ -13,16 +13,117 @@ export const metadata = {
 
 # Sync Boundaries on Shared Branches
 
+Once multiple people depend on the same branch, actions that feel harmless on a personal branch can become destructive at team scale.  
+On a solo branch, rebase and reset may be cleanup. On a shared branch, they may change the synchronization baseline for everyone else.
+
+<CommandFlowFigure
+  title="The safer sequence on a shared branch"
+  caption="Identify that the branch is shared, then prefer append-style history operations unless the team explicitly coordinates a rewrite."
+  inputsLabel="Recognize first"
+  inputs="main|release branch|multi-person feature branch"
+  commandLabel="observe → align → append"
+  outputsLabel="Prefer"
+  outputs="safe sync|explainable history|controlled risk"
+  note="Shared branches optimize for collective predictability, not personal cleanup speed."
+/>
+
 ## Why shared branches are different
 
-Once multiple people depend on the same branch, actions that feel harmless on a personal branch can become destructive team-wide.
+The defining property of a shared branch is not only “many people use it.” It is that other people depend on the history expression you are looking at right now.  
+If you rewrite that expression, you are not only changing your own branch view. You are changing other people’s sync base.
+
+That is why shared-branch mistakes often become coordination incidents rather than personal mistakes.
 
 ## A useful rule
 
-Prioritize "everyone can sync safely" over "history looks maximally tidy."
+Prioritize “everyone can sync safely” over “history looks maximally tidy.”
 
-## Safer boundaries
+This rule directly reduces:
 
-- allow fetch, ff-only pulls, explicit merges, and deliberate review merges
-- treat shared-branch rebases with care
-- avoid force-push and reset-based history rewrites unless the team explicitly coordinates them
+- surprise divergence after pull
+- confusion around CI, tags, and release context
+- recovery complexity after branch accidents
+
+## Which actions usually stay inside the safer boundary
+
+### Usually acceptable
+
+- `git fetch`
+- `git pull --ff-only`
+- explicit merge
+- deliberate review-driven merge actions
+
+The common property is that they mostly append history or at least avoid silently rewriting history other people already depend on.
+
+### Use with serious care
+
+- rebasing a shared branch
+- reordering commits that teammates already saw
+- changing upstream or branch shape without coordination
+
+These are not always forbidden, but they should never be casual.
+
+### Normally avoid
+
+- unannounced force-push
+- reset-based shared-history rewrites
+- treating a shared branch like a personal cleanup area
+
+## Why this boundary is healthier
+
+Shared branches are not optimized for one person’s history preferences. They are optimized for team-wide predictability.
+
+If every contributor assumes “I’ll tidy this up and others can just pull again,” the result is usually not better history. It is higher coordination cost.
+
+<WarningBox title="The biggest force-push risk on a shared branch is coordination loss">
+  The technical command is only part of the issue. The more dangerous part is that others may not know their synchronization base has changed. Shared-branch failures are often expectation failures first and command failures second.
+</WarningBox>
+
+## Not all shared branches carry the same risk
+
+### Main or default branch
+
+Usually the highest-risk branch.  
+It should normally accept only protected, deliberate integrations.
+
+### Release branch
+
+Also high risk, because it often maps to deployment state, tags, release notes, or support expectations. Casual history rewriting is especially dangerous here.
+
+### Multi-person feature branch
+
+Lower risk than main, but still no longer a personal branch. If several people depend on it, history cleanup should not be casual.
+
+## A lightweight team baseline
+
+1. clearly name which branches count as shared
+2. avoid private rebase and force-push on shared branches by default
+3. fetch before integration decisions
+4. if history rewrite is truly necessary, coordinate it explicitly
+5. treat main and release branches more conservatively than ordinary team branches
+
+## Common mistakes
+
+### Treating a shared branch like a personal branch
+
+This is the most common and expensive mistake.
+
+### “I only rewrote a little history; everyone can pull again”
+
+That assumes teammates understand what changed and how to recover cleanly, which is often false.
+
+### Applying one risk model to every shared branch
+
+Main, release, and multi-person feature branches do not all deserve identical rules.
+
+<PracticeBox title="Ask these questions before changing a shared branch">
+  1. Am I the only person depending on this branch?
+  2. Does this action append history or rewrite it?
+  3. If a teammate syncs right now, will this action surprise or break their flow?
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `Fetch vs pull`
+2. `PR merge strategy and platform settings`
+3. `Merge queue workflow`
