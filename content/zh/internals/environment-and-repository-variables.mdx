@@ -1,0 +1,107 @@
+export const metadata = {
+  title: "环境变量、仓库变量与 Git 运行上下文",
+  slug: "environment-and-repository-variables",
+  locale: "zh",
+  section: "internals",
+  summary: "理解 GIT_DIR、GIT_WORK_TREE、GIT_INDEX_FILE 等环境变量，能帮助你看懂 Git 如何决定“当前仓库上下文”到底是什么。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Internals-Environment-Variables",
+    "https://git-scm.com/docs/gitrepository-layout",
+  ],
+};
+
+# 环境变量、仓库变量与 Git 运行上下文
+
+很多人平时用 Git 时，默认它总能“自动知道我在哪个仓库里”。  
+这在最普通的场景里没问题，但 Git 其实一直允许你通过环境变量重写很多运行上下文。
+
+这意味着 Git 不是单纯依赖“当前目录里有没有 `.git/`”，而是在用一套更灵活的上下文决策模型。
+
+## 最常见的几个变量
+
+Git 官方书里特别值得关注的几个包括：
+
+- `GIT_DIR`
+- `GIT_WORK_TREE`
+- `GIT_INDEX_FILE`
+- `GIT_OBJECT_DIRECTORY`
+- `GIT_ALTERNATE_OBJECT_DIRECTORIES`
+
+它们共同在回答一件事：
+
+**这次 Git 命令到底应该把哪当成仓库、工作区、索引和对象库？**
+
+## `GIT_DIR` 在改什么
+
+`GIT_DIR` 最直接，它告诉 Git：
+
+- 真正的仓库目录在哪
+
+如果不设置，Git 会按默认规则在当前目录或上层目录寻找 `.git/`。  
+但一旦显式设置，它就会优先服从这个上下文。
+
+这对脚本、调试、特殊部署布局都很关键。
+
+## `GIT_WORK_TREE` 为什么重要
+
+它告诉 Git：
+
+- 哪个目录应该被视为当前工作区
+
+这意味着仓库状态和工作区位置可以被分开理解。  
+在多 worktree 或非常规仓库布局场景里，这一点尤其重要。
+
+## `GIT_INDEX_FILE` 为什么值得知道
+
+平时大家默认只有一个 index，也就是 `.git/index`。  
+但 Git 实际允许你把 index 指向另一份文件。
+
+这意味着：
+
+- index 不是天生不可替换的固定位置
+- 某些脚本、实验或底层工具可以在不碰默认索引的情况下做操作
+
+这也是理解“索引是一个明确存在的文件状态，而不是抽象概念”的很好入口。
+
+## 对象目录也能被重定向
+
+`GIT_OBJECT_DIRECTORY` 和 `GIT_ALTERNATE_OBJECT_DIRECTORIES` 说明：
+
+- 对象库并不一定只能来自当前仓库默认的 `objects/`
+- Git 可以在更灵活的对象来源布局中运行
+
+这会让你更好理解：
+
+- 镜像仓库
+- 共享对象存储
+- 某些高级仓库优化方式
+
+## 为什么这些变量对普通用户也有价值
+
+不是因为你每天都要手动设置它们，而是因为它们揭示了一件重要事实：
+
+**Git 的很多“看起来理所当然”的行为，其实是运行上下文推导出来的。**
+
+例如：
+
+- 为什么一个命令在这个目录能跑，在另一个目录不行
+- 为什么 `rev-parse --git-dir` 很有诊断价值
+- 为什么 worktree 和 bare repo 不该只靠直觉理解
+
+## 常见误区
+
+### Git 总是靠当前目录决定仓库
+
+不完全是。当前目录只是默认发现规则的一部分。
+
+### index 只是一个抽象层
+
+不是。index 是真实文件状态，而且可以被显式替换。
+
+### 对象库一定只在 `.git/objects`
+
+不一定。Git 的对象来源可以更灵活。
+
+## 最值得记住的结论
+
+**环境变量不是 Git 的边缘知识，它们在告诉你 Git 的仓库上下文其实是可配置、可重定向的。**

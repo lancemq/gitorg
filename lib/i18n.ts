@@ -126,11 +126,16 @@ export type GitlabSlug =
 
 export type InternalsSlug =
   | "object-database"
+  | "plumbing-and-porcelain"
   | "index-and-working-tree"
+  | "repository-layout-and-gitdir"
   | "refs-and-head"
   | "remote-tracking-refs"
+  | "revision-selection-and-ranges"
   | "commit-graph"
   | "packfiles-and-storage"
+  | "transfer-protocols-and-negotiation"
+  | "environment-and-repository-variables"
   | "reachability-and-garbage-collection"
   | "merge-base-and-ancestry"
   | "tree-objects-and-snapshots"
@@ -692,11 +697,16 @@ export const recoverySlugs = [
 
 export const internalsSlugs = [
   "object-database",
+  "plumbing-and-porcelain",
   "index-and-working-tree",
+  "repository-layout-and-gitdir",
   "refs-and-head",
   "remote-tracking-refs",
+  "revision-selection-and-ranges",
   "commit-graph",
   "packfiles-and-storage",
+  "transfer-protocols-and-negotiation",
+  "environment-and-repository-variables",
   "reachability-and-garbage-collection",
   "merge-base-and-ancestry",
   "tree-objects-and-snapshots",

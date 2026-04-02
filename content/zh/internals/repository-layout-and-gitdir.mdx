@@ -1,0 +1,139 @@
+export const metadata = {
+  title: "仓库布局、.git 目录与 GIT_DIR",
+  slug: "repository-layout-and-gitdir",
+  locale: "zh",
+  section: "internals",
+  summary: "理解 `.git` 目录、工作区、gitdir、common dir 和 worktree 之间的关系，能帮助你看懂仓库到底把什么放在了哪里。",
+  sourceUrls: [
+    "https://git-scm.com/docs/gitrepository-layout",
+    "https://git-scm.com/book/en/v2/Git-Internals-Environment-Variables",
+  ],
+};
+
+# 仓库布局、.git 目录与 GIT_DIR
+
+很多人第一次接触 Git 时，会把仓库简单理解成“项目目录加一个 `.git` 隐藏文件夹”。  
+这对入门够用，但一旦你接触这些场景，就会发现它不够了：
+
+- bare repo
+- linked worktree
+- 分离工作区和 gitdir
+- 临时指定 `GIT_DIR`
+
+所以这一页的重点，是把 Git 仓库“到底由哪几部分组成”讲清楚。
+
+## 最常见的仓库形态
+
+最常见的形态当然是：
+
+- 工作区：你正在编辑的项目文件
+- `.git/`：Git 的仓库元数据和对象存储目录
+
+在这种布局下，你会觉得“仓库就在 `.git` 里”。这没错，但只是最常见情况，不是唯一情况。
+
+## `.git/` 目录里通常有什么
+
+如果你进入 `.git/`，会看到很多熟悉又陌生的名字：
+
+- `objects/`
+- `refs/`
+- `HEAD`
+- `index`
+- `config`
+- `logs/`
+- `hooks/`
+
+它们分别对应：
+
+- 对象数据库
+- 分支和标签引用
+- 当前 HEAD 指向
+- 暂存区索引
+- 仓库级配置
+- reflog
+- hook 脚本
+
+换句话说，`.git/` 不是一个“黑盒目录”，而是 Git 运行时最核心的状态容器。
+
+## 什么是 gitdir
+
+Git 真正关心的，不一定是名叫 `.git` 的目录，而是**当前仓库的 gitdir 在哪**。
+
+平时最常见的情况是：
+
+- gitdir 恰好就是当前工作区里的 `.git/`
+
+但在更高级的布局里，gitdir 可能在别处，而当前目录里的 `.git` 甚至只是一个指向真实 gitdir 的文本文件。
+
+这在 `git worktree` 里尤其常见。
+
+## bare repo 为什么重要
+
+bare repo 没有普通工作区，它更像一个纯仓库目录。  
+通常在服务端、中央仓库或镜像仓库里常见。
+
+它的特点是：
+
+- 没有被检出的工作文件
+- 仓库目录本身就是 gitdir
+- 很适合被当成远端接收 push
+
+这能帮助你理解为什么服务器上的仓库长得和本地工作目录不一样。
+
+## linked worktree 为什么会改变你的理解
+
+一旦用 `git worktree`，你就会发现：
+
+- 一个 Git 仓库可以对应多个工作区
+- 这些工作区并不各自拥有完整独立的对象库
+- 它们共享底层对象和大部分仓库状态，但每个 worktree 又有自己的 HEAD 和工作目录上下文
+
+这时，如果还坚持把“仓库 = 当前目录里的 `.git` 文件夹”当成唯一模型，就会开始混乱。
+
+<MentalModelBox title="工作区是视图，gitdir 才是仓库状态核心">
+  <p>
+    你可以把工作区理解成“项目文件的一个展开视图”，而把 gitdir 理解成真正保存对象、引用、索引和配置的状态核心。
+  </p>
+</MentalModelBox>
+
+## GIT_DIR 和 GIT_WORK_TREE 在做什么
+
+Git 允许你通过环境变量显式告诉它：
+
+- 仓库目录在哪：`GIT_DIR`
+- 工作区在哪：`GIT_WORK_TREE`
+
+这意味着 Git 并不总是靠“当前目录里有没有 `.git/`”来判断上下文。  
+它也可以在更灵活的布局下工作。
+
+这对脚本、嵌套目录、诊断场景都很重要。
+
+## 为什么这会影响命令行为
+
+因为很多命令其实都依赖“当前仓库状态在哪”这个前提：
+
+- `status`
+- `add`
+- `commit`
+- `worktree`
+- `rev-parse --git-dir`
+
+如果你搞不清 gitdir、工作区和当前 repo 上下文，遇到多 worktree 或脚本场景时就很容易误判。
+
+## 常见误区
+
+### `.git` 一定是目录
+
+不一定。在某些场景下它可能只是一个指向真实 gitdir 的文件。
+
+### bare repo 不是完整仓库
+
+不是。它是没有工作区的完整仓库。
+
+### 每个 worktree 都有独立完整对象库
+
+通常不是。多个 worktree 会共享底层对象和部分仓库状态。
+
+## 最值得记住的结论
+
+**工作区告诉你“现在在哪改”，gitdir 才告诉 Git“仓库状态真正放在哪”。**

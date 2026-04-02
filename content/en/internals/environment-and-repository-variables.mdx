@@ -1,0 +1,79 @@
+export const metadata = {
+  title: "Environment Variables and Repository Context",
+  slug: "environment-and-repository-variables",
+  locale: "en",
+  section: "internals",
+  summary: "Variables like GIT_DIR, GIT_WORK_TREE, and GIT_INDEX_FILE help explain how Git decides what repository context it is actually operating in.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Internals-Environment-Variables",
+    "https://git-scm.com/docs/gitrepository-layout",
+  ],
+};
+
+# Environment Variables and Repository Context
+
+Most people use Git as if it always “just knows” which repository it is in.  
+That is usually fine for ordinary work, but Git actually allows many parts of its runtime context to be overridden explicitly.
+
+That tells you something important: Git is not relying only on “is there a `.git` directory here?” It can work from a more flexible context model.
+
+## The most important variables to know
+
+Some especially revealing variables are:
+
+- `GIT_DIR`
+- `GIT_WORK_TREE`
+- `GIT_INDEX_FILE`
+- `GIT_OBJECT_DIRECTORY`
+- `GIT_ALTERNATE_OBJECT_DIRECTORIES`
+
+Together, they answer one big question:
+
+**what should Git treat as the repository, working tree, index, and object store for this command?**
+
+## What `GIT_DIR` changes
+
+`GIT_DIR` tells Git where repository state lives.
+
+If you do not set it, Git follows default repository discovery rules.  
+If you do set it, Git uses that explicit context instead.
+
+That matters for scripts, diagnostics, nonstandard layouts, and advanced repository structures.
+
+## Why `GIT_WORK_TREE` matters
+
+`GIT_WORK_TREE` tells Git which directory should count as the working tree.
+
+That means repository state and checked-out files do not have to be inferred from the same default path structure.
+
+This becomes especially useful when you think about bare repositories, linked worktrees, or custom layouts.
+
+## Why `GIT_INDEX_FILE` is revealing
+
+Many users think of “the index” as a concept, but Git treats it as a real file that can be replaced.
+
+By setting `GIT_INDEX_FILE`, you can direct Git to use an alternate index file instead of the default one.
+
+That is a strong reminder that the index is a concrete repository state artifact, not just an abstract staging idea.
+
+## Why object-directory variables matter
+
+`GIT_OBJECT_DIRECTORY` and `GIT_ALTERNATE_OBJECT_DIRECTORIES` reveal that object storage can also be redirected or supplemented.
+
+That helps explain more advanced repository layouts, shared object storage, and optimization-oriented setups.
+
+## Why ordinary users still benefit from knowing this
+
+Not because everyone should export these variables every day, but because they reveal a deeper truth:
+
+**many Git behaviors depend on runtime context discovery, and that context is configurable.**
+
+That helps make sense of questions like:
+
+- why a command works in one directory but not another
+- why `rev-parse --git-dir` is diagnostically useful
+- why worktrees and bare repositories need a better model than “a folder with `.git`”
+
+## A conclusion worth keeping
+
+**Environment variables are not fringe Git trivia. They expose how Git decides what repository context a command is really running inside.**

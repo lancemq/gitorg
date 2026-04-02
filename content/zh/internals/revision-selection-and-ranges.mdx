@@ -1,0 +1,130 @@
+export const metadata = {
+  title: "修订选择、范围表达式与提交集合",
+  slug: "revision-selection-and-ranges",
+  locale: "zh",
+  section: "internals",
+  summary: "很多 Git 命令真正处理的不是“一个提交”，而是一组通过 revision syntax 表达出来的提交集合。",
+  sourceUrls: [
+    "https://git-scm.com/docs/gitrevisions",
+    "https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection",
+  ],
+};
+
+# 修订选择、范围表达式与提交集合
+
+很多人觉得 `git log`、`git show`、`git diff` 的参数很零散，背起来很痛苦。  
+但 Git 的真实逻辑不是“每个命令有自己的参数黑魔法”，而是：
+
+**很多命令都在共享一套 revision 选择语法。**
+
+这套语法的意义，不只是指定某个提交，更重要的是：  
+它能表达一组提交、一个范围，甚至某个提交里的树或 blob。
+
+## 为什么 revision syntax 很重要
+
+因为 Git 很多命令都不是在处理“一个点”，而是在处理“图里的一个子集”。
+
+例如：
+
+- `git log A..B`
+- `git diff main...feature`
+- `git show HEAD~2`
+- `git rev-list --ancestry-path`
+
+表面看语法不同，本质上都在回答：  
+“你要让 Git 从提交图里选哪些对象出来？”
+
+## 单个修订怎么指定
+
+最直接的当然是完整 SHA。  
+但实际更常用的是这些别名式写法：
+
+- `HEAD`
+- `main`
+- `feature`
+- `HEAD~1`
+- `HEAD^`
+
+它们的意义都和“如何在提交图上走一步或多步”有关。
+
+## `~` 和 `^` 为什么要分开
+
+这是理解 revision syntax 的第一道门槛。
+
+- `HEAD~3`：沿着第一父链往回走三步
+- `HEAD^`：取某个提交的父提交
+- `HEAD^2`：在 merge commit 场景下，取第二父提交
+
+也就是说：
+
+- `~` 更像“沿第一父链连续回退”
+- `^` 更像“显式选某个父节点”
+
+这对理解 merge commit 特别重要。
+
+## 两点和三点到底在表达什么
+
+很多人会混淆：
+
+- `A..B`
+- `A...B`
+
+它们之所以难，是因为 Git 在不同命令里对两点、三点的使用语义不完全一样。  
+但有一个更稳定的理解方式：
+
+- 两点更接近“从 B 看，排除掉 A 已经覆盖的那部分”
+- 三点更接近“围绕 merge base 来看双方差异”
+
+这就是为什么：
+
+- `git log A..B`
+- `git diff A...B`
+
+虽然都用到了点语法，但底层关注点并不完全一致。
+
+## 为什么 merge base 会在这里反复出现
+
+因为当 Git 要比较两条分支时，它不能只看“你给了两个名字”，还得决定：
+
+- 从哪个共同祖先开始看
+- 哪部分是双方共同拥有的
+- 哪部分是某一边独有的
+
+这也是 revision 语法和提交图、merge base 紧密绑定的原因。
+
+<MentalModelBox title="revision syntax 本质上是在给提交图做切片">
+  <p>
+    你可以把 `HEAD~3`、`A..B`、`A...B` 看成“提交图切片表达式”，而不是零散参数技巧。
+  </p>
+</MentalModelBox>
+
+## 为什么这能帮助你理解很多命令
+
+一旦你理解 Git 真正在处理“提交集合”，这些命令就会突然统一起来：
+
+- `log` 在展示集合
+- `rev-list` 在遍历集合
+- `diff` 在比较集合或两个端点之间的结果
+- `show` 在解释一个对象或一组对象
+
+也就是说，revision 语法是很多高级命令共享的底层语言。
+
+## 常见误区
+
+### `A..B` 就是“从 A 到 B”
+
+这种自然语言式理解很容易误导。  
+它更准确地说是在表达“B 独有而 A 不包含的那部分提交集合”。
+
+### `A...B` 永远代表同一种含义
+
+不完全是。  
+不同命令会基于 merge base 和比较语义给它不同上下文。
+
+### revision 语法只对 `log` 有用
+
+不是。它几乎影响所有遍历或比较提交图的高级命令。
+
+## 一句最值得记住的话
+
+**Git 很多命令处理的不是单个提交，而是由 revision syntax 表达出来的一组提交和对象。**

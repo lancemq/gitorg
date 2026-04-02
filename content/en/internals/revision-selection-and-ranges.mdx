@@ -1,0 +1,112 @@
+export const metadata = {
+  title: "Revision Selection and Commit Ranges",
+  slug: "revision-selection-and-ranges",
+  locale: "en",
+  section: "internals",
+  summary: "Many advanced Git commands are really working over sets of commits expressed through revision syntax, not just single named commits.",
+  sourceUrls: [
+    "https://git-scm.com/docs/gitrevisions",
+    "https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection",
+  ],
+};
+
+# Revision Selection and Commit Ranges
+
+Many people experience `git log`, `git diff`, and `git show` syntax as a pile of unrelated tricks.  
+But Git is actually sharing a common language across many commands:
+
+**revision selection syntax**
+
+That language is not only about naming one commit. It is often about describing a set of commits, a range, or even trees and blobs reachable from revisions.
+
+## Why revision syntax matters
+
+Because many Git commands are not really operating on a single point. They are operating on a subset of the commit graph.
+
+Examples:
+
+- `git log A..B`
+- `git diff main...feature`
+- `git show HEAD~2`
+- `git rev-list --ancestry-path`
+
+These may look different on the surface, but they are all asking Git to select some portion of repository history.
+
+## Naming single revisions
+
+The most literal way is a full SHA, but in practice people rely on friendlier expressions such as:
+
+- `HEAD`
+- `main`
+- `feature`
+- `HEAD~1`
+- `HEAD^`
+
+Those names matter because of how they walk the commit graph.
+
+## Why `~` and `^` are different
+
+This is one of the first useful distinctions:
+
+- `HEAD~3` means “walk back three times along the first-parent chain”
+- `HEAD^` means “the parent of this commit”
+- `HEAD^2` matters on merge commits and means “the second parent”
+
+So:
+
+- `~` is about repeated first-parent walking
+- `^` is about selecting a particular parent edge
+
+That matters especially when merge commits are involved.
+
+## What two-dot and three-dot really do
+
+People often memorize:
+
+- `A..B`
+- `A...B`
+
+without building a durable model.
+
+A more stable way to think about them is:
+
+- two-dot often expresses “what is reachable from B but not from A”
+- three-dot often brings merge-base logic into the comparison
+
+That is why:
+
+- `git log A..B`
+- `git diff A...B`
+
+use similar notation but do not always mean the exact same thing in the exact same way.
+
+## Why merge-base keeps showing up
+
+When Git compares two lines of development, it does not only care that you named two refs. It also cares about:
+
+- where their common ancestry is
+- what both sides already share
+- what is unique on each side
+
+That is why revision syntax ties so naturally into commit-graph and merge-base understanding.
+
+<MentalModelBox title="Revision syntax is a slicing language for the commit graph">
+  <p>
+    Expressions like `HEAD~3`, `A..B`, and `A...B` are easiest to understand as graph-slicing instructions rather than random command-line tricks.
+  </p>
+</MentalModelBox>
+
+## Why this clarifies many commands
+
+Once you see revision syntax as a shared language, many commands feel more unified:
+
+- `log` displays a selected set
+- `rev-list` walks a selected set
+- `diff` compares states or ranges around selected revisions
+- `show` explains an object or revision target
+
+That makes the syntax feel less arbitrary and more like a common substrate.
+
+## A conclusion worth keeping
+
+**Many advanced Git commands operate on sets of commits and objects described by revision syntax, not only on single named revisions.**

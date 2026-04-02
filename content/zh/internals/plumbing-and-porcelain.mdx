@@ -1,0 +1,138 @@
+export const metadata = {
+  title: "Plumbing 与 Porcelain：Git 两层命令世界",
+  slug: "plumbing-and-porcelain",
+  locale: "zh",
+  section: "internals",
+  summary: "理解 porcelain 与 plumbing 的分层，能帮助你看懂为什么有些 Git 命令偏“日常操作”，有些命令更像底层原语。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain",
+    "https://git-scm.com/book/en/v2/Git-Internals-Git-Objects",
+  ],
+};
+
+# Plumbing 与 Porcelain：Git 两层命令世界
+
+很多人学 Git 时会自然把所有命令都放在一层理解里。  
+但 Git 官方长期在强调一个更底层的分法：
+
+- `porcelain`：面向用户的高层命令
+- `plumbing`：更底层、更接近对象和引用操作的原语命令
+
+这不是学院派分类，而是理解 Git 设计方式的关键入口。
+
+## 为什么 Git 要分成两层
+
+Git 最初就不是一个“只有几个固定终端命令”的工具，而更像一组可以组合的底层能力。  
+高层命令负责把这些能力包装成更稳定、更适合日常开发的动作；底层命令则更接近：
+
+- 写对象
+- 读对象
+- 更新索引
+- 移动引用
+- 遍历提交图
+
+这也是为什么很多 Git 文档在解释内部机制时，会不断提到 `hash-object`、`cat-file`、`update-index`、`update-ref` 这类命令。
+
+## 什么属于 porcelain
+
+你每天最常用的大多数命令，都属于 porcelain：
+
+- `git status`
+- `git add`
+- `git commit`
+- `git switch`
+- `git merge`
+- `git rebase`
+
+这些命令的共同点是：  
+它们站在“协作任务”的角度帮你完成工作，而不是暴露对象数据库的全部细节。
+
+## 什么属于 plumbing
+
+plumbing 命令更像底层构件，例如：
+
+- `git hash-object`
+- `git cat-file`
+- `git ls-tree`
+- `git update-index`
+- `git update-ref`
+- `git rev-parse`
+- `git rev-list`
+
+这些命令往往不直接描述一个“团队动作”，而是在暴露 Git 内部数据结构和状态变换的操作入口。
+
+<MentalModelBox title="porcelain 是“任务语言”，plumbing 是“机制语言”">
+  <p>
+    高层命令更像是在说“我要提交”“我要合并”；底层命令更像是在说“我要写对象”“我要更新引用”“我要遍历提交图”。
+  </p>
+</MentalModelBox>
+
+## 为什么这对理解 Git 很重要
+
+因为很多看起来“很复杂”的 Git 行为，本质上只是高层命令在组合多个底层步骤。
+
+例如一次 `git commit`，你可以把它粗略拆成：
+
+1. 确认索引里的候选快照
+2. 写出 tree 对象
+3. 写出 commit 对象
+4. 更新当前分支引用
+
+高层命令把这四步封装成了一个稳定动作。  
+而底层命令让你看见这个动作究竟是由哪些原语拼起来的。
+
+## 为什么日常用户通常不该直接依赖 plumbing
+
+因为 plumbing 更强，也更容易绕过高层语义保护。  
+它们适合这些场景：
+
+- 理解 Git 内部原理
+- 做诊断和调试
+- 编写脚本或工具
+- 精确观察对象和引用变化
+
+但它们并不总是最适合直接拿来做日常协作操作。
+
+例如，团队里的大多数人不应该用 `update-ref` 来代替正常分支命令；  
+同样，也不该把 `hash-object` 当作常规工作流的一部分。
+
+## 一个典型误区
+
+很多人第一次接触 plumbing，会误以为：
+
+“既然底层命令更真实，那高层命令是不是只是方便接口？”
+
+这种理解不完整。  
+高层命令并不只是“更容易输入”，它们还带着协作语义、风险边界和更稳的默认行为。
+
+也就是说：
+
+- plumbing 更接近内部机制
+- porcelain 更接近团队协作现实
+
+这两层都重要，但用途不同。
+
+## 哪些高层命令最值得反过来拆底层
+
+如果你想真正理解 Git，最值得从高层拆回底层的几类命令是：
+
+- `commit`
+- `reset`
+- `rebase`
+- `fetch`
+- `push`
+
+因为它们几乎都能映射回对象、引用、索引或图遍历这些底层概念。
+
+## 怎么利用这个视角继续学
+
+最好的方式不是死记“哪个命令属于哪层”，而是在遇到复杂行为时问自己：
+
+- 这里主要在改对象、索引，还是引用？
+- 这是在做高层协作动作，还是在调用底层构件？
+
+这个问题会让很多命令行为突然变得更清楚。
+
+## 一句最值得记住的话
+
+**Git 不是只有一层命令表面。你平时用的是 porcelain，而 Git 真正的机械结构更多暴露在 plumbing 里。**

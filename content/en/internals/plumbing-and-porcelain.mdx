@@ -1,0 +1,121 @@
+export const metadata = {
+  title: "Plumbing and Porcelain",
+  slug: "plumbing-and-porcelain",
+  locale: "en",
+  section: "internals",
+  summary: "Understanding the split between porcelain and plumbing makes it easier to see why some Git commands feel task-oriented while others expose internal primitives directly.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain",
+    "https://git-scm.com/book/en/v2/Git-Internals-Git-Objects",
+  ],
+};
+
+# Plumbing and Porcelain
+
+Many Git learners naturally put every command on one flat layer.  
+But Git has long been organized around a deeper distinction:
+
+- `porcelain`: user-facing, higher-level commands
+- `plumbing`: lower-level primitives closer to objects, refs, and internal state
+
+This is not just trivia. It explains a lot about how Git is designed.
+
+## Why Git has two layers
+
+Git was never only a handful of fixed end-user commands.  
+It is also a toolkit of lower-level capabilities. High-level commands package those capabilities into safer collaboration actions, while low-level commands expose operations around:
+
+- writing objects
+- reading objects
+- updating the index
+- moving refs
+- walking commit graphs
+
+That is why internal explanations keep mentioning commands like `hash-object`, `cat-file`, `update-index`, and `update-ref`.
+
+## What counts as porcelain
+
+Most commands people use every day are porcelain:
+
+- `git status`
+- `git add`
+- `git commit`
+- `git switch`
+- `git merge`
+- `git rebase`
+
+These commands speak in the language of developer tasks and collaboration.
+
+## What counts as plumbing
+
+Plumbing commands are closer to internal building blocks, for example:
+
+- `git hash-object`
+- `git cat-file`
+- `git ls-tree`
+- `git update-index`
+- `git update-ref`
+- `git rev-parse`
+- `git rev-list`
+
+They are usually less about teamwork tasks and more about repository mechanics.
+
+<MentalModelBox title="Porcelain speaks in tasks; plumbing speaks in mechanisms">
+  <p>
+    High-level commands say things like “commit this” or “merge that.” Low-level commands say things like “write this object,” “update this ref,” or “walk this graph.”
+  </p>
+</MentalModelBox>
+
+## Why this distinction matters
+
+Many Git behaviors that feel complex are just high-level commands orchestrating multiple lower-level steps.
+
+For example, one `git commit` can be understood roughly as:
+
+1. taking the candidate snapshot from the index
+2. writing a tree object
+3. writing a commit object
+4. updating the current ref
+
+Porcelain hides those details. Plumbing exposes them.
+
+## Why most users should not default to plumbing
+
+Plumbing is powerful, but it can also bypass the guardrails that porcelain provides.  
+It is most useful when you want to:
+
+- understand internals
+- diagnose or debug
+- write scripts and tooling
+- inspect objects and refs precisely
+
+It is usually not the right default interface for ordinary collaboration.
+
+## A common misunderstanding
+
+Some readers assume that because plumbing is “closer to the truth,” porcelain is just convenience sugar.
+
+That misses something important. Porcelain is not only easier to type. It also encodes collaboration semantics, safer defaults, and clearer risk boundaries.
+
+So:
+
+- plumbing is closer to repository mechanics
+- porcelain is closer to real team workflows
+
+Both matter, but for different reasons.
+
+## Which porcelain commands are worth mentally decomposing
+
+The best ones to break down into plumbing ideas are usually:
+
+- `commit`
+- `reset`
+- `rebase`
+- `fetch`
+- `push`
+
+Those commands connect directly back to objects, refs, indexes, and graph walking.
+
+## One conclusion worth keeping
+
+**Git is not a single flat command surface. Porcelain is what you usually use; plumbing is where many internal mechanics become visible.**

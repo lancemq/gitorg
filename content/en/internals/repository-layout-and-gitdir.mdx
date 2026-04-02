@@ -1,0 +1,125 @@
+export const metadata = {
+  title: "Repository Layout, .git, and GIT_DIR",
+  slug: "repository-layout-and-gitdir",
+  locale: "en",
+  section: "internals",
+  summary: "Understanding working trees, gitdirs, common directories, and worktrees helps explain where Git really stores repository state.",
+  sourceUrls: [
+    "https://git-scm.com/docs/gitrepository-layout",
+    "https://git-scm.com/book/en/v2/Git-Internals-Environment-Variables",
+  ],
+};
+
+# Repository Layout, .git, and GIT_DIR
+
+At first, many people treat a Git repository as “my project folder plus a hidden `.git` directory.”  
+That is good enough until you hit cases like:
+
+- bare repositories
+- linked worktrees
+- separated gitdirs
+- explicitly setting `GIT_DIR`
+
+At that point, you need a stronger model of what the repository actually is.
+
+## The most common shape
+
+The usual local repository has:
+
+- a working tree with checked-out files
+- a `.git/` directory containing repository state
+
+In that default setup, it feels natural to say “the repo lives in `.git`.” That is often true, but it is not the only valid shape.
+
+## What usually lives in `.git/`
+
+Inside `.git/`, you commonly find:
+
+- `objects/`
+- `refs/`
+- `HEAD`
+- `index`
+- `config`
+- `logs/`
+- `hooks/`
+
+These correspond to:
+
+- the object database
+- branch and tag refs
+- the current HEAD target
+- the staging index
+- repository-local config
+- reflogs
+- hooks
+
+So `.git/` is not an opaque mystery folder. It is the operational core of the repository state.
+
+## What a gitdir really means
+
+Git does not only care about a directory literally named `.git`.  
+What it really cares about is the current **gitdir**.
+
+In the most common case:
+
+- the gitdir happens to be `.git/`
+
+But in more advanced layouts, the `.git` entry in a working tree may be a small file pointing to the real gitdir elsewhere.
+
+That becomes especially visible with `git worktree`.
+
+## Why bare repositories matter
+
+A bare repository has no normal working tree.  
+It is usually used on servers or as a central receiving repository.
+
+Its main traits are:
+
+- no checked-out working files
+- the repository directory itself acts as the gitdir
+- it is well suited for receiving pushes
+
+That helps explain why a server-side repository often looks different from a local dev clone.
+
+## Why linked worktrees change your model
+
+With `git worktree`, one repository can back multiple working trees.
+
+That means:
+
+- the working trees are separate
+- the underlying object storage is largely shared
+- each worktree still has its own working-state context
+
+If you keep thinking “repository equals the `.git` directory in this folder,” this setup starts to feel confusing quickly.
+
+<MentalModelBox title="The working tree is a view; the gitdir is the state core">
+  <p>
+    A working tree is where you edit files. The gitdir is where Git tracks repository state such as objects, refs, indexes, and logs.
+  </p>
+</MentalModelBox>
+
+## What `GIT_DIR` and `GIT_WORK_TREE` tell you
+
+Git lets you override discovery with environment variables:
+
+- `GIT_DIR` says where the repository state lives
+- `GIT_WORK_TREE` says which directory should be treated as the working tree
+
+So Git is not forced to rely on “find `.git` in the current path.” It can operate in more flexible layouts when asked to.
+
+## Why this affects command behavior
+
+Many commands depend on understanding which repository context they are operating in:
+
+- `status`
+- `add`
+- `commit`
+- `worktree`
+- `rev-parse --git-dir`
+
+If you do not understand the difference between working tree and gitdir, multi-worktree and scripted cases become much harder to reason about.
+
+## A conclusion worth keeping
+
+**The working tree tells you where files are edited. The gitdir tells Git where repository state actually lives.**

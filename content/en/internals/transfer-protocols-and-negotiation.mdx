@@ -1,0 +1,106 @@
+export const metadata = {
+  title: "Transfer Protocols and Negotiation",
+  slug: "transfer-protocols-and-negotiation",
+  locale: "en",
+  section: "internals",
+  summary: "Understanding fetch, clone, and push as negotiated object exchange helps explain why Git sync is not just copying whole repositories back and forth.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Internals-Transfer-Protocols",
+    "https://git-scm.com/book/en/v2/Git-Internals-Packfiles",
+  ],
+};
+
+# Transfer Protocols and Negotiation
+
+Many new Git users imagine network operations like this:
+
+- clone downloads “the whole repo”
+- fetch copies “whatever changed”
+- push uploads “all my commits”
+
+That picture is too blunt. Git is really concerned with:
+
+- which refs exist and where they point
+- which objects each side already has
+- which objects still need to be transferred
+
+That is a major reason Git stays efficient even with large histories.
+
+## What Git is actually exchanging
+
+At a lower level, Git mainly exchanges two kinds of information:
+
+1. ref state
+2. object data
+
+So a fetch is not just copying a repository directory. It is synchronizing graph state by comparing refs and object availability.
+
+## Why negotiation matters
+
+Most of the time, the local and remote repositories already share a lot of history.  
+Git therefore tries to avoid resending everything by working out:
+
+- what the receiver already has
+- what the receiver is missing
+- which objects are unnecessary to send again
+
+That “understand first, transfer second” model is a big part of Git's performance story.
+
+## Why packfiles matter here too
+
+Objects could be sent one by one, but that would be inefficient.  
+Git usually bundles the needed objects into packfiles for transfer.
+
+That helps with:
+
+- better compression
+- fewer repeated payloads
+- more efficient fetch, clone, and push behavior
+
+So packfiles are not only a storage concept. They are also a transport concept.
+
+## Clone versus fetch
+
+From the user perspective:
+
+- clone feels like first-time acquisition
+- fetch feels like incremental sync
+
+But both are still about:
+
+- advertised refs
+- shared history
+- missing objects
+- pack exchange
+
+The difference is mostly that a new clone starts with almost no overlap, while fetch often benefits from substantial shared history.
+
+## Why push is also negotiated
+
+Push is not simply “send my commits to the server.” It also involves:
+
+- the remote's current ref state
+- whether the requested ref updates are allowed
+- whether the remote already has the needed objects
+- whether the update violates fast-forward or policy rules
+
+So push is both object transfer and a request to update refs.
+
+<MentalModelBox title="Git transport is negotiated object-and-ref exchange, not blind repository copying">
+  <p>
+    Once you adopt that model, fetch and push start to make much more sense alongside packfiles, ref updates, and branch protection behavior.
+  </p>
+</MentalModelBox>
+
+## Why this helps in practice
+
+This view makes it easier to understand:
+
+- why fetch is often fast
+- why push can be rejected
+- why large repositories benefit from pack optimization
+- why protocol or network issues show up as sync failures
+
+## A conclusion worth keeping
+
+**Git network operations are negotiated exchange of refs and missing objects, not whole-repository copying.**
