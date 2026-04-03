@@ -3,7 +3,7 @@ export const metadata = {
   slug: "gitlab-issues-boards-and-milestones",
   locale: "en",
   section: "gitlab",
-  summary: "Learn how GitLab organizes issues, boards, and milestones so planning and delivery do not collapse into merge requests alone.",
+  summary: "Learn how GitLab issues, boards, and milestones turn project planning into a visible delivery system instead of forcing all context into merge requests.",
   sourceUrls: [
     "https://docs.gitlab.com/user/project/issues/",
     "https://docs.gitlab.com/user/project/issue_board/",
@@ -15,38 +15,105 @@ export const metadata = {
 
 ## Why merge requests are not enough
 
-If a team relies only on merge requests, it often loses the planning and problem context around the code.  
-GitLab's issues, boards, and milestones separate work management from diff review.
+If a team relies only on merge requests, it often loses planning context, work-in-progress visibility, and release grouping.  
+GitLab's issues, boards, and milestones exist so code review does not have to carry all product and delivery meaning by itself.
 
-## What each one does
+<MentalModelBox title="Separate work description from code review">
+  <p>An issue should explain the work, a board should expose flow, and a milestone should show delivery timing. The merge request should then focus on implementation and review.</p>
+</MentalModelBox>
 
-- `Issue`: a trackable task, bug, request, or discussion entry
-- `Board`: a visual flow for issue state
-- `Milestone`: a time- or release-oriented grouping of work
+## What each layer is for
 
-That makes merge requests part of the delivery loop, not the only collaboration surface.
+- `Issue`: one problem, request, bug, or task entry
+- `Board`: a visual workflow that shows where issues currently sit
+- `Milestone`: a release-, sprint-, or date-oriented grouping
+
+The point is not to create more containers.  
+The point is to give planning, delivery, and code review different jobs.
 
 ## A healthier project rhythm
 
-1. create or clarify the issue
-2. move it through a board
-3. connect it to a milestone when timing matters
-4. implement through a merge request
+1. create or refine the issue
+2. place the issue on a board
+3. move it across the workflow
+4. attach it to a milestone when timing matters
+5. implement through a merge request linked back to the issue
 
-## Why this matters
+That rhythm keeps product intent visible even before the code is ready.
 
-- work and code stay connected but distinct
-- delivery rhythm becomes visible
-- reviewers do not need to reconstruct all context from the MR alone
+## What teams gain from this model
 
-## Common anti-patterns
+- reviewers can read the issue for context instead of reconstructing intent from the diff
+- delivery leads can see flow bottlenecks without opening each merge request
+- release planning can group work by milestone rather than by whichever MR happened to merge first
 
-- opening merge requests without issues
-- leaving boards stale
-- creating milestones that have no real planning meaning
+## Where teams go wrong
 
-## Good follow-up reads
+The most common anti-patterns are:
 
-1. GitLab Flow and merge requests
-2. issues, projects, and discussions
-3. feature-branch collaboration
+- opening merge requests with no issue context
+- using boards once and never maintaining them
+- creating milestones that carry dates but no real planning discipline
+- tracking everything at MR level so non-code work disappears
+
+## A practical structure that scales
+
+For many teams, a useful baseline looks like:
+
+- issues describe one real unit of work
+- board columns reflect actual team state, not wishful labels
+- milestones map to releases, sprints, or customer-facing delivery checkpoints
+- merge requests reference issues instead of replacing them
+
+<TipBox title="Start smaller than you think">
+  <p>A board with four honest states is usually better than a complex process map no one updates. Visibility beats decorative process design.</p>
+</TipBox>
+
+## How this changes review quality
+
+Once issue and board context are healthy:
+
+- merge requests can stay focused on implementation
+- reviewers spend less energy asking “what problem are we solving?”
+- work prioritization becomes visible before code review starts
+
+That is the real value.  
+It is not “having boards.” It is reducing collaboration ambiguity.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="Planning flow around merge requests"
+  caption="The issue explains the work, the board exposes status, and the milestone groups timing. The merge request should sit inside that flow rather than replace it."
+  inputsLabel="Planning surfaces"
+  inputs="Issue|Board state|Milestone target"
+  commandLabel="Implementation flow"
+  outputsLabel="Delivery surfaces"
+  outputs="Merge request|Visible status|Release grouping"
+  note="When everything collapses into the MR, planning and delivery context usually become much harder to maintain."
+/>
+
+## Boundaries to remember
+
+- not every issue needs a milestone, but every milestone should mean something real
+- a board should reflect actual team flow, not only desired process theory
+- merge requests become easier to review when they inherit clear issue context
+
+<WarningBox title="Do not let the board become performative">
+  <p>If the board is no longer updated honestly, it stops being coordination infrastructure and becomes decoration. At that point it starts harming trust instead of helping flow.</p>
+</WarningBox>
+
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: turn one feature request into a visible planning loop"
+  intro="The goal is to stop treating merge requests as the first place work becomes visible."
+  setupLabel="Setup"
+  setup={`Pick one small feature or bug.\nCreate an issue for it.\nCreate or reuse a board with a few real states.`}
+  stepsLabel="Try it"
+  steps="Write the problem clearly in the issue.|Move the issue onto a board column that reflects its current state.|Attach it to a milestone only if timing really matters.|Open a merge request that links back to the issue.|After merge, verify whether the board and milestone still reflect reality."
+  outcomesLabel="What happens next"
+  outcomes="The team can understand the work before reading code.|Board state becomes useful for delivery visibility.|Milestones become release signals instead of decorative labels."
+  mistakesLabel="Common mistake checks"
+  mistakes="If the issue is vague, the MR will usually inherit that vagueness.|If every item gets a milestone, milestones stop helping prioritization.|If the board is never updated, it will quickly stop being trusted."
+/>

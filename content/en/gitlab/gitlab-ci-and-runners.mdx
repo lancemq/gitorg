@@ -3,7 +3,7 @@ export const metadata = {
   slug: "gitlab-ci-and-runners",
   locale: "en",
   section: "gitlab",
-  summary: "Build the smallest useful mental model for GitLab CI/CD, pipelines, jobs, and runners, and understand how they work with merge requests.",
+  summary: "Build a stronger mental model for GitLab CI/CD, pipelines, jobs, and runners, and understand how they shape merge request readiness.",
   sourceUrls: [
     "https://docs.gitlab.com/ci/quick_start/",
     "https://docs.gitlab.com/ci/runners/",
@@ -15,31 +15,35 @@ export const metadata = {
 
 ## Why GitLab learning needs CI/CD
 
-One major difference in GitLab is how strongly it ties collaboration and automation together.  
-If you understand merge requests but not pipelines and runners, much of the platform will still feel opaque.
+One major difference in GitLab is how tightly collaboration and automation are connected.  
+If you understand merge requests but not pipelines and runners, a large part of the platform still feels opaque.
 
-## The smallest useful model
+## Start with the smallest useful model
 
-Start by separating these ideas:
+Separate these ideas first:
 
-- `pipeline`
-- `job`
-- `runner`
-- `.gitlab-ci.yml`
+- `pipeline`: one full execution flow
+- `job`: one task inside the pipeline
+- `runner`: the execution environment for jobs
+- `.gitlab-ci.yml`: the configuration entry point
 
-You do not need advanced syntax first. You need role clarity first.
+You do not need advanced syntax first.  
+You need role clarity first.
+
+<MentalModelBox title="CI/CD is part of merge readiness">
+  <p>In many GitLab teams, the pipeline is not a side system that runs after collaboration. It is part of the evidence used to decide whether a merge request is ready.</p>
+</MentalModelBox>
 
 ## Why merge requests and pipelines belong together
 
-In GitLab, a merge request is often not only a review surface. It is also where the team sees whether the pipeline has satisfied the minimum merge bar.
+In GitLab, a merge request often becomes the place where teams inspect whether:
 
-That often means tests, linting, builds, and policy checks all feed directly into MR readiness.
+- tests passed
+- linting passed
+- build artifacts succeeded
+- policy checks were satisfied
 
-<MentalModelBox title="GitLab CI/CD is often part of merge readiness, not only post-merge automation">
-  <p>
-    Teams often rely on pipeline status before they decide a merge request is ready, which makes CI/CD part of the collaboration loop itself.
-  </p>
-</MentalModelBox>
+That makes CI/CD part of the collaboration loop itself, not just an implementation detail.
 
 ## What a minimal configuration looks like
 
@@ -54,25 +58,70 @@ test:
     - npm test
 ```
 
-That is enough to understand:
+That tiny example is enough to teach three important ideas:
 
-- where work is defined
-- how it runs
-- how the result flows back into the merge request
+- where work is declared
+- how work is grouped into stages
+- how results feed back into merge readiness
 
-## Why runners matter
+## Why runners matter so much
 
 Many beginners focus only on `.gitlab-ci.yml`, but runners are the execution layer.  
-Without the right runner setup, a pipeline definition cannot actually help the team.
+Without the right runner setup, the pipeline definition cannot help the team.
 
-## Common misunderstandings
+Runners affect:
 
-- memorizing config syntax before understanding the model
-- ignoring runner and permission boundaries
-- treating pipelines as separate from merge-request collaboration
+- execution environment
+- trust boundary
+- performance and availability
+- whether protected jobs can run in sensitive contexts
 
-## Good follow-up reads
+So “the pipeline failed” is not always a YAML problem.  
+Sometimes it is a runner, access, or environment problem.
 
-1. GitLab Flow and merge requests
-2. GitHub Actions and GitHub Skills
-3. merge strategy and platform settings
+## A safer way to introduce CI/CD
+
+For a new team, a strong starting sequence is:
+
+1. make one simple pipeline reliable
+2. confirm who owns runner setup
+3. connect pipeline status to merge request expectations
+4. only then add more stages, environments, or advanced rules
+
+That keeps CI/CD from becoming configuration theater.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="How GitLab CI/CD feeds merge readiness"
+  caption="A merge request points to pipeline evidence, while runners supply execution. The configuration only matters if the execution path is real and trusted."
+  inputsLabel="Inputs"
+  inputs="MR event|.gitlab-ci.yml|Runner availability"
+  commandLabel="Pipeline execution"
+  outputsLabel="Results"
+  outputs="Job status|Merge signal|Operational feedback"
+  note="When a team says “CI is broken,” the failure may live in config, runners, permissions, or merge-request expectations."
+/>
+
+<TipBox title="Make the first pipeline boring and dependable">
+  <p>A small reliable pipeline teaches more than a clever fragile one. Trust in CI starts with predictability.</p>
+</TipBox>
+
+<WarningBox title="Do not ignore runner boundaries">
+  <p>Runners are not neutral plumbing. They define where jobs execute and which trust assumptions the team is making about code, secrets, and environments.</p>
+</WarningBox>
+
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: trace one merge request from config to runner"
+  intro="The goal is to understand why a pipeline result appears on an MR and what infrastructure actually produced it."
+  setupLabel="Setup"
+  setup={`Create or inspect a small GitLab project with a minimal .gitlab-ci.yml.\nOpen a merge request from a feature branch.`}
+  stepsLabel="Try it"
+  steps="Inspect the merge request and identify which pipeline ran.|Open the pipeline and list its jobs.|Identify which runner executed those jobs.|Ask what would happen if the runner were unavailable or restricted."
+  outcomesLabel="What happens next"
+  outcomes="You connect MR status to actual execution infrastructure.|You learn that CI problems are not always config problems.|You build a stronger mental model for debugging failed or missing pipelines."
+  mistakesLabel="Common mistake checks"
+  mistakes="If a pipeline never starts, check runner availability and triggering rules before editing YAML blindly.|If sensitive jobs are missing, inspect permission and protection boundaries.|If the MR shows pipeline status but the team cannot explain it, the model is still too shallow."
+/>

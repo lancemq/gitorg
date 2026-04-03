@@ -3,7 +3,7 @@ export const metadata = {
   slug: "gitlab-issues-boards-and-milestones",
   locale: "zh",
   section: "gitlab",
-  summary: "理解 GitLab 如何把 issue、board、milestone 和交付节奏组织在一起，而不是把所有协作都丢进 Merge Request。",
+  summary: "理解 GitLab 如何用 issue、board 和 milestone 把计划、流转和交付组织起来，而不是把所有上下文都塞进 Merge Request。",
   sourceUrls: [
     "https://docs.gitlab.com/user/project/issues/",
     "https://docs.gitlab.com/user/project/issue_board/",
@@ -15,38 +15,101 @@ export const metadata = {
 
 ## 为什么不能只看 Merge Request
 
-如果团队只围绕 Merge Request 工作，很容易把真正的任务管理和协作背景都丢失掉。  
-GitLab 的 issue、board 和 milestone，就是为了把“工作项”和“交付节奏”从代码 diff 里分离出来。
+如果团队只围绕 Merge Request 工作，就很容易把计划背景、任务流转和交付节奏全部丢进代码评审里。  
+GitLab 的 issue、board 和 milestone，就是为了把这些语义从 diff 页面里分离出来。
 
-## 这三者分别在做什么
+<MentalModelBox title="把工作描述、流程状态和交付时间拆开">
+  <p>issue 负责说明工作本身，board 负责呈现流转，milestone 负责表达时间或版本目标。Merge Request 更适合承担实现和评审，而不是背全部协作语义。</p>
+</MentalModelBox>
 
-- `Issue`：记录需求、缺陷、任务和讨论入口
-- `Board`：把 issue 组织成一个可视化流程
-- `Milestone`：把一批工作和某个时间点或版本目标关联起来
+## 这三层分别负责什么
 
-这样一来，Merge Request 更像是在完成 issue，而不是承担所有上下文。
+- `Issue`：一个具体问题、需求、缺陷或任务入口
+- `Board`：把 issue 按当前状态组织成可视化流程
+- `Milestone`：把工作与某个版本、阶段或时间点关联起来
 
-## 更成熟的协作线
+它们不是多余容器，而是让计划、执行、交付各自有更清晰的位置。
 
-1. 先用 issue 承载问题或需求
-2. 用 board 管理当前流程状态
-3. 用 milestone 绑定阶段目标
-4. 最后通过 Merge Request 落地改动
+## 一条更成熟的协作线
 
-## 这套方式的价值
+1. 先创建或补充 issue
+2. 把 issue 放到 board 的对应状态里
+3. 在流转过程中持续更新 board
+4. 如果交付时间重要，再把 issue 绑定到 milestone
+5. 最后通过 Merge Request 实现并回链 issue
 
-- 需求、任务和代码变更分层更清晰
-- 交付节奏更容易被看见
-- 讨论不会全部挤进 Merge Request
+这样做的价值是：代码评审不需要替代任务管理。
+
+## 团队能得到什么
+
+- reviewer 可以先看 issue 理解业务背景，而不是只盯 diff 猜意图
+- 负责人可以从 board 看到堵点，而不是逐个点开 MR
+- 交付节奏可以通过 milestone 体现，而不是靠大家口头记忆
 
 ## 常见反模式
 
 - 只开 MR，不建 issue
-- board 长期不维护
-- milestone 设了名字但没有真实计划意义
+- board 只在搭建时更新，后面形同虚设
+- milestone 只是有名字和日期，但没有真实计划意义
+- 把非代码工作全都排除在系统外，导致流程只剩“写代码”
 
-## 接下来建议继续看什么
+## 一个够用而稳的实践基线
 
-1. `GitLab Flow 与 Merge Request`
-2. `Issues、Projects 与 Discussions`
-3. `feature branch collaboration`
+很多团队用下面这套就已经很有效：
+
+- issue 只表达一个真实工作单元
+- board 列反映真实流程，而不是理想化名词
+- milestone 只在“时间或版本目标真的重要”时使用
+- Merge Request 引用 issue，而不是替代 issue
+
+<TipBox title="先从诚实的最小流程开始">
+  <p>四列真实可维护的 board，通常比十列没人更新的“精致流程图”更有价值。先保证可见性，再谈复杂流程。</p>
+</TipBox>
+
+## 它如何直接提升评审质量
+
+一旦 issue 和 board 管得健康：
+
+- MR 就可以更聚焦在实现本身
+- reviewer 不需要反复追问“这到底在解决什么”
+- 工作优先级和流转状态在代码评审前就已经可见
+
+真正的价值不是“有了 board”，而是降低了协作歧义。
+
+## 图例理解
+
+<CommandFlowFigure
+  title="围绕 Merge Request 的计划流"
+  caption="issue 负责描述工作，board 负责暴露状态，milestone 负责表达时间目标。MR 应该处在这条流里，而不是替代整条流。"
+  inputsLabel="计划层"
+  inputs="Issue|Board 状态|Milestone 目标"
+  commandLabel="实现流"
+  outputsLabel="交付层"
+  outputs="Merge Request|可见状态|版本分组"
+  note="一旦所有信息都压进 MR，计划和交付上下文通常就会越来越难维护。"
+/>
+
+## 边界与判断
+
+- 不是每个 issue 都需要 milestone，但每个 milestone 都应该有真实含义
+- board 应该反映真实团队流转，而不是理想化口号
+- MR 会因为 issue 上下文更清楚，而更容易评审
+
+<WarningBox title="不要让 board 变成表演性看板">
+  <p>如果 board 不再被诚实更新，它就不再是协作基础设施，而会变成一种误导团队判断的装饰品。</p>
+</WarningBox>
+
+## 跟着做一遍
+
+<PracticeLab
+  title="练习：把一个需求变成可见的计划闭环"
+  intro="目标是让工作在进入 Merge Request 之前就已经被看见和组织起来。"
+  setupLabel="准备"
+  setup={`选一个小需求或缺陷。\n为它创建 issue。\n准备一个只有少量真实状态列的 board。`}
+  stepsLabel="动手试"
+  steps="先在 issue 里写清楚问题和目标。|把它放进 board 的真实当前状态。|只有在时间目标重要时才绑定 milestone。|打开一个回链该 issue 的 Merge Request。|合并后再检查 board 和 milestone 是否仍然准确。"
+  outcomesLabel="会发生什么"
+  outcomes="团队可以在读代码前先理解工作本身。|board 能成为真实的流转信号。|milestone 更像交付管理工具，而不是装饰字段。"
+  mistakesLabel="常见错误判断"
+  mistakes="如果 issue 很模糊，MR 通常也会跟着模糊。|如果所有任务都加 milestone，milestone 就会失去筛选价值。|如果 board 长期不更新，团队很快就不会再信它。"
+/>

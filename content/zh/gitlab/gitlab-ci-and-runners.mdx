@@ -3,7 +3,7 @@ export const metadata = {
   slug: "gitlab-ci-and-runners",
   locale: "zh",
   section: "gitlab",
-  summary: "建立 GitLab CI/CD、pipeline、job、runner 的最小心智模型，理解它们怎样和 Merge Request 协作。",
+  summary: "建立更扎实的 GitLab CI/CD、pipeline、job、runner 心智模型，并理解它们怎样参与 Merge Request 准入。",
   sourceUrls: [
     "https://docs.gitlab.com/ci/quick_start/",
     "https://docs.gitlab.com/ci/runners/",
@@ -15,35 +15,34 @@ export const metadata = {
 
 ## 为什么 GitLab 学习离不开 CI/CD
 
-GitLab 和很多平台的一个显著差别，是它特别强调把协作、代码和流水线放在一起。  
-所以如果你只理解 Merge Request，却不了解 pipeline 和 runner，很多平台行为都会显得很抽象。
+GitLab 和很多平台最大的差异之一，就是它把协作和自动化绑得非常紧。  
+如果你理解 Merge Request，却不理解 pipeline 和 runner，那么平台的很多行为仍然会显得很抽象。
 
-## 最小模型是什么
+## 先建立最小模型
 
-你可以先把这几个词分开：
+先把这几个词彻底分开：
 
-- `pipeline`：一次完整流水线执行
-- `job`：流水线里的单个任务
-- `runner`：执行任务的环境
-- `.gitlab-ci.yml`：定义规则的入口文件
+- `pipeline`：一次完整流水线运行
+- `job`：流水线中的单个任务
+- `runner`：执行这些任务的运行环境
+- `.gitlab-ci.yml`：声明规则和任务的配置入口
 
-## 为什么 Merge Request 和 pipeline 要一起看
+学习顺序不应该是先背语法，而应该是先搞清角色分工。
 
-在 GitLab 中，Merge Request 经常不仅是 review 页面，还是 pipeline 结果的展示和准入门槛。  
-这意味着团队通常会把：
-
-- 测试
-- lint
-- build
-- 部署前检查
-
-都收束到 MR 协作里。
-
-<MentalModelBox title="GitLab CI/CD 是 Merge Request 质量门槛的一部分">
-  <p>
-    它不是“代码合并后再跑的附加动作”，而是很多团队在合并前就已经依赖的自动化判断层。
-  </p>
+<MentalModelBox title="CI/CD 是 Merge Request 准入证据的一部分">
+  <p>在很多 GitLab 团队里，pipeline 不是合并后的附加动作，而是决定 Merge Request 能不能通过的核心证据层。</p>
 </MentalModelBox>
+
+## 为什么 MR 和 pipeline 要一起理解
+
+在 GitLab 中，MR 常常会同时承接这些信息：
+
+- 测试是否通过
+- lint 是否通过
+- build 是否成功
+- 策略检查是否满足
+
+所以 pipeline 在这里不是单独系统，而是协作闭环的一部分。
 
 ## 一个最小配置长什么样
 
@@ -58,25 +57,69 @@ test:
     - npm test
 ```
 
-先从这种最小示例理解：
+这个最小示例已经足够说明三件事：
 
-- 任务在哪定义
-- 怎么执行
-- 结果怎么反馈回 Merge Request
+- 任务在哪里声明
+- 任务怎么组织进 stage
+- 执行结果怎样反馈回 Merge Request
 
-## Runner 为什么关键
+## Runner 为什么必须单独理解
 
-很多新手只看 `.gitlab-ci.yml`，却忽略 runner 才是真正执行任务的地方。  
-没有合适的 runner，pipeline 就算定义好了也跑不起来。
+很多新手只盯 `.gitlab-ci.yml`，但真正执行 job 的是 runner。  
+没有 runner，配置写得再完整也不会真正产生价值。
 
-## 常见误区
+runner 直接影响：
 
-- 先背 CI 配置语法，而不是先理解模型
-- 忽视 runner 和权限边界
-- 把 pipeline 当成独立系统，不和 Merge Request 协作放在一起看
+- 任务运行环境
+- 执行权限边界
+- 可用性与速度
+- 敏感 job 是否能在受信环境里运行
 
-## 接下来建议继续看什么
+所以“pipeline 失败”并不总是 YAML 有问题，也可能是 runner、权限或环境问题。
 
-1. `GitLab Flow 与 Merge Request`
-2. `GitHub Actions 与 GitHub Skills`
-3. `PR 合并策略与平台设置`
+## 更稳的落地顺序
+
+如果团队刚开始建立 GitLab CI/CD，更推荐：
+
+1. 先让一个最小 pipeline 稳定可跑
+2. 再确认 runner 由谁负责、在哪里执行
+3. 把 pipeline 状态和 MR 准入标准挂钩
+4. 最后再逐步扩到环境、部署和高级规则
+
+这样能避免一开始就陷入“配置很复杂，但团队没人真正信任 CI”的状态。
+
+## 图例理解
+
+<CommandFlowFigure
+  title="GitLab CI/CD 如何进入 Merge Request 准入"
+  caption="MR 触发协作上下文，pipeline 提供自动化证据，runner 提供真正的执行能力。只有这三层连起来，CI/CD 才是可靠基础设施。"
+  inputsLabel="输入"
+  inputs="MR 事件|.gitlab-ci.yml|Runner 可用性"
+  commandLabel="Pipeline 执行"
+  outputsLabel="结果"
+  outputs="Job 状态|Merge 信号|运维反馈"
+  note="当团队说“CI 又坏了”时，问题可能在配置、runner、权限，甚至 MR 准入定义本身。"
+/>
+
+<TipBox title="第一个 pipeline 要求稳，不要求炫">
+  <p>一个简单但可靠的流水线，比一个华丽但经常不稳定的流水线更能建立团队信任。</p>
+</TipBox>
+
+<WarningBox title="不要忽视 runner 边界">
+  <p>runner 不是中立流水管道，它决定 job 在哪里执行、用什么权限执行、是否触碰敏感环境。因此它本身就是协作和安全模型的一部分。</p>
+</WarningBox>
+
+## 跟着做一遍
+
+<PracticeLab
+  title="练习：沿着一个 Merge Request 追到 runner"
+  intro="目标是搞清楚 MR 上看到的 pipeline 状态，到底是如何被执行出来的。"
+  setupLabel="准备"
+  setup={`找一个带最小 .gitlab-ci.yml 的小项目。\n从功能分支打开一个 Merge Request。`}
+  stepsLabel="动手试"
+  steps="先在 MR 页面里看它关联了哪条 pipeline。|再进入 pipeline 看具体有哪些 jobs。|确认这些 jobs 是由哪个 runner 执行的。|最后问自己：如果 runner 不可用或权限受限，这个 MR 会发生什么变化？"
+  outcomesLabel="会发生什么"
+  outcomes="你会把 MR 状态和实际执行基础设施联系起来。|会意识到 CI 问题不总是 YAML 问题。|以后排查 GitLab pipeline 时会更快找到真正的故障层。"
+  mistakesLabel="常见错误判断"
+  mistakes="如果 pipeline 根本没启动，先查 runner 和触发规则。|如果某些敏感 job 没出现，先看权限或保护策略。|如果团队只会改 YAML 却说不清 runner 状态，说明模型还没真正建立起来。"
+/>

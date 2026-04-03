@@ -3,7 +3,7 @@ export const metadata = {
   slug: "gitlab-flow-and-merge-requests",
   locale: "en",
   section: "gitlab",
-  summary: "Understand GitLab Flow, environment-aware branching, and merge requests as one collaboration model instead of a collection of UI features.",
+  summary: "Understand GitLab Flow, environment-aware branching, and merge requests as one delivery model instead of a collection of UI features.",
   sourceUrls: [
     "https://docs.gitlab.com/topics/gitlab_flow/",
     "https://docs.gitlab.com/user/project/merge_requests/",
@@ -14,59 +14,105 @@ export const metadata = {
 
 ## Where GitLab Flow fits
 
-GitLab Flow is not just GitHub Flow under a different name, and it is not a direct Gitflow replacement either.  
-Its value comes from connecting branching to release, environment, and deployment realities.
+GitLab Flow is not just GitHub Flow under a different name, and it is not a direct Gitflow clone either.  
+Its value comes from connecting branch work to delivery realities such as environments, release movement, and approval gates.
 
-That means the real question is not only "how do we merge code?" but also:
+That shifts the question from:
 
-- how does the team move through environments?
-- what role do merge requests play in approval and release readiness?
-- how do default, stable, or environment-facing branches interact?
+- how do we merge code?
 
-## Why the merge request is central
+to:
 
-On GitLab, a merge request often becomes the place where teams bring together:
+- how does work move toward production?
+- where do approval and pipeline status become merge gates?
+- which branches represent collaboration versus deployment state?
 
-- change context
-- review conversation
-- CI pipeline results
+<MentalModelBox title="GitLab Flow is branch strategy tied to delivery context">
+  <p>It is not only about keeping feature branches tidy. It is about making merge requests, pipelines, and branch policy work together as one operating model.</p>
+</MentalModelBox>
+
+## Why merge requests are central
+
+On GitLab, a merge request often becomes the single place where teams combine:
+
+- change explanation
+- review discussion
+- pipeline results
 - approvals
 - merge readiness
 
-So learning GitLab well means understanding merge requests as collaboration surfaces, not only code comparison pages.
+That is why learning GitLab well means treating merge requests as collaboration hubs, not just diff pages.
 
-<MentalModelBox title="Think of GitLab Flow as branch collaboration tied more closely to environments and delivery">
-  <p>
-    Compared with simpler branch models, GitLab Flow often cares more explicitly about where code is going next, not only where it came from.
-  </p>
-</MentalModelBox>
+## A common GitLab Flow rhythm
 
-## A common rhythm
-
-1. branch from the default line
-2. commit on the working branch
+1. branch from the default or designated integration line
+2. commit on a working branch
 3. open a merge request
-4. run pipelines and gather review or approval
-5. merge when requirements are satisfied
+4. let pipeline, review, and approvals converge there
+5. merge only when technical and policy gates are satisfied
 
-Teams with environment branches or release branches extend that rhythm further.
+Teams with release or environment branches extend this rhythm, but the merge request remains the main checkpoint.
 
-## Where it fits best
+## When GitLab Flow works well
 
 GitLab Flow is especially useful when:
 
-- CI/CD is deeply integrated into collaboration
-- environment movement matters
-- approvals, pipelines, and review need to meet in one place
+- CI/CD is deeply integrated into review and merge policy
+- environment progression matters
+- you want one place to evaluate code, automation, and approval readiness together
 
-## Common misunderstandings
+It is less compelling if the team only wants a very light branch model and does not use much of the surrounding platform.
+
+## What teams often misunderstand
 
 - treating GitLab Flow as only a renamed feature-branch workflow
-- focusing on the merge request page while ignoring pipelines and approval rules
-- allowing branches to live too long and inflate review cost
+- focusing on the MR page while ignoring the policy and pipeline layers around it
+- letting branches live too long so the merge request becomes expensive to review
+- copying a release model without checking whether the team actually uses those branch semantics
 
-## Good follow-up reads
+## A healthier adoption sequence
 
-1. GitLab CI/CD and runners
-2. pull requests and reviews
-3. merge strategy and platform settings
+The most stable way to adopt GitLab Flow is usually:
+
+1. define the default collaboration branch clearly
+2. decide what makes a merge request mergeable
+3. wire those gates into CI and approvals
+4. only add environment or release branch complexity if the delivery model truly needs it
+
+That order keeps the team from building a ceremonial process around features it does not really need yet.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="GitLab Flow around the merge request"
+  caption="The merge request is the place where branch work, pipeline status, and approval rules meet before code moves forward."
+  inputsLabel="Inputs"
+  inputs="Working branch|Pipeline status|Review and approvals"
+  commandLabel="Merge request gate"
+  outputsLabel="Results"
+  outputs="Accepted change|Blocked merge|Delivery-ready branch state"
+  note="If teams treat the MR as only a code comparison page, they usually miss the real value of GitLab Flow."
+/>
+
+<TipBox title="Start from merge policy, not branch taxonomy">
+  <p>Many teams get more value from a clear merge request policy than from inventing more branches. Branch complexity should follow delivery needs, not lead them.</p>
+</TipBox>
+
+<WarningBox title="Long-lived branches quietly inflate review cost">
+  <p>Even if the branch model looks elegant on paper, merge requests become harder to review, test, and trust when branch lifetime grows too long.</p>
+</WarningBox>
+
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: map one merge request to the real GitLab Flow gates"
+  intro="The goal is to see the merge request as a decision surface, not just a place to click Merge."
+  setupLabel="Setup"
+  setup={`Create a small branch from your default integration line.\nMake one focused change and open a merge request.`}
+  stepsLabel="Try it"
+  steps="Inspect which pipeline checks appear on the merge request.|Inspect which approvals or branch rules affect mergeability.|Ask whether this branch is only a collaboration branch or also tied to a delivery environment.|Write down what conditions truly make the MR ready."
+  outcomesLabel="What happens next"
+  outcomes="You see GitLab Flow as branch work plus policy and automation.|You learn which merge gates are technical and which are organizational.|You can evaluate whether the team's branch design matches real delivery needs."
+  mistakesLabel="Common mistake checks"
+  mistakes="If the branch model feels complicated, ask whether the delivery model actually needs that complexity.|If the MR is the only place context appears, planning may be underdeveloped upstream.|If merge readiness is unclear, define policy before adding more branches."
+/>

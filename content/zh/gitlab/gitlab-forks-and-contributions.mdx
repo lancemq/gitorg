@@ -3,7 +3,7 @@ export const metadata = {
   slug: "gitlab-forks-and-contributions",
   locale: "zh",
   section: "gitlab",
-  summary: "把 GitLab 上的 fork、贡献分支、合并请求和上游同步串成一条更真实的外部协作路径。",
+  summary: "把 GitLab 上的 fork、贡献分支、Merge Request 和上游同步串成一条更真实的外部协作路径，并说明权限与 CI 边界。",
   sourceUrls: [
     "https://docs.gitlab.com/user/project/repository/forking_workflow/",
     "https://docs.gitlab.com/user/project/merge_requests/",
@@ -14,42 +14,114 @@ export const metadata = {
 
 ## 什么时候会用到这条路径
 
-当你没有目标项目直接写权限，或者希望把外部贡献和内部协作隔离开时，GitLab 的 fork 工作流就很常见。
+当你没有目标项目直接写权限，或者维护者希望把外部贡献和内部协作隔开时，fork 工作流就会成为更自然的选择。
 
-它和站内已经有的 Git fork 工作流思路相近，但 GitLab 上你还会更频繁地遇到：
+在 GitLab 里，这条路径往往还会和这些边界一起出现：
 
-- 组和项目权限差异
-- Merge Request 目标项目设置
-- pipeline 在 fork 场景下的边界
+- group / project 权限边界
+- Merge Request 的目标项目选择
+- fork 场景下的 pipeline、runner 和变量限制
 
-## 一条更稳的节奏
+所以它不只是 Git 命令顺序，更是信任边界的一部分。
 
-1. fork 项目
+<MentalModelBox title="fork 不只是仓库副本，也是权限边界">
+  <p>fork 的意义不只是“复制一份项目”。它还把贡献者可控范围和维护者控制范围明确分开，让协作更安全、更可审查。</p>
+</MentalModelBox>
+
+## 一条稳定的外部贡献节奏
+
+1. fork 目标项目
 2. clone 自己的 fork
-3. 添加上游 remote
-4. 同步主线
-5. 切任务分支
+3. 把原项目添加成 `upstream`
+4. 同步 upstream 主线
+5. 在 fork 里切工作分支
 6. push 到自己的 fork
 7. 向上游发起 Merge Request
 
-## 为什么要特别注意权限和 pipeline
+这条线看起来普通，但它最重要的价值是：把“谁负责贡献分支、谁负责最终合并”说清楚。
 
-在 GitLab 的 fork 场景里，很多团队最容易忽略的是：
+## 为什么 upstream 同步如此关键
 
-- 你是否有权触发某些 pipeline
-- 变量、密钥和 runner 是否会暴露
-- Merge Request 是向哪个项目发起
+很多 noisy MR，本质上不是改动太差，而是 fork 太久没同步。
 
-这就是为什么外部贡献场景需要比内部团队协作更保守。
+如果不持续同步 upstream：
+
+- 你的工作分支会离真实基线越来越远
+- 冲突会在评审前集中爆发
+- reviewer 看到的比较结果会越来越脏
+
+一个更稳的同步习惯通常是：
+
+```bash
+git remote add upstream <original-url>
+git fetch upstream
+git switch main
+git merge upstream/main
+```
+
+如果团队偏好 rebase，也可以换成 rebase 版本，但核心原则一样：**不要长期让 fork 自己漂移。**
+
+## GitLab 场景下为什么要额外关注权限和 CI
+
+GitLab 的 fork 场景最容易让人踩坑的地方，不是 fork 本身，而是这些细节：
+
+- Merge Request 究竟是向哪个项目发起
+- fork 项目能不能触发和上游一样的 pipeline
+- 某些变量和密钥是否被平台故意屏蔽
+- runner、权限和安全策略是否允许同等执行
+
+所以外部贡献流不仅是“fork -> branch -> push -> MR”，还包括：
+
+**理解平台会为安全考虑限制哪些能力。**
 
 ## 常见错误
 
-- fork 后不持续同步上游
-- 分不清自己的项目和目标项目
-- 在不了解 CI 权限边界时直接依赖 pipeline 结果
+- fork 后长期不再同步 upstream
+- 搞不清 `origin` 和 `upstream`
+- 把自己的 fork 当成长线项目来经营，导致分支越来越乱
+- 在不了解 fork 下 CI 限制的情况下，误判 pipeline 结果
 
-## 接下来建议继续看什么
+<TipBox title="让 fork 尽量保持“无聊”">
+  <p>更健康的 fork 通常不是第二主仓库，而是一个用于贡献分支的干净中转站。它越简单，后续同步和评审越轻松。</p>
+</TipBox>
 
-1. `GitLab Groups / Projects / Permissions`
-2. `开源贡献 / fork + PR 完整提交流程`
-3. `GitLab CI/CD 与 Runners`
+## 从维护者视角要额外看什么
+
+维护者在看 fork 贡献时，通常要多问两个问题：
+
+1. 这条分支和 upstream 是否已经足够同步？
+2. 这次 MR 的 CI 结果，是否受 fork 权限边界影响？
+
+只有双方都理解这些边界，外部贡献路径才会真正顺畅。
+
+## 图例理解
+
+<CommandFlowFigure
+  title="从 fork 回到上游 Merge Request"
+  caption="贡献路径先经过贡献者可控的 fork，再通过 Merge Request 进入维护者控制的目标项目。"
+  inputsLabel="贡献者侧"
+  inputs="Fork 项目|工作分支|Upstream 同步"
+  commandLabel="贡献流"
+  outputsLabel="维护者侧"
+  outputs="目标 MR|可评审上下文|受控合并"
+  note="最常见的问题不是命令顺序，而是失去了“哪个项目拥有什么责任”的清晰边界。"
+/>
+
+<WarningBox title="不要默认 fork 场景下 CI 一定对等">
+  <p>GitLab 在 fork 场景中常常会故意限制变量、runner 或敏感 job，这通常是安全设计，不是平台“坏了”。</p>
+</WarningBox>
+
+## 跟着做一遍
+
+<PracticeLab
+  title="练习：走一遍干净的 fork 到 MR 流程"
+  intro="目标是把 upstream 所有权、同步习惯和贡献分支边界真正建立起来。"
+  setupLabel="准备"
+  setup={`fork 一个小型 GitLab 项目。\n本地 clone 你的 fork。\n把原项目加成 \`upstream\`。`}
+  stepsLabel="动手试"
+  steps="先从 upstream 抓取并同步你的本地主线。|在 fork 中切一个功能分支。|做一个小改动并 push 到自己的 fork。|向 upstream 发起 MR。|再观察这个 MR 的 pipeline 和内部团队分支是否完全一致。"
+  outcomesLabel="会发生什么"
+  outcomes="你会更清楚哪个仓库负责贡献、哪个仓库负责最终合并。|会形成先同步 upstream 再开始工作的习惯。|也会更理解 GitLab 在外部贡献路径上的权限与 CI 边界。"
+  mistakesLabel="常见错误判断"
+  mistakes="如果 MR diff 很脏，通常说明 fork 相对 upstream 已经太旧。|如果 pipeline 行为和内部分支不同，先查 fork 限制。|如果 push 前搞不清目标 remote，先确认 `origin` 和 `upstream`。"
+/>

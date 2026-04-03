@@ -3,7 +3,7 @@ export const metadata = {
   slug: "gitlab-flow-and-merge-requests",
   locale: "zh",
   section: "gitlab",
-  summary: "理解 GitLab Flow、分支环境和 Merge Request 在团队协作里的关系，而不只是学会在哪点合并。",
+  summary: "理解 GitLab Flow、环境感知的分支协作，以及 Merge Request 为什么会成为 GitLab 交付模型的中心。",
   sourceUrls: [
     "https://docs.gitlab.com/topics/gitlab_flow/",
     "https://docs.gitlab.com/user/project/merge_requests/",
@@ -12,61 +12,107 @@ export const metadata = {
 
 # GitLab Flow 与 Merge Request 教程
 
-## 先理解 GitLab Flow 的位置
+## GitLab Flow 的位置到底在哪里
 
-GitLab Flow 不是对 GitHub Flow 的简单复制，也不是 Gitflow 的直接替代。  
-它更强调把分支策略和团队的发布、环境、部署节奏联系起来。
+GitLab Flow 不是对 GitHub Flow 的简单换皮，也不是 Gitflow 的直接复制。  
+它真正强调的是：**分支协作要和交付现实绑定在一起。**
 
-也就是说，它问的不只是“代码怎么合并”，还包括：
+所以它关注的不只是：
 
-- 你们是按环境推进，还是按版本推进
-- Merge Request 在协作和审核里扮演什么角色
-- 默认分支、稳定分支和部署分支之间怎么配合
+- 代码怎么合并
 
-## Merge Request 为什么是核心
+还包括：
 
-在 GitLab 里，Merge Request 不只是代码比对页，它通常还是这些事情的收束点：
+- 代码要往哪个环境走
+- 哪些条件构成 merge readiness
+- 分支是在表达协作状态，还是交付状态
 
-- 变更说明
-- review 反馈
-- pipeline 结果
-- approvals
-- 合并门槛
-
-所以学习 GitLab 协作时，理解 Merge Request 比记住某个按钮位置更重要。
-
-<MentalModelBox title="把 GitLab Flow 想成“和发布/环境联动的分支协作模型”">
-  <p>
-    它和更纯粹的 GitHub Flow 相比，往往更强调环境、部署和持续交付场景下的团队边界。
-  </p>
+<MentalModelBox title="GitLab Flow 是“分支策略 + 交付上下文”">
+  <p>如果只盯着分支名或 MR 页面，很容易误解 GitLab Flow。它真正有价值的地方，是把 branch、pipeline、approval 和 delivery gate 组织成一个完整模型。</p>
 </MentalModelBox>
 
-## 一条常见节奏
+## 为什么 Merge Request 是这套模型的核心
 
-1. 从默认分支切工作分支
-2. 在分支上提交改动
+在 GitLab 中，Merge Request 往往同时承载：
+
+- 变更说明
+- code review
+- pipeline 结果
+- approvals
+- 是否满足合并条件
+
+这意味着 MR 在 GitLab 里不只是“代码比对页”，更像一个真正的协作和准入关口。
+
+## 一条常见的 GitLab Flow 节奏
+
+1. 从默认分支或指定整合分支切工作分支
+2. 在工作分支提交改动
 3. 打开 Merge Request
-4. 跑 pipeline 并等待 review / approval
-5. 条件满足后合并
+4. 让 pipeline、review 和 approvals 在 MR 里汇合
+5. 条件满足后再合并
 
-如果团队有环境分支或稳定分支，这条线会继续延伸到部署和回流。
+如果团队还有环境分支、稳定分支或发布分支，这条线会继续往部署和回流延伸，但 MR 仍然是中枢。
 
-## GitLab Flow 适合什么团队
+## 它适合什么团队
 
-它尤其适合这些情况：
+GitLab Flow 特别适合这些场景：
 
-- 团队已经把 CI/CD 深度接进协作流程
+- CI/CD 已经深度参与协作决策
 - 环境推进和部署状态很重要
-- 想把 review、pipeline、approval 放在同一平台里收束
+- 团队希望在一个地方同时看到 review、自动化和准入条件
+
+如果团队只想要极轻量分支模式，又几乎不用 CI / approval / environment，这套模型的优势就会弱很多。
 
 ## 常见误区
 
-- 把 GitLab Flow 误解成“只是换了个名字的 feature branch”
-- 只看 Merge Request，不看 pipeline 和审批规则
-- 让分支存在太久，导致 review 和合并成本越来越大
+- 把 GitLab Flow 理解成“带 MR 的 feature branch”
+- 只看 MR 页面，不看围绕它的 pipeline 与审批规则
+- 分支活得太久，让 MR 越来越难评审
+- 先套复杂分支结构，再去想团队实际上有没有这样的交付需求
 
-## 接下来建议继续看什么
+## 更稳的落地顺序
 
-1. `GitLab CI/CD 与 Runners`
-2. `Pull Request 与 Code Review`
-3. `PR 合并策略与平台设置`
+很多团队按下面顺序推进会更稳：
+
+1. 先明确默认协作分支
+2. 再明确什么条件才算 MR 可合并
+3. 把这些条件落进 pipeline 和 approvals
+4. 只有交付模型确实需要时，才继续引入环境分支或发布分支
+
+这样能避免流程设计先于真实需求，导致团队只是在维护一套“看起来很完整”的分支制度。
+
+## 图例理解
+
+<CommandFlowFigure
+  title="围绕 Merge Request 的 GitLab Flow"
+  caption="GitLab Flow 的关键不是多几个分支，而是把工作分支、pipeline 和审批规则在 MR 上汇成一个合并关口。"
+  inputsLabel="输入"
+  inputs="工作分支|Pipeline 状态|Review / Approval"
+  commandLabel="Merge Request 关口"
+  outputsLabel="结果"
+  outputs="可合并变更|被阻止的变更|面向交付的分支状态"
+  note="如果团队把 MR 仅仅当成 diff 页面，就会错过 GitLab Flow 真正的组织价值。"
+/>
+
+<TipBox title="先把 merge policy 讲清楚，再增加分支">
+  <p>很多团队真正需要的不是更多 branch，而是更清楚的 MR 准入规则。分支复杂度应该服务于交付，而不是反过来。</p>
+</TipBox>
+
+<WarningBox title="长寿命分支会悄悄抬高协作成本">
+  <p>无论流程图画得多漂亮，只要分支活太久，MR 的 review、测试和信任成本都会上升。</p>
+</WarningBox>
+
+## 跟着做一遍
+
+<PracticeLab
+  title="练习：把一个 Merge Request 映射成真正的 GitLab Flow 关口"
+  intro="目标是把 MR 看成决策界面，而不是点 Merge 的地方。"
+  setupLabel="准备"
+  setup={`从默认协作分支切一个小分支。\n做一处明确改动并打开 MR。`}
+  stepsLabel="动手试"
+  steps="观察这个 MR 里出现了哪些 pipeline 检查。|观察哪些 approval 或分支规则影响它能否合并。|判断这个分支只是协作分支，还是还代表环境或发布状态。|把“什么条件下它才算 ready”写下来。"
+  outcomesLabel="会发生什么"
+  outcomes="你会意识到 GitLab Flow 不只是 branch 命名，而是 policy 和 automation 一起工作的模型。|会更容易看出哪些关口是技术性的，哪些是组织性的。|也能更判断团队当前的分支模型是不是过度设计。"
+  mistakesLabel="常见错误判断"
+  mistakes="如果流程显得很复杂，先问交付模型是不是真的需要这些分支。|如果 MR 成了唯一上下文入口，通常说明上游计划层还不够健康。|如果 merge readiness 说不清，先定义规则再加流程。"
+/>

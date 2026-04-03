@@ -3,7 +3,7 @@ export const metadata = {
   slug: "gitlab-forks-and-contributions",
   locale: "en",
   section: "gitlab",
-  summary: "Connect GitLab forks, contribution branches, merge requests, and upstream sync into a more realistic external collaboration flow.",
+  summary: "Connect GitLab forks, contribution branches, merge requests, and upstream sync into a realistic external contribution workflow with permission and CI boundaries.",
   sourceUrls: [
     "https://docs.gitlab.com/user/project/repository/forking_workflow/",
     "https://docs.gitlab.com/user/project/merge_requests/",
@@ -12,44 +12,115 @@ export const metadata = {
 
 # GitLab Forks and Contribution Flow
 
-## When this workflow shows up
+## When this workflow appears
 
-Use this path when contributors do not have direct write access to the target project, or when teams want external contribution separated from internal branches.
+Fork-based contribution is the right model when contributors do not have direct write access to the target repository, or when maintainers want external work isolated from internal branches.
 
-In GitLab, that usually also means thinking about:
+In GitLab, that model usually interacts with:
 
-- group and project permission boundaries
-- merge-request targets
-- CI and variable behavior in forked contexts
+- project and group permission boundaries
+- merge request target selection
+- pipeline, variable, and runner restrictions in fork contexts
 
-## A steadier contribution rhythm
+That means the Git mechanics are only half the story.
 
-1. fork the project
-2. clone your fork
-3. add the upstream remote
-4. sync the main line
-5. create a working branch
-6. push to your fork
-7. open the merge request back upstream
+<MentalModelBox title="A fork flow is also a trust boundary">
+  <p>The fork is not just a copy of the repository. It is the technical boundary that separates contributor control from maintainer-controlled project state.</p>
+</MentalModelBox>
 
-## Why permissions and CI matter here
+## A stable contribution rhythm
 
-Fork-based contribution on GitLab often becomes tricky because teams overlook:
+1. fork the target project
+2. clone your fork locally
+3. add the original repository as `upstream`
+4. sync from upstream before starting work
+5. create a feature branch in your fork
+6. push the branch to your fork
+7. open a merge request back to upstream
 
-- who can trigger which pipelines
-- whether variables or secrets are available
+That rhythm matters because it keeps your contribution branch current and makes the target of review explicit.
+
+## Why upstream sync matters so much
+
+The easiest way to create noisy merge requests is to forget upstream sync for too long.
+
+If you do not regularly fetch from upstream:
+
+- your branch can drift far from the target base
+- conflict resolution gets harder than it needs to be
+- reviewers see outdated comparisons
+
+A healthy routine is usually:
+
+```bash
+git remote add upstream <original-url>
+git fetch upstream
+git switch main
+git merge upstream/main
+```
+
+or a rebase-based equivalent if the project expects that style.
+
+## Where GitLab adds operational caution
+
+Fork contribution on GitLab often becomes tricky because teams overlook:
+
 - which project the merge request actually targets
+- whether fork pipelines have the same runner or variable access
+- whether secrets are intentionally unavailable for security reasons
+- whether the contributor expects CI parity when the platform is deliberately restricting it
 
-That is why external contribution flows need stronger operational caution than internal team branching.
+So the contributor workflow is not only “fork, branch, push, MR.”  
+It is also “understand what the platform will and will not execute for an external source.”
 
 ## Common mistakes
 
-- never syncing upstream
-- confusing the contributor fork with the target project
-- trusting CI results without understanding fork-related runner and variable limits
+- never syncing from upstream after forking
+- confusing the personal fork with the canonical target project
+- trusting CI outcomes without understanding fork-specific restrictions
+- pushing feature work directly to a stale branch inside the fork for too long
 
-## Good follow-up reads
+<TipBox title="Keep your fork boring">
+  <p>The safest contributor fork is usually not a second long-lived project roadmap. It is mainly a clean staging area for branches you intend to send upstream.</p>
+</TipBox>
 
-1. GitLab groups, projects, and permissions
-2. open source fork plus PR contribution
-3. GitLab CI/CD and runners
+## Review and maintainership perspective
+
+Maintainers should evaluate fork-based merge requests with two extra questions:
+
+1. is the source branch up to date enough to review cleanly?
+2. are CI and permission expectations clear for this contribution path?
+
+External contribution feels much smoother when maintainers and contributors both understand those boundaries in advance.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="From fork to upstream merge request"
+  caption="The contribution path moves through a contributor-controlled fork, then back into the maintainer-controlled project through a merge request."
+  inputsLabel="Contributor side"
+  inputs="Forked project|Feature branch|Upstream sync"
+  commandLabel="Contribution flow"
+  outputsLabel="Maintainer side"
+  outputs="Target MR|Review context|Controlled merge"
+  note="The most common failure is not the Git command sequence. It is losing track of which project owns which part of the flow."
+/>
+
+<WarningBox title="Do not assume CI parity across forks">
+  <p>Some GitLab setups intentionally limit variables, runners, or sensitive jobs for fork-based pipelines. Treat that as a security boundary, not a bug.</p>
+</WarningBox>
+
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: rehearse a clean fork-to-MR flow"
+  intro="The goal is to practice contribution with the right mental model for upstream ownership and sync."
+  setupLabel="Setup"
+  setup={`Fork a small GitLab project.\nClone your fork locally.\nAdd the original repository as \`upstream\`.`}
+  stepsLabel="Try it"
+  steps="Fetch from upstream and sync your local main branch.|Create a feature branch in your fork.|Make a small change and push it to your fork.|Open a merge request to the upstream project.|Check whether the MR and pipeline behavior differ from internal branch workflows."
+  outcomesLabel="What happens next"
+  outcomes="You learn which repository owns the contribution and which one owns the final merge.|You get practice keeping the fork synchronized before review.|You see GitLab's permission and CI boundaries in a real contribution flow."
+  mistakesLabel="Common mistake checks"
+  mistakes="If the MR diff is unexpectedly large, your fork may be stale relative to upstream.|If CI behaves differently from an internal branch, inspect fork restrictions before drawing conclusions.|If you lose track of remotes, verify `origin` versus `upstream` before pushing."
+/>
