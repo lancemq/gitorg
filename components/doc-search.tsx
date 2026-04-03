@@ -118,6 +118,8 @@ const loadErrorStates = {
   en: "Search is temporarily unavailable. Please try again.",
 };
 
+const SEARCH_LOAD_TIMEOUT_MS = 5000;
+
 const searchSuggestionLabels = {
   zh: {
     prerequisite: "先读",
@@ -200,6 +202,11 @@ const sectionOrder: SearchDoc["section"][] = [
   "concepts",
   "recovery",
 ];
+
+async function loadStaticSearchIndex(locale: Locale): Promise<SearchDoc[]> {
+  const { staticSearchIndex } = await import("@/lib/search-index-static");
+  return staticSearchIndex[locale] ?? [];
+}
 
 export function DocSearch({ label, locale }: DocSearchProps) {
   const pathname = usePathname();
@@ -389,12 +396,18 @@ export function DocSearch({ label, locale }: DocSearchProps) {
     }
 
     const controller = new AbortController();
+    let shouldIgnore = false;
 
     async function loadSearchItems() {
       setIsLoading(true);
       setLoadError(false);
+      let timeoutId: number | undefined;
 
       try {
+        timeoutId = window.setTimeout(() => {
+          controller.abort("timeout");
+        }, SEARCH_LOAD_TIMEOUT_MS);
+
         const response = await fetch(`/api/search/${locale}`, {
           signal: controller.signal,
         });
@@ -404,17 +417,46 @@ export function DocSearch({ label, locale }: DocSearchProps) {
         }
 
         const nextItems = (await response.json()) as SearchDoc[];
+        if (shouldIgnore) {
+          return;
+        }
         setItems(nextItems);
         setHasLoaded(true);
       } catch (error) {
-        if (controller.signal.aborted) {
+        if (shouldIgnore) {
           return;
+        }
+
+        const wasTimeoutAbort =
+          controller.signal.aborted && controller.signal.reason === "timeout";
+
+        if (controller.signal.aborted && !wasTimeoutAbort) {
+          return;
+        }
+
+        try {
+          const fallbackItems = await loadStaticSearchIndex(locale);
+          if (shouldIgnore) {
+            return;
+          }
+
+          if (fallbackItems.length > 0) {
+            setItems(fallbackItems);
+            setHasLoaded(true);
+            setLoadError(false);
+            return;
+          }
+        } catch (fallbackError) {
+          console.error(fallbackError);
         }
 
         console.error(error);
         setLoadError(true);
       } finally {
-        if (!controller.signal.aborted) {
+        if (timeoutId) {
+          window.clearTimeout(timeoutId);
+        }
+        if (!shouldIgnore) {
           setIsLoading(false);
         }
       }
@@ -422,7 +464,10 @@ export function DocSearch({ label, locale }: DocSearchProps) {
 
     void loadSearchItems();
 
-    return () => controller.abort();
+    return () => {
+      shouldIgnore = true;
+      controller.abort("closed");
+    };
   }, [hasLoaded, isLoading, isOpen, locale]);
 
   useEffect(() => {
