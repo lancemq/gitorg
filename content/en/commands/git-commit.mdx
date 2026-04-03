@@ -3,7 +3,7 @@ export const metadata = {
   slug: "git-commit",
   locale: "en",
   section: "commands",
-  summary: "Explains how git commit creates new history nodes, how to write useful messages, and when amend is appropriate.",
+  summary: "Explains how git commit creates new history nodes, how to write stronger messages, and when amend is safe versus risky.",
   sourceUrls: [
     "https://git-scm.com/docs/git-commit",
     "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
@@ -14,7 +14,25 @@ export const metadata = {
 
 ## The short version
 
-`git commit` turns staged content into a new commit object at the tip of the current branch.
+`git commit` turns the staged snapshot into a new commit object and moves the current branch to that new history point.
+
+<MentalModelBox title="A commit is both content and explanation">
+  <p>A useful commit is not just a saved diff. It is a stable checkpoint plus a message that explains why this checkpoint should exist.</p>
+</MentalModelBox>
+
+## What this command is really for
+
+People sometimes talk about commit as if it were a save button.  
+That is too small a mental model.
+
+A good commit gives you:
+
+- a rollback point
+- a reviewable unit of change
+- a reusable change for cherry-pick or backport
+- a readable step in the project story
+
+That is why commit quality matters so much more than raw commit count.
 
 ## Common usage
 
@@ -23,35 +41,105 @@ git commit -m "feat: add search dialog"
 git commit --amend
 ```
 
-Use `--amend` mainly for local cleanup before the history is shared.
+- `git commit -m`: create a new commit from the index
+- `git commit --amend`: rewrite the most recent local commit
 
+## What to confirm before committing
 
-## What problem this command solves in a workflow
+Before you run `git commit`, check three things:
 
-`git commit` sits close to the working tree, the index, and the current branch. The most important question is not “which flag exists,” but “which layer will this command modify?”
+1. is the index cleanly scoped to one logical change?
+2. does the message explain intent, not only mechanics?
+3. is this history still local, or already visible to others?
 
-## Typical use cases
+That third question matters because commits are easy to rewrite when private and much more expensive to rewrite when shared.
 
-- Use `git commit` inside the daily loop of edit, inspect, stage, and commit so local state stays intentional.
-- Reach for `git commit` when you need to prepare a clean handoff between file changes, staging decisions, and branch movement.
-- Use `git commit` to clean up local state before collaboration steps that are more expensive to recover from later.
+## A stronger commit message pattern
+
+Good commit messages are usually:
+
+- specific
+- action-oriented
+- small enough to match the actual diff
+
+For example:
+
+- good: `fix: avoid infinite loading in doc search`
+- weaker: `update search`
+- weaker: `misc changes`
+
+The point is not following a strict grammar for its own sake.  
+The point is helping reviewers and future-you understand why this commit exists.
+
+## When amend is appropriate
+
+`git commit --amend` is ideal when:
+
+- you forgot one small file in the last local commit
+- the message is misleading or incomplete
+- you want to polish the latest commit before review
+
+It becomes risky when:
+
+- the commit was already pushed to a shared branch
+- CI, review comments, or teammates now refer to that exact history
+
+<TipBox title="Use amend as local cleanup">
+  <p>If the history is still private, amend is one of the cleanest ways to fix a commit without adding unnecessary noise.</p>
+</TipBox>
+
+## A safer commit routine
+
+When you want commits to stay useful, a practical routine is:
+
+1. inspect with `git status`
+2. inspect exact staged content with `git diff --staged`
+3. commit with a message that describes intent
+4. re-check the branch shape with `git log --oneline -5`
+
+For example:
+
+```bash
+git status
+git diff --staged
+git commit -m "fix: fall back to local search index on timeout"
+git log --oneline -5
+```
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Working tree / index / ref relationship"
-  caption="State-oriented commands revolve around file content, staging state, and the current branch pointer."
-  inputsLabel="Input state"
-  inputs="Working tree files|Index snapshot|Current branch"
+  title="Turning staged state into history"
+  caption="Commit does not pull content directly from your current files. It records the index as a new history node and moves the branch pointer."
+  inputsLabel="Inputs"
+  inputs="Working tree edits|Index snapshot|Current branch"
   commandLabel="git commit"
-  outputsLabel="Possible changes"
-  outputs="File content|Staging result|Current ref"
-  note="A quick before-and-after git status check is often enough to validate whether a state command behaved as intended."
+  outputsLabel="Results"
+  outputs="New commit object|Moved branch tip|Recoverable checkpoint"
+  note="If the resulting commit looks wrong, check the index first. Most commit mistakes start before the command itself."
 />
 
-## Special cases and boundaries
+## Boundaries and common mistakes
 
-- The risk in state-changing commands is usually not the syntax itself, but whether you correctly identified which layer they will touch.
-- If there are still valuable local edits in the working tree, decide whether they should be committed, stashed, or discarded before running `git commit`.
-- Running `git status` before and after `git commit` is often the fastest way to confirm what really changed.
+- `git commit` does not automatically include every visible file edit. It records what is staged.
+- A commit that mixes refactor, bug fix, and formatting work is harder to review and harder to revert safely.
+- Rewriting a local commit is usually cheap; rewriting a published commit is a coordination decision.
 
+<WarningBox title="Do not use commits as a dumping ground">
+  <p>If the commit message sounds vague because the change set is vague, the usual fix is not a better sentence. The usual fix is splitting the commit.</p>
+</WarningBox>
+
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: compare a messy commit with a clean one"
+  intro="This helps you see why staging and commit messages matter together."
+  setupLabel="Setup"
+  setup={`git switch -c lab/commit-demo\n# make one real fix and one unrelated cleanup`}
+  stepsLabel="Try it"
+  steps="Stage everything and imagine the resulting commit message.|Reset the index, then stage only the real fix.|Create a focused commit.|Stage the cleanup separately and write a second message."
+  outcomesLabel="What happens next"
+  outcomes="You can compare one mixed commit with two focused commits.|The branch history becomes easier to review.|Future revert or cherry-pick actions become safer because each commit has one job."
+  mistakesLabel="Common mistake checks"
+  mistakes="If you amend after pushing, make sure you understand whether the branch is shared.|If the message feels generic, inspect whether the staged diff is too broad.|If you are unsure what will be committed, run `git diff --staged` before committing."
+/>

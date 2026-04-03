@@ -3,7 +3,7 @@ export const metadata = {
   slug: "git-pull",
   locale: "zh",
   section: "commands",
-  summary: "解释 git pull 是 fetch 加整合的组合命令，以及为何很多团队更推荐 fetch-first 或 ff-only 的保守策略。",
+  summary: "解释 git pull 是 fetch 加整合的组合动作，什么时候 pull 很方便，什么时候 fetch-first 更稳，以及 rebase / ff-only 会怎样改变结果。",
   sourceUrls: [
     "https://git-scm.com/docs/git-pull",
     "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
@@ -14,11 +14,25 @@ export const metadata = {
 
 ## 一句话理解
 
-`git pull` 会先抓取远端更新，再把它们整合进当前分支。
+`git pull` 会先从远端抓取更新，再把这些更新整合进当前分支。
 
-## 为什么它容易让人误解
+<MentalModelBox title="pull 其实是两步动作">
+  <p>`git pull` 看起来只是一条短命令，但它把“获取远端状态”和“修改当前分支”两个决定绑在了一起。很多误操作都出在第二步。</p>
+</MentalModelBox>
 
-因为它把“同步信息”和“修改当前分支”合在了一起，所以很多人会忽略整合策略本身。
+## 为什么它特别容易让人误解
+
+很多人会把 pull 当成“同步按钮”。  
+但实际上，pull 可能会：
+
+- 直接快进当前分支
+- 产生 merge commit
+- 以 rebase 的方式改写本地提交祖先关系
+- 因策略限制或冲突而失败
+
+所以真正要问的问题不是“要不要同步”，而是：
+
+**这次同步后，我希望当前分支变成什么样？**
 
 ## 常见写法
 
@@ -28,42 +42,96 @@ git pull --rebase
 git pull --ff-only
 ```
 
-## 一个更稳的习惯
+- `git pull`：使用当前默认整合策略
+- `git pull --rebase`：先 fetch，再把本地提交重放到上游之后
+- `git pull --ff-only`：只有能快进时才成功，否则直接失败
 
-如果你不想把判断交给默认行为，先 `fetch` 再决定 merge 还是 rebase，会更可控。
+## 什么时候 pull 适合直接用
 
-## 什么时候用 ff-only
+在这些前提下，`git pull` 可以很顺手：
 
-当你希望分叉时直接失败，而不是隐式产生 merge commit，`--ff-only` 是很好的保守策略。
+- 团队已经统一了默认同步策略
+- 你知道当前分支是否用 merge、rebase 或 ff-only
+- 这是普通同步，不是高风险历史修复
 
+如果你想完全掌控行为，仍然更推荐先 `fetch`，再明确选择 merge 或 rebase。
 
-## 这条命令在流程里解决什么问题
+## 更稳的共享分支同步顺序
 
-`git pull` 围绕“本地仓库怎样与远端、补丁或可传输工件交换信息”展开。理解它时，要先分清下载、发布、整合、分发这几种动作分别由谁负责。
+很多团队更保守的写法是：
 
-## 典型用例
+1. `git status`
+2. `git fetch origin`
+3. `git log --oneline --graph --decorate --all -12`
+4. 再决定 merge、rebase，或者先停下来
 
-- 在同步上游、发布本地提交或传递补丁时，用 `git pull` 控制信息流动的方向。
-- 把 `git pull` 放进协作流程中，让“先观察远端，再决定整合方式”这件事更可控。
-- 在自动化、镜像、离线传输或邮件流中，用 `git pull` 管理可交换的历史单元。
+它只是多一步，但会显著提升判断质量。
+
+<TipBox title="fetch-first 不是保守过度，而是让判断前置">
+  <p>真正的目标不是永远不用 `git pull`，而是避免在没看清远端变化前就把整合动作自动做掉。</p>
+</TipBox>
+
+## `--ff-only` 什么时候特别好用
+
+`--ff-only` 适合这些场景：
+
+- 希望分支历史保持简单可预期
+- 不想悄悄产生 merge commit
+- 希望出现分叉时直接失败，逼自己先看清情况
+
+它尤其适合：
+
+- 受保护的主分支
+- 自动化同步脚本
+- 不希望开发者无意中改历史形状的团队
+
+## `--rebase` 改变了什么
+
+`git pull --rebase` 并不是“另一种同步”，而是：
+
+**在同步时顺手重写本地提交的祖先关系。**
+
+它往往适合个人功能分支，但仍然要先问：
+
+- 这些本地提交有没有共享出去？
+- 当前分支是否已经进入 review 或 CI？
+- 这里用 merge 会不会比 rebase 更透明？
 
 ## 图例理解
 
 <CommandFlowFigure
-  title="本地与外部信息流"
-  caption="远端与补丁类命令最关键的是分清信息从哪里来、到哪里去，以及是否会顺手改当前分支。"
-  inputsLabel="来源"
-  inputs="本地引用|远端引用|补丁 / 工件"
+  title="先抓取，再整合"
+  caption="只要把下载和分支变更拆开理解，pull 的行为就会清晰很多。fetch 负责了解远端状态，integration 负责改变本地历史形状。"
+  inputsLabel="输入"
+  inputs="远端引用|本地跟踪引用|当前分支"
   commandLabel="git pull"
-  outputsLabel="结果"
-  outputs="更新后的跟踪引用|发布的提交|传输产物"
-  note="只要涉及共享分支，就优先确认目标引用和团队约定，再执行真正的发布或整合动作。"
+  outputsLabel="可能结果"
+  outputs="更新后的 remote-tracking refs|快进结果|merge 或 rebase 后的历史"
+  note="如果 pull 的结果让你意外，通常不是因为 Git 随机工作，而是整合策略在隐式生效。"
 />
 
-## 特殊情况与边界
+## 常见错误
 
-- 远端类命令最常见的误区，是把“下载”“整合”“发布”混成同一件事。先拆清动作，再决定参数。
-- 如果操作结果会影响共享分支或对外发布，执行 `git pull` 前最好再确认一次目标远端、目标引用和权限边界。
-- 和 `git fetch`、`git push`、`git remote -v` 一起看，通常更容易判断问题出在同步、认证还是引用选择。
-- `git pull` 的结果会受到 `pull.rebase`、`pull.ff` 和命令参数影响，所以团队里最好统一默认策略。
+- 工作区还不干净就直接 pull，把本地改动问题和同步问题混在一起
+- 以为每次 pull 都只是 harmless fast-forward
+- 对共享分支使用 `--rebase`，却没先确认是否安全
+- 不知道 `pull.rebase` 或 `pull.ff` 当前配置的默认行为
 
+<WarningBox title="pull 不是天然安全的">
+  <p>一条命令写起来很方便，不代表它的后果就简单。只要当前分支历史形状重要，就应该在整合前先看清楚。</p>
+</WarningBox>
+
+## 跟着做一遍
+
+<PracticeLab
+  title="练习：比较普通 pull、ff-only 和 fetch-first"
+  intro="目标是把 pull 看成一种策略选择，而不是单纯同步快捷键。"
+  setupLabel="准备"
+  setup={`git switch -c lab/pull-demo\n# 模拟本地有提交，同时上游分支也向前移动`}
+  stepsLabel="动手试"
+  steps="先运行 `git fetch`，再用 `git log --oneline --graph --decorate --all -12` 看分叉。|尝试 `git pull --ff-only`，观察它什么时候成功、什么时候失败。|如果分支已经分叉，再判断 `git pull --rebase` 还是 `git merge` 更合适。"
+  outcomesLabel="会发生什么"
+  outcomes="你会把 pull 看成“抓取 + 整合策略”的组合。|会理解 ff-only 为什么能防止意外 merge。|会逐渐形成“先看清，再整合”的同步习惯。"
+  mistakesLabel="常见错误判断"
+  mistakes="尽量不要带着不相关的 unstaged 改动去 pull。|如果结果出乎意料，先检查 `pull.rebase` 和 `pull.ff`，不要靠猜。|如果分支已经共享，把 rebase 当成协作决定，而不是个人习惯。"
+/>

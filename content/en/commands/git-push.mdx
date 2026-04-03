@@ -3,7 +3,7 @@ export const metadata = {
   slug: "git-push",
   locale: "en",
   section: "commands",
-  summary: "Explains how git push publishes local branches, how upstream tracking works, and why force-with-lease is safer than raw force push.",
+  summary: "Explains how git push publishes local branches, how upstream tracking works, and how to reason about safe versus risky publication.",
   sourceUrls: [
     "https://git-scm.com/docs/git-push",
     "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
@@ -14,7 +14,24 @@ export const metadata = {
 
 ## The short version
 
-`git push` publishes local refs and objects to a remote repository.
+`git push` sends local refs and objects to a remote repository so other systems or teammates can see the new history.
+
+<MentalModelBox title="Push is publication, not just synchronization">
+  <p>The important shift is social, not only technical. Once you push, your local history may become part of review, CI, deployment, or another person's branch base.</p>
+</MentalModelBox>
+
+## What this command really changes
+
+When people think about `git push`, they often focus on auth or syntax.  
+The more important question is:
+
+**what shared ref am I about to update?**
+
+That determines whether push is:
+
+- harmless publication of a feature branch
+- a routine update to a review branch
+- a dangerous rewrite of a shared branch
 
 ## Common forms
 
@@ -24,36 +41,92 @@ git push -u origin feature/login
 git push --force-with-lease
 ```
 
-`--force-with-lease` is the safer force option for collaborative work.
+- `git push origin main`: update a named remote branch
+- `git push -u origin feature/login`: publish and set upstream tracking
+- `git push --force-with-lease`: rewrite remote history only if the remote tip still matches what you expect
 
+## When `-u` matters
 
-## What problem this command solves in a workflow
+Setting upstream once makes later commands simpler because the branch now knows which remote branch it tracks.
 
-`git push` is about how your local repository exchanges information with remotes, patches, or transportable artifacts. The mental model becomes clearer once you separate download, publish, integrate, and distribute.
+That improves:
 
-## Typical use cases
+- `git push`
+- `git pull`
+- `git status`
 
-- Use `git push` when synchronizing upstream state, publishing local work, or packaging history for review or transfer.
-- Place `git push` inside collaboration flow so the team can control when information is fetched, integrated, or exposed.
-- Use `git push` in automation, mirroring, offline transfer, or email-based workflows when Git history needs to move between systems.
+especially on new feature branches.
+
+## A safer push checklist
+
+Before pushing, ask:
+
+1. am I targeting the intended remote and branch?
+2. is this branch shared, protected, or review-visible?
+3. am I publishing new commits or rewriting old ones?
+4. does the working tree and local history look the way I think they do?
+
+A practical preflight is:
+
+```bash
+git status
+git log --oneline --graph --decorate -8
+git remote -v
+```
+
+## Why `--force-with-lease` exists
+
+There are cases where rewriting remote history is legitimate:
+
+- cleaning up your own feature branch before merge
+- updating a review branch after local history cleanup
+- replacing a mistaken push that nobody else built on
+
+But blind `--force` ignores whether the remote has moved since you last checked.
+
+`--force-with-lease` is safer because it says:
+
+“rewrite only if the remote tip is still the one I think it is.”
+
+<TipBox title="Default to lease, not force">
+  <p>If you ever need to rewrite published history, `--force-with-lease` should be the default reflex. Raw `--force` should feel exceptional.</p>
+</TipBox>
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Local-to-external information flow"
-  caption="Remote and patch commands are easiest to reason about when you separate where data comes from, where it goes, and whether the current branch changes as a side effect."
-  inputsLabel="Sources"
-  inputs="Local refs|Remote refs|Patches / artifacts"
+  title="Publishing local history to a shared ref"
+  caption="Push is about moving information from local refs to remote refs. The risk depends on whether the target ref is private, review-visible, or broadly shared."
+  inputsLabel="Inputs"
+  inputs="Local branch tip|Remote branch tip|Remote policy"
   commandLabel="git push"
-  outputsLabel="Results"
-  outputs="Updated tracking refs|Published commits|Transfer artifacts"
-  note="Any time a shared branch is involved, confirm the target ref and team policy before running the action that publishes or integrates history."
+  outputsLabel="Possible results"
+  outputs="Published commits|Updated upstream ref|Rejected or protected push"
+  note="The most valuable push question is not “did it work?” It is “did I publish exactly the history I intended to publish?”"
 />
 
-## Special cases and boundaries
+## Common mistakes
 
-- A common remote-workflow mistake is treating download, integration, and publication as the same action. Split them first, then choose flags.
-- If the result may affect shared branches or externally visible history, double-check the remote, the target ref, and the permission boundary before executing `git push`.
-- Looking at `git fetch`, `git push`, and `git remote -v` together usually makes it easier to tell whether the problem is transport, auth, or ref selection.
-- If you really need to rewrite published history, prefer `--force-with-lease` over a blind `--force`.
+- pushing to the wrong remote because `origin` was assumed
+- pushing mixed or unreviewed commits too early
+- rewriting a branch that teammates already pulled
+- using force when the real problem was poor local branch hygiene
 
+<WarningBox title="Shared branches change the risk model">
+  <p>Once the target branch is used by teammates, CI, or deployment, push is no longer only your local action. It becomes part of system coordination.</p>
+</WarningBox>
+
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: publish a feature branch and inspect the upstream relationship"
+  intro="The goal is to understand the difference between first publication, later updates, and risky rewrites."
+  setupLabel="Setup"
+  setup={`git switch -c lab/push-demo\n# create one or two local commits`}
+  stepsLabel="Try it"
+  steps="Run `git push -u origin lab/push-demo` on a throwaway branch.|Inspect `git status` and notice the upstream relationship.|Add another commit and run `git push` again.|Then ask what would change if you had rewritten local history before the second push."
+  outcomesLabel="What happens next"
+  outcomes="You learn what first-time publication does differently from later updates.|You see how upstream tracking simplifies normal sync flow.|You build a stronger intuition for when a later push would become a rewrite decision."
+  mistakesLabel="Common mistake checks"
+  mistakes="Verify the remote and branch before publishing if multiple remotes exist.|Do not use force to fix unclear local history unless you have checked the remote impact.|If a push is rejected, confirm whether the issue is auth, protection, or non-fast-forward history."
+/>

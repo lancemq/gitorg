@@ -3,7 +3,7 @@ export const metadata = {
   slug: "git-pull",
   locale: "en",
   section: "commands",
-  summary: "Explains git pull as fetch plus integration, and why many teams prefer fetch-first or ff-only synchronization habits.",
+  summary: "Explains git pull as fetch plus integration, when pull is convenient, when fetch-first is safer, and how rebase or ff-only change the outcome.",
   sourceUrls: [
     "https://git-scm.com/docs/git-pull",
     "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
@@ -14,7 +14,24 @@ export const metadata = {
 
 ## The short version
 
-`git pull` fetches remote updates and then integrates them into the current branch.
+`git pull` downloads updates from a remote and then integrates them into the current branch.
+
+<MentalModelBox title="Pull is two actions glued together">
+  <p>`git pull` feels simple because it is short to type, but it hides two decisions: what to fetch and how to integrate. Most mistakes happen in the second half.</p>
+</MentalModelBox>
+
+## Why this command causes confusion
+
+People often say “just pull” as if it were a harmless sync button.  
+In reality, pull can:
+
+- fast-forward your branch
+- create a merge commit
+- rebase your local commits
+- fail because of policy or conflict
+
+So the right question is not “should I sync?”  
+It is “what integration behavior do I want right now?”
 
 ## Common forms
 
@@ -24,36 +41,95 @@ git pull --rebase
 git pull --ff-only
 ```
 
-If you want maximum control, fetch first and choose the integration strategy explicitly.
+- `git pull`: use configured default integration behavior
+- `git pull --rebase`: fetch, then replay local commits on top of upstream
+- `git pull --ff-only`: succeed only if no merge commit is needed
 
+## When pull is a good fit
 
-## What problem this command solves in a workflow
+`git pull` is reasonable when:
 
-`git pull` is about how your local repository exchanges information with remotes, patches, or transportable artifacts. The mental model becomes clearer once you separate download, publish, integrate, and distribute.
+- your team has a clear default sync policy
+- you understand whether the branch uses merge, rebase, or ff-only
+- you are on a routine branch update, not a high-risk history repair
 
-## Typical use cases
+If you want maximum visibility, `git fetch` first and decide the integration step explicitly.
 
-- Use `git pull` when synchronizing upstream state, publishing local work, or packaging history for review or transfer.
-- Place `git pull` inside collaboration flow so the team can control when information is fetched, integrated, or exposed.
-- Use `git pull` in automation, mirroring, offline transfer, or email-based workflows when Git history needs to move between systems.
+## A safer routine for shared branches
+
+For many teams, the more conservative sequence is:
+
+1. `git status`
+2. `git fetch origin`
+3. inspect with `git log --oneline --graph --decorate --all -12`
+4. choose `merge`, `rebase`, or stop
+
+That is slower by one command, but much safer when you care about history shape.
+
+<TipBox title="Fetch-first is about decision quality">
+  <p>The goal is not to avoid `git pull` forever. The goal is to avoid integrating remote history before you have looked at it.</p>
+</TipBox>
+
+## When `--ff-only` is excellent
+
+`--ff-only` is ideal when you want:
+
+- predictable branch updates
+- no surprise merge commits
+- failure instead of silent history shape changes
+
+It is especially good for:
+
+- protected main branches
+- scripted update flows
+- teams that want users to stop and inspect divergence before integrating
+
+## When `--rebase` changes the meaning
+
+`git pull --rebase` does not just “sync differently.”  
+It rewrites local commit ancestry during the integration step.
+
+That is often useful for a local feature branch, but you should still ask:
+
+- have these local commits already been shared?
+- does this branch have open review or CI references?
+- would a merge be more transparent than a rewrite?
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Local-to-external information flow"
-  caption="Remote and patch commands are easiest to reason about when you separate where data comes from, where it goes, and whether the current branch changes as a side effect."
-  inputsLabel="Sources"
-  inputs="Local refs|Remote refs|Patches / artifacts"
+  title="Fetch plus integration"
+  caption="Pull is easiest to reason about once you separate download from branch mutation. The fetch part learns remote state; the integration part changes local history shape."
+  inputsLabel="Inputs"
+  inputs="Remote refs|Local tracking refs|Current branch"
   commandLabel="git pull"
-  outputsLabel="Results"
-  outputs="Updated tracking refs|Published commits|Transfer artifacts"
-  note="Any time a shared branch is involved, confirm the target ref and team policy before running the action that publishes or integrates history."
+  outputsLabel="Possible results"
+  outputs="Updated remote-tracking refs|Fast-forward|Merge commit or rebased history"
+  note="If you are surprised by pull, it is usually because the integration policy was implicit instead of explicit."
 />
 
-## Special cases and boundaries
+## Common mistakes
 
-- A common remote-workflow mistake is treating download, integration, and publication as the same action. Split them first, then choose flags.
-- If the result may affect shared branches or externally visible history, double-check the remote, the target ref, and the permission boundary before executing `git pull`.
-- Looking at `git fetch`, `git push`, and `git remote -v` together usually makes it easier to tell whether the problem is transport, auth, or ref selection.
-- The result of `git pull` depends on options and config such as `pull.rebase` and `pull.ff`, so teams should align on a default sync policy.
+- pulling with a dirty working tree and then mixing sync problems with local edit problems
+- assuming every pull is a harmless fast-forward
+- using `--rebase` on history that is already shared without checking
+- not knowing what `pull.rebase` or `pull.ff` is configured to do
 
+<WarningBox title="Pull is not automatically safe">
+  <p>The convenience of one command can hide a branch-changing decision. If branch history matters right now, inspect before you integrate.</p>
+</WarningBox>
+
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: compare plain pull, ff-only, and fetch-first"
+  intro="The goal is to see how different sync habits change branch behavior."
+  setupLabel="Setup"
+  setup={`git switch -c lab/pull-demo\n# simulate local commits and an upstream branch that also moved`}
+  stepsLabel="Try it"
+  steps="Run `git fetch` and inspect branch divergence with `git log --oneline --graph --decorate --all -12`.|Try `git pull --ff-only` and observe whether it succeeds or fails.|If the branches diverged, decide whether `git pull --rebase` or `git merge` is the better next step."
+  outcomesLabel="What happens next"
+  outcomes="You see pull as a policy choice, not only a sync shortcut.|You learn when ff-only protects you from surprise merges.|You build the habit of inspecting divergence before integration."
+  mistakesLabel="Common mistake checks"
+  mistakes="Do not pull with unrelated unstaged work if you can avoid it.|If the result surprises you, inspect `pull.rebase` and `pull.ff` config rather than guessing.|If the branch is shared, treat rebasing during pull as a coordination decision."
+/>

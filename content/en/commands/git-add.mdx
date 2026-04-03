@@ -3,7 +3,7 @@ export const metadata = {
   slug: "git-add",
   locale: "en",
   section: "commands",
-  summary: "Explains how git add stages changes for the next commit, and why the index is central to creating cleaner history.",
+  summary: "Explains how git add stages changes for the next commit, how patch staging works, and how to avoid mixing unrelated edits into one commit.",
   sourceUrls: [
     "https://git-scm.com/docs/git-add",
     "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
@@ -14,9 +14,25 @@ export const metadata = {
 
 ## The short version
 
-`git add` moves selected changes into the staging area so they can become part of the next commit.
+`git add` copies selected content from the working tree into the index so the next commit can use it.
 
-## Common forms
+<MentalModelBox title="Think in layers, not files alone">
+  <p>`git add` does not “save your work” by itself. It updates the staging snapshot. That is why the same file can still have unstaged edits even after you run `git add`.</p>
+</MentalModelBox>
+
+## What problem this command actually solves
+
+New Git users often assume a commit is built directly from current files.  
+Git is stricter than that: it asks you to decide which content belongs in the next commit first.
+
+That extra step is what makes these workflows possible:
+
+- split one messy working session into several logical commits
+- stage only the lines that are ready for review
+- leave half-finished experiments out of the next commit
+- resolve conflicts and stage only the resolved files
+
+## The forms you will actually use
 
 ```bash
 git add README.md
@@ -25,35 +41,114 @@ git add .
 git add --patch
 ```
 
-`--patch` is especially important when you want clean, focused commits.
+- `git add README.md`: stage one file
+- `git add src/`: stage a directory
+- `git add .`: stage all detected changes under the current directory
+- `git add --patch`: stage selected hunks interactively
 
+## A realistic daily workflow
 
-## What problem this command solves in a workflow
+The safest everyday loop is usually:
 
-`git add` sits close to the working tree, the index, and the current branch. The most important question is not “which flag exists,” but “which layer will this command modify?”
+1. inspect the current state with `git status`
+2. inspect the actual changes with `git diff`
+3. stage intentionally with `git add <path>` or `git add --patch`
+4. confirm the staged result with `git diff --staged`
+5. commit only after the index looks right
 
-## Typical use cases
+For example:
 
-- Use `git add` inside the daily loop of edit, inspect, stage, and commit so local state stays intentional.
-- Reach for `git add` when you need to prepare a clean handoff between file changes, staging decisions, and branch movement.
-- Use `git add` to clean up local state before collaboration steps that are more expensive to recover from later.
+```bash
+git status
+git diff
+git add --patch
+git diff --staged
+git commit -m "fix: keep search fallback stable"
+```
+
+<TipBox title="Use the index as a quality filter">
+  <p>If a commit should tell one story, the index is the place where you enforce that story before it becomes history.</p>
+</TipBox>
+
+## Where people get into trouble
+
+The most common mistake is not syntax.  
+It is staging more than intended because `git add .` felt convenient.
+
+Typical failure patterns:
+
+- staging debug output, generated files, or unrelated refactors together
+- assuming a file is fully staged when only part of it should be
+- forgetting that new edits made after `git add` are still unstaged
+- resolving a conflict but forgetting to stage the resolved file
+
+## Patch mode is the skill that changes everything
+
+```bash
+git add --patch
+```
+
+Patch mode matters because it lets you separate:
+
+- one bug fix from a nearby refactor
+- production code from temporary logging
+- finished changes from still-uncertain edits
+
+That is often the difference between:
+
+- a commit that is easy to review
+- and a commit that future-you cannot safely revert or cherry-pick
+
+## How to reason about staged versus unstaged edits
+
+Imagine you modify the same file twice:
+
+1. first you change the real logic
+2. then you add temporary console output
+3. you run `git add --patch` and stage only the logic change
+
+Now the file exists in two states at once:
+
+- the index contains the logic fix
+- the working tree still contains the temporary logging
+
+That is not weird Git behavior.  
+That is exactly what the index is for.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Working tree / index / ref relationship"
-  caption="State-oriented commands revolve around file content, staging state, and the current branch pointer."
-  inputsLabel="Input state"
-  inputs="Working tree files|Index snapshot|Current branch"
+  title="Working tree to index to commit"
+  caption="The key decision is whether you are only changing files, staging a snapshot, or turning that staged snapshot into history."
+  inputsLabel="Current state"
+  inputs="Working tree edits|Index snapshot|Current branch"
   commandLabel="git add"
-  outputsLabel="Possible changes"
-  outputs="File content|Staging result|Current ref"
-  note="A quick before-and-after git status check is often enough to validate whether a state command behaved as intended."
+  outputsLabel="What changes"
+  outputs="Updated index|Reviewable staged diff|Safer next commit"
+  note="If you are unsure what changed, compare `git diff` and `git diff --staged` before committing."
 />
 
-## Special cases and boundaries
+## Boundaries worth remembering
 
-- The risk in state-changing commands is usually not the syntax itself, but whether you correctly identified which layer they will touch.
-- If there are still valuable local edits in the working tree, decide whether they should be committed, stashed, or discarded before running `git add`.
-- Running `git status` before and after `git add` is often the fastest way to confirm what really changed.
+- `git add` usually does not move branch pointers, but it absolutely changes what the next commit will mean.
+- `git add .` is fast, not careful. Prefer narrower staging when the change set is mixed.
+- If you are about to switch branches or recover from mistakes, a clean understanding of what is staged versus unstaged matters a lot.
 
+<WarningBox title="Do not confuse staging with backup">
+  <p>Staging content does not publish it anywhere. It only changes the local index. If you need a recovery point, create a commit or a stash rather than assuming staged changes are “safe enough”.</p>
+</WarningBox>
+
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: create one clean commit from a messy edit session"
+  intro="This exercise helps you feel the difference between the working tree and the index."
+  setupLabel="Setup"
+  setup={`git switch -c lab/add-demo\n# edit one file with both a real fix and a temporary debug line`}
+  stepsLabel="Try it"
+  steps="Run `git diff` to see all edits.|Run `git add --patch` and stage only the real fix.|Run `git diff --staged` and confirm the staged change is clean.|Leave the debug line unstaged and create the commit."
+  outcomesLabel="What happens next"
+  outcomes="The commit contains only the staged change.|The working tree can still keep extra unstaged edits.|You end up with cleaner history without losing the unfinished work."
+  mistakesLabel="Common mistake checks"
+  mistakes="If `git diff` looks empty, check `git diff --staged` because the change may already be in the index.|If your commit still contains mixed work, you probably staged too broadly.|If you resolved a conflict, remember that the resolution is not complete until the file is staged."
+/>

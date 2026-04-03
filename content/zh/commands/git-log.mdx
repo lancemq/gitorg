@@ -3,7 +3,7 @@ export const metadata = {
   slug: "git-log",
   locale: "zh",
   section: "commands",
-  summary: "说明 git log 如何查看提交历史、图结构和作者信息，以及哪些参数最适合日常排查和阅读历史。",
+  summary: "说明 git log 如何查看提交历史、分支图结构、作者和范围过滤，并把它真正用到评审、同步和恢复判断中。",
   sourceUrls: [
     "https://git-scm.com/docs/git-log",
     "https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History",
@@ -14,55 +14,126 @@ export const metadata = {
 
 ## 一句话理解
 
-`git log` 是查看提交历史的核心命令，既能看简单列表，也能看图结构、作者、时间和差异摘要。
+`git log` 是阅读历史的核心命令，它不只是看提交列表，更重要的是帮助你理解分支关系、共同祖先和当前历史到底长成了什么样。
 
-## 日常最常用写法
+<MentalModelBox title="log 不只是看过去，而是为下一步决策提供依据">
+  <p>`git log` 的价值常常不在“读到了什么”，而在它帮助你避免了哪一个错误的 merge、rebase、reset 或恢复动作。</p>
+</MentalModelBox>
+
+## 日常最有价值的写法
 
 ```bash
 git log --oneline --graph --decorate --all
 ```
 
-这能更直观地展示分支和 merge 关系。
+这条命令很值得形成肌肉记忆，因为它同时给你：
 
-## 常见筛选
+- 短提交 ID
+- 分支图结构
+- tag 和分支标签
+- 所有 refs 的上下文
+
+很多排障和 review 场景，第一眼看它就够了。
+
+## 它能帮你回答哪些问题
+
+例如：
+
+- 这个分支最近到底做了什么？
+- 我的分支和 main 从哪里分叉？
+- 某个提交是不是已经进了另一个分支？
+- 事故发生前最后一个稳定点在哪里？
+- 为什么现在仓库历史会长成这样？
+
+所以 `git log` 既是日常命令，也是恢复和分析命令。
+
+## 几种实用形式
+
+### 看最近几条提交
 
 ```bash
-git log -5
+git log -5 --oneline
+```
+
+### 按作者过滤
+
+```bash
 git log --author="Alice"
+```
+
+### 看某个文件的历史
+
+```bash
 git log -- path/to/file
 ```
 
-## 为什么 log 很重要
+### 看当前功能分支比 main 多了什么
 
-它不只是“看过去发生了什么”，也是理解分支状态、回滚目标和 review 边界的重要工具。
+```bash
+git log main..feature/login --oneline
+```
 
+它适合回答：“我这个分支有哪些提交是 main 还没有的？”
 
-## 这条命令在流程里解决什么问题
+## 在高风险动作前怎么用它
 
-从流程位置看，`git log` 更像“先观察、再决定”的命令。它通常不直接改写历史，而是帮助你确认工作区、暂存区、引用或提交对象当前到底处于什么状态。
+在做 rebase、reset、revert 或恢复前，很推荐这样做：
 
-## 典型用例
+1. 先 `git status`
+2. 再 `git log --oneline --graph --decorate --all -20`
+3. 找到可能需要回退或参考的那个点
+4. 再执行真正会改历史的动作
 
-- 在真正修改历史或文件之前，先用 `git log` 收集当前状态、差异或证据。
-- 把 `git log` 放进代码评审、排障和复盘流程，帮助团队对齐上下文。
-- 当你需要解释“现在仓库为什么会这样”时，让 `git log` 先输出可验证的信息。
+这样能显著降低“在模糊印象上操作历史”的风险。
 
 ## 图例理解
 
 <CommandFlowFigure
-  title="观察类命令的作用位置"
-  caption="这类命令主要读取仓库状态并输出信息，重点在于知道自己观察的是哪一层。"
+  title="观察历史，获得决策依据"
+  caption="观察类命令通常不直接改写历史，但它们决定了你后续的历史操作是不是基于证据。"
   inputsLabel="观察对象"
-  inputs="工作区|暂存区|提交历史|引用"
+  inputs="提交历史|引用|分支头|路径历史"
   commandLabel="git log"
   outputsLabel="产出"
-  outputs="控制台信息|差异上下文|决策依据"
-  note="如果输出看起来“不对”，优先排查的是观察范围，而不是命令本身有没有生效。"
+  outputs="可见的祖先关系|评审上下文|恢复目标"
+  note="很多时候，`git log` 最大的价值不是输出本身，而是阻止了错误的下一步。"
 />
 
-## 特殊情况与边界
+## 常见误解
 
-- 大多数观察命令本身不改历史，但它看到的结果会受 HEAD、路径、提交范围或引用选择影响。
-- 如果 `git log` 的输出和预期不一致，先确认你看的到底是工作区、索引、当前分支，还是某个历史提交。
-- 把 `git log` 和 `git status`、`git log`、`git show` 组合使用，通常比单独看一个输出更稳。
+- `git log` 不是脱离范围的“真相”，它只能展示你指定范围内的历史。
+- 只看线性列表很容易忽略分支结构，所以 `--graph --decorate --all` 很重要。
+- 文件历史和分支历史回答的是不同问题，不能互相替代。
 
+<TipBox title="先上 graph，再上高级过滤">
+  <p>当仓库历史看起来很乱时，先加 `--graph --decorate --all`，通常比一开始就堆很多过滤参数更有效。</p>
+</TipBox>
+
+## 边界与配套命令
+
+`git log` 最适合和这些命令配合使用：
+
+- `git show`：看单个提交的详细内容
+- `git diff`：看精确差异
+- `git reflog`：看本地分支指针如何移动过
+
+如果 `git log` 看起来怪，下一步通常不是怀疑 Git，而是确认自己看的范围对不对。
+
+<WarningBox title="不要把 log 和 reflog 混为一谈">
+  <p>`git log` 展示的是提交祖先关系，`git reflog` 记录的是本地 ref 如何移动。它们都重要，但不是在回答同一个问题。</p>
+</WarningBox>
+
+## 跟着做一遍
+
+<PracticeLab
+  title="练习：在整合前先看懂分支分叉"
+  intro="目标是把 `git log` 从“看历史”变成“做决定前的检查工具”。"
+  setupLabel="准备"
+  setup={`git switch -c lab/log-demo\n# 在分支上做两次提交\n# 再让 main 前进一次`}
+  stepsLabel="动手试"
+  steps="运行 `git log --oneline --graph --decorate --all -12`。|运行 `git log main..HEAD --oneline` 看当前分支独有提交。|运行 `git log HEAD..main --oneline` 看上游比你多了什么。|再判断下一步更适合 merge、rebase 还是暂时不动。"
+  outcomesLabel="会发生什么"
+  outcomes="你会看到分叉关系，而不是靠猜。|你能判断当前分支是 ahead、behind 还是 both。|后续整合决策会更有证据。"
+  mistakesLabel="常见错误判断"
+  mistakes="如果图太简单，记得加 `--all` 和 `--decorate`。|如果输出为空，先确认 refs 是否写对。|如果你需要的是本地恢复轨迹，应该转向 `git reflog`。"
+/>

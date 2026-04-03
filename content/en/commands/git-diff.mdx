@@ -3,7 +3,7 @@ export const metadata = {
   slug: "git-diff",
   locale: "en",
   section: "commands",
-  summary: "Explains how git diff compares working tree, index, and commit states, and which forms are most useful day to day.",
+  summary: "Explains how git diff compares working tree, index, and commit states, how to read the most useful forms, and how to avoid checking the wrong layer.",
   sourceUrls: [
     "https://git-scm.com/docs/git-diff",
     "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
@@ -14,44 +14,135 @@ export const metadata = {
 
 ## The short version
 
-`git diff` compares two states, whether that means the working tree, the staging area, or commits in history.
+`git diff` compares two states in Git, whether those states are the working tree, the index, or commits in history.
 
-## Most common forms
+<MentalModelBox title="Diff answers one question: compared to what?">
+  <p>Most confusion around `git diff` comes from forgetting that the command is always relative. If the output looks surprising, the first thing to fix is usually the comparison target.</p>
+</MentalModelBox>
+
+## The three daily forms you should know first
 
 ```bash
 git diff
 git diff --staged
 git diff HEAD
+```
+
+- `git diff`: working tree versus index
+- `git diff --staged`: index versus `HEAD`
+- `git diff HEAD`: everything not yet represented in `HEAD`
+
+If you only memorize one thing, memorize those three scopes.
+
+## Why this command matters
+
+`git diff` is the command that keeps you honest before you:
+
+- stage changes
+- create a commit
+- open a pull request
+- rebase or reset
+- explain what changed during an incident
+
+In other words, diff is not only for review.  
+It is also for verification before costly actions.
+
+## Practical examples
+
+### Check what is still unstaged
+
+```bash
+git diff
+```
+
+### Check what the next commit will contain
+
+```bash
+git diff --staged
+```
+
+### Compare your feature branch to main
+
+```bash
 git diff main...feature/login
 ```
 
+The triple-dot form is useful when you want the branch-specific change set, not every difference in absolute history position.
 
-## What problem this command solves in a workflow
+### Inspect one file only
 
-In the workflow, `git diff` is mostly a “inspect first, decide second” command. It usually does not rewrite history by itself; instead, it helps you confirm the current state of the working tree, index, refs, or commit objects.
+```bash
+git diff -- src/search/doc-search.tsx
+```
 
-## Typical use cases
+That keeps the output readable when the repository is noisy.
 
-- Use `git diff` before changing files or history so you have observable evidence first.
-- Put `git diff` into review, debugging, and incident-analysis flow so the team can align on the same context.
-- When you need to explain why the repository looks the way it does, let `git diff` surface verifiable information first.
+## How to read “no output”
+
+No diff output does not always mean “nothing changed.”
+
+For example:
+
+- `git diff` may be empty because the changes are already staged
+- `git diff --staged` may be empty because nothing is staged yet
+- `git diff HEAD` may be large because it includes both staged and unstaged edits
+
+That is why `git status` and `git diff` work best together.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Where inspection commands operate"
-  caption="These commands mainly read repository state and emit information. The key is knowing which layer you are observing."
-  inputsLabel="Observed layers"
-  inputs="Working tree|Index|Commit history|Refs"
+  title="Reading differences across Git layers"
+  caption="Diff becomes predictable once you know whether you are comparing working files, the index, or a historical commit range."
+  inputsLabel="Possible scopes"
+  inputs="Working tree|Index|HEAD|Named refs"
   commandLabel="git diff"
-  outputsLabel="Outputs"
-  outputs="Console output|Diff context|Decision signal"
-  note="If the output looks wrong, the first thing to question is usually the scope you inspected, not whether the command “worked”."
+  outputsLabel="What you get"
+  outputs="Patch view|Review signal|Safer next decision"
+  note="If the patch looks wrong, verify the scope first: unstaged, staged, or historical."
 />
 
-## Special cases and boundaries
+## A safer inspection routine
 
-- Most inspection commands do not mutate history, but their output still depends on which HEAD, path, range, or ref you asked them to inspect.
-- If `git diff` shows something unexpected, first verify whether you are looking at the working tree, the index, the current branch, or a historical commit.
-- Combining `git diff` with `git status`, `git log`, and `git show` is usually safer than trusting a single output in isolation.
+Before a commit or review, a reliable sequence is:
 
+1. `git status`
+2. `git diff`
+3. `git diff --staged`
+4. only then commit, rebase, or open review
+
+That routine catches a lot of avoidable mistakes:
+
+- forgetting to stage a file
+- staging too much
+- reviewing the wrong branch comparison
+- thinking a clean working tree means a clean staged snapshot
+
+<TipBox title="Use diff as a preflight check">
+  <p>Many Git mistakes are not command mistakes. They are visibility mistakes. `git diff` is how you reduce them before they become history problems.</p>
+</TipBox>
+
+## Boundaries and common mistakes
+
+- `git diff` does not mutate history, but it can still mislead you if you inspect the wrong comparison.
+- Long diff output does not automatically mean the change is too big; sometimes it means the scope is too broad.
+- Review-oriented comparisons and staging-oriented comparisons are not the same question. Use the right form for the job.
+
+<WarningBox title="Do not review a branch with the wrong range">
+  <p>If you compare the wrong refs, you can easily think a branch contains more or less than it really does. For pull request prep, verify whether you want two-dot or three-dot semantics before trusting the output.</p>
+</WarningBox>
+
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: inspect unstaged, staged, and branch-level diffs"
+  intro="The goal is to build reflexes for which diff form answers which question."
+  setupLabel="Setup"
+  setup={`git switch -c lab/diff-demo\n# edit one file and stage only part of the change`}
+  stepsLabel="Try it"
+  steps="Run `git diff` and note what is still unstaged.|Run `git diff --staged` and see what the next commit contains.|Run `git diff HEAD` and compare how it combines both views.|If you have a main branch baseline, try `git diff main...HEAD`."
+  outcomesLabel="What happens next"
+  outcomes="You will see that each diff form answers a different question.|The same file can appear differently depending on whether you compare the working tree, the index, or branch history.|You become less likely to commit or review the wrong content."
+  mistakesLabel="Common mistake checks"
+  mistakes="If `git diff` is empty, check whether the changes are already staged.|If a branch diff feels too large, confirm you used the intended ref range.|If the patch is unreadable, narrow it to a path or smaller scope before making decisions."
+/>

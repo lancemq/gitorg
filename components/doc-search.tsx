@@ -391,7 +391,7 @@ export function DocSearch({ label, locale }: DocSearchProps) {
     flatDisplayItems[Math.min(selectedIndex, Math.max(flatDisplayItems.length - 1, 0))];
 
   useEffect(() => {
-    if (!isOpen || hasLoaded || isLoading) {
+    if (!isOpen || hasLoaded) {
       return;
     }
 
@@ -468,7 +468,7 @@ export function DocSearch({ label, locale }: DocSearchProps) {
       shouldIgnore = true;
       controller.abort("closed");
     };
-  }, [hasLoaded, isLoading, isOpen, locale]);
+  }, [hasLoaded, isOpen, locale]);
 
   useEffect(() => {
     if (!isOpen) {

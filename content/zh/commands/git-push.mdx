@@ -3,7 +3,7 @@ export const metadata = {
   slug: "git-push",
   locale: "zh",
   section: "commands",
-  summary: "说明 git push 如何发布本地分支、设置上游分支，以及 force-with-lease 为什么比裸 force 更安全。",
+  summary: "说明 git push 如何发布本地分支、建立上游跟踪关系，以及怎样判断一次 push 是安全发布还是高风险改写。",
   sourceUrls: [
     "https://git-scm.com/docs/git-push",
     "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
@@ -14,55 +14,121 @@ export const metadata = {
 
 ## 一句话理解
 
-`git push` 会把本地引用和对象发布到远端，让其他协作者可以看到你的分支更新。
+`git push` 会把本地的引用和对象发送到远端，让其他人或其他系统看到新的历史。
 
-## 基本用法
+<MentalModelBox title="push 的核心不是“同步”，而是“发布”">
+  <p>一旦 push，原本只是你本地的历史，就可能进入评审、CI、部署或别人的分支基线。所以 push 的风险往往来自协作影响，而不只是命令本身。</p>
+</MentalModelBox>
+
+## 它真正改变了什么
+
+很多人谈 push 时，只想到：
+
+- 认证有没有过
+- 命令能不能成功
+
+更重要的问题其实是：
+
+**我现在要更新的是哪一个共享引用？**
+
+这决定了一次 push 是：
+
+- 普通发布个人功能分支
+- 更新评审分支
+- 还是在高风险地改写共享历史
+
+## 常见写法
 
 ```bash
 git push origin main
 git push -u origin feature/login
+git push --force-with-lease
 ```
 
-## `-u` 的作用
+- `git push origin main`：更新指定远端分支
+- `git push -u origin feature/login`：首次发布并建立上游跟踪关系
+- `git push --force-with-lease`：仅在远端仍处于你预期状态时，才允许重写
 
-它会把当前本地分支与远端上游分支关联起来，后续再 push / pull 会更方便。
+## `-u` 为什么有价值
 
-## 强推时为什么更推荐 `--force-with-lease`
+第一次发布分支时设好 upstream，后面这些命令都会更顺：
 
-因为它会先检查远端是否仍然处于你预期的状态，能减少误覆盖别人新提交的风险。
+- `git push`
+- `git pull`
+- `git status`
 
-## 一个实践建议
+尤其是功能分支较多时，它能减少很多机械成本。
 
-共享分支默认不要随便强推；如果确实要改写，优先用 `--force-with-lease`。
+## 更稳的 push 前检查
 
+在 push 前，至少先问自己：
 
-## 这条命令在流程里解决什么问题
+1. 目标远端和目标分支写对了吗？
+2. 这个分支是个人分支、评审分支，还是共享主分支？
+3. 这次是在发布新提交，还是在改写旧历史？
+4. 本地历史和工作区状态是不是已经如你所想？
 
-`git push` 围绕“本地仓库怎样与远端、补丁或可传输工件交换信息”展开。理解它时，要先分清下载、发布、整合、分发这几种动作分别由谁负责。
+一个很实用的预检查是：
 
-## 典型用例
+```bash
+git status
+git log --oneline --graph --decorate -8
+git remote -v
+```
 
-- 在同步上游、发布本地提交或传递补丁时，用 `git push` 控制信息流动的方向。
-- 把 `git push` 放进协作流程中，让“先观察远端，再决定整合方式”这件事更可控。
-- 在自动化、镜像、离线传输或邮件流中，用 `git push` 管理可交换的历史单元。
+## 为什么更推荐 `--force-with-lease`
+
+确实存在需要重写远端历史的情况：
+
+- 整理自己的功能分支
+- 在 merge 前清理 review 分支历史
+- 修正一条刚 push 错但别人还没基于它工作的记录
+
+但裸 `--force` 完全不管远端这段时间有没有发生变化。
+
+`--force-with-lease` 更安全，因为它表达的是：
+
+“只有远端还停在我预期的位置时，才允许我改写它。”
+
+<TipBox title="把 lease 当默认，把 force 当例外">
+  <p>只要真的需要改写已发布历史，`--force-with-lease` 应该是第一反应。裸 `--force` 应该是极少数特例。</p>
+</TipBox>
 
 ## 图例理解
 
 <CommandFlowFigure
-  title="本地与外部信息流"
-  caption="远端与补丁类命令最关键的是分清信息从哪里来、到哪里去，以及是否会顺手改当前分支。"
-  inputsLabel="来源"
-  inputs="本地引用|远端引用|补丁 / 工件"
+  title="把本地历史发布到共享引用"
+  caption="push 的本质是把本地 ref 对应的历史发送到远端 ref。风险取决于这个远端 ref 是私有、评审可见，还是团队共享。"
+  inputsLabel="输入"
+  inputs="本地分支头|远端分支头|远端策略"
   commandLabel="git push"
-  outputsLabel="结果"
-  outputs="更新后的跟踪引用|发布的提交|传输产物"
-  note="只要涉及共享分支，就优先确认目标引用和团队约定，再执行真正的发布或整合动作。"
+  outputsLabel="可能结果"
+  outputs="已发布的提交|更新后的上游引用|被保护策略拒绝"
+  note="push 最重要的问题不是“是否成功”，而是“我发布出去的历史是不是正是我想发布的那段”。"
 />
 
-## 特殊情况与边界
+## 常见错误
 
-- 远端类命令最常见的误区，是把“下载”“整合”“发布”混成同一件事。先拆清动作，再决定参数。
-- 如果操作结果会影响共享分支或对外发布，执行 `git push` 前最好再确认一次目标远端、目标引用和权限边界。
-- 和 `git fetch`、`git push`、`git remote -v` 一起看，通常更容易判断问题出在同步、认证还是引用选择。
-- 如果需要改写已经发布到远端的历史，优先用 `--force-with-lease` 而不是裸 `--force`。
+- 因为默认叫 `origin` 就没再确认目标远端
+- 本地历史还很乱，就太早 push 到远端
+- 同事已经基于这个分支开发了，仍然去改写它
+- 用 force 掩盖本地分支整理不到位的问题
 
+<WarningBox title="共享分支会放大 push 的后果">
+  <p>只要目标分支已经被同事、CI 或部署使用，push 就不再只是你的本地动作，而是团队协作的一部分。</p>
+</WarningBox>
+
+## 跟着做一遍
+
+<PracticeLab
+  title="练习：首次发布分支，再理解后续更新的差别"
+  intro="目标是区分“第一次发布”“普通更新”和“历史改写”三种完全不同的 push 语义。"
+  setupLabel="准备"
+  setup={`git switch -c lab/push-demo\n# 先创建一到两个本地提交`}
+  stepsLabel="动手试"
+  steps="在一个实验分支上运行 `git push -u origin lab/push-demo`。|观察 `git status`，看 upstream 关系如何变化。|再新增一个提交，重新执行 `git push`。|然后思考：如果你在第二次 push 前重写了本地历史，会发生什么变化？"
+  outcomesLabel="会发生什么"
+  outcomes="你会理解首次发布和后续更新的区别。|会看到 upstream 关系如何让日常同步更顺。|也会更容易判断什么时候一次 push 已经变成“改写远端历史”的决定。"
+  mistakesLabel="常见错误判断"
+  mistakes="多远端场景下，push 前要确认 remote 和 branch。|如果 push 被拒绝，先判断是认证、保护策略还是 non-fast-forward。|不要用 force 掩盖本地历史还没整理清楚的问题。"
+/>

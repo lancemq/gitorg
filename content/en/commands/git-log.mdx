@@ -3,7 +3,7 @@ export const metadata = {
   slug: "git-log",
   locale: "en",
   section: "commands",
-  summary: "Shows how git log inspects commit history, graph structure, authorship, and filtered history for debugging and review.",
+  summary: "Shows how git log inspects commit history, graph structure, authorship, and filtered history for debugging, review, and recovery.",
   sourceUrls: [
     "https://git-scm.com/docs/git-log",
     "https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History",
@@ -14,43 +14,126 @@ export const metadata = {
 
 ## The short version
 
-`git log` is the main command for reading commit history.
+`git log` is the main command for reading commit history and understanding how branches and commits actually relate.
 
-## High-value daily form
+<MentalModelBox title="Log is not only a list of commits">
+  <p>The highest-value use of `git log` is not memorizing old commit messages. It is learning the shape of history before you merge, rebase, reset, revert, or recover anything.</p>
+</MentalModelBox>
+
+## The daily high-value form
 
 ```bash
 git log --oneline --graph --decorate --all
 ```
 
-This makes branch structure and merge points much easier to read.
+This single form gives you:
 
+- short commit IDs
+- visible branch structure
+- tags and branch labels
+- context across all refs
 
-## What problem this command solves in a workflow
+For many debugging or review tasks, this is the fastest first look.
 
-In the workflow, `git log` is mostly a “inspect first, decide second” command. It usually does not rewrite history by itself; instead, it helps you confirm the current state of the working tree, index, refs, or commit objects.
+## What this command helps you decide
 
-## Typical use cases
+Use `git log` when you need to answer questions like:
 
-- Use `git log` before changing files or history so you have observable evidence first.
-- Put `git log` into review, debugging, and incident-analysis flow so the team can align on the same context.
-- When you need to explain why the repository looks the way it does, let `git log` surface verifiable information first.
+- what changed recently on this branch?
+- where did my branch diverge from main?
+- did this commit already land somewhere else?
+- what was the last good point before a mistake?
+- who introduced this sequence of changes?
+
+That is why `git log` belongs in both everyday work and incident recovery.
+
+## Practical forms worth knowing
+
+### See the latest few commits
+
+```bash
+git log -5 --oneline
+```
+
+### Filter by author
+
+```bash
+git log --author="Alice"
+```
+
+### Follow one file's history
+
+```bash
+git log -- path/to/file
+```
+
+### Compare branch-specific history
+
+```bash
+git log main..feature/login --oneline
+```
+
+That helps answer: “what commits are on my branch but not on main?”
+
+## How to use log before risky actions
+
+Before history-changing commands, a reliable routine is:
+
+1. run `git status`
+2. run `git log --oneline --graph --decorate --all -20`
+3. identify the commit or ref you may need later
+4. only then rebase, reset, revert, or recover
+
+This lowers the chance of acting on vague assumptions.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Where inspection commands operate"
-  caption="These commands mainly read repository state and emit information. The key is knowing which layer you are observing."
+  title="Where history inspection creates clarity"
+  caption="Inspection commands do not usually rewrite anything, but they decide whether your next history action is informed or blind."
   inputsLabel="Observed layers"
-  inputs="Working tree|Index|Commit history|Refs"
+  inputs="Commit history|Refs|Branch tips|Path history"
   commandLabel="git log"
   outputsLabel="Outputs"
-  outputs="Console output|Diff context|Decision signal"
-  note="If the output looks wrong, the first thing to question is usually the scope you inspected, not whether the command “worked”."
+  outputs="Visible ancestry|Review context|Recovery target"
+  note="The biggest win from `git log` is often not the output itself, but the bad decision it prevents."
 />
 
-## Special cases and boundaries
+## Typical misunderstandings
 
-- Most inspection commands do not mutate history, but their output still depends on which HEAD, path, range, or ref you asked them to inspect.
-- If `git log` shows something unexpected, first verify whether you are looking at the working tree, the index, the current branch, or a historical commit.
-- Combining `git log` with `git status`, `git log`, and `git show` is usually safer than trusting a single output in isolation.
+- `git log` does not show “the truth” independent of scope; it shows the history you asked for.
+- A simple linear log can hide branch shape, which is why `--graph --decorate --all` is so valuable.
+- File history and branch history answer different questions. Do not assume one replaces the other.
 
+<TipBox title="Reach for graph view early">
+  <p>If a repository feels confusing, add `--graph --decorate --all` before adding more filters. Structure usually matters more than clever filtering at the start.</p>
+</TipBox>
+
+## Boundaries and related commands
+
+`git log` is strongest when paired with:
+
+- `git show` for one commit in detail
+- `git diff` for exact change comparison
+- `git reflog` for local branch-tip movement and recovery
+
+If `git log` shows something surprising, the next question is often not “is Git broken?” but “am I reading the right history scope?”
+
+<WarningBox title="Do not confuse branch history with reflog history">
+  <p>`git log` shows commit ancestry. `git reflog` shows how your refs moved locally. They help with different debugging and recovery tasks.</p>
+</WarningBox>
+
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: inspect branch divergence before integration"
+  intro="The goal is to use `git log` as a decision tool rather than a passive viewer."
+  setupLabel="Setup"
+  setup={`git switch -c lab/log-demo\n# create two commits on the branch\n# move main forward with one different commit`}
+  stepsLabel="Try it"
+  steps="Run `git log --oneline --graph --decorate --all -12`.|Run `git log main..HEAD --oneline` to see branch-only commits.|Run `git log HEAD..main --oneline` to see what upstream has that you do not.|Decide whether the next action should be merge, rebase, or wait."
+  outcomesLabel="What happens next"
+  outcomes="You can see branch divergence instead of guessing it.|You learn whether your branch is ahead, behind, or both.|Your next integration decision becomes evidence-based."
+  mistakesLabel="Common mistake checks"
+  mistakes="If the graph looks too simple, add `--all` and `--decorate` before drawing conclusions.|If the output looks empty, confirm you are comparing the intended refs.|If you need local recovery history, switch to `git reflog` instead of forcing `git log` to answer the wrong question."
+/>

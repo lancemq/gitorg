@@ -3,7 +3,7 @@ export const metadata = {
   slug: "git-diff",
   locale: "zh",
   section: "commands",
-  summary: "讲清 git diff 如何比较工作区、暂存区和提交之间的差异，以及最常见的几种比较方式。",
+  summary: "讲清 git diff 如何比较工作区、暂存区和提交状态，如何正确选择比较范围，以及怎样避免看错层级。",
   sourceUrls: [
     "https://git-scm.com/docs/git-diff",
     "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
@@ -14,9 +14,13 @@ export const metadata = {
 
 ## 一句话理解
 
-`git diff` 用来比较两个状态之间的差异，它既可以看工作区，也可以看暂存区和历史提交。
+`git diff` 用来比较两个 Git 状态之间的差异，关键不是“会不会用”，而是“你到底在拿什么和什么比”。
 
-## 最常见三种比较
+<MentalModelBox title="diff 永远是相对的">
+  <p>大多数人对 `git diff` 的困惑，都不是因为输出难读，而是因为一开始就选错了比较对象。</p>
+</MentalModelBox>
+
+## 先记住这三种最常用写法
 
 ```bash
 git diff
@@ -25,48 +29,117 @@ git diff HEAD
 ```
 
 - `git diff`：工作区 vs 暂存区
-- `git diff --staged`：暂存区 vs HEAD
-- `git diff HEAD`：工作区 + 暂存区 vs HEAD
+- `git diff --staged`：暂存区 vs `HEAD`
+- `git diff HEAD`：工作区和暂存区相对 `HEAD` 的全部变化
 
-## 比较分支
+只要把这三种关系吃透，很多“为什么 diff 没反应”之类的问题都会自然消失。
+
+## 它为什么重要
+
+`git diff` 的价值不只是在 code review。  
+它还用于：
+
+- commit 前确认 staged 内容
+- rebase 或 reset 前确认当前状态
+- PR 前核对实际差异
+- 排障时收集明确证据
+
+换句话说，diff 是很多高风险动作之前的“最后确认层”。
+
+## 一些高频场景
+
+### 看还有哪些内容没暂存
+
+```bash
+git diff
+```
+
+### 看下一次提交会包含什么
+
+```bash
+git diff --staged
+```
+
+### 比较功能分支和主分支
 
 ```bash
 git diff main...feature/login
 ```
 
-适合在 review 前快速确认分支差异。
+三点比较很适合在 review 前看“这个分支相对共同基线真正新增了什么”。
 
-## 一个常见误区
+### 只看某个文件
 
-`git diff` 没输出不一定表示“没改动”，有可能是因为改动已经进了暂存区，所以这时要看 `git diff --staged`。
+```bash
+git diff -- src/search/doc-search.tsx
+```
 
+这在仓库改动很多时特别有用。
 
-## 这条命令在流程里解决什么问题
+## 为什么“没有输出”不一定代表“没改动”
 
-从流程位置看，`git diff` 更像“先观察、再决定”的命令。它通常不直接改写历史，而是帮助你确认工作区、暂存区、引用或提交对象当前到底处于什么状态。
+例如：
 
-## 典型用例
+- `git diff` 没输出，可能只是因为改动已经全部进了 staged
+- `git diff --staged` 没输出，可能只是因为你还没 add
+- `git diff HEAD` 看起来很多，是因为它同时包含 staged 和 unstaged
 
-- 在真正修改历史或文件之前，先用 `git diff` 收集当前状态、差异或证据。
-- 把 `git diff` 放进代码评审、排障和复盘流程，帮助团队对齐上下文。
-- 当你需要解释“现在仓库为什么会这样”时，让 `git diff` 先输出可验证的信息。
+这也是为什么 `git status` 和 `git diff` 最适合配合使用。
 
 ## 图例理解
 
 <CommandFlowFigure
-  title="观察类命令的作用位置"
-  caption="这类命令主要读取仓库状态并输出信息，重点在于知道自己观察的是哪一层。"
-  inputsLabel="观察对象"
-  inputs="工作区|暂存区|提交历史|引用"
+  title="跨不同 Git 层查看差异"
+  caption="只要先判断比较对象是工作区、索引还是历史提交，diff 的输出就会稳定很多。"
+  inputsLabel="可能范围"
+  inputs="工作区|暂存区|HEAD|命名引用"
   commandLabel="git diff"
-  outputsLabel="产出"
-  outputs="控制台信息|差异上下文|决策依据"
-  note="如果输出看起来“不对”，优先排查的是观察范围，而不是命令本身有没有生效。"
+  outputsLabel="你会得到什么"
+  outputs="补丁视图|评审依据|更安全的下一步判断"
+  note="如果 patch 看起来不对，优先重新确认范围，而不是马上怀疑命令本身。"
 />
 
-## 特殊情况与边界
+## 一个更稳的检查顺序
 
-- 大多数观察命令本身不改历史，但它看到的结果会受 HEAD、路径、提交范围或引用选择影响。
-- 如果 `git diff` 的输出和预期不一致，先确认你看的到底是工作区、索引、当前分支，还是某个历史提交。
-- 把 `git diff` 和 `git status`、`git log`、`git show` 组合使用，通常比单独看一个输出更稳。
+在 commit 或发评审前，很推荐这样做：
 
+1. `git status`
+2. `git diff`
+3. `git diff --staged`
+4. 然后再 commit、rebase 或发起 review
+
+这个顺序能提前发现很多常见问题：
+
+- 忘了 add 某个文件
+- staged 里混入了不该提交的内容
+- 分支比较范围选错了
+- 以为工作区干净就代表 staged 也干净
+
+<TipBox title="把 diff 当成起飞前检查">
+  <p>很多 Git 事故不是命令本身危险，而是人在没看清状态时就继续执行了下一步。`git diff` 可以帮你在代价变大前发现问题。</p>
+</TipBox>
+
+## 边界与常见误区
+
+- `git diff` 不改历史，但它依然可能因为比较范围错了而误导你。
+- 输出太长不一定说明改动太大，也可能只是你看的范围太宽。
+- review 场景和 staged 检查场景，不是同一个问题，不能永远用同一种 diff 方式。
+
+<WarningBox title="不要用错比较范围来做评审判断">
+  <p>如果 refs 选错了，你会误以为某个分支改得更多或更少。尤其在 PR 场景下，先确认自己想看的是两点比较还是三点比较。</p>
+</WarningBox>
+
+## 跟着做一遍
+
+<PracticeLab
+  title="练习：分别观察 unstaged、staged 和分支级差异"
+  intro="目标是形成条件反射：不同的 diff 形式到底在回答什么问题。"
+  setupLabel="准备"
+  setup={`git switch -c lab/diff-demo\n# 修改一个文件，只暂存其中一部分`}
+  stepsLabel="动手试"
+  steps="运行 `git diff`，观察还没暂存的内容。|运行 `git diff --staged`，确认下一次提交会包含什么。|运行 `git diff HEAD`，比较它和前两个输出的关系。|如果有 main 基线，再运行 `git diff main...HEAD`。"
+  outcomesLabel="会发生什么"
+  outcomes="你会发现每种 diff 形式都在回答不同问题。|同一个文件在不同范围里显示出的结果可以不一样。|以后 commit 或 review 前更不容易看错内容。"
+  mistakesLabel="常见错误判断"
+  mistakes="如果 `git diff` 空了，检查改动是不是已经进 staged。|如果分支 diff 太大，先确认 refs 和范围是否写对。|如果 patch 过长难读，先缩小到某个路径再判断。"
+/>
