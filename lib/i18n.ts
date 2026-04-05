@@ -73,12 +73,15 @@ export type CommandSlug =
 export type BestPracticeSlug =
   | "commit-hygiene"
   | "topic-branches"
+  | "branch-workflow-and-lifecycle"
   | "fetch-first-sync"
   | "shared-history-boundaries"
   | "review-and-safe-push"
   | "atomic-commits"
+  | "focused-commits-and-topic-branch-hygiene"
   | "branch-naming"
   | "pull-request-prep"
+  | "pull-request-review-readiness"
   | "conflict-resolution-routine"
   | "release-hygiene"
   | "safe-cherry-picks"
@@ -646,12 +649,15 @@ export const advancedCommandSlugs = [
 export const bestPracticeSlugs = [
   "commit-hygiene",
   "topic-branches",
+  "branch-workflow-and-lifecycle",
   "fetch-first-sync",
   "shared-history-boundaries",
   "review-and-safe-push",
   "atomic-commits",
+  "focused-commits-and-topic-branch-hygiene",
   "branch-naming",
   "pull-request-prep",
+  "pull-request-review-readiness",
   "conflict-resolution-routine",
   "release-hygiene",
   "safe-cherry-picks",

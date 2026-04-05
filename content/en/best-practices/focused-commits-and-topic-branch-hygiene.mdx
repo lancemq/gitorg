@@ -1,0 +1,133 @@
+export const metadata = {
+  title: "Focused Commits and Topic Branch Hygiene",
+  slug: "focused-commits-and-topic-branch-hygiene",
+  locale: "en",
+  section: "best-practices",
+  summary: "When commit scope and branch scope stay clean, reviews move faster, rebases stay safer, and rollback boundaries become much easier to reason about.",
+  sourceUrls: [
+    "https://git-scm.com/docs/gitworkflows",
+    "https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows",
+  ],
+};
+
+# Focused Commits and Topic Branch Hygiene
+
+## Why small, focused commits matter
+
+Smaller commits are not only about making history look elegant. They improve three concrete things:
+
+- reviewers can understand intent faster
+- rebasing and cleanup become more predictable
+- rollback and cherry-pick boundaries become safer
+
+The point is not tiny commits for their own sake. The point is commits with one clear purpose.
+
+## 1. Let each commit express one complete move
+
+Good commit boundaries often look like:
+
+- add audit logging for sign-in events
+- fix navbar overlap on mobile
+- adjust release script version parsing
+
+Weaker boundaries look like:
+
+- login logging plus style cleanup plus docs tweaks
+- one huge "today's work" commit
+- "I will sort it out later" commits
+
+You do not need microscopic commits, but you do want single-theme commits.
+
+## 2. Keep unrelated noise out of the topic branch
+
+A topic branch becomes harder to review when it accumulates:
+
+- temporary debug code
+- unrelated formatting cleanup
+- side refactors that are not part of the current task
+
+Those changes blur the story of the branch and make later revert or cherry-pick work harder.
+
+## 3. Use staging deliberately
+
+When one file contains multiple logical changes, staging in smaller chunks can help:
+
+```bash
+git add -p
+git commit -m "refactor: simplify branch status summary"
+git add -p
+git commit -m "fix: stop detached-head hint from flashing"
+```
+
+That extra step often pays back during review and cleanup.
+
+## 4. Use case: cleaner review flow
+
+Imagine a pull request touching 12 files. If the branch is split into a few clean commits, the reviewer can process it in layers:
+
+- structure changes first
+- behavior fixes second
+- tests and docs last
+
+That is much easier than reading one giant undifferentiated diff.
+
+## 5. Use case: easier interactive rebase
+
+When each commit is focused, interactive rebase becomes much easier:
+
+- which commits should squash
+- which commit messages need rewriting
+- which commit belongs earlier
+- which experimental commit should disappear
+
+If each commit already mixes several concerns, cleanup becomes much harder.
+
+## 6. Use case: safer rollback
+
+When production issues happen, you want a precise answer to:
+
+- which commit or small group introduced the problem
+- what can be reverted without damaging unrelated work
+
+Messy commit boundaries make that much harder.
+
+## 7. A useful pre-review hygiene check
+
+Before requesting review, it is worth checking:
+
+```bash
+git log --oneline --decorate -10
+git diff --stat origin/main...
+git diff --name-only origin/main...
+```
+
+That helps answer:
+
+- do the commit titles tell a coherent story
+- is there obvious noise
+- did unrelated files leak into the branch
+
+## 8. Special case: experimentation is normal, but it does not all belong in final history
+
+Exploration during development is healthy. That does not mean every local checkpoint belongs in the final review history.
+
+A better pattern is often:
+
+- allow messy exploration locally
+- clean up the branch before asking others to review it
+
+That preserves development flow without forcing reviewers to parse the entire trial-and-error process.
+
+## 9. A practical minimum standard
+
+1. one commit, one purpose
+2. one topic branch, one primary theme
+3. unrelated edits do not ride along
+4. authors review their own log and diff before requesting review
+5. if the author cannot explain the commit sequence, the reviewer probably cannot either
+
+## Suggested follow-up
+
+- `Atomic Commits and Commit Narrative`
+- `Topic Branch Strategy`
+- `Pull Request Prep`
