@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 
 import { DocTemplate } from "@/components/doc-template";
 import { getDocByPath, getDocHref, getDocLastModified, getDocNeighbors, getDocPathFromSlugParts, getDocPaths, getDocPrimer, getRelatedDocs } from "@/lib/content";
@@ -21,12 +21,18 @@ type Props = {
   }>;
 };
 
+function isCanonicalDocsPath(locale: Locale, docPath: string) {
+  return getDocHref(locale, docPath as ReturnType<typeof getDocPathFromSlugParts>).startsWith(`/${locale}/docs/`);
+}
+
 export async function generateStaticParams() {
   return locales.flatMap((lang) =>
-    getDocPaths(lang).map((docPath) => ({
-      lang,
-      slug: docPath.split("/"),
-    })),
+    getDocPaths(lang)
+      .filter((docPath) => isCanonicalDocsPath(lang, docPath))
+      .map((docPath) => ({
+        lang,
+        slug: docPath.split("/"),
+      })),
   );
 }
 
@@ -67,19 +73,19 @@ export default async function DocDetailPage({ params }: Props) {
   const docPath = getDocPathFromSlugParts(slug);
 
   if (rawDocPath === "concepts/git-internals") {
-    redirect(`/${locale}/internals`);
+    permanentRedirect(`/${locale}/internals`);
   }
 
   if (rawDocPath === "concepts/refs-and-head") {
-    redirect(`/${locale}/internals/refs-and-head`);
+    permanentRedirect(`/${locale}/internals/refs-and-head`);
   }
 
   if (rawDocPath === "learning-path/quick-start") {
-    redirect(`/${locale}/learning-path`);
+    permanentRedirect(`/${locale}/learning-path`);
   }
 
   if (rawDocPath.startsWith("recovery/")) {
-    redirect(`/${locale}/recovery/${rawDocPath.replace("recovery/", "")}`);
+    permanentRedirect(`/${locale}/recovery/${rawDocPath.replace("recovery/", "")}`);
   }
 
   const sectionId = docPath.split("/")[0] as DocsSectionId;

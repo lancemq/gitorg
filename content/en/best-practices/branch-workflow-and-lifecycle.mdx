@@ -1,0 +1,126 @@
+export const metadata = {
+  title: "Branch Workflows and Branch Lifecycle",
+  slug: "branch-workflow-and-lifecycle",
+  locale: "en",
+  section: "best-practices",
+  summary: "Teams move faster when mainline, release lines, hotfix lines, and topic branches each have a clear job and a clear exit condition.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows",
+    "https://git-scm.com/docs/gitworkflows",
+  ],
+};
+
+# Branch Workflows and Branch Lifecycle
+
+## Why branch lifecycle matters
+
+Branch strategy is not really about inventing more branch names. It is about making these questions explicit:
+
+- which branch is the trusted integration baseline
+- where day-to-day work should happen
+- where urgent production fixes should start
+- how release stabilization differs from normal feature development
+
+If those boundaries are fuzzy, Git commands still work, but team coordination gets noisier and riskier.
+
+## 1. Give each branch category a clear role
+
+A lightweight but effective split is:
+
+- mainline branch: the trusted integration baseline
+- topic branches: one feature or one fix each
+- release branches: stabilization and final validation
+- hotfix branches: shortest path for urgent production issues
+
+The exact names matter less than stable rules for when work enters and leaves each branch type.
+
+## 2. Keep topic branches short-lived and single-purpose
+
+A reliable starting routine is:
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c feature/account-audit-log
+```
+
+That keeps review, rollback, rebase, and merge boundaries much clearer. Once a topic branch starts carrying multiple unrelated concerns, it stops being easy to review or revert cleanly.
+
+## 3. Mainline should stay integration-ready
+
+Whatever merge strategy the team prefers, the mainline should feel trustworthy:
+
+- new work can branch from it safely
+- CI results are meaningful
+- unfinished or noisy work does not accumulate there
+
+That makes mainline a dependable collaboration surface instead of a staging dump.
+
+## 4. Release branches exist to reduce decision noise
+
+A release branch is useful for:
+
+- version freeze
+- final regression checks
+- low-risk release-specific fixes
+- defining the exact boundary of a version
+
+It is not the right place to continue mixing in large new features. Otherwise the team loses clarity about what belongs in the current release versus the next one.
+
+## 5. Hotfix branches should optimize for shortest safe loop
+
+For urgent production issues, the cleanest sequence is:
+
+1. cut a hotfix branch from the stable release baseline
+2. fix only the urgent problem
+3. validate quickly and release
+4. merge or replay the same fix back into the main development line
+
+That prevents the classic failure mode where production is fixed but the ongoing branch line never gets the change back.
+
+## 6. Use case: parallel feature work without corrupting mainline
+
+If several developers are working in parallel, topic branches let the team:
+
+- isolate each unit of work
+- review and merge independently
+- postpone one feature without untangling unrelated history
+
+That is far safer than piling unrelated work into one shared development branch.
+
+## 7. Use case: shifting into release mode
+
+Once the team says "this week we release," branch behavior should change:
+
+- new feature work stays on topic branches
+- the current version is stabilized on a release branch
+- only selected release-critical fixes enter that line
+
+This is branch lifecycle in practice, not just extra naming.
+
+## 8. Special case: not every team needs full Git Flow
+
+Some teams do not need a large permanent hierarchy of `develop`, `release/*`, `hotfix/*`, and long-lived support lines.
+
+Often a smaller system works better:
+
+- `main` as trusted baseline
+- short-lived topic branches
+- release and hotfix branches only when needed
+
+The goal is not maximum ceremony. It is the minimum structure that makes collaboration safer.
+
+## 9. A practical minimum standard
+
+1. mainline stays integration-ready
+2. one task, one topic branch
+3. release branches exist only when a release is being stabilized
+4. hotfixes use their own branch
+5. released fixes must flow back into the main line
+6. long-lived branches should be rare and clearly justified
+
+## Suggested follow-up
+
+- `Topic Branch Strategy`
+- `Pull Request Prep`
+- `Release Hygiene and Version Boundaries`

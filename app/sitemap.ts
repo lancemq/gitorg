@@ -9,13 +9,19 @@ function buildLocaleAlternates(siteUrl: string, pathname: string) {
     languages: {
       "zh-CN": `${siteUrl}/zh${pathname}`,
       en: `${siteUrl}/en${pathname}`,
-      "x-default": `${siteUrl}/zh${pathname}`,
+      "x-default": pathname ? `${siteUrl}${pathname}` : `${siteUrl}/`,
     },
   };
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = getSiteUrl();
+  const rootRoute = {
+    pathname: "/",
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 1,
+  };
   const staticRoutes = await Promise.all(
     locales.flatMap((locale) => [
       (async () => ({
@@ -119,16 +125,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ),
   );
 
-  return [...staticRoutes, ...docRoutes, ...machineReadableRoutes].map((entry) => ({
+  const dedupedRoutes = new Map<
+    string,
+    {
+      pathname: string;
+      lastModified: Date;
+      changeFrequency: "weekly" | "monthly";
+      priority: number;
+    }
+  >();
+
+  for (const entry of [rootRoute, ...staticRoutes, ...docRoutes, ...machineReadableRoutes]) {
+    const existing = dedupedRoutes.get(entry.pathname);
+
+    if (!existing || existing.lastModified < entry.lastModified || existing.priority < entry.priority) {
+      dedupedRoutes.set(entry.pathname, entry);
+    }
+  }
+
+  return Array.from(dedupedRoutes.values()).map((entry) => ({
     url: `${siteUrl}${entry.pathname}`,
     lastModified: entry.lastModified,
     changeFrequency: entry.changeFrequency,
     priority: entry.priority,
-    alternates: entry.pathname.startsWith("/zh") || entry.pathname.startsWith("/en")
-      ? buildLocaleAlternates(
-          siteUrl,
-          entry.pathname.replace(/^\/(zh|en)/, ""),
-        )
-      : undefined,
+    alternates:
+      entry.pathname === "/" || entry.pathname.startsWith("/zh") || entry.pathname.startsWith("/en")
+        ? buildLocaleAlternates(siteUrl, entry.pathname === "/" ? "" : entry.pathname.replace(/^\/(zh|en)/, ""))
+        : undefined,
   }));
 }

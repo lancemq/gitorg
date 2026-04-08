@@ -1,0 +1,122 @@
+export const metadata = {
+  title: "Pull Request Review Readiness",
+  slug: "pull-request-review-readiness",
+  locale: "en",
+  section: "best-practices",
+  summary: "Review quality depends heavily on whether the author prepared branch scope, change narrative, validation notes, and follow-up behavior before requesting feedback.",
+  sourceUrls: [
+    "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/about-pull-request-reviews",
+    "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project",
+  ],
+};
+
+# Pull Request Review Readiness
+
+## Why review quality is not only the reviewer's responsibility
+
+Teams often talk about review as if it begins when the reviewer opens the diff. In practice, review quality is heavily shaped before that moment:
+
+- how well the branch was cleaned up
+- whether the author explained intent and risk
+- whether the change scope is still coherent
+
+If that preparation is missing, reviewers end up reconstructing context instead of evaluating the actual solution.
+
+## 1. The title and description should answer the essential questions
+
+A review-ready pull request should quickly explain:
+
+- what problem this change solves
+- why it is being changed now
+- what parts of the system are affected
+- what risks, limitations, or follow-up work remain
+
+The goal is not a long essay. The goal is fast situational clarity.
+
+## 2. Clean the branch before you ask for review
+
+A reliable sequence is:
+
+1. sync with the latest mainline
+2. remove obvious noise commits
+3. verify the diff scope
+4. then request review
+
+Otherwise the reviewer is often forced to read the author's entire exploration trail instead of the intended final change.
+
+## 3. Tell reviewers how to read the change
+
+For medium or large pull requests, it helps to suggest an order:
+
+- start with the data model changes
+- then read the API adjustments
+- finish with tests and UI changes
+
+That reduces cognitive load and helps reviewers focus on the real design questions sooner.
+
+## 4. Use case: scope explanation improves review quality
+
+Suppose a pull request includes:
+
+- core logic changes
+- tests
+- documentation updates
+
+If the description does not explain which part is primary and which parts are supporting, reviewers often spend energy on the wrong layer first. Explicit scope notes keep the discussion more focused.
+
+## 5. Use case: when to re-request review
+
+After significant changes in response to feedback, it is risky to assume reviewers will naturally revisit the right parts on their own.
+
+A better pattern is:
+
+- reply to the key comments
+- explain what changed
+- re-request review when appropriate
+
+That keeps review flow explicit instead of relying on guesswork.
+
+## 6. Use case: when not to keep piling onto the same PR
+
+Some branches grow during review:
+
+- the original bug fix lands
+- then a refactor gets mixed in
+- then a loosely related cleanup appears
+
+At that point review quality usually drops. If new work changes the theme of the pull request, it is often better to split it into another branch and another review thread.
+
+## 7. Validation notes are part of reviewer respect
+
+If behavior changed, the pull request should ideally say:
+
+- how to validate it manually
+- what tests were added or run
+- where the reviewer should pay extra attention
+
+That lets the reviewer spend time judging correctness and risk instead of first figuring out how to reproduce the feature.
+
+## 8. Special case: large pull requests can still be reviewable
+
+Small pull requests are easier, but not every change can be made small. For larger reviews, structure matters even more:
+
+- provide reading order
+- label non-core files
+- identify logically separable commits
+- explain why the work was not split further
+
+Large is manageable. Large and unstructured is the real problem.
+
+## 9. A practical minimum standard for authors
+
+1. accurate title and clear description
+2. up-to-date base branch
+3. self-reviewed commit history and diff
+4. validation notes and explicit risk areas
+5. clear follow-up during review, including re-requesting review when needed
+
+## Suggested follow-up
+
+- `Pull Request Prep`
+- `Focused Commits and Topic Branch Hygiene`
+- `Small Batch Review and Feedback Loops`

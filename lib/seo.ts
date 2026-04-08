@@ -49,7 +49,7 @@ export function buildAlternates(locale: Locale, pathname: string) {
     languages: {
       "zh-CN": `/zh${pathname}`,
       en: `/en${pathname}`,
-      "x-default": `/zh${pathname}`,
+      "x-default": pathname || "/",
     },
   };
 }
