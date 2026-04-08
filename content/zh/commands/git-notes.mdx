@@ -3,7 +3,7 @@ export const metadata = {
   slug: "git-notes",
   locale: "zh",
   section: "commands",
-  summary: "解释如何用 git-notes 给提交附加额外说明而不改写原提交。",
+  summary: "在不改写提交对象的前提下给提交补充审计、复盘或评审注释，适合需要保留原始历史又要追加上下文的团队。",
   sourceUrls: [
     "https://git-scm.com/docs/git-notes",
   ],
@@ -13,65 +13,67 @@ export const metadata = {
 
 ## 一句话理解
 
-git-notes 用于给提交附加额外说明而不改写原提交。
+`git notes` 可以给已有提交追加“旁路注释”，不会改变提交 ID。
 
 ## 什么时候适合用
 
-- 当你需要给提交附加额外说明而不改写原提交
-- 当你想把这类操作做成稳定流程而不是手工重复
-- 当你需要更准确地理解 Git 在这一步到底记录了什么
+- 需要记录审计结论、事故编号、上线追踪信息
+- 不希望用 amend/rebase 改写历史
+- 想给特定提交补后续说明而不干扰主流程提交信息
 
-## 基本示例
+## 基本操作
 
 ```bash
-git notes add -m "Investigated by release team"
+git notes add -m "Incident: INC-2026-0421 mitigated"
+git notes show <commit>
+git log --show-notes
 ```
 
-## 读这条命令时最该注意什么
+## 团队使用前要先约定
 
-高级命令不是日常主流程，但一旦用错，恢复成本会明显升高。
+1. notes 用于什么场景（审计/复盘/合规）
+2. notes ref 是否统一（默认是 `refs/notes/commits`）
+3. notes 是否需要推送共享
 
-## 一个更稳的实践建议
+## 共享 notes 的关键点
 
-在真实仓库执行前，先用一段最小可复现历史做演练。
+notes 不是默认跟着普通 `git push` 走。需要显式推送：
 
-## 补充理解角度
+```bash
+git push origin refs/notes/* 
+```
 
-- 处理复杂协作和历史分析问题
-- 把一次性操作收敛成可重复流程
-- 降低高风险操作的偶然性
-
-
-## 这条命令在流程里解决什么问题
-
-`git notes` 直接影响历史表达、引用位置或提交之间的关系。读这类命令时，要先判断这次操作是在整理本地未共享历史，还是在处理已经公开给团队的历史。
-
-## 典型用例
-
-- 在合并、回滚、挑提交或整理提交序列时，用 `git notes` 重塑历史表达。
-- 把 `git notes` 放进“先备份、再变更、最后复核”的高风险操作流程，降低误操作损失。
-- 在复盘冲突、回滚事故或判断分支关系时，用 `git notes` 理清提交之间的因果链。
+拉取也要显式配置或执行。
 
 ## 图例理解
 
 <CommandFlowFigure
-  title="历史命令的作用面"
-  caption="历史类命令通常围绕提交、当前分支和祖先关系展开，差别在于它是新增历史、移动引用，还是重写已有序列。"
+  title="提交对象与注释分离"
+  caption="notes 存放在独立引用中，提交对象本身不变，因此适合追加上下文而不重写历史。"
   inputsLabel="输入"
-  inputs="提交序列|当前分支|祖先关系"
+  inputs="既有提交|notes ref"
   commandLabel="git notes"
-  outputsLabel="结果"
-  outputs="新的提交关系|移动后的引用|可恢复路径"
-  note="这类命令执行前最值得确认的一件事，是“这段历史是不是已经共享给别人”。"
+  outputsLabel="输出"
+  outputs="附加注释|不变的 commit ID|可共享的 notes 引用"
+  note="它改变的是注释引用，而不是提交对象。"
 />
 
-## 特殊情况与边界
+## 常见误区
 
-- 历史类命令最常见的风险，是对已经共享出去的提交继续做重写或移动。
-- 如果这次操作可能影响团队协作，先跑 `git status`、`git log --oneline --graph` 和 `git reflog`，再决定是否继续。
-- 一旦不确定，就先建一个备份分支，让自己保留“能回去”的选项。
+### 误区 1：以为 notes 所有人都能自动看到
 
+如果没有共享 notes ref，别人看不到这些信息。
 
-## 延伸阅读
+### 误区 2：把 notes 当成提交信息替代品
 
-继续搭配 git status、git log、git show 一起看，通常更容易判断这条命令对历史、索引和工作区分别造成了什么影响。
+提交 message 仍是主叙事；notes 更适合后续追加信息。
+
+### 误区 3：没有治理规则就大量写 notes
+
+会形成噪声，降低检索价值。
+
+## 接下来建议继续看什么
+
+1. `commit message conventions`
+2. `release checklist discipline`
+3. `git-show`

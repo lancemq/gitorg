@@ -3,7 +3,7 @@ export const metadata = {
   slug: "git-send-email",
   locale: "en",
   section: "commands",
-  summary: "Explains how to use git-send-email to send patch emails to a mailing list or review flow.",
+  summary: "Send patch series produced by `format-patch` through email while preserving commit boundaries and thread context.",
   sourceUrls: [
     "https://git-scm.com/docs/git-send-email",
     "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project",
@@ -14,66 +14,51 @@ export const metadata = {
 
 ## The short version
 
-git-send-email is used to send patch emails to a mailing list or review flow.
+`git send-email` sends patch series via email, preserving commit granularity and discussion threading.
 
-## When it is a good fit
+## Typical scenarios
 
-- when you need to send patch emails to a mailing list or review flow
-- when you want this step to be repeatable instead of ad hoc
-- when you need a clearer mental model of what Git is recording or updating
+- mailing-list based contribution workflows
+- maintainer projects requiring patch-by-email
+- environments without direct hosted-platform access
 
-## Basic example
+## Common companion flow
 
 ```bash
+git format-patch -3 origin/main
 git send-email *.patch
 ```
 
-## What to watch most closely
+Generate patches first, then send.
 
-Patch-based workflows are sensitive to context drift, so confirm the base state and the recovery path first.
+## Pre-send checklist
 
-## A safer working habit
+1. SMTP/auth configuration works
+2. To/Cc recipients are correct
+3. thread conventions (subject prefix, reply chain) match project rules
+4. patch ordering and cover letter are complete
 
-Read the patch series first and keep abort, continue, or a backup branch ready.
+## Safer send pattern
 
-## Useful angles for understanding it
+Dry-run or self-send before real list submission:
 
-- Handle mailbox patches or patch files
-- Exchange changes outside direct repository access
-- Preserve commit boundaries instead of copying edits manually
+```bash
+git send-email --dry-run *.patch
+```
 
-## Related reading
+## Frequent failure modes
 
-Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.
+- encoding/line-wrap issues corrupt patch application
+- incorrect subject prefix violates list rules
+- missing one patch in a series breaks review/application continuity
 
+<WarningBox title="Dry-run before real send">
+  Once patches are mailed to public lists, correction cost rises quickly. Validate formatting and threading first.
+</WarningBox>
 
-## What problem this command solves in a workflow
+## Good follow-up reads
 
-`git send-email` is about how your local repository exchanges information with remotes, patches, or transportable artifacts. The mental model becomes clearer once you separate download, publish, integrate, and distribute.
-
-## Typical use cases
-
-- Use `git send-email` when synchronizing upstream state, publishing local work, or packaging history for review or transfer.
-- Place `git send-email` inside collaboration flow so the team can control when information is fetched, integrated, or exposed.
-- Use `git send-email` in automation, mirroring, offline transfer, or email-based workflows when Git history needs to move between systems.
-
-## Diagram view
-
-<CommandFlowFigure
-  title="Local-to-external information flow"
-  caption="Remote and patch commands are easiest to reason about when you separate where data comes from, where it goes, and whether the current branch changes as a side effect."
-  inputsLabel="Sources"
-  inputs="Local refs|Remote refs|Patches / artifacts"
-  commandLabel="git send-email"
-  outputsLabel="Results"
-  outputs="Updated tracking refs|Published commits|Transfer artifacts"
-  note="Any time a shared branch is involved, confirm the target ref and team policy before running the action that publishes or integrates history."
-/>
-
-## Special cases and boundaries
-
-- A common remote-workflow mistake is treating download, integration, and publication as the same action. Split them first, then choose flags.
-- If the result may affect shared branches or externally visible history, double-check the remote, the target ref, and the permission boundary before executing `git send-email`.
-- Looking at `git fetch`, `git push`, and `git remote -v` together usually makes it easier to tell whether the problem is transport, auth, or ref selection.
-- Do a dry run or small-scope test first so recipients, threading, and encoding are all correct before the real send.
+1. `git-format-patch`
+2. `git-request-pull`
+3. `open source fork pr contribution`
 

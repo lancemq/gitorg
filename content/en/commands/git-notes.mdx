@@ -3,7 +3,7 @@ export const metadata = {
   slug: "git-notes",
   locale: "en",
   section: "commands",
-  summary: "Explains how to use git-notes to attach extra notes to commits without rewriting them.",
+  summary: "Attach audit or review annotations to commits without rewriting commit objects, useful when teams need extra context without history mutation.",
   sourceUrls: [
     "https://git-scm.com/docs/git-notes",
   ],
@@ -13,65 +13,66 @@ export const metadata = {
 
 ## The short version
 
-git-notes is used to attach extra notes to commits without rewriting them.
+`git notes` adds side-channel annotations to commits while keeping commit IDs unchanged.
 
 ## When it is a good fit
 
-- when you need to attach extra notes to commits without rewriting them
-- when you want this step to be repeatable instead of ad hoc
-- when you need a clearer mental model of what Git is recording or updating
+- append incident, audit, or release annotations after merge
+- keep original commit history immutable
+- preserve additional context without amend/rebase rewrite
 
-## Basic example
+## Core usage
 
 ```bash
 git notes add -m "Investigated by release team"
+git notes show <commit>
+git log --show-notes
 ```
 
-## What to watch most closely
+## Team decisions you should make first
 
-Advanced commands are not always part of the daily path, but mistakes with them usually cost more to recover from.
+1. what notes are used for (audit, incident, compliance)
+2. which notes ref to use
+3. whether notes must be shared in remotes
 
-## A safer working habit
+## Sharing notes across collaborators
 
-Rehearse the flow on a small reproducible history before running it in a production repository.
+Notes are not always pushed with default branch push behavior. Push notes refs explicitly:
 
-## Useful angles for understanding it
-
-- Handle more complex collaboration or history-analysis tasks
-- Turn one-off steps into repeatable routines
-- Reduce the risk of advanced operations
-
-## Related reading
-
-Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.
-
-
-## What problem this command solves in a workflow
-
-`git notes` directly affects history shape, ref position, or relationships between commits. The first decision is whether you are organizing private local history or touching history that is already shared with others.
-
-## Typical use cases
-
-- Use `git notes` when integrating branches, undoing changes, selecting commits, or reshaping a sequence of commits.
-- Put `git notes` inside a “backup first, mutate second, verify last” flow so higher-risk history operations stay recoverable.
-- Use `git notes` to understand ancestry, recovery paths, and commit causality during conflict resolution or post-incident analysis.
+```bash
+git push origin refs/notes/*
+```
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="What history commands act on"
-  caption="History-oriented commands revolve around commit sequences, branch pointers, and ancestry. The difference is whether they add history, move refs, or rewrite an existing sequence."
+  title="Commit object plus note reference"
+  caption="Notes are stored separately from commit objects, so history identity remains intact."
   inputsLabel="Inputs"
-  inputs="Commit sequence|Current branch|Ancestry"
+  inputs="Existing commit|Notes ref"
   commandLabel="git notes"
   outputsLabel="Results"
-  outputs="New commit relations|Moved refs|Recovery path"
-  note="The highest-value preflight question for this category is simple: “Has this history already been shared?”"
+  outputs="Additional annotation|Unchanged commit hash|Shareable notes ref"
+  note="This is contextual metadata, not commit history rewrite."
 />
 
-## Special cases and boundaries
+## Common mistakes
 
-- The most expensive failure mode in history commands is rewriting or moving commits that other people already depend on.
-- If the operation might affect team flow, run `git status`, `git log --oneline --graph`, and `git reflog` first so the recovery path is visible.
-- When in doubt, create a backup branch before continuing so you preserve an obvious way back.
+### Mistake 1: assuming everyone sees notes automatically
+
+Without pushing/fetching notes refs, collaborators may not see them.
+
+### Mistake 2: using notes as a replacement for commit messages
+
+Commit messages remain the primary narrative; notes are supplemental.
+
+### Mistake 3: no governance for note content
+
+Unstructured notes quickly become noisy and hard to trust.
+
+## Good follow-up reads
+
+1. `commit message conventions`
+2. `release checklist discipline`
+3. `git-show`
 

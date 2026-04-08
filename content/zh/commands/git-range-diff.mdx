@@ -3,7 +3,7 @@ export const metadata = {
   slug: "git-range-diff",
   locale: "zh",
   section: "commands",
-  summary: "解释如何用 git-range-diff 比较两组提交序列之间的差异。",
+  summary: "比较两组“补丁序列”而不是单点 diff，适合在 rebase 或重排提交后向 reviewer 解释“这次版本改动到底变了什么”。",
   sourceUrls: [
     "https://git-scm.com/docs/git-range-diff",
   ],
@@ -13,65 +13,69 @@ export const metadata = {
 
 ## 一句话理解
 
-git-range-diff 用于比较两组提交序列之间的差异。
+`git range-diff` 比较的是“两段提交序列之间的补丁变化”，不是单个提交或两个目录快照。
 
-## 什么时候适合用
+## 什么时候最有价值
 
-- 当你需要比较两组提交序列之间的差异
-- 当你想把这类操作做成稳定流程而不是手工重复
-- 当你需要更准确地理解 Git 在这一步到底记录了什么
+- 你对分支做了 rebase / squash / 重排后，想说明版本差异
+- reviewer 问“v2 相比 v1 到底变了什么”
+- 你要确认历史整理是否意外丢补丁或引入额外修改
 
-## 基本示例
+## 典型命令
 
 ```bash
-git range-diff origin/main...v1 origin/main...v2
+git range-diff origin/main...feature-v1 origin/main...feature-v2
 ```
 
-## 读这条命令时最该注意什么
+含义是：都以 `origin/main` 为基线，比较 `feature-v1` 与 `feature-v2` 两组补丁序列。
 
-高级命令不是日常主流程，但一旦用错，恢复成本会明显升高。
+## 它和 `git diff` 的区别
 
-## 一个更稳的实践建议
+- `git diff`：看“最终文件差异”
+- `git range-diff`：看“补丁序列如何变化”
 
-在真实仓库执行前，先用一段最小可复现历史做演练。
+两者都重要，但回答的问题不同。
 
-## 补充理解角度
+## 推荐操作流程
 
-- 处理复杂协作和历史分析问题
-- 把一次性操作收敛成可重复流程
-- 降低高风险操作的偶然性
+1. 保留旧版本分支或 tag（如 `feature-v1`）
+2. 在新版本完成后运行 `range-diff`
+3. 把关键差异摘要写进 PR 说明
 
-
-## 这条命令在流程里解决什么问题
-
-`git range-diff` 直接影响历史表达、引用位置或提交之间的关系。读这类命令时，要先判断这次操作是在整理本地未共享历史，还是在处理已经公开给团队的历史。
-
-## 典型用例
-
-- 在合并、回滚、挑提交或整理提交序列时，用 `git range-diff` 重塑历史表达。
-- 把 `git range-diff` 放进“先备份、再变更、最后复核”的高风险操作流程，降低误操作损失。
-- 在复盘冲突、回滚事故或判断分支关系时，用 `git range-diff` 理清提交之间的因果链。
+```bash
+git fetch origin
+git range-diff origin/main...feature-v1 origin/main...feature-v2
+```
 
 ## 图例理解
 
 <CommandFlowFigure
-  title="历史命令的作用面"
-  caption="历史类命令通常围绕提交、当前分支和祖先关系展开，差别在于它是新增历史、移动引用，还是重写已有序列。"
-  inputsLabel="输入"
-  inputs="提交序列|当前分支|祖先关系"
+  title="比较两组补丁序列"
+  caption="range-diff 关注的是“序列与序列的对应关系”，所以它特别适合评估 rebase 后的版本变化。"
+  inputsLabel="输入序列"
+  inputs="base...v1|base...v2"
   commandLabel="git range-diff"
-  outputsLabel="结果"
-  outputs="新的提交关系|移动后的引用|可恢复路径"
-  note="这类命令执行前最值得确认的一件事，是“这段历史是不是已经共享给别人”。"
+  outputsLabel="输出"
+  outputs="补丁对应关系|新增/删除补丁|补丁内容变化"
+  note="它通常是“解释改动演进”的工具，而不是“修改历史”的工具。"
 />
 
-## 特殊情况与边界
+## 常见误区
 
-- 历史类命令最常见的风险，是对已经共享出去的提交继续做重写或移动。
-- 如果这次操作可能影响团队协作，先跑 `git status`、`git log --oneline --graph` 和 `git reflog`，再决定是否继续。
-- 一旦不确定，就先建一个备份分支，让自己保留“能回去”的选项。
+### 误区 1：把它当成文件 diff
 
+这样会误解输出语义，错过“补丁级变化”信息。
 
-## 延伸阅读
+### 误区 2：没有固定基线就直接比较
 
-继续搭配 git status、git log、git show 一起看，通常更容易判断这条命令对历史、索引和工作区分别造成了什么影响。
+基线不同会导致结果噪声很大。
+
+### 误区 3：整理历史后不做 range-diff
+
+容易把“看似等价”的历史重写带入不可见偏差。
+
+## 接下来建议继续看什么
+
+1. `prepare commits before pull request`
+2. `stacked pull requests workflow`
+3. `git-rebase`

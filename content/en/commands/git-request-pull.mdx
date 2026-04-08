@@ -3,7 +3,7 @@ export const metadata = {
   slug: "git-request-pull",
   locale: "en",
   section: "commands",
-  summary: "Explains how to use git-request-pull to generate a pull request summary for maintainers.",
+  summary: "Generate a pull summary that tells maintainers what to fetch from which base and branch, useful in email-driven or traditional maintainer workflows.",
   sourceUrls: [
     "https://git-scm.com/docs/git-request-pull",
     "https://git-scm.com/book/en/v2/Distributed-Git-Maintaining-a-Project",
@@ -14,66 +14,61 @@ export const metadata = {
 
 ## The short version
 
-git-request-pull is used to generate a pull request summary for maintainers.
+`git request-pull` creates a text summary describing what maintainers should pull and from which base.
 
-## When it is a good fit
+## Best-fit scenarios
 
-- when you need to generate a pull request summary for maintainers
-- when you want this step to be repeatable instead of ad hoc
-- when you need a clearer mental model of what Git is recording or updating
+- mailing-list or patch-style contribution flow
+- repositories without hosted-platform PR usage
+- workflows needing explicit base + remote + range context
 
-## Basic example
+## Typical command
 
 ```bash
-git request-pull origin/main https://example.com/repo.git feature
+git request-pull origin/main https://example.com/repo.git feature/my-change
 ```
 
-## What to watch most closely
+Output typically includes:
 
-Patch-based workflows are sensitive to context drift, so confirm the base state and the recovery path first.
+- base commit context
+- target repository URL
+- commit summary/range details
 
-## A safer working habit
+## What this command does not do
 
-Read the patch series first and keep abort, continue, or a backup branch ready.
+- it does not create a GitHub/GitLab PR
+- it does not push branches
+- it does not notify maintainers automatically
 
-## Useful angles for understanding it
+It only produces a shareable pull-summary text.
 
-- Handle mailbox patches or patch files
-- Exchange changes outside direct repository access
-- Preserve commit boundaries instead of copying edits manually
+## Recommended workflow
 
-## Related reading
+1. ensure your branch is pushed to accessible remote
+2. generate and review request-pull output
+3. send via agreed communication channel
 
-Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.
+<WarningBox title="Wrong base selection misleads review scope">
+  `request-pull` is only as accurate as your chosen base and remote context.
+</WarningBox>
 
+## Common mistakes
 
-## What problem this command solves in a workflow
+### Mistake 1: treating it as a hosted PR replacement
 
-`git request-pull` is about how your local repository exchanges information with remotes, patches, or transportable artifacts. The mental model becomes clearer once you separate download, publish, integrate, and distribute.
+It is a summary generator, not a platform PR action.
 
-## Typical use cases
+### Mistake 2: sending summary before branch is available remotely
 
-- Use `git request-pull` when synchronizing upstream state, publishing local work, or packaging history for review or transfer.
-- Place `git request-pull` inside collaboration flow so the team can control when information is fetched, integrated, or exposed.
-- Use `git request-pull` in automation, mirroring, offline transfer, or email-based workflows when Git history needs to move between systems.
+Maintainers cannot fetch what you referenced.
 
-## Diagram view
+### Mistake 3: sending without verifying URL/base details
 
-<CommandFlowFigure
-  title="Local-to-external information flow"
-  caption="Remote and patch commands are easiest to reason about when you separate where data comes from, where it goes, and whether the current branch changes as a side effect."
-  inputsLabel="Sources"
-  inputs="Local refs|Remote refs|Patches / artifacts"
-  commandLabel="git request-pull"
-  outputsLabel="Results"
-  outputs="Updated tracking refs|Published commits|Transfer artifacts"
-  note="Any time a shared branch is involved, confirm the target ref and team policy before running the action that publishes or integrates history."
-/>
+Small metadata mistakes create large review friction.
 
-## Special cases and boundaries
+## Good follow-up reads
 
-- A common remote-workflow mistake is treating download, integration, and publication as the same action. Split them first, then choose flags.
-- If the result may affect shared branches or externally visible history, double-check the remote, the target ref, and the permission boundary before executing `git request-pull`.
-- Looking at `git fetch`, `git push`, and `git remote -v` together usually makes it easier to tell whether the problem is transport, auth, or ref selection.
-- This command creates a pull request summary message, not a hosted-platform PR, so it must still fit your team communication flow.
+1. `git-send-email`
+2. `git-format-patch`
+3. `fork upstream sync`
 

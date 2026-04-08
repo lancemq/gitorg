@@ -3,7 +3,7 @@ export const metadata = {
   slug: "git-worktree",
   locale: "en",
   section: "commands",
-  summary: "Explains how to use git-worktree to manage multiple working trees for the same repository.",
+  summary: "Create parallel working directories for one repository to reduce stash/switch friction and improve multi-task flow.",
   sourceUrls: [
     "https://git-scm.com/docs/git-worktree",
   ],
@@ -13,66 +13,53 @@ export const metadata = {
 
 ## The short version
 
-git-worktree is used to manage multiple working trees for the same repository.
+`git worktree` gives one repository multiple checkouts so different tasks can run in separate directories.
 
-## When it is a good fit
+## Why this often beats stash-driven switching
 
-- when you need to manage multiple working trees for the same repository
-- when you want this step to be repeatable instead of ad hoc
-- when you need a clearer mental model of what Git is recording or updating
+- task context is directory-isolated
+- less stash/pop churn
+- hotfix and feature work can proceed in parallel
 
-## Basic example
+## Core commands
 
 ```bash
-git worktree add ../repo-hotfix hotfix
+git worktree list
+git worktree add ../repo-hotfix hotfix/login-timeout
+git worktree remove ../repo-hotfix
 ```
 
-## What to watch most closely
+## Recommended usage
 
-These commands often change repository layout or collaboration patterns, so align on conventions first.
+1. one worktree per clear task
+2. meaningful directory/branch naming
+3. remove finished worktrees to keep layout clean
 
-## A safer working habit
+## Key limitation
 
-Test the flow in a small sandbox repository before rolling it into the main repo or automation.
+A branch typically cannot be checked out as writable in multiple worktrees simultaneously.
 
-## Useful angles for understanding it
+<WarningBox title="Do not mix unrelated tasks in one worktree">
+  Worktree value comes from separation. Mixed task context reintroduces local-state confusion.
+</WarningBox>
 
-- Distribute code or history
-- Reduce clone or checkout scope
-- Coordinate multi-repo or multi-worktree setups
+## Common mistakes
 
-## Related reading
+### Mistake 1: creating worktrees but still doing all edits in main directory
 
-Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.
+You lose isolation and switch-cost benefits.
 
+### Mistake 2: deleting directories without `git worktree remove`
 
-## What problem this command solves in a workflow
+Metadata can become stale and list output confusing.
 
-`git worktree` is less about a single commit and more about managing working copies, directory layout, or temporary local state. It helps solve questions like “how do I parallelize local work?” and “how do I preserve or clean my current scene?”
+### Mistake 3: sharing temporary build outputs across worktrees
 
-## Typical use cases
+This can hide branch-specific state differences.
 
-- Use `git worktree` when juggling multiple tasks, temporarily switching context, or cleaning up local workspace state.
-- Place `git worktree` inside team habits that reduce dirty-working-tree friction and improve local task switching.
-- Use `git worktree` in large repos, submodule-heavy environments, or multi-worktree setups to lower checkout cost and local cognitive load.
+## Good follow-up reads
 
-## Diagram view
-
-<CommandFlowFigure
-  title="Workspace-oriented command scope"
-  caption="These commands focus on managing local working copies rather than simply producing new commits."
-  inputsLabel="Local context"
-  inputs="Branches|Directories|Worktrees|Uncommitted edits"
-  commandLabel="git worktree"
-  outputsLabel="Results"
-  outputs="Extra checkouts|Saved context|Cleaned workspace"
-  note="Whenever a command may alter what is visible on disk, ask whether the current local scene still needs to be preserved."
-/>
-
-## Special cases and boundaries
-
-- These commands often change what is physically present on disk, so think about file preservation before you think about syntax.
-- If there are still active edits, decide whether they should move with you, be parked temporarily, or be removed explicitly.
-- When multiple directories or nested repositories are involved, validate the scope on a small example first.
-- A branch usually cannot be checked out as a writable target in multiple worktrees at the same time, so confirm branch occupancy first.
+1. `parallel work with worktree`
+2. `ai agent worktree mode`
+3. `git-switch`
 

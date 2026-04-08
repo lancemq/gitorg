@@ -3,7 +3,7 @@ export const metadata = {
   slug: "git-am",
   locale: "en",
   section: "commands",
-  summary: "Explains how to use git-am to apply a mailbox patch series onto the current branch.",
+  summary: "Apply mailbox patch series as real commits, preserving author/message metadata in patch-by-email workflows.",
   sourceUrls: [
     "https://git-scm.com/docs/git-am",
   ],
@@ -13,66 +13,62 @@ export const metadata = {
 
 ## The short version
 
-git-am is used to apply a mailbox patch series onto the current branch.
+`git am` applies email-style patches and records them as commits, not just working-tree edits.
 
-## When it is a good fit
+## Best-fit scenarios
 
-- when you need to apply a mailbox patch series onto the current branch
-- when you want this step to be repeatable instead of ad hoc
-- when you need a clearer mental model of what Git is recording or updating
+- ingesting mailing-list patch series
+- preserving original author/subject metadata
+- importing changes in non-platform collaboration models
 
-## Basic example
+## Core flow
 
 ```bash
-git am 0001-fix-login.patch
+git am 0001-fix.patch
+# or
+git am *.patch
 ```
 
-## What to watch most closely
+If conflicts happen:
 
-Patch-based workflows are sensitive to context drift, so confirm the base state and the recovery path first.
+```bash
+git am --continue
+git am --skip
+git am --abort
+```
 
-## A safer working habit
+## Why it differs from `git apply`
 
-Read the patch series first and keep abort, continue, or a backup branch ready.
+- `git apply`: apply file diffs only
+- `git am`: apply diffs and create commits with mail metadata
 
-## Useful angles for understanding it
+## Safer usage pattern
 
-- Handle mailbox patches or patch files
-- Exchange changes outside direct repository access
-- Preserve commit boundaries instead of copying edits manually
+1. run on a temporary branch first
+2. verify base alignment before apply
+3. avoid repeated blind `--skip`; keep recovery checkpoints
 
-## Related reading
+<WarningBox title="Base mismatch is the main `am` failure cause">
+  Patch-series context drift can produce cascading conflicts. Syncing base first is often the cheapest prevention step.
+</WarningBox>
 
-Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.
+## Common mistakes
 
+### Mistake 1: expecting every patch to apply automatically
 
-## What problem this command solves in a workflow
+Context divergence still requires human conflict resolution.
 
-`git am` is about how your local repository exchanges information with remotes, patches, or transportable artifacts. The mental model becomes clearer once you separate download, publish, integrate, and distribute.
+### Mistake 2: aborting immediately and losing useful progress
 
-## Typical use cases
+Evaluate already-applied commits before discarding series state.
 
-- Use `git am` when synchronizing upstream state, publishing local work, or packaging history for review or transfer.
-- Place `git am` inside collaboration flow so the team can control when information is fetched, integrated, or exposed.
-- Use `git am` in automation, mirroring, offline transfer, or email-based workflows when Git history needs to move between systems.
+### Mistake 3: skipping patches without traceability
 
-## Diagram view
+Later it becomes hard to explain sequence gaps.
 
-<CommandFlowFigure
-  title="Local-to-external information flow"
-  caption="Remote and patch commands are easiest to reason about when you separate where data comes from, where it goes, and whether the current branch changes as a side effect."
-  inputsLabel="Sources"
-  inputs="Local refs|Remote refs|Patches / artifacts"
-  commandLabel="git am"
-  outputsLabel="Results"
-  outputs="Updated tracking refs|Published commits|Transfer artifacts"
-  note="Any time a shared branch is involved, confirm the target ref and team policy before running the action that publishes or integrates history."
-/>
+## Good follow-up reads
 
-## Special cases and boundaries
-
-- A common remote-workflow mistake is treating download, integration, and publication as the same action. Split them first, then choose flags.
-- If the result may affect shared branches or externally visible history, double-check the remote, the target ref, and the permission boundary before executing `git am`.
-- Looking at `git fetch`, `git push`, and `git remote -v` together usually makes it easier to tell whether the problem is transport, auth, or ref selection.
-- When patch application fails, separate “context mismatch” from “the patch no longer fits this history” before choosing a recovery path.
+1. `git-format-patch`
+2. `git-send-email`
+3. `recover after wrong cherry-pick`
 

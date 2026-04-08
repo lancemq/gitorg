@@ -3,7 +3,7 @@ export const metadata = {
   slug: "git-range-diff",
   locale: "en",
   section: "commands",
-  summary: "Explains how to use git-range-diff to compare the differences between two commit series.",
+  summary: "Compare two patch series (not just final file states), especially useful after rebase or commit reshaping when reviewers ask what changed between v1 and v2.",
   sourceUrls: [
     "https://git-scm.com/docs/git-range-diff",
   ],
@@ -13,65 +13,69 @@ export const metadata = {
 
 ## The short version
 
-git-range-diff is used to compare the differences between two commit series.
+`git range-diff` compares one commit series to another at patch level.
 
-## When it is a good fit
+## Best-fit scenarios
 
-- when you need to compare the differences between two commit series
-- when you want this step to be repeatable instead of ad hoc
-- when you need a clearer mental model of what Git is recording or updating
+- you rebased/squashed/reordered commits and need a clear v1 vs v2 explanation
+- reviewers ask “what actually changed since last revision”
+- you want to verify history cleanup did not lose or alter intended patches
 
-## Basic example
+## Typical command
 
 ```bash
-git range-diff origin/main...v1 origin/main...v2
+git range-diff origin/main...feature-v1 origin/main...feature-v2
 ```
 
-## What to watch most closely
+This means: use `origin/main` as base, compare the two patch stacks on top.
 
-Advanced commands are not always part of the daily path, but mistakes with them usually cost more to recover from.
+## How it differs from `git diff`
 
-## A safer working habit
+- `git diff`: compares resulting file states
+- `git range-diff`: compares patch-series evolution
 
-Rehearse the flow on a small reproducible history before running it in a production repository.
+They answer different questions and are often complementary.
 
-## Useful angles for understanding it
+## Recommended workflow
 
-- Handle more complex collaboration or history-analysis tasks
-- Turn one-off steps into repeatable routines
-- Reduce the risk of advanced operations
+1. keep old revision branch/tag (for example `feature-v1`)
+2. produce new revision (`feature-v2`)
+3. run range-diff and summarize key deltas in PR notes
 
-## Related reading
-
-Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.
-
-
-## What problem this command solves in a workflow
-
-`git range-diff` directly affects history shape, ref position, or relationships between commits. The first decision is whether you are organizing private local history or touching history that is already shared with others.
-
-## Typical use cases
-
-- Use `git range-diff` when integrating branches, undoing changes, selecting commits, or reshaping a sequence of commits.
-- Put `git range-diff` inside a “backup first, mutate second, verify last” flow so higher-risk history operations stay recoverable.
-- Use `git range-diff` to understand ancestry, recovery paths, and commit causality during conflict resolution or post-incident analysis.
+```bash
+git fetch origin
+git range-diff origin/main...feature-v1 origin/main...feature-v2
+```
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="What history commands act on"
-  caption="History-oriented commands revolve around commit sequences, branch pointers, and ancestry. The difference is whether they add history, move refs, or rewrite an existing sequence."
-  inputsLabel="Inputs"
-  inputs="Commit sequence|Current branch|Ancestry"
+  title="Comparing patch stacks"
+  caption="range-diff is optimized for revision-to-revision comparison of commit stacks."
+  inputsLabel="Input stacks"
+  inputs="base...v1|base...v2"
   commandLabel="git range-diff"
-  outputsLabel="Results"
-  outputs="New commit relations|Moved refs|Recovery path"
-  note="The highest-value preflight question for this category is simple: “Has this history already been shared?”"
+  outputsLabel="Output"
+  outputs="Patch mapping|Added/dropped patches|Patch-level changes"
+  note="This command is mainly for explainability and verification after history edits."
 />
 
-## Special cases and boundaries
+## Common mistakes
 
-- The most expensive failure mode in history commands is rewriting or moving commits that other people already depend on.
-- If the operation might affect team flow, run `git status`, `git log --oneline --graph`, and `git reflog` first so the recovery path is visible.
-- When in doubt, create a backup branch before continuing so you preserve an obvious way back.
+### Mistake 1: using it as a plain file diff replacement
 
+You lose the patch-sequence semantics that make range-diff valuable.
+
+### Mistake 2: comparing stacks with inconsistent base
+
+Noise increases and interpretation becomes unreliable.
+
+### Mistake 3: skipping range-diff after rebasing PR updates
+
+You may miss unintended patch drift.
+
+## Good follow-up reads
+
+1. `prepare commits before pull request`
+2. `stacked pull requests workflow`
+3. `git-rebase`

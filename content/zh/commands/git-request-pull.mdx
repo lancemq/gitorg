@@ -3,7 +3,7 @@ export const metadata = {
   slug: "git-request-pull",
   locale: "zh",
   section: "commands",
-  summary: "解释如何用 git-request-pull 生成一段可交给维护者的拉取说明。",
+  summary: "生成“从哪个基线到哪个分支”的拉取摘要，适合邮件流或传统维护者流程中做可审阅的变更交付说明。",
   sourceUrls: [
     "https://git-scm.com/docs/git-request-pull",
     "https://git-scm.com/book/en/v2/Distributed-Git-Maintaining-a-Project",
@@ -14,66 +14,61 @@ export const metadata = {
 
 ## 一句话理解
 
-git-request-pull 用于生成一段可交给维护者的拉取说明。
+`git request-pull` 生成一段文本摘要，告诉维护者“请从这个基线拉取我这个分支的改动”。
 
 ## 什么时候适合用
 
-- 当你需要生成一段可交给维护者的拉取说明
-- 当你想把这类操作做成稳定流程而不是手工重复
-- 当你需要更准确地理解 Git 在这一步到底记录了什么
+- 邮件列表或传统补丁协作流程
+- 无法直接开平台 PR 的仓库
+- 需要明确说明 base、仓库地址与变更范围
 
-## 基本示例
+## 典型命令
 
 ```bash
-git request-pull origin/main https://example.com/repo.git feature
+git request-pull origin/main https://example.com/repo.git feature/my-change
 ```
 
-## 读这条命令时最该注意什么
+输出通常包含：
 
-补丁工作流最怕上下文不一致，所以应用前最好先确认基线、工作区状态和回退动作。
+- 基线提交
+- 目标仓库 URL
+- 变更摘要与提交列表
 
-## 一个更稳的实践建议
+## 这条命令不是做什么的
 
-在真正应用前先阅读补丁内容，并准备 abort、continue 或备用分支。
+- 不是自动创建 GitHub/GitLab PR
+- 不是自动推送分支
+- 不是自动通知维护者
 
-## 补充理解角度
+它只生成“可发送的拉取说明文本”。
 
-- 处理补丁邮件或补丁文件
-- 在仓库外部交换变更
-- 保留提交边界而不是手工复制改动
+## 推荐流程
 
+1. 先确保分支已推送到可访问远端
+2. 用 `request-pull` 生成摘要并人工校对
+3. 再通过邮件或约定渠道发送
 
-## 这条命令在流程里解决什么问题
+<WarningBox title="基线写错会直接误导评审范围">
+  `request-pull` 的可用性高度依赖 base 选择。基线不准，维护者看到的比较范围就会偏移。
+</WarningBox>
 
-`git request-pull` 围绕“本地仓库怎样与远端、补丁或可传输工件交换信息”展开。理解它时，要先分清下载、发布、整合、分发这几种动作分别由谁负责。
+## 常见误区
 
-## 典型用例
+### 误区 1：把它当平台 PR 替代按钮
 
-- 在同步上游、发布本地提交或传递补丁时，用 `git request-pull` 控制信息流动的方向。
-- 把 `git request-pull` 放进协作流程中，让“先观察远端，再决定整合方式”这件事更可控。
-- 在自动化、镜像、离线传输或邮件流中，用 `git request-pull` 管理可交换的历史单元。
+它是文本摘要工具，不是平台 API。
 
-## 图例理解
+### 误区 2：分支没推送就发 request-pull
 
-<CommandFlowFigure
-  title="本地与外部信息流"
-  caption="远端与补丁类命令最关键的是分清信息从哪里来、到哪里去，以及是否会顺手改当前分支。"
-  inputsLabel="来源"
-  inputs="本地引用|远端引用|补丁 / 工件"
-  commandLabel="git request-pull"
-  outputsLabel="结果"
-  outputs="更新后的跟踪引用|发布的提交|传输产物"
-  note="只要涉及共享分支，就优先确认目标引用和团队约定，再执行真正的发布或整合动作。"
-/>
+维护者无法拉取到你描述的对象。
 
-## 特殊情况与边界
+### 误区 3：摘要不校对直接发送
 
-- 远端类命令最常见的误区，是把“下载”“整合”“发布”混成同一件事。先拆清动作，再决定参数。
-- 如果操作结果会影响共享分支或对外发布，执行 `git request-pull` 前最好再确认一次目标远端、目标引用和权限边界。
-- 和 `git fetch`、`git push`、`git remote -v` 一起看，通常更容易判断问题出在同步、认证还是引用选择。
-- 这条命令生成的是“请求摘要”，不是自动发起平台 PR，所以还要结合团队实际协作渠道使用。
+base 或 URL 有误会增加维护者沟通成本。
 
+## 接下来建议继续看什么
 
-## 延伸阅读
+1. `git-send-email`
+2. `git-format-patch`
+3. `fork upstream sync`
 
-继续搭配 git status、git log、git show 一起看，通常更容易判断这条命令对历史、索引和工作区分别造成了什么影响。
