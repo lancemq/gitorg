@@ -112,7 +112,11 @@ export type WorkflowSlug =
   | "trunk-based-development-workflow"
   | "stacked-pull-requests-workflow"
   | "bisect-regression-triage-workflow"
-  | "code-freeze-and-release-candidate-workflow";
+  | "code-freeze-and-release-candidate-workflow"
+  | "revert-first-stabilization-workflow"
+  | "feature-flag-rollout-workflow"
+  | "release-train-workflow"
+  | "cross-repo-integration-workflow";
 
 export type GithubSlug =
   | "github-flow-basics"
@@ -691,6 +695,10 @@ export const workflowSlugs = [
   "stacked-pull-requests-workflow",
   "bisect-regression-triage-workflow",
   "code-freeze-and-release-candidate-workflow",
+  "revert-first-stabilization-workflow",
+  "feature-flag-rollout-workflow",
+  "release-train-workflow",
+  "cross-repo-integration-workflow",
 ] as const satisfies readonly WorkflowSlug[];
 
 export const recoverySlugs = [

@@ -1,0 +1,91 @@
+export const metadata = {
+  title: "跨仓库集成工作流",
+  slug: "cross-repo-integration-workflow",
+  locale: "zh",
+  section: "workflows",
+  summary: "当一个需求跨多个仓库协同落地时，用统一分支命名、集成清单和串联验证流程降低联调失败率。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes",
+    "https://git-scm.com/docs/git-worktree",
+    "https://git-scm.com/docs/git-tag",
+  ],
+};
+
+# 跨仓库集成工作流
+
+需求跨仓库改动时，问题往往不是单个仓库里的代码，而是“谁先发、谁后发、版本如何对齐、联调如何复现”。
+
+<CommandFlowFigure
+  title="跨仓库改动的协同链路"
+  caption="把多仓库改动串成一条可追踪链：统一任务标识、各仓库独立提交、集成环境联合验证、再按顺序发布。"
+  inputsLabel="输入"
+  inputs="跨仓需求|多仓代码变更|统一验收标准"
+  commandLabel="align scope → branch per repo → integrate test → coordinated release"
+  outputsLabel="输出"
+  outputs="联调路径清晰|发布顺序可控|回滚定位更快"
+  note="跨仓协作最怕“每个仓库都看起来没问题，但放在一起就坏”。"
+/>
+
+## 推荐实践
+
+### 1. 统一任务标识与分支命名
+
+每个仓库都用同一个任务号前缀，例如：
+
+- `feature/ORD-142-api`
+- `feature/ORD-142-web`
+- `feature/ORD-142-worker`
+
+这样能在日志、PR 和发布记录里快速串联上下游。
+
+### 2. 为跨仓改动维护集成清单
+
+清单至少包含：
+
+- 涉及仓库与分支
+- 依赖顺序（谁先发布）
+- 配置开关与迁移脚本
+- 回滚策略
+
+### 3. 建立联合验证环境
+
+不要只跑单仓测试。应在集成环境按真实依赖关系做端到端验收。
+
+### 4. 按依赖顺序发布
+
+通常是：底层服务/协议先发布，再发布调用方和界面层。
+
+### 5. 发布后记录版本矩阵
+
+明确“某次上线对应各仓库哪个 tag / commit”，便于后续排障。
+
+<WarningBox title="跨仓联调失败最常见的原因是版本对齐不完整">
+  某个仓库的接口已变更，但另一个仓库仍使用旧契约，就会出现“单测都绿、联调全红”。跨仓任务里，版本矩阵比单仓通过更关键。
+</WarningBox>
+
+## 常见误区
+
+### 误区 1：只在聊天工具同步，不沉淀集成清单
+
+信息散落会让交接和复盘成本急剧上升。
+
+### 误区 2：每个仓库各自发版，缺少统一窗口
+
+容易出现中间态兼容问题。
+
+### 误区 3：回滚只准备单仓方案
+
+跨仓变更往往需要联动回滚或兼容桥接。
+
+<PracticeBox title="为一个跨仓需求准备发布矩阵">
+  1. 列出所有涉及仓库和目标分支。
+  2. 写明依赖顺序和最晚可发布时点。
+  3. 为每个仓库准备回滚动作。
+  4. 上线后记录最终 commit/tag 对照表。
+</PracticeBox>
+
+## 接下来建议继续看什么
+
+1. `Feature branch collaboration`
+2. `Fork and upstream sync`
+3. `Merge queue workflow`

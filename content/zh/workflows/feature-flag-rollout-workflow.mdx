@@ -1,0 +1,90 @@
+export const metadata = {
+  title: "Feature Flag 渐进发布工作流",
+  slug: "feature-flag-rollout-workflow",
+  locale: "zh",
+  section: "workflows",
+  summary: "把代码合并与功能放量解耦，利用 feature flag 分阶段上线与回滚，降低大功能一次性发布风险。",
+  sourceUrls: [
+    "https://martinfowler.com/articles/feature-toggles.html",
+    "https://git-scm.com/docs/git-revert",
+    "https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows",
+  ],
+};
+
+# Feature Flag 渐进发布工作流
+
+Feature flag 的价值在于把“代码进入主线”与“功能对用户生效”拆开。这样可以在主线持续集成的同时，保留发布节奏控制权。
+
+<CommandFlowFigure
+  title="代码合并与功能放量解耦"
+  caption="先把受控代码安全合入主线，再按流量或用户组逐步放开。出现异常时优先关旗而不是立即重发版本。"
+  inputsLabel="输入"
+  inputs="可关闭的功能开关|观测指标|灰度策略"
+  commandLabel="merge behind flag → gradual rollout → observe/rollback flag"
+  outputsLabel="输出"
+  outputs="发布更平滑|事故半径更小|回滚速度更快"
+  note="flag 是运行时控制，不应替代代码质量门禁。"
+/>
+
+## 适用场景
+
+- 新功能影响核心流程，风险不可一次性全量
+- 需要 A/B 或分群发布能力
+- 希望在不频繁发版的前提下调整开放策略
+
+## 推荐流程
+
+### 1. 先实现可关闭路径
+
+功能代码必须在 flag 关闭时保持旧行为完整可用。
+
+### 2. 合并到主线并保持默认关闭
+
+```bash
+git switch -c feature/new-checkout-flow
+git commit -m "add new checkout flow behind flag"
+```
+
+### 3. 从内部用户开始小流量灰度
+
+逐步从 1% → 5% → 20% → 50% → 100%，每一步观察核心指标。
+
+### 4. 异常时优先关闭旗标
+
+如果出现指标恶化，先关旗并恢复旧路径，再决定是否回滚代码。
+
+### 5. 稳定后删除旗标与死代码
+
+长期遗留 flag 会增加代码复杂度，应设定清理时限。
+
+<WarningBox title="没有观测能力的灰度，等于盲飞">
+  如果没有延迟、错误率、转化等关键指标，渐进放量只是“慢一点冒险”。放量前先确认指标面板和告警阈值。
+</WarningBox>
+
+## 常见误区
+
+### 误区 1：一个 flag 控制太多行为
+
+职责不清会导致回滚时影响面不可预测。
+
+### 误区 2：异常后一边关旗一边继续推新代码
+
+应先止损，再恢复排查节奏。
+
+### 误区 3：稳定后不清理 flag
+
+最终会形成难以维护的“配置债务 + 分支逻辑债务”。
+
+<PracticeBox title="为下个高风险功能写一份放量计划">
+  1. 定义默认关闭状态下的行为。
+  2. 定义 4 个放量阶段和每阶段通过条件。
+  3. 写清“关旗触发阈值”和执行责任人。
+  4. 设定 flag 下线日期。
+</PracticeBox>
+
+## 接下来建议继续看什么
+
+1. `Trunk-based development workflow`
+2. `Code freeze and release candidate workflow`
+3. `Revert-first stabilization workflow`
+

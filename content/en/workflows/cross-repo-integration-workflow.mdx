@@ -1,0 +1,92 @@
+export const metadata = {
+  title: "Cross-Repository Integration Workflow",
+  slug: "cross-repo-integration-workflow",
+  locale: "en",
+  section: "workflows",
+  summary: "Coordinate multi-repo changes with shared task IDs, dependency-aware release order, and integrated validation to reduce cross-repo breakage.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes",
+    "https://git-scm.com/docs/git-worktree",
+    "https://git-scm.com/docs/git-tag",
+  ],
+};
+
+# Cross-Repository Integration Workflow
+
+For multi-repo initiatives, failure usually comes from sequencing and version alignment, not from one repository’s local code quality.
+
+<CommandFlowFigure
+  title="Multi-repo coordination chain"
+  caption="Use one traceable chain across repositories: shared task identity, per-repo branches, integration environment validation, and coordinated release order."
+  inputsLabel="Inputs"
+  inputs="cross-repo requirement|changes in multiple repos|shared acceptance criteria"
+  commandLabel="align scope → branch per repo → integrate test → coordinated release"
+  outputsLabel="Outputs"
+  outputs="clear integration path|controlled release order|faster rollback diagnosis"
+  note="Most cross-repo failures look green in each repo but red in integration."
+/>
+
+## Recommended practices
+
+### 1. Share one task identity across repositories
+
+Use a unified prefix across repo branches, for example:
+
+- `feature/ORD-142-api`
+- `feature/ORD-142-web`
+- `feature/ORD-142-worker`
+
+This makes PRs, logs, and release notes linkable.
+
+### 2. Maintain an integration checklist
+
+At minimum include:
+
+- involved repositories and branches
+- dependency order and release sequence
+- config/migration requirements
+- rollback strategy
+
+### 3. Use an integrated validation environment
+
+Per-repo tests are necessary but not sufficient. Validate end-to-end behavior with real dependency wiring.
+
+### 4. Release in dependency order
+
+Usually publish protocol/back-end layers before dependents.
+
+### 5. Capture a post-release version matrix
+
+Record which tag/commit from each repository was deployed together.
+
+<WarningBox title="Cross-repo incidents often start from incomplete version alignment">
+  If one repository moves API contracts while another still runs previous assumptions, isolated test success can hide integration breakage.
+</WarningBox>
+
+## Common mistakes
+
+### Mistake 1: coordination only in chat threads
+
+Without a durable checklist, handoffs and retrospectives become unreliable.
+
+### Mistake 2: independent repo releases without global sequencing
+
+This creates avoidable compatibility windows.
+
+### Mistake 3: rollback plan only for one repository
+
+Cross-repo changes often require coordinated rollback or compatibility bridges.
+
+<PracticeBox title="Build a release matrix for one multi-repo initiative">
+  1. List all repos and target branches.
+  2. Define release order and latest allowed release time.
+  3. Define rollback action per repo.
+  4. Record final deployed commit/tag mapping.
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `Feature branch collaboration`
+2. `Fork and upstream sync`
+3. `Merge queue workflow`
+

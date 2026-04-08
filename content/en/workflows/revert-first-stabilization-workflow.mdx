@@ -1,0 +1,90 @@
+export const metadata = {
+  title: "Revert-First Stabilization Workflow",
+  slug: "revert-first-stabilization-workflow",
+  locale: "en",
+  section: "workflows",
+  summary: "In high-impact regressions, restore service stability first and separate root-cause fixes afterward to reduce incident duration and secondary risk.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-revert",
+    "https://git-scm.com/docs/git-cherry-pick",
+    "https://sre.google/sre-book/emergency-response/",
+  ],
+};
+
+# Revert-First Stabilization Workflow
+
+During production regressions, teams often try to diagnose and patch live at the same time. Revert-first separates goals: restore stability first, then fix root cause safely.
+
+<CommandFlowFigure
+  title="Two-phase incident response"
+  caption="Phase 1 restores availability quickly. Phase 2 performs root-cause repair under controlled conditions."
+  inputsLabel="Inputs"
+  inputs="incident alert|suspected commit range|rollback authority"
+  commandLabel="stabilize by revert → investigate → patch-forward"
+  outputsLabel="Outputs"
+  outputs="shorter outage window|lower secondary-failure risk|auditable fix path"
+  note="Priority order is stability first, perfect fix second."
+/>
+
+## When revert should be the default
+
+- customer-impacting path is degraded and blast radius is growing
+- root cause is still uncertain under time pressure
+- one or more likely commits can be identified
+
+## Minimal execution sequence
+
+### 1. Identify likely offending changes
+
+```bash
+git log --oneline --decorate -20
+```
+
+### 2. Revert in a dedicated hotfix branch
+
+```bash
+git switch -c hotfix/revert-login-regression
+git revert <bad-commit>
+```
+
+For multiple commits, revert in controlled order and include incident ID in commit messages.
+
+### 3. Validate quickly and release recovery build
+
+Run critical-path checks and ship the stabilization release early.
+
+### 4. Perform root-cause fix on a separate branch
+
+Do not stack ad-hoc patching while service remains unstable.
+
+<WarningBox title="Revert is risk control, not a failure signal">
+  In incident mode, rolling back quickly is often the most mature engineering decision. Recovery first, deep repair second.
+</WarningBox>
+
+## Common mistakes
+
+### Mistake 1: reverting without follow-up root-cause analysis
+
+The same class of failure often returns later.
+
+### Mistake 2: editing directly on main and force-pushing
+
+Use traceable branches and normal release controls, even under urgency.
+
+### Mistake 3: bundling unrelated changes in emergency patches
+
+Keep emergency change scope minimal to avoid widening validation surface.
+
+<PracticeBox title="Run a revert-first tabletop exercise">
+  1. Pick a past regression and reconstruct timeline.
+  2. Write the revert-first action sequence.
+  3. Define minimum release gates in incident mode.
+  4. Clarify rollback decision ownership.
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `Hotfix and urgent fixes`
+2. `Hotfix rollback after release`
+3. `Bisect regression triage workflow`
+

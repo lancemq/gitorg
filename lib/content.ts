@@ -156,6 +156,10 @@ export const docPathRegistry = [
   "workflows/stacked-pull-requests-workflow",
   "workflows/bisect-regression-triage-workflow",
   "workflows/code-freeze-and-release-candidate-workflow",
+  "workflows/revert-first-stabilization-workflow",
+  "workflows/feature-flag-rollout-workflow",
+  "workflows/release-train-workflow",
+  "workflows/cross-repo-integration-workflow",
   "github/github-flow-basics",
   "github/pull-requests-and-reviews",
   "github/forks-and-open-source-contribution",
@@ -309,6 +313,13 @@ const contentModules = {
       import("@/content/zh/workflows/bisect-regression-triage-workflow.mdx"),
     "workflows/code-freeze-and-release-candidate-workflow": () =>
       import("@/content/zh/workflows/code-freeze-and-release-candidate-workflow.mdx"),
+    "workflows/revert-first-stabilization-workflow": () =>
+      import("@/content/zh/workflows/revert-first-stabilization-workflow.mdx"),
+    "workflows/feature-flag-rollout-workflow": () =>
+      import("@/content/zh/workflows/feature-flag-rollout-workflow.mdx"),
+    "workflows/release-train-workflow": () => import("@/content/zh/workflows/release-train-workflow.mdx"),
+    "workflows/cross-repo-integration-workflow": () =>
+      import("@/content/zh/workflows/cross-repo-integration-workflow.mdx"),
     "github/github-flow-basics": () => import("@/content/zh/github/github-flow-basics.mdx"),
     "github/pull-requests-and-reviews": () => import("@/content/zh/github/pull-requests-and-reviews.mdx"),
     "github/forks-and-open-source-contribution": () =>
@@ -469,6 +480,13 @@ const contentModules = {
       import("@/content/en/workflows/bisect-regression-triage-workflow.mdx"),
     "workflows/code-freeze-and-release-candidate-workflow": () =>
       import("@/content/en/workflows/code-freeze-and-release-candidate-workflow.mdx"),
+    "workflows/revert-first-stabilization-workflow": () =>
+      import("@/content/en/workflows/revert-first-stabilization-workflow.mdx"),
+    "workflows/feature-flag-rollout-workflow": () =>
+      import("@/content/en/workflows/feature-flag-rollout-workflow.mdx"),
+    "workflows/release-train-workflow": () => import("@/content/en/workflows/release-train-workflow.mdx"),
+    "workflows/cross-repo-integration-workflow": () =>
+      import("@/content/en/workflows/cross-repo-integration-workflow.mdx"),
     "github/github-flow-basics": () => import("@/content/en/github/github-flow-basics.mdx"),
     "github/pull-requests-and-reviews": () => import("@/content/en/github/pull-requests-and-reviews.mdx"),
     "github/forks-and-open-source-contribution": () =>
@@ -641,6 +659,10 @@ const recommendedDocPaths = new Set<DocPath>([
   "workflows/stacked-pull-requests-workflow",
   "workflows/bisect-regression-triage-workflow",
   "workflows/code-freeze-and-release-candidate-workflow",
+  "workflows/revert-first-stabilization-workflow",
+  "workflows/feature-flag-rollout-workflow",
+  "workflows/release-train-workflow",
+  "workflows/cross-repo-integration-workflow",
   "github/github-flow-basics",
   "github/pull-requests-and-reviews",
   "gitlab/gitlab-flow-and-merge-requests",
@@ -1342,6 +1364,26 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
     "workflows/release-branch-workflow",
     "workflows/hotfix-and-urgent-fixes",
     "commands/git-tag",
+  ],
+  "workflows/revert-first-stabilization-workflow": [
+    "commands/git-revert",
+    "workflows/hotfix-and-urgent-fixes",
+    "workflows/hotfix-rollback-after-release",
+  ],
+  "workflows/feature-flag-rollout-workflow": [
+    "workflows/trunk-based-development-workflow",
+    "workflows/sync-before-review",
+    "workflows/release-branch-workflow",
+  ],
+  "workflows/release-train-workflow": [
+    "workflows/code-freeze-and-release-candidate-workflow",
+    "workflows/release-branch-workflow",
+    "workflows/post-release-multi-branch-backporting",
+  ],
+  "workflows/cross-repo-integration-workflow": [
+    "workflows/feature-branch-collaboration",
+    "workflows/fork-upstream-sync",
+    "workflows/merge-queue-workflow",
   ],
   "workflows/rerere-for-recurring-conflicts": [
     "commands/git-rebase",

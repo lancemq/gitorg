@@ -1,0 +1,90 @@
+export const metadata = {
+  title: "Revert-First 稳定化工作流",
+  slug: "revert-first-stabilization-workflow",
+  locale: "zh",
+  section: "workflows",
+  summary: "线上回归发生时先恢复服务稳定，再分离根因修复；通过 revert-first 策略缩短故障窗口并降低二次事故风险。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-revert",
+    "https://git-scm.com/docs/git-cherry-pick",
+    "https://sre.google/sre-book/emergency-response/",
+  ],
+};
+
+# Revert-First 稳定化工作流
+
+当发布后出现高影响故障时，团队最容易犯的错是“边排查边在线修补”。Revert-first 的核心是先恢复稳定，再进行根因修复与二次发布。
+
+<CommandFlowFigure
+  title="故障响应的两阶段"
+  caption="第一阶段优先恢复可用性，第二阶段再做根因修复。把目标拆开能显著降低高压下的错误决策。"
+  inputsLabel="输入"
+  inputs="故障告警|可疑提交范围|回滚权限"
+  commandLabel="stabilize by revert → investigate → patch-forward"
+  outputsLabel="输出"
+  outputs="故障窗口更短|回归风险降低|修复链路可审计"
+  note="优先级顺序是稳定性 > 完美修复。"
+/>
+
+## 什么时候优先 revert
+
+- 故障影响核心路径，且正在持续扩大
+- 根因尚不清晰，短时间难以给出安全修补
+- 已定位到高概率可疑变更集合
+
+## 最小执行流程
+
+### 1. 锁定可疑提交并确认影响面
+
+```bash
+git log --oneline --decorate -20
+```
+
+### 2. 在修复分支上执行 revert
+
+```bash
+git switch -c hotfix/revert-login-regression
+git revert <bad-commit>
+```
+
+多提交可用范围或逐个 revert，并在提交信息写清 incident 编号。
+
+### 3. 快速验证并发布恢复版本
+
+通过最低必要测试与关键路径验证后尽快发布，先止损。
+
+### 4. 在稳定状态下补根因修复
+
+根因修复应在新分支推进，验证充分后再发布，不要在故障态继续叠加临时修改。
+
+<WarningBox title="revert 不是失败，而是风险控制">
+  在高压故障场景里，回滚是工程能力，不是面子问题。先恢复服务可用性，再做深入修复，通常是更专业也更稳的决策。
+</WarningBox>
+
+## 常见误区
+
+### 误区 1：revert 后不做根因复盘
+
+这会导致问题以新形态再次出现。
+
+### 误区 2：在主线上直接手改并强推
+
+应通过可审计分支和正常发布流程执行恢复。
+
+### 误区 3：把多个问题混在一次紧急修复里
+
+高压场景下应保持变更最小化，避免扩大验证面。
+
+<PracticeBox title="给你的团队做一次 revert-first 演练">
+  1. 选一个历史回归案例，重建时间线。
+  2. 写出“如果先 revert 再修复”会怎样操作。
+  3. 定义事故状态下的最小发布门禁。
+  4. 明确谁拥有回滚决策权。
+</PracticeBox>
+
+## 接下来建议继续看什么
+
+1. `Hotfix and urgent fixes`
+2. `Hotfix rollback after release`
+3. `Bisect regression triage workflow`
+

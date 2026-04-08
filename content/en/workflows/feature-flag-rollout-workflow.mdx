@@ -1,0 +1,90 @@
+export const metadata = {
+  title: "Feature Flag Rollout Workflow",
+  slug: "feature-flag-rollout-workflow",
+  locale: "en",
+  section: "workflows",
+  summary: "Decouple code merge from user exposure by rolling features out gradually behind flags, reducing one-shot release risk.",
+  sourceUrls: [
+    "https://martinfowler.com/articles/feature-toggles.html",
+    "https://git-scm.com/docs/git-revert",
+    "https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows",
+  ],
+};
+
+# Feature Flag Rollout Workflow
+
+Feature flags separate two timelines: code integration into main and feature exposure to users. That allows continuous integration without forcing immediate full rollout.
+
+<CommandFlowFigure
+  title="Decouple merge and exposure"
+  caption="Merge safely behind a disabled flag, then ramp by cohorts or traffic percentages while watching key metrics."
+  inputsLabel="Inputs"
+  inputs="kill-switch capable flag|observability metrics|staged rollout policy"
+  commandLabel="merge behind flag → gradual rollout → observe/rollback flag"
+  outputsLabel="Outputs"
+  outputs="smoother releases|smaller blast radius|faster operational rollback"
+  note="Flags are runtime control, not a substitute for quality gates."
+/>
+
+## When this workflow fits
+
+- high-impact features cannot be safely released to 100% immediately
+- experimentation or cohort-based exposure is required
+- teams want release flexibility without shipping new builds repeatedly
+
+## Recommended sequence
+
+### 1. Implement a clean off path
+
+When the flag is off, legacy behavior should remain intact.
+
+### 2. Merge with default-off behavior
+
+```bash
+git switch -c feature/new-checkout-flow
+git commit -m "add new checkout flow behind flag"
+```
+
+### 3. Start with internal or low-percentage rollout
+
+Typical ramp: 1% → 5% → 20% → 50% → 100%, with gate checks at each step.
+
+### 4. On anomaly, disable flag first
+
+Use flag rollback for immediate mitigation, then decide whether code revert is needed.
+
+### 5. Remove stale flags after stabilization
+
+Long-lived flags increase cognitive and maintenance debt.
+
+<WarningBox title="No metrics means no safe gradual rollout">
+  If you cannot observe latency, errors, and conversion effects, staged rollout becomes blind risk distribution.
+</WarningBox>
+
+## Common mistakes
+
+### Mistake 1: one flag controls too many behaviors
+
+Overloaded flags create unpredictable rollback effects.
+
+### Mistake 2: continuing feature changes during incident rollback
+
+Mitigate first, then resume development.
+
+### Mistake 3: leaving flags permanently
+
+This accumulates configuration debt and dead-path complexity.
+
+<PracticeBox title="Draft a rollout plan for your next risky feature">
+  1. Define off-state behavior.
+  2. Define four rollout stages and pass criteria.
+  3. Define kill-switch trigger thresholds.
+  4. Set a target date to retire the flag.
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `Trunk-based development workflow`
+2. `Code freeze and release candidate workflow`
+3. `Revert-first stabilization workflow`
+

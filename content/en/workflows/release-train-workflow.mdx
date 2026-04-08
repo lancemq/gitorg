@@ -1,0 +1,94 @@
+export const metadata = {
+  title: "Release Train Workflow",
+  slug: "release-train-workflow",
+  locale: "en",
+  section: "workflows",
+  summary: "Ship on a fixed cadence so releases are schedule-driven rather than feature-driven, improving predictability across teams.",
+  sourceUrls: [
+    "https://martinfowler.com/bliki/ReleaseTrain.html",
+    "https://git-scm.com/docs/git-tag",
+    "https://git-scm.com/docs/git-branch",
+  ],
+};
+
+# Release Train Workflow
+
+Release train is about predictability, not raw speed. Teams ship on fixed departure times so features catch the next train instead of moving the train itself.
+
+<CommandFlowFigure
+  title="Time-boxed release model"
+  caption="Define train windows by time, not by feature completion. If a feature misses readiness gates, it rolls to the next train."
+  inputsLabel="Inputs"
+  inputs="fixed cadence|clear intake gates|version tagging policy"
+  commandLabel="time-box intake → cut train → release on schedule"
+  outputsLabel="Outputs"
+  outputs="predictable release dates|steadier cross-team coordination|less last-minute scope churn"
+  note="Release trains protect cadence even when scope varies."
+/>
+
+## Where this works best
+
+- multiple teams share release dependencies
+- release plans are frequently disrupted by late feature requests
+- external stakeholders need reliable shipping timelines
+
+## Recommended implementation steps
+
+### 1. Set train cadence
+
+Example: one departure every two weeks with publicly known freeze points.
+
+### 2. Define intake criteria
+
+- feature complete and validated
+- migration or docs ready
+- risk assessment approved
+
+Missed readiness moves to the next train by default.
+
+### 3. Cut release branch and tag candidate
+
+```bash
+git switch -c release/2026w15
+git tag -a v2026.15.0-rc1 -m "train 2026w15 rc1"
+```
+
+### 4. During train window, accept blocker-level changes only
+
+Avoid opportunistic “while we are here” additions.
+
+### 5. Ship on time and review train metrics
+
+Track on-time rate and carry-over rate (items moved to next train).
+
+<WarningBox title="Release train fails when teams keep delaying departure">
+  Holding trains for extra scope destroys the very predictability the model is designed to provide.
+</WarningBox>
+
+## Common mistakes
+
+### Mistake 1: delaying train to maximize payload
+
+Train models optimize cadence reliability, not per-release fullness.
+
+### Mistake 2: no explicit intake criteria
+
+This creates late-cycle negotiation and friction.
+
+### Mistake 3: tracking release count but not schedule reliability
+
+Without on-time confidence, cadence is just noise.
+
+<PracticeBox title="Define a minimum release-train contract">
+  1. Choose a fixed release frequency.
+  2. Define three to five intake gates.
+  3. Define freeze point and exception path.
+  4. Track on-time and carry-over metrics per train.
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `Code freeze and release candidate workflow`
+2. `Release branch workflow`
+3. `Post-release multi-branch backporting`
+

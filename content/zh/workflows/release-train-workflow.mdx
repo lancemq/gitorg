@@ -1,0 +1,94 @@
+export const metadata = {
+  title: "Release Train 工作流",
+  slug: "release-train-workflow",
+  locale: "zh",
+  section: "workflows",
+  summary: "以固定节奏发车替代“功能等发布”，通过版本列车机制提高组织可预测性并降低临时插单造成的发布波动。",
+  sourceUrls: [
+    "https://martinfowler.com/bliki/ReleaseTrain.html",
+    "https://git-scm.com/docs/git-tag",
+    "https://git-scm.com/docs/git-branch",
+  ],
+};
+
+# Release Train 工作流
+
+Release train 的关键不是更快，而是更可预测。团队按固定节奏发布，让功能“赶上下一班车”，而不是让发布日期被单个需求绑架。
+
+<CommandFlowFigure
+  title="固定节奏发布模型"
+  caption="按时间窗口切分列车班次：到站即发，不等晚到乘客。未完成功能自动进入下一班，减少临时决策。"
+  inputsLabel="输入"
+  inputs="固定发布节奏|清晰准入标准|版本标记策略"
+  commandLabel="time-box intake → cut train → release on schedule"
+  outputsLabel="输出"
+  outputs="发布时间可预测|跨团队协作更稳定|需求插单减少"
+  note="release train 优先保证节奏，而不是每班都塞满功能。"
+/>
+
+## 适合什么团队
+
+- 多团队协作、依赖较多
+- 发布常因“临门一脚需求”反复变更
+- 业务需要稳定对外节奏（客户沟通、运营、合规）
+
+## 推荐实施步骤
+
+### 1. 定义班次节奏
+
+例如每两周一次固定发布时间，提前公布冻结时间点。
+
+### 2. 定义“上车条件”
+
+- 功能完成并通过核心测试
+- 文档/迁移脚本齐备
+- 风险评估通过
+
+未达标功能自动转入下一班。
+
+### 3. 切 release 分支并标记候选版本
+
+```bash
+git switch -c release/2026w15
+git tag -a v2026.15.0-rc1 -m "train 2026w15 rc1"
+```
+
+### 4. 班次期间只处理阻断项
+
+避免“顺带合入小优化”破坏班次稳定性。
+
+### 5. 准点发版并复盘
+
+复盘关注两个指标：准点率、跨班率（被延后到下一班的比例）。
+
+<WarningBox title="列车模式不等于僵化流程">
+  固定节奏的目标是减少临时决策噪声，而不是压制反馈。节奏应稳定，准入规则可以持续优化。
+</WarningBox>
+
+## 常见误区
+
+### 误区 1：为了“满载”而推迟整班
+
+列车模式最忌讳临时改时刻表。
+
+### 误区 2：没有明确上车标准
+
+会导致发布前争议集中爆发。
+
+### 误区 3：只看发版次数，不看准点率
+
+没有节奏可靠性，班次再多也难形成组织信任。
+
+<PracticeBox title="给团队定义一个最小 release train 规则">
+  1. 先选一个固定发版频率。
+  2. 明确 3 到 5 条上车条件。
+  3. 定义班次冻结点和例外审批机制。
+  4. 发布后统计准点率与跨班率。
+</PracticeBox>
+
+## 接下来建议继续看什么
+
+1. `Code freeze and release candidate workflow`
+2. `Release branch workflow`
+3. `Post-release multi-branch backporting`
+
