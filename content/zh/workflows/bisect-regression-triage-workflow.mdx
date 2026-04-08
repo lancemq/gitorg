@@ -1,0 +1,122 @@
+export const metadata = {
+  title: "回归问题 bisect 排查工作流",
+  slug: "bisect-regression-triage-workflow",
+  locale: "zh",
+  section: "workflows",
+  summary: "当出现“最近坏了但不知道谁改坏的”问题时，用 git bisect 通过二分定位首个坏提交，显著缩短排查路径。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-bisect",
+    "https://git-scm.com/docs/git-rev-list",
+    "https://git-scm.com/docs/git-show",
+  ],
+};
+
+# 回归问题 bisect 排查工作流
+
+很多线上回归最耗时的部分，不是修复，而是“到底是哪次提交引入的”。`git bisect` 的价值是把线性猜测改成对数级定位。
+
+<CommandFlowFigure
+  title="bisect 的定位路径"
+  caption="在已知 good 与 bad 的边界内二分查找，每轮只判断当前提交是否复现问题，直到收敛到首个坏提交。"
+  inputsLabel="输入"
+  inputs="一个确认可复现的 bad 状态|一个确认正常的 good 状态|可重复执行的验证步骤"
+  commandLabel="bisect start → test midpoint → mark good/bad"
+  outputsLabel="输出"
+  outputs="首个引入回归的提交|清晰复盘线索|更快修复决策"
+  note="最关键前提是：验证步骤必须稳定可重复。"
+/>
+
+## 什么时候应该启动 bisect
+
+- 回归已经确认存在，但提交跨度太大
+- 手工翻日志效率低，且没有直接嫌疑人
+- 你能定义一个“这次测试算好还是坏”的判定
+
+## 启动前准备
+
+1. 先在本地稳定复现问题
+2. 找到一个明确 `good` 提交和一个明确 `bad` 提交
+3. 准备一个可重复脚本（测试命令或最小复现步骤）
+
+## 基本流程
+
+```bash
+git bisect start
+git bisect bad
+git bisect good <good-commit>
+```
+
+每次 bisect 停在中点后，执行验证：
+
+```bash
+# 例如
+npm test -- login-regression
+```
+
+根据结果标记：
+
+```bash
+git bisect bad
+# 或
+git bisect good
+```
+
+收敛后查看定位结果：
+
+```bash
+git show
+git bisect reset
+```
+
+## 自动化 bisect（推荐）
+
+如果验证命令可脚本化，优先用：
+
+```bash
+git bisect start <bad-commit> <good-commit>
+git bisect run ./scripts/repro-check.sh
+```
+
+这样可减少人工判断噪声，并把排查过程沉淀成可复用资产。
+
+## 与修复流程怎么衔接
+
+定位到首个坏提交后，通常有三条路径：
+
+1. 在当前主线补丁修复
+2. 回滚坏提交（如果影响面可控）
+3. 局部关闭相关特性（feature flag）
+
+不要把 bisect 当成“修复动作”，它是“定位动作”。
+
+<WarningBox title="不要在不稳定测试上直接跑 bisect">
+  如果验证步骤本身时好时坏，bisect 会被噪声污染，最终结果不可信。先把复现条件收敛，再开始二分。
+</WarningBox>
+
+## 常见误区
+
+### 误区 1：good 和 bad 边界模糊
+
+边界不清晰会导致整个二分路径失真。
+
+### 误区 2：定位后忘记 `git bisect reset`
+
+这会让你停留在中间提交状态，后续操作容易混乱。
+
+### 误区 3：定位到提交就直接责备作者
+
+提交作者不等于问题根因。应结合上下游依赖和运行环境复盘。
+
+<PracticeBox title="为一个真实回归制作 bisect 清单">
+  1. 写下 bad 现象和最小复现步骤。
+  2. 指定一个可确认 good 的历史点。
+  3. 把验证步骤脚本化，确保可重复运行。
+  4. 排查结束后记录“首个坏提交 + 修复策略”。
+</PracticeBox>
+
+## 接下来建议继续看什么
+
+1. `git-bisect`
+2. `Hotfix and urgent fixes`
+3. `Recover after reset`
+

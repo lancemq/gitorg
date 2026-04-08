@@ -1,0 +1,113 @@
+export const metadata = {
+  title: "Stacked Pull Requests 工作流",
+  slug: "stacked-pull-requests-workflow",
+  locale: "zh",
+  section: "workflows",
+  summary: "把一个大改动拆成有依赖关系的多层 PR，提升评审吞吐与可读性，同时降低一次性大 PR 的认知负担。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rebase",
+    "https://git-scm.com/docs/git-range-diff",
+    "https://git-scm.com/docs/git-cherry-pick",
+  ],
+};
+
+# Stacked Pull Requests 工作流
+
+Stacked PR 的思路是：把大改动按依赖链拆成多层小 PR，而不是提交一个超大 PR 让 reviewer 一次性消化。
+
+<CommandFlowFigure
+  title="Stacked PR 的结构"
+  caption="每一层 PR 都只关注一个明确目标。下层先合并后，上层自动变小，评审负担也随之下降。"
+  inputsLabel="输入"
+  inputs="大需求|可拆分依赖|统一分支命名"
+  commandLabel="base branch → stack branches → sequential merge"
+  outputsLabel="输出"
+  outputs="小而清晰的 PR|并行评审|更低返工成本"
+  note="Stacked PR 追求的是审查吞吐，而不是分支数量本身。"
+/>
+
+## 适合什么场景
+
+- 功能体量大，但可切成若干有序子任务
+- 团队 review 资源紧张，单个超大 PR 常被长时间阻塞
+- 你希望尽早让底层改动落主线，减少上层冲突
+
+## 推荐拆分策略
+
+优先按“依赖层级”拆，而不是按文件目录硬切：
+
+1. 基础设施层（类型、接口、工具函数）
+2. 业务逻辑层（核心行为变更）
+3. 交互与文案层（UI 与细节修正）
+
+## 一个最小操作流程
+
+```bash
+git switch main
+git switch -c stack/auth-base
+# 提交基础层改动
+
+git switch -c stack/auth-service
+# 在 auth-base 之上继续提交
+
+git switch -c stack/auth-ui
+# 在 auth-service 之上继续提交
+```
+
+此时可以创建三层 PR，并标注依赖关系。
+
+## 维护 stack 的关键动作
+
+当底层分支更新后，上层应及时 rebase：
+
+```bash
+git switch stack/auth-service
+git rebase stack/auth-base
+
+git switch stack/auth-ui
+git rebase stack/auth-service
+```
+
+合并前可用 `git range-diff` 检查“和上一版相比到底改了什么”：
+
+```bash
+git range-diff origin/main...stack/auth-service@{1} origin/main...stack/auth-service
+```
+
+## 评审协作建议
+
+- 每层 PR 都写清楚“依赖哪一层、预计先后顺序”
+- reviewer 先看最底层，再看上层
+- 上层 PR 描述中只强调新增差异，不重复底层解释
+
+<WarningBox title="不要把 stacked PR 变成“多层复制粘贴”">
+  如果每层 PR 的差异边界不清楚，stack 只会让复杂度分散到多个页面。拆分前先定义每层的单一职责，比盲目切分更重要。
+</WarningBox>
+
+## 常见误区
+
+### 误区 1：层数越多越专业
+
+层数过多会增加维护成本。通常 2 到 5 层更稳。
+
+### 误区 2：上层可以长期不跟底层同步
+
+底层一旦变化，上层越晚同步，最终冲突越大。
+
+### 误区 3：合并顺序随意
+
+Stacked PR 必须遵循依赖顺序，否则会出现基底缺失或重复变更。
+
+<PracticeBox title="把一个大 PR 改写成 3 层 stack">
+  1. 选一个最近的大 PR，标出“基础层/逻辑层/界面层”。
+  2. 为每层写一句“这一层独立价值是什么”。
+  3. 检查每层是否都能单独通过 CI。
+  4. 用 `range-diff` 验证每层变更边界是否清楚。
+</PracticeBox>
+
+## 接下来建议继续看什么
+
+1. `Prepare commits before pull request`
+2. `Small batch review`
+3. `git-range-diff`
+

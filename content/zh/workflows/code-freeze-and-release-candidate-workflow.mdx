@@ -1,0 +1,121 @@
+export const metadata = {
+  title: "Code Freeze 与 Release Candidate 工作流",
+  slug: "code-freeze-and-release-candidate-workflow",
+  locale: "zh",
+  section: "workflows",
+  summary: "在发布前通过代码冻结与 RC 候选流程收敛变更范围，让问题暴露在发布前而不是发布后。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-branch",
+    "https://git-scm.com/docs/git-tag",
+    "https://git-scm.com/docs/git-revert",
+    "https://git-scm.com/docs/git-cherry-pick",
+  ],
+};
+
+# Code Freeze 与 Release Candidate 工作流
+
+“代码冻结”不是让团队停工，而是限制进入候选发布线的变更类型；“RC”不是最终版，而是可验证的发布候选快照。
+
+<CommandFlowFigure
+  title="Freeze + RC 的发布收敛路径"
+  caption="先切候选分支并打 RC 标签，冻结后只接收高优先级修复。每轮验证失败都形成新的 RC 版本，直到满足发布门槛。"
+  inputsLabel="输入"
+  inputs="发布范围|质量门禁|回滚策略"
+  commandLabel="cut release branch → tag rc → accept only fixes"
+  outputsLabel="输出"
+  outputs="可审计候选版本|问题收敛路径|更稳的正式发布"
+  note="这个流程的核心是“变更收敛”，不是“无限追加修复”。"
+/>
+
+## 这个流程解决什么问题
+
+没有 freeze 约束时，发布前最后几天常见现象是：
+
+- 新功能仍持续进入，验证范围不断变化
+- 同一个问题难以判断是旧缺陷还是新引入
+- 发布日期被反复拖延且原因不透明
+
+Freeze + RC 的目标是让变更边界稳定下来。
+
+## 推荐步骤
+
+### 1. 从主线切发布候选分支
+
+```bash
+git fetch origin
+git switch main
+git pull --ff-only origin main
+git switch -c release/2026-04
+```
+
+### 2. 打第一个 RC 标签
+
+```bash
+git tag -a v2026.04.0-rc1 -m "Release candidate 1"
+git push origin release/2026-04 --tags
+```
+
+### 3. 冻结变更类型
+
+冻结期通常只允许：
+
+- 阻断级 bug 修复
+- 发布必需配置修正
+- 合规/安全紧急项
+
+其他改动留到下个迭代。
+
+### 4. 问题修复后形成新 RC
+
+```bash
+git switch release/2026-04
+# 合并或 cherry-pick 修复
+git tag -a v2026.04.0-rc2 -m "Release candidate 2"
+git push origin release/2026-04 --tags
+```
+
+### 5. 达到门槛后发布正式版
+
+```bash
+git tag -a v2026.04.0 -m "Release 2026.04.0"
+git push origin v2026.04.0
+```
+
+## 修复进入 RC 的两种常见方式
+
+1. 在 release 分支直接提交修复（紧急、局部变更）
+2. 在独立 hotfix 分支修复后 `cherry-pick` 回 release
+
+关键不是方式本身，而是保证每个进入 RC 的修复都可追踪、可解释。
+
+<WarningBox title="冻结期最危险的是“顺手带入非必要改动”">
+  一次看似无害的额外优化，会扩大验证面并引入新变量。冻结期要优先保护发布确定性，而不是追求“顺便一起做完”。
+</WarningBox>
+
+## 常见误区
+
+### 误区 1：把 freeze 理解为“任何代码都不能改”
+
+冻结的是“进入候选发布线的范围”，不是团队开发活动本身。
+
+### 误区 2：RC 失败后直接覆盖旧标签
+
+应创建新的 RC 标签，保留完整验证轨迹。
+
+### 误区 3：fix 只在 release 分支做，不回主线
+
+这会导致主线与发布线长期漂移。修复最终应回补主线。
+
+<PracticeBox title="为下一次发布准备 freeze 清单">
+  1. 写出 freeze 期间允许进入的变更类型。
+  2. 定义 RC 通过门槛（测试、性能、风险项）。
+  3. 约定 RC 标签命名规范。
+  4. 明确修复回补主线的责任人和时点。
+</PracticeBox>
+
+## 接下来建议继续看什么
+
+1. `Release branch workflow`
+2. `Hotfix and urgent fixes`
+3. `Post-release multi-branch backporting`
+

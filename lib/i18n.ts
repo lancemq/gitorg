@@ -108,7 +108,11 @@ export type WorkflowSlug =
   | "squash-vs-rebase-merge"
   | "long-lived-branch-maintenance"
   | "long-lived-branch-conflict-governance"
-  | "submodule-update-flow";
+  | "submodule-update-flow"
+  | "trunk-based-development-workflow"
+  | "stacked-pull-requests-workflow"
+  | "bisect-regression-triage-workflow"
+  | "code-freeze-and-release-candidate-workflow";
 
 export type GithubSlug =
   | "github-flow-basics"
@@ -683,6 +687,10 @@ export const workflowSlugs = [
   "long-lived-branch-maintenance",
   "long-lived-branch-conflict-governance",
   "submodule-update-flow",
+  "trunk-based-development-workflow",
+  "stacked-pull-requests-workflow",
+  "bisect-regression-triage-workflow",
+  "code-freeze-and-release-candidate-workflow",
 ] as const satisfies readonly WorkflowSlug[];
 
 export const recoverySlugs = [

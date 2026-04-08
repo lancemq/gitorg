@@ -1,0 +1,124 @@
+export const metadata = {
+  title: "Trunk-Based Development 工作流",
+  slug: "trunk-based-development-workflow",
+  locale: "zh",
+  section: "workflows",
+  summary: "用短生命周期分支和高频小批次合并，把主线始终保持在可发布状态，降低长期分叉与集成冲突成本。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows",
+    "https://git-scm.com/docs/git-rebase",
+    "https://git-scm.com/docs/git-merge",
+    "https://git-scm.com/docs/git-worktree",
+  ],
+};
+
+# Trunk-Based Development 工作流
+
+Trunk-based development（TBD）的核心，不是“禁止分支”，而是把分支寿命压到足够短，让主线始终可集成、可回滚、可发布。
+
+<CommandFlowFigure
+  title="TBD 的最小闭环"
+  caption="从主线切短分支，快速完成小批次改动，尽快回到主线并验证。重点是缩短分叉时间，而不是追求单次改动很大。"
+  inputsLabel="起点"
+  inputs="main 保持绿色|小范围任务|明确回滚方案"
+  commandLabel="branch → small commits → rebase/merge main → PR/merge"
+  outputsLabel="结果"
+  outputs="主线持续可发布|冲突窗口变小|回归定位更快"
+  note="TBD 的价值来自节奏管理：短分支、高频同步、小批次合并。"
+/>
+
+## 这个工作流解决什么问题
+
+当团队长期使用大分支时，常见问题是：
+
+- 分支在外漂移太久，回归主线时冲突爆炸
+- CI 通过只是“分支内通过”，不代表主线仍稳定
+- 一次合并包含太多语义变化，回滚和定位都困难
+
+TBD 的目标是把这些风险前置并分散。
+
+## 什么时候适合用 TBD
+
+- 团队每天都有多人并发改动同一代码库
+- 希望主线随时可以发布，而不是到发布周才集成
+- 愿意把大需求拆成可独立合并的小步
+
+如果团队仍依赖“长时间封闭开发后统一大合并”，TBD 的收益会打折扣。
+
+## 推荐操作节奏
+
+### 1. 从最新主线切短分支
+
+```bash
+git fetch origin
+git switch main
+git pull --ff-only origin main
+git switch -c feature/login-copy-tuning
+```
+
+### 2. 以小批次提交推进
+
+```bash
+git add -p
+git commit -m "tune login copy tone"
+```
+
+每个提交尽量保持“可解释、可回滚、可审查”。
+
+### 3. 合并前先同步主线
+
+```bash
+git fetch origin
+git rebase origin/main
+```
+
+如果团队禁止 rebase 个人分支，也可以在 PR 中由平台执行更新基底。
+
+### 4. 快速审查并合并
+
+关键是减少“等待合并窗口”的时间，而不是让分支挂几天后再一次性进主线。
+
+## 与 GitFlow 的关键区别
+
+- GitFlow 强调多条长期分支（develop/release/hotfix）
+- TBD 强调主线唯一、分支短命、快速回主线
+
+两者不是谁绝对更好，而是适配不同组织节奏。TBD 更适合高频集成场景。
+
+<WarningBox title="不要把 TBD 理解成“直接在 main 上裸改”">
+  TBD 不是取消边界，而是压缩边界周期。你仍然需要代码审查、CI 和发布门禁，只是把每次改动变小、变快、变清晰。
+</WarningBox>
+
+## 团队落地时最容易忽略的 3 件事
+
+1. 没有把需求切小，导致“短分支”只是口号
+2. CI 太慢，合并反馈滞后，分支仍会堆积
+3. 回滚策略不清晰，主线变更虽快但不可控
+
+## 常见误区
+
+### 误区 1：分支短就等于质量高
+
+分支短只是降低集成摩擦，质量仍取决于测试与审查门禁。
+
+### 误区 2：所有改动都要一天内合并
+
+复杂改动可以分阶段合并，通过 feature flag 或逐步启用控制风险。
+
+### 误区 3：TBD 不需要 release 策略
+
+恰恰相反。越高频合并，越需要清晰的版本、回滚和观察指标。
+
+<PracticeBox title="把一个大需求改写成 TBD 形态">
+  1. 列出一个你们最近做过的大需求。
+  2. 把它拆成 3 到 6 个可独立合并的小批次。
+  3. 为每个批次写出“最小可回滚单元”。
+  4. 检查是否每个批次都能在主线独立通过 CI。
+</PracticeBox>
+
+## 接下来建议继续看什么
+
+1. `Feature branch collaboration`
+2. `Sync before review`
+3. `Merge queue workflow`
+

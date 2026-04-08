@@ -1,0 +1,122 @@
+export const metadata = {
+  title: "Bisect Regression Triage Workflow",
+  slug: "bisect-regression-triage-workflow",
+  locale: "en",
+  section: "workflows",
+  summary: "When something recently broke but ownership is unclear, use git bisect to isolate the first bad commit quickly and reproducibly.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-bisect",
+    "https://git-scm.com/docs/git-rev-list",
+    "https://git-scm.com/docs/git-show",
+  ],
+};
+
+# Bisect Regression Triage Workflow
+
+For many regressions, the longest phase is not fixing but identifying which commit introduced the break. `git bisect` replaces linear guessing with logarithmic narrowing.
+
+<CommandFlowFigure
+  title="The bisect narrowing path"
+  caption="Start with one known good and one known bad point, test midpoint commits, and classify each result until convergence on the first bad commit."
+  inputsLabel="Inputs"
+  inputs="reproducible bad state|verified good state|repeatable test check"
+  commandLabel="bisect start → test midpoint → mark good/bad"
+  outputsLabel="Outputs"
+  outputs="first bad commit|clean root-cause trail|faster repair decisions"
+  note="The critical requirement is stable reproducibility."
+/>
+
+## When to start bisect
+
+- the regression is confirmed but commit range is wide
+- manual log scanning is too slow or inconclusive
+- you can define a clear pass/fail check for each midpoint
+
+## Setup checklist before running
+
+1. Reproduce the issue reliably on your machine or CI.
+2. Identify one known `good` commit and one known `bad` commit.
+3. Prepare a repeatable verification command.
+
+## Core sequence
+
+```bash
+git bisect start
+git bisect bad
+git bisect good <good-commit>
+```
+
+At each midpoint, run your verification:
+
+```bash
+# example
+npm test -- login-regression
+```
+
+Then classify:
+
+```bash
+git bisect bad
+# or
+git bisect good
+```
+
+Once converged:
+
+```bash
+git show
+git bisect reset
+```
+
+## Prefer automated bisect when possible
+
+If your check is scriptable:
+
+```bash
+git bisect start <bad-commit> <good-commit>
+git bisect run ./scripts/repro-check.sh
+```
+
+Automation removes human inconsistency and turns triage into reusable infrastructure.
+
+## Handoff from triage to fix
+
+After isolating the first bad commit, you usually choose among:
+
+1. patch-forward on main
+2. revert the offending change (if impact is bounded)
+3. disable behavior temporarily with a feature flag
+
+Bisect is a localization tool, not a repair command.
+
+<WarningBox title="Do not run bisect on flaky tests without stabilization first">
+  If your pass/fail signal is noisy, bisect output is unreliable. Stabilize reproduction criteria first, then run binary search.
+</WarningBox>
+
+## Common mistakes
+
+### Mistake 1: weak good/bad boundaries
+
+Ambiguous boundaries distort the whole search path.
+
+### Mistake 2: forgetting `git bisect reset`
+
+You can remain on an intermediate commit state and accidentally continue unrelated work there.
+
+### Mistake 3: treating the first bad author as the whole root cause
+
+The introducing commit is evidence, not always full causality. Review dependency and context.
+
+<PracticeBox title="Create a bisect checklist for your next regression">
+  1. Write the bad symptom and minimal reproduction path.
+  2. Record a verified good historical point.
+  3. Script the verification check.
+  4. Capture first bad commit plus chosen remediation path.
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `git-bisect`
+2. `Hotfix and urgent fixes`
+3. `Recover after reset`
+

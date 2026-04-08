@@ -1,0 +1,121 @@
+export const metadata = {
+  title: "Code Freeze and Release Candidate Workflow",
+  slug: "code-freeze-and-release-candidate-workflow",
+  locale: "en",
+  section: "workflows",
+  summary: "Use freeze boundaries and release-candidate iterations to stabilize release scope and expose risk before production rollout.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-branch",
+    "https://git-scm.com/docs/git-tag",
+    "https://git-scm.com/docs/git-revert",
+    "https://git-scm.com/docs/git-cherry-pick",
+  ],
+};
+
+# Code Freeze and Release Candidate Workflow
+
+A code freeze is not “stop all coding.” It means restricting what can enter the release line. An RC is not final release; it is a testable candidate snapshot.
+
+<CommandFlowFigure
+  title="Freeze + RC convergence path"
+  caption="Cut a release branch, tag RC builds, and admit only high-priority fixes. Each failed validation round produces a new RC until release gates are met."
+  inputsLabel="Inputs"
+  inputs="release scope|quality gates|rollback policy"
+  commandLabel="cut release branch → tag rc → accept only fixes"
+  outputsLabel="Outputs"
+  outputs="auditable candidate versions|clear defect-convergence path|safer production release"
+  note="The core objective is scope convergence, not endless patch accumulation."
+/>
+
+## What this workflow solves
+
+Without freeze boundaries, teams often face:
+
+- moving release scope during final validation
+- unclear defect attribution because baseline keeps changing
+- repeated date slips with poor visibility
+
+Freeze + RC creates a stable target surface for release verification.
+
+## Recommended sequence
+
+### 1. Cut release branch from current main
+
+```bash
+git fetch origin
+git switch main
+git pull --ff-only origin main
+git switch -c release/2026-04
+```
+
+### 2. Tag the first RC
+
+```bash
+git tag -a v2026.04.0-rc1 -m "Release candidate 1"
+git push origin release/2026-04 --tags
+```
+
+### 3. Freeze admitted change types
+
+Typical freeze-window admissions:
+
+- blocker bug fixes
+- mandatory release configuration fixes
+- urgent security or compliance items
+
+Everything else waits for the next iteration.
+
+### 4. Produce new RC tags after each fix round
+
+```bash
+git switch release/2026-04
+# merge or cherry-pick approved fixes
+git tag -a v2026.04.0-rc2 -m "Release candidate 2"
+git push origin release/2026-04 --tags
+```
+
+### 5. Publish final release tag after gates pass
+
+```bash
+git tag -a v2026.04.0 -m "Release 2026.04.0"
+git push origin v2026.04.0
+```
+
+## Two common ways to move fixes into RC
+
+1. commit directly on release branch (small urgent fix)
+2. fix on dedicated hotfix branch, then `cherry-pick` into release
+
+Either is fine when every admitted fix remains traceable and intentional.
+
+<WarningBox title="Freeze windows fail when teams sneak in non-essential changes">
+  “Since we are here, let’s include this small improvement too” is a classic release destabilizer. Freeze periods prioritize predictability over opportunistic scope growth.
+</WarningBox>
+
+## Common mistakes
+
+### Mistake 1: interpreting freeze as zero engineering activity
+
+Freeze limits release-line intake, not all ongoing development.
+
+### Mistake 2: overwriting old RC tags
+
+Create new RC tags per iteration to preserve verification history.
+
+### Mistake 3: fixing only on release line and never backporting to main
+
+That creates long-term divergence between release and trunk.
+
+<PracticeBox title="Prepare a freeze checklist for your next release">
+  1. Define admitted change categories during freeze.
+  2. Define pass gates for each RC round.
+  3. Standardize RC tag naming.
+  4. Assign ownership for backporting release fixes to main.
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `Release branch workflow`
+2. `Hotfix and urgent fixes`
+3. `Post-release multi-branch backporting`
+

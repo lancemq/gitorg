@@ -152,6 +152,10 @@ export const docPathRegistry = [
   "workflows/long-lived-branch-maintenance",
   "workflows/long-lived-branch-conflict-governance",
   "workflows/submodule-update-flow",
+  "workflows/trunk-based-development-workflow",
+  "workflows/stacked-pull-requests-workflow",
+  "workflows/bisect-regression-triage-workflow",
+  "workflows/code-freeze-and-release-candidate-workflow",
   "github/github-flow-basics",
   "github/pull-requests-and-reviews",
   "github/forks-and-open-source-contribution",
@@ -297,6 +301,14 @@ const contentModules = {
     "workflows/long-lived-branch-maintenance": () => import("@/content/zh/workflows/long-lived-branch-maintenance.mdx"),
     "workflows/long-lived-branch-conflict-governance": () => import("@/content/zh/workflows/long-lived-branch-conflict-governance.mdx"),
     "workflows/submodule-update-flow": () => import("@/content/zh/workflows/submodule-update-flow.mdx"),
+    "workflows/trunk-based-development-workflow": () =>
+      import("@/content/zh/workflows/trunk-based-development-workflow.mdx"),
+    "workflows/stacked-pull-requests-workflow": () =>
+      import("@/content/zh/workflows/stacked-pull-requests-workflow.mdx"),
+    "workflows/bisect-regression-triage-workflow": () =>
+      import("@/content/zh/workflows/bisect-regression-triage-workflow.mdx"),
+    "workflows/code-freeze-and-release-candidate-workflow": () =>
+      import("@/content/zh/workflows/code-freeze-and-release-candidate-workflow.mdx"),
     "github/github-flow-basics": () => import("@/content/zh/github/github-flow-basics.mdx"),
     "github/pull-requests-and-reviews": () => import("@/content/zh/github/pull-requests-and-reviews.mdx"),
     "github/forks-and-open-source-contribution": () =>
@@ -449,6 +461,14 @@ const contentModules = {
     "workflows/long-lived-branch-maintenance": () => import("@/content/en/workflows/long-lived-branch-maintenance.mdx"),
     "workflows/long-lived-branch-conflict-governance": () => import("@/content/en/workflows/long-lived-branch-conflict-governance.mdx"),
     "workflows/submodule-update-flow": () => import("@/content/en/workflows/submodule-update-flow.mdx"),
+    "workflows/trunk-based-development-workflow": () =>
+      import("@/content/en/workflows/trunk-based-development-workflow.mdx"),
+    "workflows/stacked-pull-requests-workflow": () =>
+      import("@/content/en/workflows/stacked-pull-requests-workflow.mdx"),
+    "workflows/bisect-regression-triage-workflow": () =>
+      import("@/content/en/workflows/bisect-regression-triage-workflow.mdx"),
+    "workflows/code-freeze-and-release-candidate-workflow": () =>
+      import("@/content/en/workflows/code-freeze-and-release-candidate-workflow.mdx"),
     "github/github-flow-basics": () => import("@/content/en/github/github-flow-basics.mdx"),
     "github/pull-requests-and-reviews": () => import("@/content/en/github/pull-requests-and-reviews.mdx"),
     "github/forks-and-open-source-contribution": () =>
@@ -617,6 +637,10 @@ const recommendedDocPaths = new Set<DocPath>([
   "workflows/backport-with-cherry-pick",
   "workflows/shared-branch-sync-boundaries",
   "workflows/submodule-update-flow",
+  "workflows/trunk-based-development-workflow",
+  "workflows/stacked-pull-requests-workflow",
+  "workflows/bisect-regression-triage-workflow",
+  "workflows/code-freeze-and-release-candidate-workflow",
   "github/github-flow-basics",
   "github/pull-requests-and-reviews",
   "gitlab/gitlab-flow-and-merge-requests",
@@ -1298,6 +1322,26 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
     "commands/git-sparse-checkout",
     "commands/git-worktree",
     "workflows/submodule-update-flow",
+  ],
+  "workflows/trunk-based-development-workflow": [
+    "workflows/feature-branch-collaboration",
+    "workflows/sync-before-review",
+    "workflows/merge-queue-workflow",
+  ],
+  "workflows/stacked-pull-requests-workflow": [
+    "commands/git-range-diff",
+    "commands/git-rebase",
+    "workflows/prepare-commits-before-pull-request",
+  ],
+  "workflows/bisect-regression-triage-workflow": [
+    "commands/git-bisect",
+    "commands/git-rev-list",
+    "workflows/hotfix-and-urgent-fixes",
+  ],
+  "workflows/code-freeze-and-release-candidate-workflow": [
+    "workflows/release-branch-workflow",
+    "workflows/hotfix-and-urgent-fixes",
+    "commands/git-tag",
   ],
   "workflows/rerere-for-recurring-conflicts": [
     "commands/git-rebase",
