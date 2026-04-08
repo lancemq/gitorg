@@ -1,0 +1,47 @@
+export const metadata = {
+  title: "Hooks and policy enforcement",
+  slug: "hooks-and-policy-enforcement",
+  locale: "en",
+  section: "internals",
+  summary: "Use local and server-side hooks with clear responsibility boundaries to turn collaboration policy from convention into enforcement.",
+  sourceUrls: [
+    "https://git-scm.com/docs/githooks",
+    "https://git-scm.com/docs/git-commit",
+    "https://git-scm.com/docs/git-push",
+  ],
+};
+
+# Hooks and policy enforcement
+
+Git hooks let teams attach automation and policy checks to commit and push lifecycle events.
+
+## Two hook classes
+
+- local hooks: execute on developer machines
+- server hooks: execute when remote receives pushes
+
+## Responsibility split
+
+- local hooks for fast feedback (formatting, quick lint)
+- server hooks for mandatory governance (branch rules, policy gates)
+
+## Common enforcement targets
+
+1. commit-message policy
+2. protected-branch direct-push restrictions
+3. required issue/change-ticket reference
+
+## Practical rule
+
+Put advisory checks locally and mandatory checks server-side.
+
+<WarningBox title="Local-only hooks cannot guarantee team policy">
+  Local hooks can be skipped or inconsistent. Critical controls must be enforced centrally.
+</WarningBox>
+
+## Good follow-up reads
+
+1. `review and safe push`
+2. `commit message conventions`
+3. `pr merge strategy and platform settings`
+

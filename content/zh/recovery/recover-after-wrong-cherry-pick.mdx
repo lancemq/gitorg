@@ -1,0 +1,64 @@
+export const metadata = {
+  title: "cherry-pick 挑错提交后的恢复",
+  slug: "recover-after-wrong-cherry-pick",
+  locale: "zh",
+  section: "recovery",
+  summary: "当 cherry-pick 了错误提交或错误顺序后，根据是否已共享分支历史，选择 reset、revert 或重建补丁链恢复正确状态。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-cherry-pick",
+    "https://git-scm.com/docs/git-reset",
+    "https://git-scm.com/docs/git-revert",
+  ],
+};
+
+# cherry-pick 挑错提交后的恢复
+
+挑错提交后第一步不是立刻“撤销”，而是先判断这段历史是否已经推送给别人。
+
+## 决策边界
+
+- 未共享：通常可以用 `reset` 回到 pick 前
+- 已共享：优先 `revert` 保持公共历史可解释
+
+## 快速定位 pick 前位置
+
+```bash
+git reflog
+```
+
+找到 cherry-pick 前的位置后先建救援分支：
+
+```bash
+git switch -c rescue/pre-wrong-pick HEAD@{2}
+```
+
+## 两种典型恢复路径
+
+### 未共享分支
+
+```bash
+git reset --hard HEAD@{2}
+```
+
+### 已共享分支
+
+```bash
+git revert <wrong-picked-commit>
+```
+
+然后再按正确顺序重新 cherry-pick。
+
+## 处理“顺序错但提交都要”场景
+
+这类问题建议在临时分支重排顺序并验证后，再合并回主线，避免在主线上反复改写。
+
+<WarningBox title="公共分支别用 hard reset 纠错">
+  共享历史上的 reset 会把问题转移给协作者。对公共分支，revert 通常更安全也更可审计。
+</WarningBox>
+
+## 接下来建议继续看什么
+
+1. `recover after reset`
+2. `assess force-push impact`
+3. `git-cherry-pick`
+

@@ -1,0 +1,55 @@
+export const metadata = {
+  title: "Recover after a wrong cherry-pick",
+  slug: "recover-after-wrong-cherry-pick",
+  locale: "en",
+  section: "recovery",
+  summary: "If the wrong commit was cherry-picked, choose reset or revert based on whether the history is already shared, then replay the correct patch sequence.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-cherry-pick",
+    "https://git-scm.com/docs/git-reset",
+    "https://git-scm.com/docs/git-revert",
+  ],
+};
+
+# Recover after a wrong cherry-pick
+
+The critical decision is whether the picked commit is already shared.
+
+## Decision boundary
+
+- private/local only: reset is often acceptable
+- shared/public branch: prefer revert for traceable correction
+
+## Locate pre-pick state
+
+```bash
+git reflog
+git switch -c rescue/pre-wrong-pick HEAD@{2}
+```
+
+## Typical recovery paths
+
+### Unshared branch
+
+```bash
+git reset --hard HEAD@{2}
+```
+
+### Shared branch
+
+```bash
+git revert <wrong-picked-commit>
+```
+
+Then cherry-pick the correct commit(s) in the intended order.
+
+<WarningBox title="Avoid hard reset on shared branches">
+  Reset on public history shifts synchronization pain to collaborators. Revert is usually safer in team contexts.
+</WarningBox>
+
+## Good follow-up reads
+
+1. `recover after reset`
+2. `assess force-push impact`
+3. `git-cherry-pick`
+

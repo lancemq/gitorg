@@ -1,0 +1,81 @@
+export const metadata = {
+  title: "API 版本变更工作流",
+  slug: "api-versioning-change-workflow",
+  locale: "zh",
+  section: "workflows",
+  summary: "对外 API 发生破坏性变更时，通过并行版本、弃用窗口和迁移治理降低客户端升级成本与兼容事故。",
+  sourceUrls: [
+    "https://martinfowler.com/articles/enterpriseREST.html",
+    "https://opensource.zalando.com/restful-api-guidelines/#must-use-semantic-versioning",
+    "https://git-scm.com/docs/git-tag",
+  ],
+};
+
+# API 版本变更工作流
+
+API 版本治理的难点，不在“能不能发布 v2”，而在“如何让旧客户端在可控成本下完成迁移”。
+
+<CommandFlowFigure
+  title="破坏性变更的迁移路径"
+  caption="先发布新版本并保持旧版本可用，给出迁移窗口和监控，再按计划下线旧版本。"
+  inputsLabel="输入"
+  inputs="破坏性变更需求|客户端清单|弃用策略"
+  commandLabel="introduce v2 → migrate clients → deprecate v1"
+  outputsLabel="输出"
+  outputs="兼容风险降低|迁移节奏清晰|下线可执行"
+  note="版本策略的核心是治理节奏，不是 URL 命名。"
+/>
+
+## 推荐步骤
+
+### 1. 明确哪些变更属于破坏性
+
+例如字段语义变化、默认行为变化、认证方式变化。
+
+### 2. 发布并行版本
+
+在迁移窗口内同时支持旧版和新版接口。
+
+### 3. 公布迁移文档与截止日期
+
+至少包括差异说明、示例请求、错误码变更和时间计划。
+
+### 4. 监控客户端迁移进度
+
+按调用量、错误率和客户端版本维度跟踪。
+
+### 5. 到期下线旧版本
+
+下线前应完成通知、预演和应急回开方案。
+
+<WarningBox title="没有迁移窗口的破坏性升级会直接外溢为生产事故">
+  即使接口设计正确，如果客户端升级节奏不可控，强制切换仍会触发大面积失败。版本治理必须包含沟通和窗口管理。
+</WarningBox>
+
+## 常见误区
+
+### 误区 1：版本号有了就算治理完成
+
+没有迁移计划和观测数据，版本号只是标签。
+
+### 误区 2：所有客户端都能同步升级
+
+真实环境中客户端升级速度差异很大。
+
+### 误区 3：旧版本永不下线
+
+会造成长期维护负担与安全风险叠加。
+
+<PracticeBox title="为一次 API 破坏性变更写迁移计划">
+  1. 列出破坏性差异点。
+  2. 设定迁移窗口起止日期。
+  3. 定义迁移进度监控看板字段。
+  4. 写明旧版下线与紧急回开策略。
+</PracticeBox>
+
+## 接下来建议继续看什么
+
+1. `Cross-repository integration workflow`
+2. `Release train workflow`
+3. `Feature flag rollout workflow`
+

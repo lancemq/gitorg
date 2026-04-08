@@ -1,0 +1,64 @@
+export const metadata = {
+  title: "误合并分支后的恢复",
+  slug: "recover-after-accidental-merge",
+  locale: "zh",
+  section: "recovery",
+  summary: "当错误地 merge 了不该合并的分支时，先识别 merge 是否已共享，再选择 reset 或 revert -m 安全撤销。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-merge",
+    "https://git-scm.com/docs/git-revert",
+    "https://git-scm.com/docs/git-reset",
+  ],
+};
+
+# 误合并分支后的恢复
+
+误 merge 最容易出问题的点是：不知道该用 `reset` 还是 `revert -m`。
+
+## 关键判断
+
+1. 这个 merge commit 是否已推送共享？
+2. 是否有人基于它继续开发？
+
+## merge 后第一轮检查
+
+```bash
+git log --oneline --graph --decorate -n 20
+git branch -vv
+git reflog
+```
+
+## 恢复方法
+
+### merge 未共享
+
+可以考虑回到 merge 前：
+
+```bash
+git reset --hard HEAD~1
+```
+
+### merge 已共享
+
+应优先创建反向提交：
+
+```bash
+git revert -m 1 <merge-commit>
+```
+
+`-m 1` 表示保留第一父分支视角。
+
+## 为什么不建议共享分支直接 reset
+
+因为 reset 会重写公共历史，协作者会遇到分叉和同步冲突，后续治理成本更高。
+
+<WarningBox title="先确认 parent，再执行 revert -m">
+  对 merge commit 使用 `revert -m` 前，要明确主线是哪一侧父提交。父选择错误会把不该撤销的内容撤掉。
+</WarningBox>
+
+## 接下来建议继续看什么
+
+1. `undo after pull`
+2. `assess force-push impact`
+3. `git-merge`
+

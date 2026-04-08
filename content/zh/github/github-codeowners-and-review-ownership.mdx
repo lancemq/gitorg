@@ -1,0 +1,36 @@
+export const metadata = {
+  title: "GitHub CODEOWNERS 与评审归属",
+  slug: "github-codeowners-and-review-ownership",
+  locale: "zh",
+  section: "github",
+  summary: "通过 CODEOWNERS 建立文件级评审归属，减少关键模块无人负责或评审漂移的问题。",
+  sourceUrls: [
+    "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners",
+    "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/code-review/about-pull-request-reviews",
+  ],
+};
+
+# GitHub CODEOWNERS 与评审归属
+
+CODEOWNERS 的核心价值不是“多一个审批步骤”，而是让关键路径改动自动路由到有责任的 reviewer。
+
+## 设计原则
+
+1. 按模块边界定义 owner，不按个人临时分工
+2. 避免单点 owner，关键模块至少双 owner
+3. 定期同步组织结构变化
+
+## 与分支保护联动
+
+当开启 “require review from code owners”，关键文件变更会自动触发 owner 审批门禁。
+
+<WarningBox title="CODEOWNERS 过细会导致评审拥堵">
+  规则颗粒度过小会让 PR 频繁触发大量 owner，反而降低吞吐。
+</WarningBox>
+
+## 接下来建议继续看什么
+
+1. `code review handoff quality`
+2. `small batch review`
+3. `github pull requests and reviews`
+

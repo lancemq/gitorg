@@ -1,0 +1,52 @@
+export const metadata = {
+  title: "rebase 内部机制与 sequencer",
+  slug: "rebase-internals-and-sequencer",
+  locale: "zh",
+  section: "internals",
+  summary: "从 sequencer 视角理解 rebase 的提交重放过程，帮助定位 rebase 中断、冲突恢复与历史重写后的提交变化。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rebase",
+    "https://git-scm.com/docs/git-cherry-pick",
+    "https://git-scm.com/docs/git-reflog",
+  ],
+};
+
+# rebase 内部机制与 sequencer
+
+rebase 本质上是“按顺序重放提交”，而 sequencer 是管理这条重放队列的执行器。
+
+## 它在做什么
+
+1. 计算待重放提交集合
+2. 按顺序把提交应用到新 base
+3. 遇冲突暂停，等待用户处理
+4. 继续直到队列结束
+
+## 为什么提交 ID 会变化
+
+因为 rebase 生成的是新提交对象，父指针和对象内容都可能变化。
+
+## `--continue / --skip / --abort` 的本质
+
+- `continue`：继续执行队列
+- `skip`：跳过当前提交
+- `abort`：丢弃队列执行结果，回到起点
+
+## 出错恢复思路
+
+先保住位置，再决定是否重来：
+
+```bash
+git reflog
+git switch -c rescue/pre-rebase HEAD@{n}
+```
+
+<WarningBox title="别在不确定状态下连续 skip">
+  连续跳过容易无意丢失关键补丁。每次 skip 前都应明确“这个提交为什么可跳过”。
+</WarningBox>
+
+## 接下来建议继续看什么
+
+1. `recover after rebase`
+2. `commit graph`
+3. `git-rebase`

@@ -1,0 +1,46 @@
+export const metadata = {
+  title: "发起第一个 Pull Request",
+  slug: "open-first-pull-request",
+  locale: "zh",
+  section: "learning-path",
+  summary: "从分支提交过渡到协作评审：整理改动范围、补齐说明信息、发起第一个可评审且可合并的 Pull Request。",
+  sourceUrls: [
+    "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests",
+    "https://git-scm.com/docs/git-push",
+  ],
+};
+
+# 发起第一个 Pull Request
+
+当你已经会在分支上提交，下一步就是把改动“交给团队审查并合并”。
+
+## 发起前最小检查
+
+1. 改动是否只围绕一件事
+2. 分支是否同步过最新主线
+3. 提交信息是否可读
+
+## 最小流程
+
+```bash
+git fetch origin
+git rebase origin/main
+git push -u origin feature/first-pr
+```
+
+然后在平台创建 PR，补齐：
+
+- 改动目的
+- 核心变更点
+- 风险与验证方式
+
+<WarningBox title="不要把“草稿代码”直接当 PR 交付">
+  PR 是协作接口，不只是代码上传入口。描述不完整会显著增加评审往返成本。
+</WarningBox>
+
+## 接下来建议继续学什么
+
+1. `handle review feedback`
+2. `pull request prep`
+3. `pull requests and reviews`
+

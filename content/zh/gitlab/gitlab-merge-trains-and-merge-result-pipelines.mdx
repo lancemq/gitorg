@@ -1,0 +1,37 @@
+export const metadata = {
+  title: "GitLab Merge Trains 与合并结果流水线",
+  slug: "gitlab-merge-trains-and-merge-result-pipelines",
+  locale: "zh",
+  section: "gitlab",
+  summary: "通过 Merge Trains 与 merge result pipelines 在合并前验证“真实合并结果”，降低并发 MR 导致的主线回归。",
+  sourceUrls: [
+    "https://docs.gitlab.com/ee/ci/pipelines/merge_trains/",
+    "https://docs.gitlab.com/ee/ci/pipelines/merged_results_pipelines.html",
+  ],
+};
+
+# GitLab Merge Trains 与合并结果流水线
+
+并发 MR 场景下，单个分支 CI 绿不代表“合入主线后仍绿”。Merge trains 的目标是验证“即将进入主线的真实组合”。
+
+## 两个关键组件
+
+- merge result pipeline：基于合并结果跑流水线
+- merge train：按队列顺序串联待合并 MR
+
+## 适用场景
+
+1. 主线并发合并频繁
+2. 基底变化导致 MR 反复重跑
+3. 主线稳定性优先级高
+
+<WarningBox title="队列只是调度器，不是质量替代">
+  若测试覆盖不足，merge train 也只能把风险按顺序送入主线。
+</WarningBox>
+
+## 接下来建议继续看什么
+
+1. `merge queue workflow`
+2. `gitlab ci and runners`
+3. `sync before review`
+

@@ -1,0 +1,45 @@
+export const metadata = {
+  title: "Rename detection and diff algorithms",
+  slug: "rename-detection-and-diff-algorithms",
+  locale: "en",
+  section: "internals",
+  summary: "Learn how Git infers renames and how diff algorithm choices affect review readability and change interpretation.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-diff",
+    "https://git-scm.com/docs/git-log",
+    "https://git-scm.com/docs/git-config",
+  ],
+};
+
+# Rename detection and diff algorithms
+
+Git objects do not store a built-in “rename event.” Rename is usually inferred during diff.
+
+## How rename detection works
+
+Git matches delete/add pairs by content similarity.
+
+## Why rename may appear as delete plus add
+
+- similarity score below threshold
+- file content changed too much
+- command/config options differ
+
+## Why diff algorithm choice matters
+
+Diff algorithm changes hunk shape and readability, which directly affects review effort.
+
+## Practical advice
+
+For large refactors, do pure-rename commits before logic edits to keep diffs understandable.
+
+<WarningBox title="Diff view is a comparison strategy, not object truth">
+  What you see in diff output depends on heuristics and options, not only on raw object storage.
+</WarningBox>
+
+## Good follow-up reads
+
+1. `tree objects and snapshots`
+2. `git-diff`
+3. `small batch review`
+

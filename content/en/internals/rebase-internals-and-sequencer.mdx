@@ -1,0 +1,53 @@
+export const metadata = {
+  title: "Rebase internals and the sequencer",
+  slug: "rebase-internals-and-sequencer",
+  locale: "en",
+  section: "internals",
+  summary: "Understand rebase as commit replay managed by the sequencer, making conflict handling and recovery decisions more predictable.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rebase",
+    "https://git-scm.com/docs/git-cherry-pick",
+    "https://git-scm.com/docs/git-reflog",
+  ],
+};
+
+# Rebase internals and the sequencer
+
+Rebase is ordered commit replay. The sequencer coordinates replay state and pause/resume behavior.
+
+## What the sequencer does
+
+1. computes replay set
+2. applies commits onto new base in order
+3. pauses on conflict
+4. resumes until queue is complete
+
+## Why commit IDs change
+
+Replayed commits are new objects with potentially different parents and metadata.
+
+## Meaning of `--continue`, `--skip`, `--abort`
+
+- `continue`: proceed with replay queue
+- `skip`: drop current queued commit
+- `abort`: discard replay and return to start point
+
+## Recovery-first pattern
+
+Before experimenting further:
+
+```bash
+git reflog
+git switch -c rescue/pre-rebase HEAD@{n}
+```
+
+<WarningBox title="Avoid repeated skip without explicit intent">
+  Skipping blindly can silently lose meaningful patches. Decide commit-by-commit why skip is safe.
+</WarningBox>
+
+## Good follow-up reads
+
+1. `recover after rebase`
+2. `commit graph`
+3. `git-rebase`
+

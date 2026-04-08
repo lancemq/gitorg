@@ -1,0 +1,43 @@
+export const metadata = {
+  title: "Three-way merge mechanics",
+  slug: "three-way-merge-mechanics",
+  locale: "en",
+  section: "internals",
+  summary: "Understand how Git computes merges from base, ours, and theirs so conflicts and merge outcomes are easier to reason about.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-merge",
+    "https://git-scm.com/docs/git-merge-base",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+  ],
+};
+
+# Three-way merge mechanics
+
+Git merge is a three-input computation: `base`, `ours`, and `theirs`.
+
+## Inputs
+
+- `base`: common ancestor from merge-base
+- `ours`: current branch tip
+- `theirs`: merged branch tip
+
+Git compares `base→ours` and `base→theirs`, then synthesizes result.
+
+## Why conflicts appear
+
+Conflicts occur when both sides changed overlapping regions and Git cannot choose semantics safely.
+
+## Practical takeaway
+
+To resolve conflicts well, inspect base context instead of only choosing ours/theirs blindly.
+
+<WarningBox title="Conflict markers are a decision point, not a parser failure">
+  A conflict means Git needs human intent where automatic reconciliation is ambiguous.
+</WarningBox>
+
+## Good follow-up reads
+
+1. `merge-base and ancestry`
+2. `git-merge`
+3. `rerere for recurring conflicts`
+

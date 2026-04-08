@@ -1,0 +1,56 @@
+export const metadata = {
+  title: "Recover after an accidental merge",
+  slug: "recover-after-accidental-merge",
+  locale: "en",
+  section: "recovery",
+  summary: "When the wrong branch was merged, decide between reset and revert -m based on sharing state, and undo the merge safely without damaging collaboration history.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-merge",
+    "https://git-scm.com/docs/git-revert",
+    "https://git-scm.com/docs/git-reset",
+  ],
+};
+
+# Recover after an accidental merge
+
+Most merge-recovery mistakes happen when teams use `reset` where `revert -m` is required.
+
+## Key checks
+
+1. Has the merge commit been pushed?
+2. Has anyone branched from it?
+
+## First inspection
+
+```bash
+git log --oneline --graph --decorate -n 20
+git branch -vv
+git reflog
+```
+
+## Recovery options
+
+### Merge not shared
+
+```bash
+git reset --hard HEAD~1
+```
+
+### Merge already shared
+
+```bash
+git revert -m 1 <merge-commit>
+```
+
+`-m 1` keeps the first-parent perspective.
+
+<WarningBox title="Confirm parent selection before `revert -m`">
+  Choosing the wrong parent can revert the wrong side of history and create additional recovery work.
+</WarningBox>
+
+## Good follow-up reads
+
+1. `undo after pull`
+2. `assess force-push impact`
+3. `git-merge`
+

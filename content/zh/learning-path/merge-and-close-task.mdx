@@ -1,0 +1,46 @@
+export const metadata = {
+  title: "合并并关闭任务闭环",
+  slug: "merge-and-close-task",
+  locale: "zh",
+  section: "learning-path",
+  summary: "完成一次完整协作闭环：选择合并策略、确认主线状态、清理分支并更新任务状态，避免“代码已合并但流程未收口”。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-merge",
+    "https://git-scm.com/docs/git-branch",
+    "https://git-scm.com/docs/git-push",
+  ],
+};
+
+# 合并并关闭任务闭环
+
+PR 被批准只是中间节点，真正结束是“主线已稳定 + 分支已清理 + 任务状态已更新”。
+
+## 合并前检查
+
+1. required checks 全绿
+2. 审批状态满足规则
+3. 目标分支仍是最新
+
+## 合并后动作
+
+```bash
+git switch main
+git pull --ff-only
+git branch -d feature/first-pr
+git push origin --delete feature/first-pr
+```
+
+## 为什么要清理分支
+
+分支不清理会让后续协作噪声增加，也会掩盖真正活跃任务。
+
+<WarningBox title="不要合并后就离开">
+  若不更新任务状态与回归验证结果，团队会出现“代码合了但没人确认上线效果”的盲区。
+</WarningBox>
+
+## 接下来建议继续学什么
+
+1. `first safe hotfix`
+2. `pr merge strategy and platform settings`
+3. `release hygiene`
+

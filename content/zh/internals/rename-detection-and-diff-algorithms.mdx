@@ -1,0 +1,45 @@
+export const metadata = {
+  title: "重命名检测与差异算法",
+  slug: "rename-detection-and-diff-algorithms",
+  locale: "zh",
+  section: "internals",
+  summary: "理解 Git 的 rename 检测与 diff 算法有助于解释“为何这个改动显示为删除+新增或重命名”，并优化评审可读性。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-diff",
+    "https://git-scm.com/docs/git-log",
+    "https://git-scm.com/docs/git-config",
+  ],
+};
+
+# 重命名检测与差异算法
+
+Git 并不在对象层“记录文件被重命名”，重命名通常是 diff 阶段推断出来的。
+
+## 重命名是如何推断的
+
+Git 会基于内容相似度把“删除 + 新增”匹配为 rename。
+
+## 为什么有时看起来像删了再新建
+
+- 相似度阈值没达到
+- 改动量太大
+- 参数配置不同（例如是否启用重命名检测）
+
+## diff 算法影响什么
+
+不同算法会影响 hunk 切分和可读性，进而影响 review 成本。
+
+## 实战建议
+
+在大规模重构中，先做“纯重命名提交”再做逻辑改动，通常能显著提升差异可读性。
+
+<WarningBox title="不要把 diff 结果当对象事实">
+  diff 是展示与比较策略，不是对象数据库里的原生“事件日志”。
+</WarningBox>
+
+## 接下来建议继续看什么
+
+1. `tree objects and snapshots`
+2. `git-diff`
+3. `small batch review`
+

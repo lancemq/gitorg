@@ -1,0 +1,46 @@
+export const metadata = {
+  title: "Safe force-push protocol",
+  slug: "safe-force-push-protocol",
+  locale: "en",
+  section: "best-practices",
+  summary: "When history rewrite is necessary, use explicit communication, freeze windows, and `--force-with-lease` to reduce overwrite risk.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-push",
+    "https://git-scm.com/docs/git-reflog",
+    "https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History",
+  ],
+};
+
+# Safe force-push protocol
+
+Force-push should be governed, not improvised.
+
+## Minimal protocol
+
+1. restrict allowed branches
+2. announce temporary push freeze
+3. default to `--force-with-lease`
+4. share post-push recovery guidance
+
+## Recommended sequence
+
+```bash
+git fetch origin
+git log --oneline --graph --decorate -20
+git push --force-with-lease origin <branch>
+```
+
+## Why lease matters
+
+`--force-with-lease` prevents overwriting remote commits you have not seen.
+
+<WarningBox title="Avoid force-push on shared mainline whenever possible">
+  The collaboration recovery cost is often much higher than the history-cleanliness benefit.
+</WarningBox>
+
+## Good follow-up reads
+
+1. `shared history boundaries`
+2. `assess force-push impact`
+3. `review and safe push`
+

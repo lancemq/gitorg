@@ -1,0 +1,87 @@
+export const metadata = {
+  title: "Canary 发布工作流",
+  slug: "canary-release-workflow",
+  locale: "zh",
+  section: "workflows",
+  summary: "通过小流量金丝雀发布逐步验证线上行为，在全量放量前提前暴露风险并降低事故半径。",
+  sourceUrls: [
+    "https://martinfowler.com/bliki/CanaryRelease.html",
+    "https://sre.google/workbook/canarying-releases/",
+    "https://git-scm.com/docs/git-tag",
+  ],
+};
+
+# Canary 发布工作流
+
+Canary 发布的核心是“先让少量真实流量验证新版本”，而不是在全量之后被动发现问题。
+
+<CommandFlowFigure
+  title="金丝雀放量路径"
+  caption="先在小比例流量验证关键指标，逐级放大，异常则立即停止放量或回滚。"
+  inputsLabel="输入"
+  inputs="候选版本|监控指标|放量阈值"
+  commandLabel="deploy canary → monitor → promote/rollback"
+  outputsLabel="输出"
+  outputs="提前识别风险|事故半径可控|发布信心提升"
+  note="canary 的价值来自“可观测 + 可中止”。"
+/>
+
+## 适用场景
+
+- 新版本影响核心路径，风险不适合全量一次性释放
+- 团队具备灰度路由和实时监控能力
+- 需要在真实线上环境验证性能和兼容性
+
+## 推荐步骤
+
+### 1. 定义 canary 通过条件
+
+至少包括：错误率、延迟、关键业务指标。
+
+### 2. 部署小流量版本
+
+例如先从 1% 或单可用区开始。
+
+### 3. 观察窗口内评估指标
+
+设定固定观察时间，避免“刚上线就马上全量”。
+
+### 4. 逐级放量
+
+1% → 5% → 20% → 50% → 100%，每一步都必须重新评估。
+
+### 5. 触发阈值时立即止损
+
+优先停止放量，必要时回滚版本或关功能开关。
+
+<WarningBox title="没有阈值定义的 canary 只是“慢速全量”">
+  如果团队没有明确“何时通过、何时回滚”的门槛，金丝雀发布无法发挥风险控制作用。
+</WarningBox>
+
+## 常见误区
+
+### 误区 1：只看技术指标，不看业务指标
+
+技术指标正常不代表转化路径正常。
+
+### 误区 2：观察窗口过短
+
+很多问题会在峰值流量或异步任务阶段才暴露。
+
+### 误区 3：canary 和 feature flag 职责混淆
+
+canary 控制版本流量，flag 控制功能开关，两者可配合但不等价。
+
+<PracticeBox title="设计一次 canary 放量门禁">
+  1. 定义 3 个核心技术指标与阈值。
+  2. 定义 2 个关键业务指标与阈值。
+  3. 定义每个放量阶段最短观察时长。
+  4. 指定谁有权执行停止放量。
+</PracticeBox>
+
+## 接下来建议继续看什么
+
+1. `Feature flag rollout workflow`
+2. `Code freeze and release candidate workflow`
+3. `Revert-first stabilization workflow`
+

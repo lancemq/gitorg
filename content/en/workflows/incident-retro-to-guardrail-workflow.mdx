@@ -1,0 +1,85 @@
+export const metadata = {
+  title: "Incident Retro to Guardrail Workflow",
+  slug: "incident-retro-to-guardrail-workflow",
+  locale: "en",
+  section: "workflows",
+  summary: "Turn postmortem findings into enforceable CI, release, and runtime guardrails so lessons reduce future incident probability.",
+  sourceUrls: [
+    "https://sre.google/sre-book/postmortem-culture/",
+    "https://sre.google/workbook/postmortem-culture/",
+    "https://git-scm.com/docs/git-hook",
+  ],
+};
+
+# Incident Retro to Guardrail Workflow
+
+Many teams write thorough retrospectives yet repeat similar incidents. The gap is operationalization: findings are not converted into automated guardrails.
+
+<CommandFlowFigure
+  title="Retro closure loop"
+  caption="Reconstruct facts, classify causes, design guardrails, enforce in systems, and measure effectiveness over time."
+  inputsLabel="Inputs"
+  inputs="incident timeline|root-cause analysis|improvement proposals"
+  commandLabel="retro → guardrail design → enforce in pipeline → measure"
+  outputsLabel="Outputs"
+  outputs="fewer repeat incidents|automatic risk interception|compounding reliability knowledge"
+  note="Without system-level enforcement, retros tend to remain documentation."
+/>
+
+## Recommended sequence
+
+### 1. Use a consistent retrospective structure
+
+Separate trigger, amplifiers, detection gaps, and response delays.
+
+### 2. Map each finding to an enforceable guardrail
+
+Examples:
+
+- manual checklist item → CI required check
+- ambiguous release rule → release gate script
+- tribal knowledge step → runbook plus automatic verification
+
+### 3. Assign owner and due date per guardrail
+
+Each action needs accountability and acceptance criteria.
+
+### 4. Implement at pipeline/platform level
+
+System enforcement is usually more reliable than memory-based compliance.
+
+### 5. Measure guardrail effectiveness
+
+Track repeat incident rate, guardrail hit count, and false-positive rate.
+
+<WarningBox title="Findings without ownership and due dates rarely land">
+  A retro is not complete when the document is published; it is complete when risk control is codified and verified in delivery systems.
+</WarningBox>
+
+## Common mistakes
+
+### Mistake 1: writing “be more careful” as an action
+
+Non-executable advice does not create durable reliability gains.
+
+### Mistake 2: patching only this incident path
+
+Without systemic guardrails, similar failures return in new forms.
+
+### Mistake 3: counting incidents but not guardrail efficacy
+
+You need evidence that controls are intercepting risk as intended.
+
+<PracticeBox title="Convert one retro into three concrete guardrails">
+  1. Pick one recent postmortem finding.
+  2. Define one CI, one release, and one runtime guardrail.
+  3. Assign owner, due date, and acceptance criteria.
+  4. Reassess hit rate and false positives after one month.
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `Revert-first stabilization workflow`
+2. `Bisect regression triage workflow`
+3. `Release hygiene`
+

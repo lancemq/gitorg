@@ -1,0 +1,85 @@
+export const metadata = {
+  title: "事故复盘到工程护栏工作流",
+  slug: "incident-retro-to-guardrail-workflow",
+  locale: "zh",
+  section: "workflows",
+  summary: "将事故复盘结论转化为可执行的 CI/发布/代码护栏，避免复盘停留在文档层而无法降低未来风险。",
+  sourceUrls: [
+    "https://sre.google/sre-book/postmortem-culture/",
+    "https://sre.google/workbook/postmortem-culture/",
+    "https://git-scm.com/docs/git-hook",
+  ],
+};
+
+# 事故复盘到工程护栏工作流
+
+很多团队复盘写得很完整，但同类事故仍重复发生。关键差距在于：复盘结论没有沉淀成“系统会自动执行的护栏”。
+
+<CommandFlowFigure
+  title="复盘闭环"
+  caption="从事实还原到根因分类，再到护栏落地与效果验证，形成可迭代的风险收敛循环。"
+  inputsLabel="输入"
+  inputs="事故时间线|根因分析|改进建议"
+  commandLabel="retro → guardrail design → enforce in pipeline → measure"
+  outputsLabel="输出"
+  outputs="同类事故下降|流程自动防错|知识持续积累"
+  note="没有工程化落地的复盘，通常只会变成“下一次再写一份复盘”。"
+/>
+
+## 推荐流程
+
+### 1. 用一致模板复盘事实与根因
+
+区分触发条件、放大因素、检测缺口和处置延迟。
+
+### 2. 将每条改进建议映射为可执行护栏
+
+例如：
+
+- 手工检查项 → CI 必过规则
+- 模糊发布标准 → 发布门禁脚本
+- 经验性步骤 → runbook + 自动校验
+
+### 3. 给护栏定义 owner 与截止时间
+
+每条护栏必须有负责人和验收条件。
+
+### 4. 在流水线或平台层落地
+
+优先系统级拦截，减少对人工记忆的依赖。
+
+### 5. 追踪护栏有效性
+
+用“同类事故频次、拦截次数、误报率”评估效果。
+
+<WarningBox title="复盘结论如果没有 owner 和截止时间，通常不会落地">
+  复盘不是写文档，而是改系统。每条结论都应转化为可执行、可验证、可追责的工程动作。
+</WarningBox>
+
+## 常见误区
+
+### 误区 1：把“加强注意”当改进项
+
+没有可执行动作的建议无法形成稳定改进。
+
+### 误区 2：只做一次性修复，不做系统护栏
+
+会导致同类问题在新场景下再次出现。
+
+### 误区 3：只统计事故次数，不统计护栏命中率
+
+看不到护栏是否真正工作。
+
+<PracticeBox title="把一次复盘结论改写成 3 条工程护栏">
+  1. 选一个最近事故的复盘条目。
+  2. 分别写出“CI 护栏、发布护栏、运行时护栏”。
+  3. 定义每条护栏的 owner、截止时间和验收标准。
+  4. 一个月后评估护栏命中与误报数据。
+</PracticeBox>
+
+## 接下来建议继续看什么
+
+1. `Revert-first stabilization workflow`
+2. `Bisect regression triage workflow`
+3. `Release hygiene`
+

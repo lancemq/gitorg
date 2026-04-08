@@ -1,0 +1,45 @@
+export const metadata = {
+  title: "Code review handoff quality",
+  slug: "code-review-handoff-quality",
+  locale: "en",
+  section: "best-practices",
+  summary: "Improve review throughput by handing off pull requests with clear context, scope, risks, and verification evidence.",
+  sourceUrls: [
+    "https://google.github.io/eng-practices/review/reviewer/",
+    "https://google.github.io/eng-practices/review/developer/",
+    "https://git-scm.com/docs/git-range-diff",
+  ],
+};
+
+# Code review handoff quality
+
+Slow review loops are often caused by low-context handoff, not reviewer skill.
+
+## Four required handoff elements
+
+1. context: why this change exists
+2. scope: what is in/out
+3. risk: likely impact zones
+4. verification: what was tested and how
+
+## What to include in PR handoff
+
+- key change bullets (3-7 points)
+- explicit risk checks
+- local or staging validation notes
+- files needing focused reviewer attention
+
+## Stacked PR note
+
+When using stacked PRs, state dependency order and explain only incremental delta per layer.
+
+<WarningBox title="Do not make reviewers reconstruct business context">
+  If reviewers must infer intent from code alone, review time and decision quality both degrade.
+</WarningBox>
+
+## Good follow-up reads
+
+1. `small batch review`
+2. `pull request prep`
+3. `stacked pull requests workflow`
+

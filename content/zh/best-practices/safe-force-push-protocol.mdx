@@ -1,0 +1,52 @@
+export const metadata = {
+  title: "安全 force push 协议",
+  slug: "safe-force-push-protocol",
+  locale: "zh",
+  section: "best-practices",
+  summary: "需要重写历史时，用明确告警、冻结窗口和 `--force-with-lease` 协议降低误覆盖协作者提交的风险。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-push",
+    "https://git-scm.com/docs/git-reflog",
+    "https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History",
+  ],
+};
+
+# 安全 force push 协议
+
+`force push` 不是绝对禁止，而是必须进入团队协议管理。
+
+## 协议最小要素
+
+1. 仅允许在明确范围分支执行
+2. 执行前发出冻结提醒
+3. 默认使用 `--force-with-lease`
+4. 执行后发布恢复指引
+
+## 推荐执行顺序
+
+```bash
+git fetch origin
+git log --oneline --graph --decorate -20
+git push --force-with-lease origin <branch>
+```
+
+## 为什么必须用 lease
+
+`--force-with-lease` 会检测远端是否出现你未知的新提交，能避免覆盖同事刚推送的改动。
+
+<WarningBox title="共享主线尽量不做 force push">
+  对多人协作主线做强推，恢复和沟通成本通常远高于一次历史整洁收益。
+</WarningBox>
+
+## 常见误区
+
+- 把 `--force` 当成“快速修正键”
+- 没有提前告知受影响协作者
+- 强推后不给恢复命令和对齐窗口
+
+## 接下来建议继续看什么
+
+1. `shared history boundaries`
+2. `assess force-push impact`
+3. `review and safe push`
+

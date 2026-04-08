@@ -1,0 +1,39 @@
+export const metadata = {
+  title: "GitHub 分支保护与 Rulesets",
+  slug: "github-branch-protection-and-rulesets",
+  locale: "zh",
+  section: "github",
+  summary: "用 Branch protection 与 Rulesets 把分支策略从约定升级为平台强制，降低误推送和低质量合并风险。",
+  sourceUrls: [
+    "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches",
+    "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets",
+  ],
+};
+
+# GitHub 分支保护与 Rulesets
+
+分支保护解决的是“谁可以以什么条件进入主线”，Rulesets 解决的是“这些规则如何统一治理”。
+
+## 推荐最小策略
+
+1. 受保护分支禁止直接 push
+2. 必须通过 required checks
+3. 必须至少一次 code review
+4. 限制 force push 和删除分支
+
+## Rulesets 的价值
+
+- 跨分支统一策略
+- 规则可分层与组合
+- 减少每个仓库手工重复配置
+
+<WarningBox title="保护规则应优先约束主线与发布线">
+  若保护范围只覆盖部分关键分支，流程仍会在最脆弱路径上失守。
+</WarningBox>
+
+## 接下来建议继续看什么
+
+1. `PR merge strategy and platform settings`
+2. `shared history boundaries`
+3. `github pull requests and reviews`
+

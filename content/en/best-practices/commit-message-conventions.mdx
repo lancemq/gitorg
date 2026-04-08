@@ -1,0 +1,51 @@
+export const metadata = {
+  title: "Commit message conventions",
+  slug: "commit-message-conventions",
+  locale: "en",
+  section: "best-practices",
+  summary: "Use a consistent commit message structure to improve log readability, release notes quality, and incident-time traceability.",
+  sourceUrls: [
+    "https://cbea.ms/git-commit/",
+    "https://git-scm.com/docs/git-commit",
+    "https://www.conventionalcommits.org/en/v1.0.0/",
+  ],
+};
+
+# Commit message conventions
+
+Commit messages are long-term operational metadata, not just local notes.
+
+## A practical structure
+
+`<type>(<scope>): <summary>`
+
+In body text, include:
+
+- why this changed
+- what risk or follow-up remains
+
+## Example
+
+```text
+fix(auth): reject expired refresh token
+
+Align backend token validation with new TTL rule.
+Risk: may increase login retries for stale clients.
+```
+
+## Team-level rules
+
+1. start summaries with an action verb
+2. explain motivation, not only file edits
+3. mark breaking changes explicitly
+
+<WarningBox title="PR descriptions do not replace commit messages">
+  PR context may be collapsed or lost over time. Commit history remains the durable searchable index.
+</WarningBox>
+
+## Good follow-up reads
+
+1. `commit hygiene`
+2. `prepare commits before pull request`
+3. `small batch review`
+

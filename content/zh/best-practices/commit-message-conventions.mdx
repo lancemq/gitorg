@@ -1,0 +1,51 @@
+export const metadata = {
+  title: "提交信息规范约定",
+  slug: "commit-message-conventions",
+  locale: "zh",
+  section: "best-practices",
+  summary: "统一提交信息结构（动词、范围、原因）提升日志可读性、问题追踪效率和跨团队协作透明度。",
+  sourceUrls: [
+    "https://cbea.ms/git-commit/",
+    "https://git-scm.com/docs/git-commit",
+    "https://www.conventionalcommits.org/en/v1.0.0/",
+  ],
+};
+
+# 提交信息规范约定
+
+高质量提交信息不是形式主义，它直接影响回溯效率和发布可读性。
+
+## 一个可落地的模板
+
+`<type>(<scope>): <summary>`
+
+正文建议补两点：
+
+- 为什么改
+- 有哪些风险或后续动作
+
+## 示例
+
+```text
+fix(auth): reject expired refresh token
+
+Align backend token validation with new TTL rule.
+Risk: may increase login retries for stale clients.
+```
+
+## 团队约定建议
+
+1. summary 用动词开头，尽量在 72 字符内
+2. 把“原因”写清，不只写“改了什么”
+3. 破坏性变更必须显式标注
+
+<WarningBox title="不要把 PR 描述替代 commit 信息">
+  PR 页面会被折叠或丢失上下文，commit 日志才是长期可检索的历史索引。
+</WarningBox>
+
+## 接下来建议继续看什么
+
+1. `commit hygiene`
+2. `prepare commits before pull request`
+3. `small batch review`
+

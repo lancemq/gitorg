@@ -1,0 +1,45 @@
+export const metadata = {
+  title: "Handle review feedback",
+  slug: "handle-review-feedback",
+  locale: "en",
+  section: "learning-path",
+  summary: "Learn a practical review-feedback loop: classify comments, apply focused updates in batches, and keep PR context easy to re-evaluate.",
+  sourceUrls: [
+    "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/code-review/about-pull-request-reviews",
+    "https://git-scm.com/docs/git-commit",
+    "https://git-scm.com/docs/git-range-diff",
+  ],
+};
+
+# Handle review feedback
+
+Review is not about “silencing comments.” It is a structured convergence process.
+
+## Recommended loop
+
+1. classify comments: required vs discussion
+2. update in small coherent batches
+3. explain what changed per feedback round
+
+## Common actions
+
+```bash
+git add -p
+git commit -m "fix: address review comments on error handling"
+git push
+```
+
+## Collaboration habit
+
+Reply per comment with either “fixed” or reasoned rationale for keeping current behavior.
+
+<WarningBox title="Do not bundle unrelated edits into one feedback commit">
+  Mixed changes make it hard for reviewers to verify resolution status.
+</WarningBox>
+
+## Good follow-up reads
+
+1. `merge and close task`
+2. `small batch review`
+3. `code review handoff quality`
+

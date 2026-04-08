@@ -1,0 +1,81 @@
+export const metadata = {
+  title: "API Versioning Change Workflow",
+  slug: "api-versioning-change-workflow",
+  locale: "en",
+  section: "workflows",
+  summary: "Handle breaking API changes with parallel version support, migration windows, and controlled deprecation to avoid client outages.",
+  sourceUrls: [
+    "https://martinfowler.com/articles/enterpriseREST.html",
+    "https://opensource.zalando.com/restful-api-guidelines/#must-use-semantic-versioning",
+    "https://git-scm.com/docs/git-tag",
+  ],
+};
+
+# API Versioning Change Workflow
+
+The hard part of API versioning is not shipping v2. The hard part is migrating clients safely without large compatibility incidents.
+
+<CommandFlowFigure
+  title="Breaking-change migration path"
+  caption="Introduce a new version while old version remains available, migrate clients with visibility, then deprecate on a scheduled window."
+  inputsLabel="Inputs"
+  inputs="breaking-change scope|client inventory|deprecation policy"
+  commandLabel="introduce v2 → migrate clients → deprecate v1"
+  outputsLabel="Outputs"
+  outputs="reduced compatibility incidents|predictable migration cadence|enforceable deprecation"
+  note="Versioning is governance and migration discipline, not just URL design."
+/>
+
+## Recommended sequence
+
+### 1. Identify truly breaking deltas
+
+Examples: semantic field changes, auth model changes, default-behavior changes.
+
+### 2. Provide parallel version support
+
+Keep v1 and v2 concurrently available during migration.
+
+### 3. Publish migration guide and timeline
+
+Include request/response diffs, errors, examples, and cutoff dates.
+
+### 4. Track migration progress
+
+Observe by client version, traffic volume, and error rates.
+
+### 5. Deprecate old version on schedule
+
+Use staged notices, rehearsal, and emergency reopen plans.
+
+<WarningBox title="Breaking changes without migration windows become production incidents">
+  Even correct API design fails operationally if client upgrade speed is uneven and unmanaged.
+</WarningBox>
+
+## Common mistakes
+
+### Mistake 1: version number exists but migration plan is missing
+
+Labels without migration execution do not reduce risk.
+
+### Mistake 2: assuming all clients can upgrade in sync
+
+Client release cadences vary significantly in real environments.
+
+### Mistake 3: never retiring old versions
+
+Long-lived legacy versions accumulate maintenance and security debt.
+
+<PracticeBox title="Draft a migration plan for one breaking API change">
+  1. List all breaking differences.
+  2. Set migration start and end dates.
+  3. Define migration-progress dashboard fields.
+  4. Define deprecation and emergency reopen policy.
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `Cross-repository integration workflow`
+2. `Release train workflow`
+3. `Feature flag rollout workflow`
+

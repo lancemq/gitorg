@@ -1,0 +1,45 @@
+export const metadata = {
+  title: "处理评审反馈",
+  slug: "handle-review-feedback",
+  locale: "zh",
+  section: "learning-path",
+  summary: "掌握评审反馈处理节奏：区分必须修改与讨论项、按批次提交修订、维持 PR 可审查性与上下文连续性。",
+  sourceUrls: [
+    "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/code-review/about-pull-request-reviews",
+    "https://git-scm.com/docs/git-commit",
+    "https://git-scm.com/docs/git-range-diff",
+  ],
+};
+
+# 处理评审反馈
+
+评审不是“改到 reviewer 不说话”为止，而是共同收敛风险和可维护性。
+
+## 推荐节奏
+
+1. 先把反馈分组：必须改 / 讨论项
+2. 小批次提交修订，不要一次性大改
+3. 每轮修订后写清“改了什么、为什么”
+
+## 常用动作
+
+```bash
+git add -p
+git commit -m "fix: address review comments on error handling"
+git push
+```
+
+## 关键习惯
+
+在评论区用“已修复/保留原因”逐条回应，降低认知来回切换成本。
+
+<WarningBox title="别把多个不相关修改塞进同一轮反馈提交">
+  混合提交会让 reviewer 难以判断每条评论是否真的被解决。
+</WarningBox>
+
+## 接下来建议继续学什么
+
+1. `merge and close task`
+2. `small batch review`
+3. `code review handoff quality`
+

@@ -1,0 +1,46 @@
+export const metadata = {
+  title: "Release checklist discipline",
+  slug: "release-checklist-discipline",
+  locale: "en",
+  section: "best-practices",
+  summary: "Use a fixed release checklist with owners and evidence-based validation to reduce launch omissions and avoid memory-driven failures.",
+  sourceUrls: [
+    "https://sre.google/sre-book/reliable-product-launches/",
+    "https://www.atulgawande.com/book/the-checklist-manifesto/",
+    "https://git-scm.com/docs/git-tag",
+  ],
+};
+
+# Release checklist discipline
+
+Many release failures come from missed basics, not unknown engineering complexity.
+
+## Minimal checklist sections
+
+1. version and scope confirmation
+2. migration and rollback confirmation
+3. monitoring and alert thresholds
+4. post-release validation and on-call assignment
+
+## Execution rules
+
+- each item has an owner
+- each item is evidence-verifiable
+- failed items block release
+
+## Example checks
+
+- version tag matches approved change scope
+- rollback command rehearsed in pre-production
+- release window annotation added on key dashboards
+
+<WarningBox title="Checkboxes without evidence are ceremony">
+  If teams cannot show command output or validation proof, checklist completion does not reduce actual risk.
+</WarningBox>
+
+## Good follow-up reads
+
+1. `release hygiene`
+2. `code freeze and release candidate workflow`
+3. `hotfix rollback after release`
+

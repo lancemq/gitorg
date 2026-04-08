@@ -1,0 +1,45 @@
+export const metadata = {
+  title: "First safe hotfix",
+  slug: "first-safe-hotfix",
+  locale: "en",
+  section: "learning-path",
+  summary: "Learn a low-risk emergency fix routine: stabilize quickly, ship minimal change, backport to mainline, and avoid incident amplification.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-switch",
+    "https://git-scm.com/docs/git-cherry-pick",
+    "https://git-scm.com/docs/git-revert",
+  ],
+};
+
+# First safe hotfix
+
+Hotfix discipline is “fast but controlled,” not “skip every safeguard.”
+
+## Minimal hotfix flow
+
+1. branch from stable baseline (`hotfix/*`)
+2. apply smallest necessary change
+3. validate quickly and release
+4. backport to mainline to prevent drift
+
+```bash
+git switch -c hotfix/login-timeout
+git commit -m "fix: avoid login timeout under retry storm"
+git push -u origin hotfix/login-timeout
+```
+
+## Two high-pressure rules
+
+- no unrelated opportunistic edits
+- keep explicit rollback path at each step
+
+<WarningBox title="Urgency is not a reason to skip validation">
+  Skipping checks may reduce immediate latency but increases secondary incident risk.
+</WarningBox>
+
+## Good follow-up reads
+
+1. `hotfix and urgent fixes`
+2. `revert-first stabilization workflow`
+3. `recover after accidental merge`
+

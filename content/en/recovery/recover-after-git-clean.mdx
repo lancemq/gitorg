@@ -1,0 +1,58 @@
+export const metadata = {
+  title: "Recover after an accidental git clean",
+  slug: "recover-after-git-clean",
+  locale: "en",
+  section: "recovery",
+  summary: "After `git clean` removes untracked files, recovery usually depends on external history sources; prevent recurrence with dry-run and stash -u safeguards.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-clean",
+    "https://git-scm.com/docs/git-stash",
+    "https://git-scm.com/book/en/v2/Git-Tools-Stashing-and-Cleaning",
+  ],
+};
+
+# Recover after an accidental git clean
+
+`git clean` removes untracked files. Git often has no commit history for those files, so recovery is typically external.
+
+## What to verify first
+
+If you ran preview first, use that file list:
+
+```bash
+git clean -nd
+```
+
+If deletion already happened, avoid further write-heavy actions on the same disk.
+
+## Practical recovery sources
+
+1. IDE local history or system snapshots
+2. generated artifacts reproducible from scripts
+3. teammate branches or shared backups
+
+## Why reflog is usually limited here
+
+Reflog tracks ref movement, not arbitrary untracked file contents.
+
+## Prevention habit
+
+Before destructive clean:
+
+```bash
+git clean -nd
+git stash push -u -m "pre-clean backup"
+```
+
+Preview scope first, then create a safety stash for untracked files.
+
+<WarningBox title="Use `git clean -fdx` with extreme care">
+  `-x` also removes ignored files, which may include local config or generated assets you still need.
+</WarningBox>
+
+## Good follow-up reads
+
+1. `recover lost stash`
+2. `git-clean`
+3. `reflog recovery`
+

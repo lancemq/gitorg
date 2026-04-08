@@ -1,0 +1,87 @@
+export const metadata = {
+  title: "Canary Release Workflow",
+  slug: "canary-release-workflow",
+  locale: "en",
+  section: "workflows",
+  summary: "Validate new versions on a small slice of real production traffic before broad rollout to reduce blast radius.",
+  sourceUrls: [
+    "https://martinfowler.com/bliki/CanaryRelease.html",
+    "https://sre.google/workbook/canarying-releases/",
+    "https://git-scm.com/docs/git-tag",
+  ],
+};
+
+# Canary Release Workflow
+
+Canary releases let a small percentage of real users validate a new version before full rollout.
+
+<CommandFlowFigure
+  title="Canary promotion path"
+  caption="Start with small traffic, evaluate target metrics, and only then promote to broader rollout."
+  inputsLabel="Inputs"
+  inputs="candidate build|monitoring metrics|promotion thresholds"
+  commandLabel="deploy canary → monitor → promote/rollback"
+  outputsLabel="Outputs"
+  outputs="earlier risk detection|controlled blast radius|higher release confidence"
+  note="Canary is effective only when it is observable and abortable."
+/>
+
+## Best-fit scenarios
+
+- high-impact paths where full rollout is risky
+- environments with traffic splitting and real-time observability
+- releases requiring production-behavior verification
+
+## Recommended sequence
+
+### 1. Define pass/fail thresholds
+
+Include error rate, latency, and business KPI bounds.
+
+### 2. Deploy initial canary slice
+
+Start with 1% traffic or one zone/cluster.
+
+### 3. Observe for a fixed window
+
+Do not promote immediately after deployment.
+
+### 4. Promote in stages
+
+1% → 5% → 20% → 50% → 100%, re-evaluating each stage.
+
+### 5. Stop or rollback on threshold breach
+
+Pause promotion first; then rollback version or disable risky features if required.
+
+<WarningBox title="Canary without explicit thresholds is just slow full rollout">
+  Teams need clear rules for promotion and rollback. Otherwise canary cannot act as a safety mechanism.
+</WarningBox>
+
+## Common mistakes
+
+### Mistake 1: tracking only technical signals
+
+Business-path degradation can be missed if only system metrics are observed.
+
+### Mistake 2: too-short observation windows
+
+Some issues surface only under peak traffic or delayed jobs.
+
+### Mistake 3: conflating canary with feature flags
+
+Canary controls version exposure; flags control behavior exposure.
+
+<PracticeBox title="Define canary promotion gates for your next release">
+  1. Choose three technical metrics with thresholds.
+  2. Choose two business metrics with thresholds.
+  3. Set minimum observation duration per stage.
+  4. Assign authority to halt promotion.
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `Feature flag rollout workflow`
+2. `Code freeze and release candidate workflow`
+3. `Revert-first stabilization workflow`
+

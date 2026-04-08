@@ -82,7 +82,11 @@ export type BestPracticeSlug =
   | "conflict-resolution-routine"
   | "release-hygiene"
   | "safe-cherry-picks"
-  | "small-batch-review";
+  | "small-batch-review"
+  | "safe-force-push-protocol"
+  | "commit-message-conventions"
+  | "release-checklist-discipline"
+  | "code-review-handoff-quality";
 
 export type WorkflowSlug =
   | "fetch-vs-pull"
@@ -116,21 +120,29 @@ export type WorkflowSlug =
   | "revert-first-stabilization-workflow"
   | "feature-flag-rollout-workflow"
   | "release-train-workflow"
-  | "cross-repo-integration-workflow";
+  | "cross-repo-integration-workflow"
+  | "canary-release-workflow"
+  | "database-migration-safety-workflow"
+  | "api-versioning-change-workflow"
+  | "incident-retro-to-guardrail-workflow";
 
 export type GithubSlug =
   | "github-flow-basics"
   | "pull-requests-and-reviews"
   | "forks-and-open-source-contribution"
   | "issues-projects-and-discussions"
-  | "github-actions-and-skills";
+  | "github-actions-and-skills"
+  | "github-branch-protection-and-rulesets"
+  | "github-codeowners-and-review-ownership";
 
 export type GitlabSlug =
   | "gitlab-flow-and-merge-requests"
   | "gitlab-forks-and-contributions"
   | "gitlab-issues-boards-and-milestones"
   | "gitlab-groups-projects-and-permissions"
-  | "gitlab-ci-and-runners";
+  | "gitlab-ci-and-runners"
+  | "gitlab-protected-branches-and-approval-rules"
+  | "gitlab-merge-trains-and-merge-result-pipelines";
 
 export type InternalsSlug =
   | "object-database"
@@ -149,7 +161,11 @@ export type InternalsSlug =
   | "tree-objects-and-snapshots"
   | "blob-objects-and-content-addressing"
   | "commit-message-and-parents"
-  | "refspec-and-ref-updates";
+  | "refspec-and-ref-updates"
+  | "three-way-merge-mechanics"
+  | "rename-detection-and-diff-algorithms"
+  | "rebase-internals-and-sequencer"
+  | "hooks-and-policy-enforcement";
 
 export type RecoverySlug =
   | "reflog-recovery"
@@ -158,14 +174,22 @@ export type RecoverySlug =
   | "recover-deleted-branch"
   | "detached-head-rescue"
   | "undo-after-pull"
-  | "assess-force-push-impact";
+  | "assess-force-push-impact"
+  | "recover-lost-stash"
+  | "recover-after-wrong-cherry-pick"
+  | "recover-after-accidental-merge"
+  | "recover-after-git-clean";
 
 export type LearningPathSlug =
   | "quick-start"
   | "setup-and-clone"
   | "stage-and-commit"
   | "sync-with-remote"
-  | "first-feature-branch";
+  | "first-feature-branch"
+  | "open-first-pull-request"
+  | "handle-review-feedback"
+  | "merge-and-close-task"
+  | "first-safe-hotfix";
 
 export function isValidLocale(value: string): value is Locale {
   return locales.includes(value as Locale);
@@ -469,6 +493,10 @@ export const learningPathSlugs = [
   "stage-and-commit",
   "sync-with-remote",
   "first-feature-branch",
+  "open-first-pull-request",
+  "handle-review-feedback",
+  "merge-and-close-task",
+  "first-safe-hotfix",
 ] as const satisfies readonly LearningPathSlug[];
 
 export const githubSlugs = [
@@ -477,6 +505,8 @@ export const githubSlugs = [
   "forks-and-open-source-contribution",
   "issues-projects-and-discussions",
   "github-actions-and-skills",
+  "github-branch-protection-and-rulesets",
+  "github-codeowners-and-review-ownership",
 ] as const satisfies readonly GithubSlug[];
 
 export const gitlabSlugs = [
@@ -485,6 +515,8 @@ export const gitlabSlugs = [
   "gitlab-issues-boards-and-milestones",
   "gitlab-groups-projects-and-permissions",
   "gitlab-ci-and-runners",
+  "gitlab-protected-branches-and-approval-rules",
+  "gitlab-merge-trains-and-merge-result-pipelines",
 ] as const satisfies readonly GitlabSlug[];
 
 function buildLearningPathNavItem(locale: Locale, activePath?: string): NavItem {
@@ -664,6 +696,10 @@ export const bestPracticeSlugs = [
   "release-hygiene",
   "safe-cherry-picks",
   "small-batch-review",
+  "safe-force-push-protocol",
+  "commit-message-conventions",
+  "release-checklist-discipline",
+  "code-review-handoff-quality",
 ] as const satisfies readonly BestPracticeSlug[];
 
 export const workflowSlugs = [
@@ -699,6 +735,10 @@ export const workflowSlugs = [
   "feature-flag-rollout-workflow",
   "release-train-workflow",
   "cross-repo-integration-workflow",
+  "canary-release-workflow",
+  "database-migration-safety-workflow",
+  "api-versioning-change-workflow",
+  "incident-retro-to-guardrail-workflow",
 ] as const satisfies readonly WorkflowSlug[];
 
 export const recoverySlugs = [
@@ -709,6 +749,10 @@ export const recoverySlugs = [
   "detached-head-rescue",
   "undo-after-pull",
   "assess-force-push-impact",
+  "recover-lost-stash",
+  "recover-after-wrong-cherry-pick",
+  "recover-after-accidental-merge",
+  "recover-after-git-clean",
 ] as const satisfies readonly RecoverySlug[];
 
 export const internalsSlugs = [
@@ -729,6 +773,10 @@ export const internalsSlugs = [
   "blob-objects-and-content-addressing",
   "commit-message-and-parents",
   "refspec-and-ref-updates",
+  "three-way-merge-mechanics",
+  "rename-detection-and-diff-algorithms",
+  "rebase-internals-and-sequencer",
+  "hooks-and-policy-enforcement",
 ] as const satisfies readonly InternalsSlug[];
 
 const zhDictionary: Dictionary = {

@@ -1,0 +1,47 @@
+export const metadata = {
+  title: "hooks 与策略执行",
+  slug: "hooks-and-policy-enforcement",
+  locale: "zh",
+  section: "internals",
+  summary: "理解本地 hooks 与服务端 hooks 的职责边界，帮助把提交与推送策略从“口头约定”转成“系统强制执行”。",
+  sourceUrls: [
+    "https://git-scm.com/docs/githooks",
+    "https://git-scm.com/docs/git-commit",
+    "https://git-scm.com/docs/git-push",
+  ],
+};
+
+# hooks 与策略执行
+
+Git hooks 是把流程规则嵌入仓库生命周期的机制。
+
+## 两类 hooks
+
+- 本地 hooks：在开发者机器上执行（如 pre-commit）
+- 服务端 hooks：在远端仓库接收推送时执行（如 pre-receive）
+
+## 职责边界
+
+- 本地 hooks 适合快速反馈（格式、基础 lint）
+- 服务端 hooks 适合强制门禁（分支保护、提交策略）
+
+## 常见策略落地点
+
+1. 提交信息格式检查
+2. 禁止直接推送受保护分支
+3. 必须关联工单或变更单
+
+## 一个实践原则
+
+“建议性规则”放本地，“必须性规则”放服务端，避免因本地绕过导致策略失效。
+
+<WarningBox title="只依赖本地 hooks 不能形成团队强制">
+  本地 hooks 可能被跳过或配置不一致。关键治理策略应在远端统一执行。
+</WarningBox>
+
+## 接下来建议继续看什么
+
+1. `review and safe push`
+2. `commit message conventions`
+3. `pr merge strategy and platform settings`
+

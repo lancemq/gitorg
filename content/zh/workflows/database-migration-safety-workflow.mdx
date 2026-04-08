@@ -1,0 +1,84 @@
+export const metadata = {
+  title: "数据库迁移安全工作流",
+  slug: "database-migration-safety-workflow",
+  locale: "zh",
+  section: "workflows",
+  summary: "将数据库 schema 变更拆分为可回退、可观测、可分阶段执行的迁移流程，降低发布期结构变更风险。",
+  sourceUrls: [
+    "https://martinfowler.com/articles/evodb.html",
+    "https://www.postgresql.org/docs/current/ddl-alter.html",
+    "https://git-scm.com/docs/git-revert",
+  ],
+};
+
+# 数据库迁移安全工作流
+
+数据库迁移失败的代价通常高于应用层发布失败。安全迁移的关键，是把一次不可逆大改拆成多个可控小步骤。
+
+<CommandFlowFigure
+  title="迁移分阶段执行模型"
+  caption="先兼容再切换，最后清理旧结构。每一步都保留回退空间。"
+  inputsLabel="输入"
+  inputs="迁移脚本|兼容代码|回退方案"
+  commandLabel="expand → backfill → switch read/write → contract"
+  outputsLabel="输出"
+  outputs="迁移风险降低|回滚更可行|线上中断更少"
+  note="先扩展后收缩，是多数生产迁移的保守策略。"
+/>
+
+## 推荐流程
+
+### 1. Expand：先加新字段/新表，不删旧结构
+
+先让旧逻辑继续工作，避免立即破坏兼容性。
+
+### 2. Backfill：补历史数据
+
+批量补数要控制速率，避免影响线上性能。
+
+### 3. Switch：逐步切读写路径
+
+先读新写双写或影子验证，再切换主路径。
+
+### 4. Contract：确认稳定后清理旧结构
+
+旧字段删除应延后到多个发布周期之后。
+
+## 发布前检查清单
+
+- 是否有回退脚本或等价回退策略
+- 是否有慢查询/锁等待监控
+- 是否评估了迁移窗口与流量高峰冲突
+- 是否完成了预发数据量级演练
+
+<WarningBox title="一次性删旧字段是高风险动作">
+  在未确认全链路已切换完成前，直接删除旧结构会让回滚成本暴增。优先延迟清理，先确保稳定。
+</WarningBox>
+
+## 常见误区
+
+### 误区 1：开发环境通过就直接上生产
+
+真实数据规模会放大锁竞争和回填耗时问题。
+
+### 误区 2：迁移脚本和应用发布强绑定
+
+应允许迁移先行、应用后切换，避免耦合失败。
+
+### 误区 3：回退方案只写“必要时回滚”
+
+没有具体动作步骤的回退方案等于没有方案。
+
+<PracticeBox title="为下一次 schema 变更做迁移分解">
+  1. 写出 expand/backfill/switch/contract 四阶段动作。
+  2. 定义每阶段可观测指标。
+  3. 写明每阶段失败后的回退动作。
+  4. 在预发用接近生产体量数据演练一次。
+</PracticeBox>
+
+## 接下来建议继续看什么
+
+1. `Code freeze and release candidate workflow`
+2. `Release branch workflow`
+3. `Hotfix rollback after release`
+

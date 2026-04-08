@@ -1,0 +1,39 @@
+export const metadata = {
+  title: "GitLab 受保护分支与审批规则",
+  slug: "gitlab-protected-branches-and-approval-rules",
+  locale: "zh",
+  section: "gitlab",
+  summary: "通过 Protected branches 与 Merge request approval rules 固化团队协作边界，减少高风险改动直接进入主线。",
+  sourceUrls: [
+    "https://docs.gitlab.com/ee/user/project/protected_branches.html",
+    "https://docs.gitlab.com/ee/user/project/merge_requests/approvals/",
+  ],
+};
+
+# GitLab 受保护分支与审批规则
+
+GitLab 协作治理的核心组合是：受保护分支控制写入权限，审批规则控制合并质量门槛。
+
+## 最小落地策略
+
+1. 主线只允许通过 MR 合并
+2. 关键分支禁止开发者直接推送
+3. 至少一位或多位审批人通过
+4. 必需 CI 通过后才能合并
+
+## 常见治理收益
+
+- 降低误操作推送风险
+- 强化关键模块评审责任
+- 让合并决策可追溯
+
+<WarningBox title="权限模型要和团队角色同步更新">
+  组织结构变化后若不更新保护策略，权限会出现“历史遗留漏洞”。
+</WarningBox>
+
+## 接下来建议继续看什么
+
+1. `gitlab flow and merge requests`
+2. `pr merge strategy and platform settings`
+3. `shared history boundaries`
+

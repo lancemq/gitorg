@@ -1,0 +1,45 @@
+export const metadata = {
+  title: "代码评审交接质量",
+  slug: "code-review-handoff-quality",
+  locale: "zh",
+  section: "best-practices",
+  summary: "通过高质量 review handoff（背景、范围、风险、验证）减少评审往返沟通成本并提升合并决策速度。",
+  sourceUrls: [
+    "https://google.github.io/eng-practices/review/reviewer/",
+    "https://google.github.io/eng-practices/review/developer/",
+    "https://git-scm.com/docs/git-range-diff",
+  ],
+};
+
+# 代码评审交接质量
+
+评审效率低通常不是 reviewer 慢，而是交接信息不完整。
+
+## 高质量 handoff 的四要素
+
+1. 背景：为什么要改
+2. 范围：改了哪些边界，不改哪些
+3. 风险：潜在影响面
+4. 验证：如何证明改动有效
+
+## 提交 PR 时建议附带
+
+- 关键变更点列表（3-7 条）
+- 风险检查项
+- 本地或预发验证结果
+- 需要 reviewer 特别关注的文件
+
+## 对 stacked PR 的补充
+
+每层 PR 要说明依赖关系，并强调“本层新增差异”，避免 reviewer 重复阅读。
+
+<WarningBox title="不要把 reviewer 当成需求背景探测器">
+  如果上下文全靠 reviewer 自己补全，评审必然变慢且判断质量波动更大。
+</WarningBox>
+
+## 接下来建议继续看什么
+
+1. `small batch review`
+2. `pull request prep`
+3. `stacked pull requests workflow`
+

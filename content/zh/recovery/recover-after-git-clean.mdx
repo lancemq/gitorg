@@ -1,0 +1,60 @@
+export const metadata = {
+  title: "误用 git clean 后的恢复",
+  slug: "recover-after-git-clean",
+  locale: "zh",
+  section: "recovery",
+  summary: "git clean 删除未跟踪文件后，优先从 IDE 本地历史、系统快照或构建产物来源恢复，并建立 clean 前预演与备份习惯。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-clean",
+    "https://git-scm.com/docs/git-stash",
+    "https://git-scm.com/book/en/v2/Git-Tools-Stashing-and-Cleaning",
+  ],
+};
+
+# 误用 git clean 后的恢复
+
+`git clean` 清理的是未跟踪文件，Git 对这些文件通常没有历史记录。  
+所以恢复重点是“外部来源”，不是 reflog。
+
+## 先确认删了什么
+
+如果你先执行过 `-n` 预演，会更容易定位清单：
+
+```bash
+git clean -nd
+```
+
+若已经删除，马上停止进一步写盘操作，减少覆盖风险。
+
+## 可尝试的恢复来源
+
+1. IDE Local History / Time Machine / 文件系统快照
+2. 构建产物或生成脚本可重建内容
+3. 同事分支或远端附件里可能有副本
+
+## 为什么 reflog 常帮不上忙
+
+reflog 记录的是引用移动，不记录未跟踪文件内容。  
+这类事故预防通常比恢复更关键。
+
+## 预防策略（强烈推荐）
+
+清理前先做两步：
+
+```bash
+git clean -nd
+git stash push -u -m "pre-clean backup"
+```
+
+第一步看范围，第二步给未跟踪文件留保险。
+
+<WarningBox title="不要直接 `git clean -fdx` 当作日常命令">
+  `-x` 会连忽略文件一起删，风险很高。除非你明确知道当前目录中哪些文件可重建，否则先预演再决定。
+</WarningBox>
+
+## 接下来建议继续看什么
+
+1. `recover lost stash`
+2. `git-clean`
+3. `reflog recovery`
+

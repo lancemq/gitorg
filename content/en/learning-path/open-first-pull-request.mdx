@@ -1,0 +1,46 @@
+export const metadata = {
+  title: "Open your first pull request",
+  slug: "open-first-pull-request",
+  locale: "en",
+  section: "learning-path",
+  summary: "Move from branch commits to team review by preparing scope, context, and validation details for your first merge-ready pull request.",
+  sourceUrls: [
+    "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests",
+    "https://git-scm.com/docs/git-push",
+  ],
+};
+
+# Open your first pull request
+
+After you can commit on feature branches, the next skill is handing work off for team review and integration.
+
+## Pre-PR checklist
+
+1. changes are scoped to one objective
+2. branch is synced with latest mainline
+3. commit messages are readable
+
+## Minimal sequence
+
+```bash
+git fetch origin
+git rebase origin/main
+git push -u origin feature/first-pr
+```
+
+Then open a PR with:
+
+- intent and expected outcome
+- key change points
+- risk and validation notes
+
+<WarningBox title="A PR is a collaboration interface, not just a code upload">
+  Missing context increases review round-trips and slows merge decisions.
+</WarningBox>
+
+## Good follow-up reads
+
+1. `handle review feedback`
+2. `pull request prep`
+3. `pull requests and reviews`
+

@@ -1,0 +1,43 @@
+export const metadata = {
+  title: "三方合并机制",
+  slug: "three-way-merge-mechanics",
+  locale: "zh",
+  section: "internals",
+  summary: "理解 Git 如何基于 merge-base 做三方合并，有助于准确判断冲突来源、合并结果与冲突解决策略。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-merge",
+    "https://git-scm.com/docs/git-merge-base",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+  ],
+};
+
+# 三方合并机制
+
+Git merge 的核心不是“把两边拼起来”，而是用三方输入计算结果：`base`、`ours`、`theirs`。
+
+## 三方输入分别是什么
+
+- `base`：两边分支共同祖先（merge-base）
+- `ours`：当前分支 tip
+- `theirs`：被合并分支 tip
+
+Git 对比的是 “base→ours” 与 “base→theirs” 的改动差异。
+
+## 为什么会冲突
+
+当两边都修改了同一位置且结果不可自动判定时，就会触发冲突。
+
+## 一个常见误解
+
+冲突不代表 Git 不知道文件结构，而是语义选择需要人工决策。
+
+<WarningBox title="先看 base 再解冲突">
+  只看 ours/theirs 容易失去上下文。理解 base 的原始状态，通常能更快判断哪侧更合理。
+</WarningBox>
+
+## 接下来建议继续看什么
+
+1. `merge-base and ancestry`
+2. `git-merge`
+3. `rerere for recurring conflicts`
+

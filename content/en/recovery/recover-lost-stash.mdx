@@ -1,0 +1,63 @@
+export const metadata = {
+  title: "Recover a lost stash",
+  slug: "recover-lost-stash",
+  locale: "en",
+  section: "recovery",
+  summary: "When stash entries seem to disappear, determine whether they were popped, dropped, or detached from refs, then recover via reflog or dangling commits.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-stash",
+    "https://git-scm.com/docs/git-reflog",
+    "https://git-scm.com/docs/git-fsck",
+  ],
+};
+
+# Recover a lost stash
+
+A “missing stash” is often a missing reference, not immediate data destruction.
+
+## Identify the loss type first
+
+1. stash was popped and no longer listed
+2. stash was dropped or cleared
+3. stash commit still exists but ref moved
+
+## First checks
+
+```bash
+git stash list
+git reflog show stash
+git reflog
+```
+
+If stash reflog exists, recover from there first.
+
+## If stash list is empty
+
+Search dangling objects and inspect candidates:
+
+```bash
+git fsck --no-reflog | rg dangling
+git show <commit>
+```
+
+When you find the target, preserve it immediately:
+
+```bash
+git switch -c rescue/stash-recovery <commit>
+```
+
+## Recovery options
+
+- restore patch only: `git show <commit> > rescue.patch`
+- restore working changes: apply stash ref or cherry-pick from rescue branch
+
+<WarningBox title="Create a rescue branch before applying anything">
+  Repeated apply/pop attempts on your active branch can worsen state confusion. Preserve evidence first.
+</WarningBox>
+
+## Good follow-up reads
+
+1. `reflog recovery`
+2. `recover after reset`
+3. `git-stash`
+

@@ -1,0 +1,74 @@
+export const metadata = {
+  title: "找回“消失的 stash”",
+  slug: "recover-lost-stash",
+  locale: "zh",
+  section: "recovery",
+  summary: "当 stash 列表里看不到之前保存的内容时，先判断是 pop 后丢失、误删还是引用漂移，再用 reflog 与 dangling commit 进行恢复。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-stash",
+    "https://git-scm.com/docs/git-reflog",
+    "https://git-scm.com/docs/git-fsck",
+  ],
+};
+
+# 找回“消失的 stash”
+
+stash 看起来“消失”时，最常见场景不是永久丢失，而是引用不在 `stash list` 里了。
+
+## 先判断是哪类丢失
+
+1. `git stash pop` 后冲突/误操作导致看不到
+2. 手动 `drop` / `clear` 过
+3. 引用变化后 stash 提交仍在对象库里
+
+## 第一轮检查
+
+```bash
+git stash list
+git reflog show stash
+git reflog
+```
+
+如果 `stash` 引用还在，优先从 reflog 定位旧条目。
+
+## 当 `stash list` 为空时怎么做
+
+可以尝试从 dangling commit 里找 stash 相关提交：
+
+```bash
+git fsck --no-reflog | rg dangling
+```
+
+然后逐个查看候选提交：
+
+```bash
+git show <commit>
+```
+
+找到后先建救援分支：
+
+```bash
+git switch -c rescue/stash-recovery <commit>
+```
+
+## 恢复策略
+
+- 只要补丁：`git show <commit> > rescue.patch`
+- 要完整恢复到工作区：`git stash apply <stash-ref>` 或从救援分支 cherry-pick
+
+<WarningBox title="先建救援分支，再尝试 apply">
+  直接在当前工作分支反复 apply/pop，容易把恢复现场越弄越乱。先把证据固定住再操作更稳。
+</WarningBox>
+
+## 常见误区
+
+- 误以为 `pop` 等于“安全移动”，其实它会删除 stash 引用
+- 在未确认目标提交前执行 `gc`，增加恢复难度
+- 恢复时直接覆盖当前分支，缺少对比空间
+
+## 接下来建议继续看什么
+
+1. `reflog recovery`
+2. `recover after reset`
+3. `git-stash`
+

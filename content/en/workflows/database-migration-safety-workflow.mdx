@@ -1,0 +1,84 @@
+export const metadata = {
+  title: "Database Migration Safety Workflow",
+  slug: "database-migration-safety-workflow",
+  locale: "en",
+  section: "workflows",
+  summary: "Reduce schema-change risk by splitting migrations into reversible, observable stages instead of one irreversible release step.",
+  sourceUrls: [
+    "https://martinfowler.com/articles/evodb.html",
+    "https://www.postgresql.org/docs/current/ddl-alter.html",
+    "https://git-scm.com/docs/git-revert",
+  ],
+};
+
+# Database Migration Safety Workflow
+
+Database migration failures often cost more than application rollback failures. Safe migration design is about reversible sequencing, not just SQL correctness.
+
+<CommandFlowFigure
+  title="Phased migration model"
+  caption="Expand schema first, backfill safely, switch traffic gradually, then contract old structures after stability is proven."
+  inputsLabel="Inputs"
+  inputs="migration scripts|compatibility code path|rollback strategy"
+  commandLabel="expand → backfill → switch read/write → contract"
+  outputsLabel="Outputs"
+  outputs="lower migration risk|practical rollback options|fewer production interruptions"
+  note="Expand-before-contract is a conservative default in production systems."
+/>
+
+## Recommended sequence
+
+### 1. Expand: add structures before removing legacy paths
+
+Keep existing behavior valid while introducing new schema.
+
+### 2. Backfill: migrate historical data gradually
+
+Throttle data jobs to avoid lock and load spikes.
+
+### 3. Switch: move reads/writes in controlled phases
+
+Use shadow reads or dual-write windows before full switch.
+
+### 4. Contract: remove old paths only after steady state
+
+Delay destructive cleanup until after multiple stable release cycles.
+
+## Pre-release checklist
+
+- explicit rollback method exists
+- lock/slow-query monitoring is enabled
+- migration window avoids peak traffic
+- pre-production rehearsal matches realistic data volume
+
+<WarningBox title="One-step destructive schema change is high risk">
+  Deleting old columns before complete end-to-end cutover makes rollback significantly harder.
+</WarningBox>
+
+## Common mistakes
+
+### Mistake 1: assuming dev-scale tests predict production behavior
+
+Production data shape and volume expose different locking and performance risks.
+
+### Mistake 2: tightly coupling migration and app rollout
+
+Prefer staged deployability where migration can precede application path switch.
+
+### Mistake 3: rollback plan written as a vague sentence
+
+Rollback must be explicit, procedural, and testable.
+
+<PracticeBox title="Break one schema change into four migration stages">
+  1. Define expand/backfill/switch/contract actions.
+  2. Define observable metrics for each stage.
+  3. Define rollback path for each stage.
+  4. Rehearse with near-production data volume.
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `Code freeze and release candidate workflow`
+2. `Release branch workflow`
+3. `Hotfix rollback after release`
+

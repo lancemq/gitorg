@@ -1,0 +1,39 @@
+export const metadata = {
+  title: "GitHub branch protection and rulesets",
+  slug: "github-branch-protection-and-rulesets",
+  locale: "en",
+  section: "github",
+  summary: "Use branch protection and rulesets to enforce merge policy at platform level instead of relying on informal team habits.",
+  sourceUrls: [
+    "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches",
+    "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets",
+  ],
+};
+
+# GitHub branch protection and rulesets
+
+Branch protection defines merge safety on specific branches; rulesets scale that governance across repositories and patterns.
+
+## Suggested baseline
+
+1. block direct push to protected branches
+2. require passing status checks
+3. require at least one review
+4. restrict force-push and branch deletion
+
+## Why rulesets matter
+
+- policy reuse across branch scopes
+- centralized governance
+- lower configuration drift
+
+<WarningBox title="Protect main and release branches first">
+  Partial coverage leaves your highest-risk branches exposed to accidental policy bypass.
+</WarningBox>
+
+## Good follow-up reads
+
+1. `PR merge strategy and platform settings`
+2. `shared history boundaries`
+3. `github pull requests and reviews`
+

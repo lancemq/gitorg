@@ -52,6 +52,10 @@ export const docPathRegistry = [
   "learning-path/stage-and-commit",
   "learning-path/sync-with-remote",
   "learning-path/first-feature-branch",
+  "learning-path/open-first-pull-request",
+  "learning-path/handle-review-feedback",
+  "learning-path/merge-and-close-task",
+  "learning-path/first-safe-hotfix",
   "commands/git-init",
   "commands/git-clone",
   "commands/git-status",
@@ -128,6 +132,10 @@ export const docPathRegistry = [
   "best-practices/release-hygiene",
   "best-practices/safe-cherry-picks",
   "best-practices/small-batch-review",
+  "best-practices/safe-force-push-protocol",
+  "best-practices/commit-message-conventions",
+  "best-practices/release-checklist-discipline",
+  "best-practices/code-review-handoff-quality",
   "workflows/fetch-vs-pull",
   "workflows/feature-branch-collaboration",
   "workflows/gitflow-workflow",
@@ -160,16 +168,24 @@ export const docPathRegistry = [
   "workflows/feature-flag-rollout-workflow",
   "workflows/release-train-workflow",
   "workflows/cross-repo-integration-workflow",
+  "workflows/canary-release-workflow",
+  "workflows/database-migration-safety-workflow",
+  "workflows/api-versioning-change-workflow",
+  "workflows/incident-retro-to-guardrail-workflow",
   "github/github-flow-basics",
   "github/pull-requests-and-reviews",
   "github/forks-and-open-source-contribution",
   "github/issues-projects-and-discussions",
   "github/github-actions-and-skills",
+  "github/github-branch-protection-and-rulesets",
+  "github/github-codeowners-and-review-ownership",
   "gitlab/gitlab-flow-and-merge-requests",
   "gitlab/gitlab-forks-and-contributions",
   "gitlab/gitlab-issues-boards-and-milestones",
   "gitlab/gitlab-groups-projects-and-permissions",
   "gitlab/gitlab-ci-and-runners",
+  "gitlab/gitlab-protected-branches-and-approval-rules",
+  "gitlab/gitlab-merge-trains-and-merge-result-pipelines",
   "internals/object-database",
   "internals/plumbing-and-porcelain",
   "internals/index-and-working-tree",
@@ -187,6 +203,10 @@ export const docPathRegistry = [
   "internals/blob-objects-and-content-addressing",
   "internals/commit-message-and-parents",
   "internals/refspec-and-ref-updates",
+  "internals/three-way-merge-mechanics",
+  "internals/rename-detection-and-diff-algorithms",
+  "internals/rebase-internals-and-sequencer",
+  "internals/hooks-and-policy-enforcement",
   "recovery/reflog-recovery",
   "recovery/recover-after-reset",
   "recovery/recover-after-rebase",
@@ -194,6 +214,10 @@ export const docPathRegistry = [
   "recovery/detached-head-rescue",
   "recovery/undo-after-pull",
   "recovery/assess-force-push-impact",
+  "recovery/recover-lost-stash",
+  "recovery/recover-after-wrong-cherry-pick",
+  "recovery/recover-after-accidental-merge",
+  "recovery/recover-after-git-clean",
   "concepts/git-history",
 ] as const;
 
@@ -205,6 +229,10 @@ const contentModules = {
     "learning-path/stage-and-commit": () => import("@/content/zh/learning-path/stage-and-commit.mdx"),
     "learning-path/sync-with-remote": () => import("@/content/zh/learning-path/sync-with-remote.mdx"),
     "learning-path/first-feature-branch": () => import("@/content/zh/learning-path/first-feature-branch.mdx"),
+    "learning-path/open-first-pull-request": () => import("@/content/zh/learning-path/open-first-pull-request.mdx"),
+    "learning-path/handle-review-feedback": () => import("@/content/zh/learning-path/handle-review-feedback.mdx"),
+    "learning-path/merge-and-close-task": () => import("@/content/zh/learning-path/merge-and-close-task.mdx"),
+    "learning-path/first-safe-hotfix": () => import("@/content/zh/learning-path/first-safe-hotfix.mdx"),
     "commands/git-init": () => import("@/content/zh/commands/git-init.mdx"),
     "commands/git-clone": () => import("@/content/zh/commands/git-clone.mdx"),
     "commands/git-status": () => import("@/content/zh/commands/git-status.mdx"),
@@ -281,6 +309,14 @@ const contentModules = {
     "best-practices/release-hygiene": () => import("@/content/zh/best-practices/release-hygiene.mdx"),
     "best-practices/safe-cherry-picks": () => import("@/content/zh/best-practices/safe-cherry-picks.mdx"),
     "best-practices/small-batch-review": () => import("@/content/zh/best-practices/small-batch-review.mdx"),
+    "best-practices/safe-force-push-protocol": () =>
+      import("@/content/zh/best-practices/safe-force-push-protocol.mdx"),
+    "best-practices/commit-message-conventions": () =>
+      import("@/content/zh/best-practices/commit-message-conventions.mdx"),
+    "best-practices/release-checklist-discipline": () =>
+      import("@/content/zh/best-practices/release-checklist-discipline.mdx"),
+    "best-practices/code-review-handoff-quality": () =>
+      import("@/content/zh/best-practices/code-review-handoff-quality.mdx"),
     "workflows/fetch-vs-pull": () => import("@/content/zh/workflows/fetch-vs-pull.mdx"),
     "workflows/feature-branch-collaboration": () => import("@/content/zh/workflows/feature-branch-collaboration.mdx"),
     "workflows/gitflow-workflow": () => import("@/content/zh/workflows/gitflow-workflow.mdx"),
@@ -320,6 +356,13 @@ const contentModules = {
     "workflows/release-train-workflow": () => import("@/content/zh/workflows/release-train-workflow.mdx"),
     "workflows/cross-repo-integration-workflow": () =>
       import("@/content/zh/workflows/cross-repo-integration-workflow.mdx"),
+    "workflows/canary-release-workflow": () => import("@/content/zh/workflows/canary-release-workflow.mdx"),
+    "workflows/database-migration-safety-workflow": () =>
+      import("@/content/zh/workflows/database-migration-safety-workflow.mdx"),
+    "workflows/api-versioning-change-workflow": () =>
+      import("@/content/zh/workflows/api-versioning-change-workflow.mdx"),
+    "workflows/incident-retro-to-guardrail-workflow": () =>
+      import("@/content/zh/workflows/incident-retro-to-guardrail-workflow.mdx"),
     "github/github-flow-basics": () => import("@/content/zh/github/github-flow-basics.mdx"),
     "github/pull-requests-and-reviews": () => import("@/content/zh/github/pull-requests-and-reviews.mdx"),
     "github/forks-and-open-source-contribution": () =>
@@ -327,6 +370,10 @@ const contentModules = {
     "github/issues-projects-and-discussions": () =>
       import("@/content/zh/github/issues-projects-and-discussions.mdx"),
     "github/github-actions-and-skills": () => import("@/content/zh/github/github-actions-and-skills.mdx"),
+    "github/github-branch-protection-and-rulesets": () =>
+      import("@/content/zh/github/github-branch-protection-and-rulesets.mdx"),
+    "github/github-codeowners-and-review-ownership": () =>
+      import("@/content/zh/github/github-codeowners-and-review-ownership.mdx"),
     "gitlab/gitlab-flow-and-merge-requests": () =>
       import("@/content/zh/gitlab/gitlab-flow-and-merge-requests.mdx"),
     "gitlab/gitlab-forks-and-contributions": () =>
@@ -336,6 +383,10 @@ const contentModules = {
     "gitlab/gitlab-groups-projects-and-permissions": () =>
       import("@/content/zh/gitlab/gitlab-groups-projects-and-permissions.mdx"),
     "gitlab/gitlab-ci-and-runners": () => import("@/content/zh/gitlab/gitlab-ci-and-runners.mdx"),
+    "gitlab/gitlab-protected-branches-and-approval-rules": () =>
+      import("@/content/zh/gitlab/gitlab-protected-branches-and-approval-rules.mdx"),
+    "gitlab/gitlab-merge-trains-and-merge-result-pipelines": () =>
+      import("@/content/zh/gitlab/gitlab-merge-trains-and-merge-result-pipelines.mdx"),
     "internals/object-database": () => import("@/content/zh/internals/object-database.mdx"),
     "internals/plumbing-and-porcelain": () => import("@/content/zh/internals/plumbing-and-porcelain.mdx"),
     "internals/index-and-working-tree": () => import("@/content/zh/internals/index-and-working-tree.mdx"),
@@ -357,6 +408,14 @@ const contentModules = {
     "internals/blob-objects-and-content-addressing": () => import("@/content/zh/internals/blob-objects-and-content-addressing.mdx"),
     "internals/commit-message-and-parents": () => import("@/content/zh/internals/commit-message-and-parents.mdx"),
     "internals/refspec-and-ref-updates": () => import("@/content/zh/internals/refspec-and-ref-updates.mdx"),
+    "internals/three-way-merge-mechanics": () =>
+      import("@/content/zh/internals/three-way-merge-mechanics.mdx"),
+    "internals/rename-detection-and-diff-algorithms": () =>
+      import("@/content/zh/internals/rename-detection-and-diff-algorithms.mdx"),
+    "internals/rebase-internals-and-sequencer": () =>
+      import("@/content/zh/internals/rebase-internals-and-sequencer.mdx"),
+    "internals/hooks-and-policy-enforcement": () =>
+      import("@/content/zh/internals/hooks-and-policy-enforcement.mdx"),
     "recovery/reflog-recovery": () => import("@/content/zh/recovery/reflog-recovery.mdx"),
     "recovery/recover-after-reset": () => import("@/content/zh/recovery/recover-after-reset.mdx"),
     "recovery/recover-after-rebase": () => import("@/content/zh/recovery/recover-after-rebase.mdx"),
@@ -364,6 +423,12 @@ const contentModules = {
     "recovery/detached-head-rescue": () => import("@/content/zh/recovery/detached-head-rescue.mdx"),
     "recovery/undo-after-pull": () => import("@/content/zh/recovery/undo-after-pull.mdx"),
     "recovery/assess-force-push-impact": () => import("@/content/zh/recovery/assess-force-push-impact.mdx"),
+    "recovery/recover-lost-stash": () => import("@/content/zh/recovery/recover-lost-stash.mdx"),
+    "recovery/recover-after-wrong-cherry-pick": () =>
+      import("@/content/zh/recovery/recover-after-wrong-cherry-pick.mdx"),
+    "recovery/recover-after-accidental-merge": () =>
+      import("@/content/zh/recovery/recover-after-accidental-merge.mdx"),
+    "recovery/recover-after-git-clean": () => import("@/content/zh/recovery/recover-after-git-clean.mdx"),
     "concepts/git-history": () => import("@/content/zh/concepts/git-history.mdx"),
   },
   en: {
@@ -372,6 +437,10 @@ const contentModules = {
     "learning-path/stage-and-commit": () => import("@/content/en/learning-path/stage-and-commit.mdx"),
     "learning-path/sync-with-remote": () => import("@/content/en/learning-path/sync-with-remote.mdx"),
     "learning-path/first-feature-branch": () => import("@/content/en/learning-path/first-feature-branch.mdx"),
+    "learning-path/open-first-pull-request": () => import("@/content/en/learning-path/open-first-pull-request.mdx"),
+    "learning-path/handle-review-feedback": () => import("@/content/en/learning-path/handle-review-feedback.mdx"),
+    "learning-path/merge-and-close-task": () => import("@/content/en/learning-path/merge-and-close-task.mdx"),
+    "learning-path/first-safe-hotfix": () => import("@/content/en/learning-path/first-safe-hotfix.mdx"),
     "commands/git-init": () => import("@/content/en/commands/git-init.mdx"),
     "commands/git-clone": () => import("@/content/en/commands/git-clone.mdx"),
     "commands/git-status": () => import("@/content/en/commands/git-status.mdx"),
@@ -448,6 +517,14 @@ const contentModules = {
     "best-practices/release-hygiene": () => import("@/content/en/best-practices/release-hygiene.mdx"),
     "best-practices/safe-cherry-picks": () => import("@/content/en/best-practices/safe-cherry-picks.mdx"),
     "best-practices/small-batch-review": () => import("@/content/en/best-practices/small-batch-review.mdx"),
+    "best-practices/safe-force-push-protocol": () =>
+      import("@/content/en/best-practices/safe-force-push-protocol.mdx"),
+    "best-practices/commit-message-conventions": () =>
+      import("@/content/en/best-practices/commit-message-conventions.mdx"),
+    "best-practices/release-checklist-discipline": () =>
+      import("@/content/en/best-practices/release-checklist-discipline.mdx"),
+    "best-practices/code-review-handoff-quality": () =>
+      import("@/content/en/best-practices/code-review-handoff-quality.mdx"),
     "workflows/fetch-vs-pull": () => import("@/content/en/workflows/fetch-vs-pull.mdx"),
     "workflows/feature-branch-collaboration": () => import("@/content/en/workflows/feature-branch-collaboration.mdx"),
     "workflows/gitflow-workflow": () => import("@/content/en/workflows/gitflow-workflow.mdx"),
@@ -487,6 +564,13 @@ const contentModules = {
     "workflows/release-train-workflow": () => import("@/content/en/workflows/release-train-workflow.mdx"),
     "workflows/cross-repo-integration-workflow": () =>
       import("@/content/en/workflows/cross-repo-integration-workflow.mdx"),
+    "workflows/canary-release-workflow": () => import("@/content/en/workflows/canary-release-workflow.mdx"),
+    "workflows/database-migration-safety-workflow": () =>
+      import("@/content/en/workflows/database-migration-safety-workflow.mdx"),
+    "workflows/api-versioning-change-workflow": () =>
+      import("@/content/en/workflows/api-versioning-change-workflow.mdx"),
+    "workflows/incident-retro-to-guardrail-workflow": () =>
+      import("@/content/en/workflows/incident-retro-to-guardrail-workflow.mdx"),
     "github/github-flow-basics": () => import("@/content/en/github/github-flow-basics.mdx"),
     "github/pull-requests-and-reviews": () => import("@/content/en/github/pull-requests-and-reviews.mdx"),
     "github/forks-and-open-source-contribution": () =>
@@ -494,6 +578,10 @@ const contentModules = {
     "github/issues-projects-and-discussions": () =>
       import("@/content/en/github/issues-projects-and-discussions.mdx"),
     "github/github-actions-and-skills": () => import("@/content/en/github/github-actions-and-skills.mdx"),
+    "github/github-branch-protection-and-rulesets": () =>
+      import("@/content/en/github/github-branch-protection-and-rulesets.mdx"),
+    "github/github-codeowners-and-review-ownership": () =>
+      import("@/content/en/github/github-codeowners-and-review-ownership.mdx"),
     "gitlab/gitlab-flow-and-merge-requests": () =>
       import("@/content/en/gitlab/gitlab-flow-and-merge-requests.mdx"),
     "gitlab/gitlab-forks-and-contributions": () =>
@@ -503,6 +591,10 @@ const contentModules = {
     "gitlab/gitlab-groups-projects-and-permissions": () =>
       import("@/content/en/gitlab/gitlab-groups-projects-and-permissions.mdx"),
     "gitlab/gitlab-ci-and-runners": () => import("@/content/en/gitlab/gitlab-ci-and-runners.mdx"),
+    "gitlab/gitlab-protected-branches-and-approval-rules": () =>
+      import("@/content/en/gitlab/gitlab-protected-branches-and-approval-rules.mdx"),
+    "gitlab/gitlab-merge-trains-and-merge-result-pipelines": () =>
+      import("@/content/en/gitlab/gitlab-merge-trains-and-merge-result-pipelines.mdx"),
     "internals/object-database": () => import("@/content/en/internals/object-database.mdx"),
     "internals/plumbing-and-porcelain": () => import("@/content/en/internals/plumbing-and-porcelain.mdx"),
     "internals/index-and-working-tree": () => import("@/content/en/internals/index-and-working-tree.mdx"),
@@ -524,6 +616,14 @@ const contentModules = {
     "internals/blob-objects-and-content-addressing": () => import("@/content/en/internals/blob-objects-and-content-addressing.mdx"),
     "internals/commit-message-and-parents": () => import("@/content/en/internals/commit-message-and-parents.mdx"),
     "internals/refspec-and-ref-updates": () => import("@/content/en/internals/refspec-and-ref-updates.mdx"),
+    "internals/three-way-merge-mechanics": () =>
+      import("@/content/en/internals/three-way-merge-mechanics.mdx"),
+    "internals/rename-detection-and-diff-algorithms": () =>
+      import("@/content/en/internals/rename-detection-and-diff-algorithms.mdx"),
+    "internals/rebase-internals-and-sequencer": () =>
+      import("@/content/en/internals/rebase-internals-and-sequencer.mdx"),
+    "internals/hooks-and-policy-enforcement": () =>
+      import("@/content/en/internals/hooks-and-policy-enforcement.mdx"),
     "recovery/reflog-recovery": () => import("@/content/en/recovery/reflog-recovery.mdx"),
     "recovery/recover-after-reset": () => import("@/content/en/recovery/recover-after-reset.mdx"),
     "recovery/recover-after-rebase": () => import("@/content/en/recovery/recover-after-rebase.mdx"),
@@ -531,6 +631,12 @@ const contentModules = {
     "recovery/detached-head-rescue": () => import("@/content/en/recovery/detached-head-rescue.mdx"),
     "recovery/undo-after-pull": () => import("@/content/en/recovery/undo-after-pull.mdx"),
     "recovery/assess-force-push-impact": () => import("@/content/en/recovery/assess-force-push-impact.mdx"),
+    "recovery/recover-lost-stash": () => import("@/content/en/recovery/recover-lost-stash.mdx"),
+    "recovery/recover-after-wrong-cherry-pick": () =>
+      import("@/content/en/recovery/recover-after-wrong-cherry-pick.mdx"),
+    "recovery/recover-after-accidental-merge": () =>
+      import("@/content/en/recovery/recover-after-accidental-merge.mdx"),
+    "recovery/recover-after-git-clean": () => import("@/content/en/recovery/recover-after-git-clean.mdx"),
     "concepts/git-history": () => import("@/content/en/concepts/git-history.mdx"),
   },
 } satisfies Record<Locale, Record<DocPath, ContentLoader>>;
@@ -589,6 +695,10 @@ const coreDocPaths = new Set<DocPath>([
   "learning-path/stage-and-commit",
   "learning-path/sync-with-remote",
   "learning-path/first-feature-branch",
+  "learning-path/open-first-pull-request",
+  "learning-path/handle-review-feedback",
+  "learning-path/merge-and-close-task",
+  "learning-path/first-safe-hotfix",
   "commands/git-init",
   "commands/git-clone",
   "commands/git-status",
@@ -648,6 +758,10 @@ const recommendedDocPaths = new Set<DocPath>([
   "best-practices/pull-request-prep",
   "best-practices/conflict-resolution-routine",
   "best-practices/branch-naming",
+  "best-practices/safe-force-push-protocol",
+  "best-practices/commit-message-conventions",
+  "best-practices/release-checklist-discipline",
+  "best-practices/code-review-handoff-quality",
   "workflows/prepare-commits-before-pull-request",
   "workflows/ai-agent-worktree-mode",
   "workflows/gitflow-workflow",
@@ -663,15 +777,27 @@ const recommendedDocPaths = new Set<DocPath>([
   "workflows/feature-flag-rollout-workflow",
   "workflows/release-train-workflow",
   "workflows/cross-repo-integration-workflow",
+  "workflows/canary-release-workflow",
+  "workflows/database-migration-safety-workflow",
+  "workflows/api-versioning-change-workflow",
+  "workflows/incident-retro-to-guardrail-workflow",
   "github/github-flow-basics",
   "github/pull-requests-and-reviews",
+  "github/github-branch-protection-and-rulesets",
+  "github/github-codeowners-and-review-ownership",
   "gitlab/gitlab-flow-and-merge-requests",
   "gitlab/gitlab-ci-and-runners",
+  "gitlab/gitlab-protected-branches-and-approval-rules",
+  "gitlab/gitlab-merge-trains-and-merge-result-pipelines",
   "internals/plumbing-and-porcelain",
   "internals/repository-layout-and-gitdir",
   "internals/merge-base-and-ancestry",
   "internals/reachability-and-garbage-collection",
   "internals/packfiles-and-storage",
+  "internals/three-way-merge-mechanics",
+  "internals/rename-detection-and-diff-algorithms",
+  "internals/rebase-internals-and-sequencer",
+  "internals/hooks-and-policy-enforcement",
   "recovery/recover-deleted-branch",
   "recovery/assess-force-push-impact",
 ]);
@@ -1240,6 +1366,26 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
     "commands/git-branch",
     "workflows/feature-branch-collaboration",
   ],
+  "learning-path/open-first-pull-request": [
+    "github/pull-requests-and-reviews",
+    "best-practices/pull-request-prep",
+    "workflows/prepare-commits-before-pull-request",
+  ],
+  "learning-path/handle-review-feedback": [
+    "best-practices/small-batch-review",
+    "best-practices/code-review-handoff-quality",
+    "commands/git-range-diff",
+  ],
+  "learning-path/merge-and-close-task": [
+    "workflows/pr-merge-strategy-and-platform-settings",
+    "commands/git-merge",
+    "best-practices/review-and-safe-push",
+  ],
+  "learning-path/first-safe-hotfix": [
+    "workflows/hotfix-and-urgent-fixes",
+    "workflows/revert-first-stabilization-workflow",
+    "recovery/recover-after-accidental-merge",
+  ],
   "workflows/parallel-work-with-worktree": [
     "commands/git-worktree",
     "commands/git-switch",
@@ -1280,6 +1426,16 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
     "workflows/pr-merge-strategy-and-platform-settings",
     "commands/git-worktree",
   ],
+  "github/github-branch-protection-and-rulesets": [
+    "workflows/pr-merge-strategy-and-platform-settings",
+    "best-practices/shared-history-boundaries",
+    "github/pull-requests-and-reviews",
+  ],
+  "github/github-codeowners-and-review-ownership": [
+    "best-practices/code-review-handoff-quality",
+    "best-practices/small-batch-review",
+    "github/pull-requests-and-reviews",
+  ],
   "gitlab/gitlab-flow-and-merge-requests": [
     "workflows/feature-branch-collaboration",
     "github/pull-requests-and-reviews",
@@ -1305,6 +1461,16 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
     "workflows/merge-queue-workflow",
     "workflows/pr-merge-strategy-and-platform-settings",
   ],
+  "gitlab/gitlab-protected-branches-and-approval-rules": [
+    "gitlab/gitlab-flow-and-merge-requests",
+    "best-practices/shared-history-boundaries",
+    "workflows/pr-merge-strategy-and-platform-settings",
+  ],
+  "gitlab/gitlab-merge-trains-and-merge-result-pipelines": [
+    "workflows/merge-queue-workflow",
+    "gitlab/gitlab-ci-and-runners",
+    "gitlab/gitlab-flow-and-merge-requests",
+  ],
   "internals/plumbing-and-porcelain": [
     "commands/git-cat-file",
     "commands/git-update-index",
@@ -1329,6 +1495,26 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
     "commands/git-config",
     "commands/git-rev-parse",
     "internals/repository-layout-and-gitdir",
+  ],
+  "internals/three-way-merge-mechanics": [
+    "internals/merge-base-and-ancestry",
+    "commands/git-merge",
+    "commands/git-merge-base",
+  ],
+  "internals/rename-detection-and-diff-algorithms": [
+    "commands/git-diff",
+    "commands/git-log",
+    "internals/tree-objects-and-snapshots",
+  ],
+  "internals/rebase-internals-and-sequencer": [
+    "commands/git-rebase",
+    "internals/commit-graph",
+    "recovery/recover-after-rebase",
+  ],
+  "internals/hooks-and-policy-enforcement": [
+    "commands/git-commit",
+    "commands/git-push",
+    "best-practices/review-and-safe-push",
   ],
   "workflows/multi-person-sync-routine": [
     "commands/git-fetch",
@@ -1384,6 +1570,26 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
     "workflows/feature-branch-collaboration",
     "workflows/fork-upstream-sync",
     "workflows/merge-queue-workflow",
+  ],
+  "workflows/canary-release-workflow": [
+    "workflows/feature-flag-rollout-workflow",
+    "workflows/code-freeze-and-release-candidate-workflow",
+    "workflows/revert-first-stabilization-workflow",
+  ],
+  "workflows/database-migration-safety-workflow": [
+    "workflows/code-freeze-and-release-candidate-workflow",
+    "workflows/release-branch-workflow",
+    "workflows/hotfix-rollback-after-release",
+  ],
+  "workflows/api-versioning-change-workflow": [
+    "workflows/cross-repo-integration-workflow",
+    "workflows/feature-flag-rollout-workflow",
+    "workflows/release-train-workflow",
+  ],
+  "workflows/incident-retro-to-guardrail-workflow": [
+    "workflows/revert-first-stabilization-workflow",
+    "workflows/bisect-regression-triage-workflow",
+    "best-practices/release-hygiene",
   ],
   "workflows/rerere-for-recurring-conflicts": [
     "commands/git-rebase",
@@ -1464,6 +1670,46 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
     "commands/git-push",
     "commands/git-reflog",
     "best-practices/shared-history-boundaries",
+  ],
+  "best-practices/safe-force-push-protocol": [
+    "best-practices/shared-history-boundaries",
+    "recovery/assess-force-push-impact",
+    "commands/git-push",
+  ],
+  "best-practices/commit-message-conventions": [
+    "best-practices/commit-hygiene",
+    "commands/git-commit",
+    "workflows/prepare-commits-before-pull-request",
+  ],
+  "best-practices/release-checklist-discipline": [
+    "best-practices/release-hygiene",
+    "workflows/code-freeze-and-release-candidate-workflow",
+    "workflows/release-branch-workflow",
+  ],
+  "best-practices/code-review-handoff-quality": [
+    "best-practices/small-batch-review",
+    "best-practices/pull-request-prep",
+    "workflows/sync-before-review",
+  ],
+  "recovery/recover-lost-stash": [
+    "commands/git-stash",
+    "commands/git-reflog",
+    "recovery/reflog-recovery",
+  ],
+  "recovery/recover-after-wrong-cherry-pick": [
+    "commands/git-cherry-pick",
+    "commands/git-revert",
+    "recovery/recover-after-reset",
+  ],
+  "recovery/recover-after-accidental-merge": [
+    "commands/git-merge",
+    "commands/git-reset",
+    "recovery/undo-after-pull",
+  ],
+  "recovery/recover-after-git-clean": [
+    "commands/git-clean",
+    "commands/git-stash",
+    "recovery/reflog-recovery",
   ],
 };
 

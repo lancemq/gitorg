@@ -1,0 +1,46 @@
+export const metadata = {
+  title: "发布清单纪律",
+  slug: "release-checklist-discipline",
+  locale: "zh",
+  section: "best-practices",
+  summary: "通过固定发布清单把关键检查项前置并标准化，降低“靠经验记忆”导致的线上发布遗漏与事故。",
+  sourceUrls: [
+    "https://sre.google/sre-book/reliable-product-launches/",
+    "https://www.atulgawande.com/book/the-checklist-manifesto/",
+    "https://git-scm.com/docs/git-tag",
+  ],
+};
+
+# 发布清单纪律
+
+发布事故很多不是技术难题，而是基础步骤遗漏。清单的价值是把“应做但易忘”的动作固化。
+
+## 最小清单结构
+
+1. 版本与变更范围确认
+2. 数据迁移与回退策略确认
+3. 监控与告警阈值确认
+4. 发布后验证与值班确认
+
+## 执行原则
+
+- 每项要有负责人
+- 每项要可验证，不写空泛措辞
+- 失败项不能“先发布后补”
+
+## 示例检查项
+
+- `git tag` 对应版本号与变更单一致
+- 回滚命令在预发已演练
+- 关键看板已设置发布窗口标记
+
+<WarningBox title="清单不是形式化打勾">
+  如果执行时不验证证据（日志、截图、命令结果），清单会退化为仪式，无法真正降低风险。
+</WarningBox>
+
+## 接下来建议继续看什么
+
+1. `release hygiene`
+2. `code freeze and release candidate workflow`
+3. `hotfix rollback after release`
+

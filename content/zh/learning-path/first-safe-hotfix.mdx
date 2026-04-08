@@ -1,0 +1,45 @@
+export const metadata = {
+  title: "第一次安全热修复",
+  slug: "first-safe-hotfix",
+  locale: "zh",
+  section: "learning-path",
+  summary: "在紧急修复场景下学习最小风险路径：快速止损、最小改动发布、回补主线与复盘，避免高压下扩大事故面。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-switch",
+    "https://git-scm.com/docs/git-cherry-pick",
+    "https://git-scm.com/docs/git-revert",
+  ],
+};
+
+# 第一次安全热修复
+
+热修复最难的是“快但不乱”。目标是先恢复服务，再追求完美。
+
+## 最小热修复流程
+
+1. 从稳定基线切 `hotfix/*` 分支
+2. 只做必要最小改动
+3. 快速验证并发布
+4. 回补主线，防止分叉漂移
+
+```bash
+git switch -c hotfix/login-timeout
+git commit -m "fix: avoid login timeout under retry storm"
+git push -u origin hotfix/login-timeout
+```
+
+## 高压场景的两条纪律
+
+- 不顺手夹带无关优化
+- 每一步都保留可回退路径
+
+<WarningBox title="紧急不等于跳过流程">
+  跳过评审和验证也许更快，但二次事故概率会显著上升。
+</WarningBox>
+
+## 接下来建议继续学什么
+
+1. `hotfix and urgent fixes`
+2. `revert-first stabilization workflow`
+3. `recover after accidental merge`
+
