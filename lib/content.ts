@@ -377,13 +377,6 @@ const contentModules = {
     "concepts/git-subtree": () => import("@/content/zh/concepts/git-subtree.mdx"),
     "concepts/git-lfs": () => import("@/content/zh/concepts/git-lfs.mdx"),
     "concepts/git-shallow": () => import("@/content/zh/concepts/git-shallow.mdx"),
-<<<<<<< HEAD
-=======
-    "recovery/recover-after-cherry-pick": () => import("@/content/zh/recovery/recover-after-cherry-pick.mdx"),
-    "recovery/undo-merge-commit": () => import("@/content/zh/recovery/undo-merge-commit.mdx"),
-    "recovery/fix-broken-interactive-rebase": () => import("@/content/zh/recovery/fix-broken-interactive-rebase.mdx"),
-    "recovery/recover-lost-commits": () => import("@/content/zh/recovery/recover-lost-commits.mdx"),
->>>>>>> f58dd19a9415fe6efa10fe9cea27c08ceee00ef4
     "recovery/recover-from-corrupted-repo": () => import("@/content/zh/recovery/recover-from-corrupted-repo.mdx"),
     "recovery/fix-detached-head-accidentally-committed": () => import("@/content/zh/recovery/fix-detached-head-accidentally-committed.mdx"),
     "recovery/fix-wrong-author-or-commit-message": () => import("@/content/zh/recovery/fix-wrong-author-or-commit-message.mdx"),
@@ -558,13 +551,6 @@ const contentModules = {
     "concepts/git-subtree": () => import("@/content/en/concepts/git-subtree.mdx"),
     "concepts/git-lfs": () => import("@/content/en/concepts/git-lfs.mdx"),
     "concepts/git-shallow": () => import("@/content/en/concepts/git-shallow.mdx"),
-<<<<<<< HEAD
-=======
-    "recovery/recover-after-cherry-pick": () => import("@/content/en/recovery/recover-after-cherry-pick.mdx"),
-    "recovery/undo-merge-commit": () => import("@/content/en/recovery/undo-merge-commit.mdx"),
-    "recovery/fix-broken-interactive-rebase": () => import("@/content/en/recovery/fix-broken-interactive-rebase.mdx"),
-    "recovery/recover-lost-commits": () => import("@/content/en/recovery/recover-lost-commits.mdx"),
->>>>>>> f58dd19a9415fe6efa10fe9cea27c08ceee00ef4
     "recovery/recover-from-corrupted-repo": () => import("@/content/en/recovery/recover-from-corrupted-repo.mdx"),
     "recovery/fix-detached-head-accidentally-committed": () => import("@/content/en/recovery/fix-detached-head-accidentally-committed.mdx"),
     "recovery/fix-wrong-author-or-commit-message": () => import("@/content/en/recovery/fix-wrong-author-or-commit-message.mdx"),

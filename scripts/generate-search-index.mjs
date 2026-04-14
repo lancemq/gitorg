@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-const root = "/Users/maqi/project/gitorg";
+const root = process.cwd();
 const contentRoot = path.join(root, "content");
 const contentTsPath = path.join(root, "lib", "content.ts");
 const outputPath = path.join(root, "lib", "search-index-static.ts");
