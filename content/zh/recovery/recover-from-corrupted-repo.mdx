@@ -1,0 +1,324 @@
+export const metadata = {
+  title: "仓库损坏后怎么恢复",
+  slug: "recover-from-corrupted-repo",
+  locale: "zh",
+  section: "recovery",
+  summary: "仓库损坏（pack 损坏、对象丢失、磁盘故障）后的诊断和恢复策略。包括 git fsck 诊断、从远端重新 clone、恢复 pack 文件、备份恢复和预防措施。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-fsck",
+    "https://git-scm.com/book/en/v2/Git-Internals-Packfiles",
+    "https://git-scm.com/docs/git-unpack-objects",
+    "https://git-scm.com/docs/git-bundle",
+  ],
+};
+
+# 仓库损坏后怎么恢复
+
+## 一句话理解
+
+Git 仓库损坏虽然不常见，但一旦发生可能让你无法正常工作。好消息是，Git 的内部结构具有很强的冗余性，大多数损坏情况都可以修复或从备份恢复。关键在于快速诊断和采取正确的恢复步骤。
+
+## 什么会导致仓库损坏
+
+### 磁盘错误或文件系统问题
+
+硬盘坏道、SSD 故障、文件系统错误都可能导致 Git 对象文件损坏：
+
+```bash
+# 磁盘 I/O 错误可能导致
+ls: cannot access '.git/objects/ab/cdef1234567890': Input/output error
+```
+
+### 中断的垃圾回收（git gc）
+
+如果在 `git gc` 或 `git repack` 运行过程中进程被强制终止（断电、kill -9），pack 文件可能处于不一致状态：
+
+```bash
+# 正在进行 repack 时断电
+git repack -a -d
+# 断电后可能出现损坏的 pack 文件
+```
+
+### 网络传输中断
+
+从远端拉取大仓库时网络中断，可能导致部分 pack 数据写入不完整：
+
+```bash
+git clone https://example.com/big-repo.git
+# 传输到 80% 时网络断开，pack 文件不完整
+```
+
+### 多人共享 NFS 挂载
+
+在 NFS 网络文件系统上操作时，锁机制不完善可能导致并发写入冲突，损坏引用或对象。
+
+### 手动操作 .git 目录
+
+直接编辑或删除 `.git/` 内的文件（如手动删除对象文件）是最常见的损坏原因。
+
+## 诊断仓库完整性
+
+### 第一步：git fsck --full
+
+这是 Git 内置的完整性检查工具，会遍历所有对象并验证引用完整性：
+
+```bash
+git fsck --full
+```
+
+可能的输出：
+
+```
+Checking object directories: 100% (256/256)
+Checking objects: 100% (1234/1234)
+error: a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: object corrupt or missing: .git/objects/a1/b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
+dangling blob 9876543210abcdef9876543210abcdef98765432
+missing tree abcdef1234567890abcdef1234567890abcdef12
+```
+
+关键输出类型：
+
+| 输出类型 | 含义 | 严重程度 |
+|---------|------|---------|
+| `object corrupt or missing` | 对象文件损坏或丢失 | **高** |
+| `missing tree/blob/commit` | 引用指向不存在的对象 | **高** |
+| `dangling commit/blob/tree` | 未被引用的孤立对象 | 低（无害） |
+| `unreachable` | 无法从任何引用到达 | 低 |
+
+### 第二步：检查 pack 文件
+
+```bash
+# 验证 pack 文件完整性
+git verify-pack -v .git/objects/pack/pack-*.idx
+
+# 如果 pack 损坏，会显示错误
+error: packfile .git/objects/pack/pack-abc123.pack does not match index
+```
+
+### 第三步：检查引用
+
+```bash
+# 查看所有引用是否指向有效的提交
+git for-each-ref
+
+# 检查 HEAD
+git symbolic-ref HEAD
+
+# 手动检查 .git/HEAD
+cat .git/HEAD
+```
+
+## 恢复策略
+
+### 策略 1：从远端重新 clone（最简单）
+
+如果损坏不严重，且远端仓库是完整的：
+
+```bash
+# 1. 备份当前仓库的 .git 目录
+mv .git .git.bak
+
+# 2. 重新 clone
+git clone https://example.com/repo.git
+
+# 3. 从旧仓库复制尚未推送的本地提交
+cd .git.bak
+git fsck --no-dangling 2>/dev/null | grep "commit" | awk '{print $3}'
+
+# 4. 在旧仓库中查看这些提交的差异
+git log --oneline HEAD...origin/main
+
+# 5. 使用 cherry-pick 将丢失的提交带回新仓库
+cd ../repo
+git cherry-pick <commit-hash>
+```
+
+### 策略 2：修复单个损坏对象
+
+如果只有少数对象损坏：
+
+```bash
+# 1. 识别损坏的对象
+git fsck --full 2>&1 | grep "corrupt or missing"
+
+# 2. 从远端获取缺失对象
+git fetch origin
+
+# 3. 如果远端有该对象，它会被自动修复
+# 如果远端也没有，尝试从其他副本获取
+git fetch --all
+```
+
+### 策略 3：恢复损坏的 pack 文件
+
+```bash
+# 1. 备份损坏的 pack 文件
+mkdir -p .git/pack-backup
+mv .git/objects/pack/*.pack .git/pack-backup/
+mv .git/objects/pack/*.idx .git/pack-backup/
+
+# 2. 尝试从备份 pack 中解压对象
+cd .git/pack-backup
+for pack in *.pack; do
+    echo "Attempting to unpack: $pack"
+    git unpack-objects < "$pack" 2>/dev/null || true
+done
+
+# 3. 或者使用 git unpack-objects 从 stdin 读取
+git unpack-objects < .git/pack-backup/pack-abc123.pack
+```
+
+如果 pack 部分损坏，可以尝试恢复未损坏的部分：
+
+```bash
+# 使用 git verify-pack 找出损坏的条目
+git verify-pack -v .git/pack-backup/pack-abc123.idx | grep "corrupt"
+
+# 手动提取可用对象
+git unpack-objects < .git/pack-backup/pack-abc123.pack 2>/dev/null
+```
+
+### 策略 4：从备份恢复 .git 目录
+
+如果你有定期备份 `.git` 目录：
+
+```bash
+# 1. 确认备份的时间点
+ls -la /path/to/backup/
+
+# 2. 用备份替换当前 .git
+rm -rf .git
+cp -r /path/to/backup/.git .git
+
+# 3. 验证恢复后的仓库
+git fsck --full
+
+# 4. 更新工作目录
+git reset --hard HEAD
+```
+
+### 策略 5：使用 bundle 恢复
+
+如果你之前创建了 bundle 备份：
+
+```bash
+# 从 bundle 恢复
+git clone repo-backup.bundle recovered-repo
+
+# 或者将 bundle 添加到现有仓库作为远端
+git bundle unbundle repo-backup.bundle
+
+# 添加为远端并 fetch
+git remote add backup /path/to/repo-backup.bundle
+git fetch backup
+```
+
+## 预防措施
+
+### 定期备份 .git 目录
+
+```bash
+# 创建 bundle 备份（紧凑且可移植）
+git bundle create backup-$(date +%Y%m%d).bundle --all
+
+# 恢复时只需
+git clone backup-20240315.bundle my-repo
+```
+
+### 配置多远端
+
+```bash
+# 添加多个远端作为冗余
+git remote add origin https://github.com/user/repo.git
+git remote add backup https://gitlab.com/user/repo.git
+git remote add mirror /path/to/local/mirror.git
+
+# 推送到所有远端
+git push --all origin
+git push --all backup
+```
+
+### 定期运行 fsck
+
+```bash
+# 添加到 cron 或 CI 任务中
+git fsck --full --no-dangling 2>&1 | tee /var/log/git-fsck.log
+```
+
+### 使用 git bundle 做离线备份
+
+```bash
+# 完整备份（包括所有分支和 tag）
+git bundle create full-backup.bundle --all
+
+# 只备份最近 30 天的内容
+git bundle create recent-backup.bundle --since="30 days ago" --all
+
+# 验证 bundle 完整性
+git bundle verify full-backup.bundle
+```
+
+### 启用 Git 的自动检查
+
+```bash
+# 在 .gitconfig 中启用定期检查
+git config transfer.fsckObjects true
+git config fetch.fsckObjects true
+git config receive.fsckObjects true
+```
+
+这会在 fetch/push/receive 时自动检查对象完整性。
+
+## 高级修复技巧
+
+### 重建 pack 文件
+
+```bash
+# 完全重建所有 pack 文件
+git repack -a -d --depth=250 --window=250
+
+# 如果当前 pack 损坏，先从其他来源获取对象后再重建
+git fetch origin
+git repack -a -d
+```
+
+### 使用 replace 机制绕过损坏对象
+
+```bash
+# 如果某个历史提交损坏但你不需要它
+# 可以创建替代对象
+git replace <damaged-commit> <reconstructed-commit>
+```
+
+### 手动重建损坏的引用
+
+```bash
+# 如果 HEAD 引用损坏
+echo "ref: refs/heads/main" > .git/HEAD
+
+# 如果分支引用损坏
+echo "<valid-commit-hash>" > .git/refs/heads/main
+
+# 或者使用 update-ref
+git update-ref refs/heads/main <valid-commit-hash>
+```
+
+## 注意事项
+
+1. **不要急于删除 .git 目录**：先尝试诊断和修复，很多情况不需要完全重建
+2. **备份第一**：任何修复操作前先备份当前状态
+3. **dangling 对象无害**：它们只是未被引用的对象，不影响仓库功能
+4. **远端是最可靠的恢复来源**：保持远端仓库的健康比本地更重要
+5. **bundle 是最便携的备份方式**：单文件、可验证、可离线使用
+
+## 总结
+
+| 损坏类型 | 最佳恢复方法 | 难度 |
+|---------|------------|------|
+| 少量对象丢失 | `git fetch --all` | 低 |
+| pack 文件损坏 | 备份 pack → 重建 | 中 |
+| 引用损坏 | 手动修复引用 | 中 |
+| 大面积损坏 | 重新 clone + cherry-pick | 中 |
+| 无远端可用 | bundle 恢复 / 对象重建 | 高 |
+
+记住：Git 的设计原则是"数据不可变"，大多数损坏只影响引用层而非对象层，恢复起来比想象中容易。

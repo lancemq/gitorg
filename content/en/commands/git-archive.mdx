@@ -76,3 +76,207 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 - Untracked files are never included in the archive — only Git-tracked files are exported.
 - Use `--prefix` to add a directory prefix to archived files, so they extract into a specified subdirectory.
 
+## Export specific paths with prefix
+
+The `--prefix` flag adds a directory wrapper around all archived files, which is essential for clean extraction:
+
+```bash
+# Creates my-project-v1.0/ containing all files
+git archive --format=tar --prefix=my-project-v1.0/ v1.0 | gzip > my-project-v1.0.tar.gz
+
+# ZIP with prefix
+git archive --format=zip --prefix=release-2.0/ v2.0 -o release-2.0.zip
+```
+
+Without `--prefix`, files extract directly into the current directory, which can be messy.
+
+### Archive a subdirectory only
+
+```bash
+# Export only the docs/ directory
+git archive --format=zip HEAD:docs/ -o docs-only.zip
+
+# Export src/ with a custom prefix
+git archive --format=tar --prefix=source-code/ HEAD -- src/ | gzip > source-code.tar.gz
+```
+
+The `HEAD:path/` syntax lets you specify any tree path as the archive root.
+
+## Format comparison: tar vs zip
+
+| Feature | tar | zip |
+|---------|-----|-----|
+| Compression | Requires gzip/bzip2/xz (`| gzip`) | Built-in |
+| Preserves permissions | Yes | Limited |
+| Preserves symlinks | Yes | Yes |
+| Windows compatibility | Requires extraction tools | Native support |
+| Streamable | Yes (piped) | No (needs file) |
+| Archive size | Slightly smaller | Slightly larger |
+
+### When to use tar
+
+```bash
+# Best for: Linux/Unix deployment, CI pipelines
+git archive --format=tar --prefix=deploy/ main | gzip > deploy.tar.gz
+git archive --format=tar.gz --prefix=deploy/ main -o deploy.tar.gz  # Git 2.30+
+```
+
+### When to use zip
+
+```bash
+# Best for: sharing with Windows users, GitHub-style releases
+git archive --format=zip --prefix=release/ v1.0 -o release-v1.0.zip
+```
+
+Note: Git also supports `tar.gz` and `tar.bz2` as format names directly (Git 2.30+):
+
+```bash
+git archive --format=tar.gz HEAD -o source.tar.gz
+git archive --format=tar.bz2 HEAD -o source.tar.bz2
+```
+
+## Exclude files via export-ignore in .gitattributes
+
+Use `.gitattributes` to control which files are excluded from archives without affecting the repository:
+
+```
+# .gitattributes
+tests/          export-ignore
+.github/        export-ignore
+.gitlab-ci.yml  export-ignore
+*.test.js       export-ignore
+docs/internal/  export-ignore
+```
+
+### How it works
+
+- Files matching `export-ignore` are included in `git status`, `git log`, and all Git operations
+- They are **only** excluded when creating an archive with `git archive`
+- This is different from `.gitignore` — the files are still tracked by Git
+
+### Verify what's in an archive
+
+```bash
+# List archive contents without extracting
+tar -tzf release.tar.gz
+unzip -l release.zip
+
+# Compare with and without export-ignore
+git archive --format=tar HEAD | tar -t
+git archive --format=tar HEAD -- . | tar -t
+```
+
+## Tag and revision export
+
+### Export by tag
+
+```bash
+# Clean release from a tag
+git archive --format=zip --prefix=myapp-1.0/ v1.0 -o myapp-1.0.zip
+```
+
+### Export by commit hash
+
+```bash
+git archive --format=tar --prefix=snapshot/ abc1234 -o snapshot.tar
+```
+
+### Export by branch
+
+```bash
+git archive --format=zip --prefix=latest/ main -o latest.zip
+```
+
+### Export with version information
+
+```bash
+# Using HEAD with a specific tag as version
+VERSION=$(git describe --tags --always --dirty)
+git archive --format=tar.gz --prefix="myapp-${VERSION}/" HEAD -o "myapp-${VERSION}.tar.gz"
+```
+
+### Export from a specific date
+
+```bash
+# Archive the state of main as it was on a specific date
+git archive --format=zip --prefix=snapshot/ "$(git rev-list -n1 --before='2024-06-01' main)" -o snapshot.zip
+```
+
+## Remote archive
+
+Git supports fetching archives from remote repositories without cloning:
+
+```bash
+# Archive from a remote (requires server support for upload-archive)
+git archive --remote=git@github.com:user/repo.git --format=zip HEAD -o remote-archive.zip
+
+# Archive a specific tag from remote
+git archive --remote=git@github.com:user/repo.git v2.0 -o release.zip
+```
+
+### Configure remote archive
+
+```bash
+# Set up a named remote for archiving
+git remote add releases git@github.com:org/releases.git
+git archive --remote=releases --format=tar.gz main | tar -tz
+```
+
+**Note**: Remote archive requires the server to have `upload-archive` enabled. GitHub does not support this, but self-hosted Git servers often do.
+
+## CI integration: auto-generate tarballs
+
+### GitHub Actions example
+
+```yaml
+# .github/workflows/release.yml
+name: Create Release Archive
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create archive
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          git archive --format=tar.gz --prefix="${{ github.event.repository.name }}-${VERSION}/" \
+            "${VERSION}" -o "${{ github.event.repository.name }}-${VERSION}.tar.gz"
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "*.tar.gz"
+```
+
+### GitLab CI example
+
+```yaml
+# .gitlab-ci.yml
+archive:
+  stage: package
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - git archive --format=tar.gz --prefix="app-${CI_COMMIT_TAG}/" "$CI_COMMIT_TAG" -o "app-${CI_COMMIT_TAG}.tar.gz"
+  artifacts:
+    paths:
+      - "*.tar.gz"
+```
+
+### Makefile integration
+
+```makefile
+VERSION := $(shell git describe --tags --always --dirty)
+
+dist:
+	git archive --format=tar.gz --prefix="project-$(VERSION)/" HEAD -o "project-$(VERSION).tar.gz"
+	@echo "Created project-$(VERSION).tar.gz"
+
+.PHONY: dist
+```

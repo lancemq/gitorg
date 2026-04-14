@@ -62,3 +62,143 @@ Always preview first with `-n`.
 - **`-f` is required**: Unless `clean.requireForce=false` is configured, you must add `-f` to actually perform deletion — this is Git's safety mechanism.
 - `git clean` does not affect tracked files; modifications to tracked files must be handled with `git checkout` or `git restore`.
 
+## Flag comparison table
+
+| Flag | Meaning | Safe to run alone? | What it does |
+|------|---------|-------------------|--------------|
+| `-n` / `--dry-run` | Preview only | ✅ Yes | Shows what *would* be deleted without deleting anything |
+| `-f` / `--force` | Actually delete | ❌ No | Required to perform actual deletion (unless `clean.requireForce=false`) |
+| `-d` | Include directories | ⚠️ With `-n` | Also removes untracked directories, not just files |
+| `-x` | Include ignored files | ❌ Dangerous | Removes files matching `.gitignore` patterns — can delete IDE configs, env files |
+| `-X` | Only ignored files | ⚠️ With `-n` | Removes *only* `.gitignore`-listed files, keeps other untracked files |
+| `-i` / `--interactive` | Interactive mode | ✅ Yes | Prompts for each file/directory group before deleting |
+| `-e <pattern>` | Exclude pattern | ✅ Yes | Skips files matching the given glob pattern |
+
+## Danger warnings for `-x`
+
+The `-x` flag is the most dangerous option in `git clean` because it bypasses `.gitignore` protection:
+
+```bash
+# This deletes EVERYTHING untracked, including:
+# - .env files with API keys
+# - IDE settings (.vscode/, .idea/)
+# - node_modules/ (if gitignored)
+# - build artifacts
+git clean -fdx
+```
+
+**Always run `-n` first:**
+
+```bash
+git clean -fdxn   # preview what -fdx would delete
+git clean -fdx    # only run after confirming the list is safe
+```
+
+Real-world horror story: running `git clean -fdx` in a project root has deleted `.env` files containing production database credentials. Never use `-x` without a thorough dry-run.
+
+## Interactive clean mode
+
+`git clean -i` provides a menu-driven interface for selective deletion:
+
+```bash
+git clean -i
+```
+
+You'll see a menu like:
+
+```
+Would you like to clean untracked files? [yes]
+What now>
+*** Commands ***
+    1: clean                2: filter by pattern    3: select by numbers
+    4: ask each             5: quit                 6: help
+```
+
+### Interactive mode actions
+
+- **clean**: proceed with deletion of all listed files
+- **filter by pattern**: narrow the list using a glob
+- **select by numbers**: pick specific files by their listed numbers
+- **ask each**: confirm deletion for each file individually
+- **quit**: exit without deleting anything
+
+Interactive mode is especially useful when you have many untracked files and want fine-grained control.
+
+## Dry-run output analysis
+
+Reading `git clean -n` output carefully is your primary safety mechanism:
+
+```bash
+$ git clean -n
+Would remove config.local.json
+Would remove build/
+Would remove tmp/test-output.log
+```
+
+### What to look for
+
+- **Unexpected paths**: Files you did not know existed might appear
+- **Config files**: `.env`, `.local`, config files that should not be deleted
+- **Generated directories**: `node_modules/`, `build/`, `dist/` — verify these are actually safe to remove
+- **Hidden files**: Check for `.gitignore`-listed files if you plan to use `-x`
+
+### Combine with `git status`
+
+```bash
+git status          # see tracked vs untracked overview
+git clean -n        # preview untracked files to be removed
+git clean -n -d     # include directories in preview
+git clean -fd       # execute after confirmation
+```
+
+## Exclude pattern (-e)
+
+The `-e` flag lets you protect specific files or patterns from deletion:
+
+```bash
+# Clean everything except .env files
+git clean -fd -e '*.env'
+
+# Clean but keep all .json config files
+git clean -fd -e '*.json'
+
+# Multiple exclude patterns
+git clean -fd -e '.env*' -e '*.local' -e 'config.local.*'
+```
+
+### Combine with `-x` for targeted cleanup
+
+```bash
+# Delete all ignored files EXCEPT .env
+git clean -fdX -e '.env' -e '.env.*'
+```
+
+This is useful when you want to clean build artifacts but keep your local environment configuration.
+
+## Alternative: git reset --hard for tracked files
+
+`git clean` only handles **untracked** files. If you need to reset **tracked** files to their last committed state, use a different command:
+
+```bash
+# Reset all tracked file modifications
+git reset --hard HEAD
+
+# Reset tracked files in a specific path
+git checkout HEAD -- src/
+
+# Modern equivalent (Git 2.23+)
+git restore --source=HEAD --staged --worktree .
+```
+
+### Combined clean + reset for a fresh start
+
+```bash
+# Complete working tree reset (untracked + tracked)
+git clean -fd        # remove untracked files/directories
+git reset --hard HEAD # reset tracked files to HEAD
+
+# Or as a one-liner:
+git clean -fd && git reset --hard HEAD
+```
+
+**Warning**: This combination is irreversible for uncommitted changes. Make sure you do not need any local modifications before running it.

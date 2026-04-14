@@ -1,0 +1,324 @@
+export const metadata = {
+  title: "Recovering from a corrupted repository",
+  slug: "recover-from-corrupted-repo",
+  locale: "en",
+  section: "recovery",
+  summary: "Diagnosis and recovery strategies for repository corruption: damaged pack files, missing objects, and disk failures. Covers git fsck, remote re-clone, pack recovery, backup restoration, and prevention.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-fsck",
+    "https://git-scm.com/book/en/v2/Git-Internals-Packfiles",
+    "https://git-scm.com/docs/git-unpack-objects",
+    "https://git-scm.com/docs/git-bundle",
+  ],
+};
+
+# Recovering from a corrupted repository
+
+## The short version
+
+Git repository corruption is uncommon but can halt your work when it happens. The good news is that Git's internal structure has strong redundancy, and most corruption scenarios can be repaired or restored from backups. The key is quick diagnosis and the right recovery steps.
+
+## What causes repository corruption
+
+### Disk errors or filesystem issues
+
+Bad sectors, SSD failures, or filesystem errors can corrupt Git object files:
+
+```bash
+# Disk I/O errors may produce
+ls: cannot access '.git/objects/ab/cdef1234567890': Input/output error
+```
+
+### Interrupted garbage collection (git gc)
+
+If `git gc` or `git repack` is forcefully terminated mid-run (power outage, kill -9), pack files can end up in an inconsistent state:
+
+```bash
+# Power outage during repack
+git repack -a -d
+# After power loss, pack files may be corrupted
+```
+
+### Network transfer interruptions
+
+When fetching a large repo and the network drops, partial pack data may be written incompletely:
+
+```bash
+git clone https://example.com/big-repo.git
+# Network drops at 80%, pack file is incomplete
+```
+
+### Shared NFS mounts
+
+Operating on NFS network filesystems, imperfect locking mechanisms can cause concurrent write conflicts that damage references or objects.
+
+### Manual .git directory manipulation
+
+Directly editing or deleting files inside `.git/` (such as manually removing object files) is the most common cause of corruption.
+
+## Diagnosing repository integrity
+
+### Step 1: git fsck --full
+
+This is Git's built-in integrity checker that traverses all objects and validates reference integrity:
+
+```bash
+git fsck --full
+```
+
+Possible output:
+
+```
+Checking object directories: 100% (256/256)
+Checking objects: 100% (1234/1234)
+error: a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2: object corrupt or missing: .git/objects/a1/b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
+dangling blob 9876543210abcdef9876543210abcdef98765432
+missing tree abcdef1234567890abcdef1234567890abcdef12
+```
+
+Key output types:
+
+| Output type | Meaning | Severity |
+|------------|---------|----------|
+| `object corrupt or missing` | Object file is corrupted or missing | **High** |
+| `missing tree/blob/commit` | Reference points to nonexistent object | **High** |
+| `dangling commit/blob/tree` | Unreferenced orphan object | Low (harmless) |
+| `unreachable` | Not reachable from any reference | Low |
+
+### Step 2: Check pack files
+
+```bash
+# Verify pack file integrity
+git verify-pack -v .git/objects/pack/pack-*.idx
+
+# If pack is corrupted, you'll see errors
+error: packfile .git/objects/pack/pack-abc123.pack does not match index
+```
+
+### Step 3: Check references
+
+```bash
+# Verify all references point to valid commits
+git for-each-ref
+
+# Check HEAD
+git symbolic-ref HEAD
+
+# Manually inspect .git/HEAD
+cat .git/HEAD
+```
+
+## Recovery strategies
+
+### Strategy 1: Re-clone from remote (simplest)
+
+If corruption isn't severe and the remote is intact:
+
+```bash
+# 1. Back up the current .git directory
+mv .git .git.bak
+
+# 2. Re-clone
+git clone https://example.com/repo.git
+
+# 3. Copy unpushed local commits from the old repo
+cd .git.bak
+git fsck --no-dangling 2>/dev/null | grep "commit" | awk '{print $3}'
+
+# 4. View the diffs of those commits
+git log --oneline HEAD...origin/main
+
+# 5. Cherry-pick lost commits back into the new repo
+cd ../repo
+git cherry-pick <commit-hash>
+```
+
+### Strategy 2: Repair individual corrupted objects
+
+If only a few objects are damaged:
+
+```bash
+# 1. Identify corrupted objects
+git fsck --full 2>&1 | grep "corrupt or missing"
+
+# 2. Fetch missing objects from remote
+git fetch origin
+
+# 3. If the remote has the object, it will be repaired automatically
+# If not, try fetching from other replicas
+git fetch --all
+```
+
+### Strategy 3: Recover corrupted pack files
+
+```bash
+# 1. Back up corrupted pack files
+mkdir -p .git/pack-backup
+mv .git/objects/pack/*.pack .git/pack-backup/
+mv .git/objects/pack/*.idx .git/pack-backup/
+
+# 2. Try to unpack objects from backup packs
+cd .git/pack-backup
+for pack in *.pack; do
+    echo "Attempting to unpack: $pack"
+    git unpack-objects < "$pack" 2>/dev/null || true
+done
+
+# 3. Or use git unpack-objects reading from stdin
+git unpack-objects < .git/pack-backup/pack-abc123.pack
+```
+
+If the pack is partially corrupted, try to recover the undamaged portion:
+
+```bash
+# Use git verify-pack to find corrupted entries
+git verify-pack -v .git/pack-backup/pack-abc123.idx | grep "corrupt"
+
+# Extract available objects
+git unpack-objects < .git/pack-backup/pack-abc123.pack 2>/dev/null
+```
+
+### Strategy 4: Restore .git from backup
+
+If you have regular `.git` directory backups:
+
+```bash
+# 1. Confirm backup timestamp
+ls -la /path/to/backup/
+
+# 2. Replace current .git with backup
+rm -rf .git
+cp -r /path/to/backup/.git .git
+
+# 3. Verify the restored repository
+git fsck --full
+
+# 4. Update working directory
+git reset --hard HEAD
+```
+
+### Strategy 5: Restore from bundle
+
+If you previously created a bundle backup:
+
+```bash
+# Recover from bundle
+git clone repo-backup.bundle recovered-repo
+
+# Or add bundle to existing repo as a remote
+git bundle unbundle repo-backup.bundle
+
+# Add as remote and fetch
+git remote add backup /path/to/repo-backup.bundle
+git fetch backup
+```
+
+## Prevention measures
+
+### Regular .git directory backups
+
+```bash
+# Create a bundle backup (compact and portable)
+git bundle create backup-$(date +%Y%m%d).bundle --all
+
+# To restore, just run
+git clone backup-20240315.bundle my-repo
+```
+
+### Configure multiple remotes
+
+```bash
+# Add multiple remotes as redundancy
+git remote add origin https://github.com/user/repo.git
+git remote add backup https://gitlab.com/user/repo.git
+git remote add mirror /path/to/local/mirror.git
+
+# Push to all remotes
+git push --all origin
+git push --all backup
+```
+
+### Run fsck regularly
+
+```bash
+# Add to cron or CI tasks
+git fsck --full --no-dangling 2>&1 | tee /var/log/git-fsck.log
+```
+
+### Use git bundle for offline backups
+
+```bash
+# Full backup (all branches and tags)
+git bundle create full-backup.bundle --all
+
+# Backup only the last 30 days
+git bundle create recent-backup.bundle --since="30 days ago" --all
+
+# Verify bundle integrity
+git bundle verify full-backup.bundle
+```
+
+### Enable Git's automatic checking
+
+```bash
+# Enable integrity checks in .gitconfig
+git config transfer.fsckObjects true
+git config fetch.fsckObjects true
+git config receive.fsckObjects true
+```
+
+This automatically checks object integrity during fetch/push/receive operations.
+
+## Advanced recovery techniques
+
+### Rebuild pack files
+
+```bash
+# Completely rebuild all pack files
+git repack -a -d --depth=250 --window=250
+
+# If current pack is corrupted, fetch objects from other sources first
+git fetch origin
+git repack -a -d
+```
+
+### Use replace mechanism to bypass damaged objects
+
+```bash
+# If a historical commit is damaged but you don't need it
+# Create a replacement object
+git replace <damaged-commit> <reconstructed-commit>
+```
+
+### Manually rebuild damaged references
+
+```bash
+# If HEAD reference is corrupted
+echo "ref: refs/heads/main" > .git/HEAD
+
+# If a branch reference is corrupted
+echo "<valid-commit-hash>" > .git/refs/heads/main
+
+# Or use update-ref
+git update-ref refs/heads/main <valid-commit-hash>
+```
+
+## Key takeaways
+
+1. **Don't rush to delete .git**: Diagnose first; many cases don't require full rebuild
+2. **Backup first**: Always back up before any repair operation
+3. **Dangling objects are harmless**: They're just unreferenced objects, not affecting functionality
+4. **Remote is the most reliable recovery source**: Keep remote repos healthy
+5. **Bundle is the most portable backup**: Single file, verifiable, works offline
+
+## Summary
+
+| Corruption type | Best recovery method | Difficulty |
+|----------------|---------------------|------------|
+| Few missing objects | `git fetch --all` | Low |
+| Pack file damage | Backup pack → rebuild | Medium |
+| Reference damage | Manual reference repair | Medium |
+| Widespread damage | Re-clone + cherry-pick | Medium |
+| No remote available | Bundle restore / object rebuild | High |
+
+Remember: Git's design principle is "data is immutable." Most corruption affects the reference layer rather than the object layer, making recovery easier than you might think.

@@ -1,0 +1,353 @@
+export const metadata = {
+  title: "主干开发工作流",
+  slug: "trunk-based-development",
+  locale: "zh",
+  section: "workflows",
+  summary: "主干开发 vs 分支开发对比、feature flag 配合、短分支策略、小步提交实践。",
+  sourceUrls: [
+    "https://trunkbaseddevelopment.com/",
+    "https://github.com/features/actions",
+  ],
+};
+
+# 主干开发工作流
+
+## 一句话理解
+
+主干开发（Trunk-Based Development, TBD）是一种分支策略：所有开发者直接在主干（main/master）上工作，或者创建生命周期极短（< 1-2 天）的功能分支，尽快合并回主干。这与 Gitflow 等长期分支策略形成鲜明对比。
+
+## 什么是主干开发
+
+### 核心理念
+
+```
+main ───●──●──●──●──●──●──●──●──
+        ↑  ↑     ↑  ↑     ↑  ↑
+       提交 合并 提交 合并 提交 合并
+       (频繁、小步)
+```
+
+- **单一主分支**：main（或 trunk）是唯一的长期分支
+- **短命功能分支**：功能分支生命周期 < 1-2 天
+- **频繁合并**：每天至少合并一次到主干
+- **持续集成**：每次合并都经过自动化测试
+
+### 与 Gitflow 的对比
+
+#### Gitflow 模式
+
+```
+main ───────●──────────────●──────── (只有发布时合并)
+             ↖            ↗
+develop ───────●──●──●──●──●──●──
+              ↗  ↗    ↗  ↗
+feature1 ──●──●    ─●──●
+feature2 ────●──●──●
+release ───────────────●──●──●──
+```
+
+特点：
+- 长期存在的 develop 分支
+- 功能分支可能存活数周
+- 发布分支独立管理
+- 合并频率低，合并冲突风险高
+
+#### TBD 模式
+
+```
+main ───●──●──●──●──●──●──●──●──
+       ↗  ↗  ↗  ↗  ↗  ↗  ↗
+f1 ──●──●
+f2 ─────●──●
+f3 ─────────●
+f4 ────────────●──●
+```
+
+特点：
+- 没有 develop 分支
+- 功能分支极短（几小时到 1-2 天）
+- 直接在主干上提交也是常见的
+- 合并频率极高
+
+## 短分支生命周期
+
+### 为什么分支要短
+
+```bash
+# 长分支的问题
+# Day 1: 从 main 创建 feature 分支
+git checkout -b feature-huge main
+
+# Day 7: 还在开发，main 已经前进了 50 个提交
+git fetch origin
+git log main..origin/main | wc -l
+# 50
+
+# Day 14: 合并时发现大量冲突
+git checkout main
+git merge feature-huge
+# CONFLICT! 几十个文件冲突...
+```
+
+### 短分支策略
+
+```bash
+# Day 1: 创建分支，开始工作
+git checkout -b feature-small main
+
+# Day 1 下午: 功能完成，提交 PR
+git add .
+git commit -m "feat: add small feature"
+git push origin feature-small
+# 创建 PR/MR
+
+# Day 2 上午: Review 通过，合并
+# PR merged to main
+git checkout main
+git pull
+```
+
+### 分支存活时间指南
+
+| 分支类型 | 最大存活时间 | 说明 |
+|---------|------------|------|
+| 功能分支 | < 1 天 | 小功能，一个 PR |
+| 大功能分支 | < 2 天 | 需要拆分功能 flag |
+| Bug 修复分支 | < 4 小时 | 紧急修复 |
+| 实验分支 | 按需 | 不确定是否合并 |
+
+## Feature Flag 配合策略
+
+### 为什么需要 Feature Flag
+
+在 TBD 中，未完成的功能也必须合并到主干。Feature Flag 让未完成功能对最终用户不可见：
+
+```javascript
+// 使用 feature flag 控制功能可见性
+if (featureFlags.isEnabled('new-search')) {
+    // 新搜索功能（还在开发中）
+    renderNewSearch();
+} else {
+    // 旧搜索功能
+    renderOldSearch();
+}
+```
+
+### Feature Flag 实现方式
+
+#### 环境变量
+
+```javascript
+const ENABLE_NEW_UI = process.env.ENABLE_NEW_UI === 'true';
+
+if (ENABLE_NEW_UI) {
+    renderNewUI();
+}
+```
+
+#### 配置文件
+
+```json
+// feature-flags.json
+{
+  "new-search": { "enabled": false, "rollout": 0 },
+  "dark-mode": { "enabled": true, "rollout": 100 },
+  "beta-api": { "enabled": true, "rollout": 10 }
+}
+```
+
+#### 专业工具
+
+```javascript
+// 使用 LaunchDarkly / Split.io 等
+import { LDClient } from 'launchdarkly-node-server-sdk';
+
+const client = LDClient.init('your-sdk-key');
+const showNewFeature = await client.variation('new-feature', user, false);
+
+if (showNewFeature) {
+    // 新功能
+}
+```
+
+### Feature Flag 生命周期
+
+```
+1. 创建 flag（默认关闭）
+   ↓
+2. 在 flag 保护下开发功能
+   ↓
+3. 合并到主干（flag 关闭，用户看不到）
+   ↓
+4. 测试环境开启 flag 测试
+   ↓
+5. 生产环境灰度发布（10% → 50% → 100%）
+   ↓
+6. 全量发布后移除 flag
+```
+
+### 清除过期 Flag
+
+```bash
+# 定期搜索并清理已不再需要的 flag
+grep -rn "featureFlags.isEnabled" src/
+
+# 创建清理任务
+# TODO(flag): Remove new-search flag after v2.0 release
+```
+
+## 小步提交实践
+
+### 什么是小步提交
+
+```bash
+# 不好的做法——大提交
+git add .
+git commit -m "完成用户模块"
+# 包含 200 个文件的变更，无法 code review
+
+# 好的做法——小提交
+git add src/user/model.js
+git commit -m "feat(user): 添加用户数据模型"
+
+git add src/user/service.js
+git commit -m "feat(user): 实现用户服务层"
+
+git add src/user/controller.js tests/user/
+git commit -m "feat(user): 添加用户控制器和测试"
+```
+
+### 小步提交的好处
+
+1. **易于 Code Review**：每个 PR 变更量小，review 质量高
+2. **易于定位 Bug**：出问题时可以快速定位到具体提交
+3. **减少合并冲突**：频繁合并，冲突范围小
+4. **持续反馈**：每次提交都经过 CI，问题早发现
+
+### 提交大小建议
+
+| 指标 | 建议值 |
+|------|--------|
+| 每个 PR 文件数 | < 10 个文件 |
+| 每个 PR 代码行数 | < 400 行 |
+| 每个提交文件数 | < 5 个文件 |
+| PR Review 时间 | < 30 分钟 |
+
+## 团队规模与 TBD
+
+### 小团队（1-5 人）
+
+- **推荐度**：★★★★★
+- **实践**：直接在 main 上提交，或使用极短的功能分支
+- **CI 要求**：基础自动化测试即可
+
+### 中等团队（5-20 人）
+
+- **推荐度**：★★★★☆
+- **实践**：短功能分支 + PR review + CI
+- **CI 要求**：完整的测试套件 + 自动化部署
+
+### 大团队（20+ 人）
+
+- **推荐度**：★★★☆☆
+- **实践**：需要配合 feature flag + 代码所有权 + 严格的 CI
+- **注意事项**：可能需要按模块划分子仓库或 monorepo
+
+## 什么时候不适合 TBD
+
+### 不适合的场景
+
+1. **法规要求严格的行业**：医疗、金融等需要严格变更审批
+2. **无法实现自动化测试的项目**：嵌入式系统、硬件相关
+3. **发布周期长的项目**：每年只发布几次的传统软件
+4. **外部贡献者多的开源项目**：无法保证提交质量
+
+### 替代方案
+
+| 场景 | 推荐工作流 |
+|------|-----------|
+| 大型企业，严格流程 | Gitflow |
+| Web 应用，持续部署 | GitHub Flow |
+| 多版本维护 | Gitflow 或 GitLab Flow |
+| 快速迭代的 SaaS | TBD + Feature Flags |
+
+## CI/CD 配合
+
+### 主干开发需要强大的 CI
+
+```yaml
+# .github/workflows/ci.yml
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run tests
+        run: npm test
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to staging
+        run: ./deploy.sh staging
+```
+
+### 分支策略保护
+
+```bash
+# 保护 main 分支
+# GitHub: Settings > Branches > Branch protection rules
+# - Require pull request reviews
+# - Require status checks to pass
+# - Require branches to be up to date
+# - Include administrators
+```
+
+## 最佳实践总结
+
+1. **每天至少合并一次**：不要让分支存活超过一天
+2. **Feature Flag 是必备**：保护未完成功能
+3. **CI 必须快速可靠**：慢的 CI 会阻碍频繁合并
+4. **小步提交**：每个 PR 控制在可 review 的大小
+5. **自动化一切**：测试、lint、构建全部自动化
+6. **及时清理 Flag**：功能上线后尽快移除对应 Flag
+7. **代码审查不可省**：TBD 不意味着不需要 review
+
+## 注意事项
+
+1. **TBD 不是"没有分支"**：功能分支仍然有用，只是生命周期很短
+2. **需要团队纪律**：频繁合并需要每个人的配合
+3. **CI 是基础**：没有可靠 CI 的 TBD 是灾难
+4. **渐进式采用**：可以从减少分支存活时间开始，逐步过渡
+5. **监控合并频率**：跟踪每个 PR 的存活时间，持续优化
+
+## 总结
+
+| 维度 | TBD | Gitflow |
+|------|-----|---------|
+| 分支数量 | 少（1 个主分支） | 多（main + develop + feature + release） |
+| 合并频率 | 每天多次 | 每周/每发布周期 |
+| 功能发布 | Feature Flag | 发布分支 |
+| CI 要求 | 高（必须快速可靠） | 中 |
+| 适合团队 | 敏捷、持续交付 | 传统、固定发布 |
+| 学习曲线 | 中（需要改变习惯） | 高（流程复杂） |
+
+TBD 是现代软件开发中越来越流行的分支策略。它通过频繁合并减少集成风险，通过 feature flag 实现灵活发布，是持续交付的最佳实践之一。

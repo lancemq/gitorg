@@ -1,0 +1,331 @@
+export const metadata = {
+  title: "高级提交信息规范",
+  slug: "commit-message-advanced",
+  locale: "zh",
+  section: "best-practices",
+  summary: "Conventional Commits、语义化提交、Co-authored-by、Breaking Changes 等高级提交信息规范与工具支持。",
+  sourceUrls: [
+    "https://www.conventionalcommits.org/",
+    "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project",
+    "https://github.com/commitizen/cz-cli",
+  ],
+};
+
+# 高级提交信息规范
+
+## 一句话理解
+
+好的提交信息让代码历史成为最好的文档。遵循统一规范后，团队可以通过提交信息自动生成 changelog、追溯变更原因、理解系统设计决策。
+
+## 提交信息的基本结构
+
+一个规范的提交信息包含三个部分：
+
+```
+<标题行>（50 字符以内）
+
+<正文>（每行 72 字符以内）
+
+<footer>（元数据、关联 Issue 等）
+```
+
+### 标题行规则
+
+- **不超过 50 个字符**（理想），最多 72
+- **祈使句开头**：用 "修复" 而非 "修复了"，用 "添加" 而非 "添加了"
+- **不要句号结尾**
+- **首字母大写**（英文）
+
+```
+✅ 修复登录页面的空指针异常
+✅ 添加用户头像上传功能
+✅ 重构数据库连接池配置
+
+❌ 修复了登录页面的空指针异常。
+❌ 修改了一些东西
+❌ 更新
+```
+
+### 正文规则
+
+- 与标题行之间**空一行**
+- 解释**为什么**做这个改动，而不是做了什么（代码已经展示了做了什么）
+- 每行不超过 72 字符
+- 可以包含多段
+
+```
+修复登录页面的空指针异常
+
+用户在没有填写密码的情况下点击登录按钮时，
+后端没有进行空值校验，导致 NullPointerException。
+
+修复方法是在认证服务中添加了密码字段的非空检查，
+并返回明确的错误提示信息。
+```
+
+### Footer 规则
+
+- 与正文之间**空一行**
+- 包含关联 Issue、破坏性变更、合作者等元数据
+
+```
+修复登录页面的空指针异常
+
+添加了密码字段的非空检查。
+
+Closes #123
+Co-authored-by: 李四 <lisi@example.com>
+```
+
+## Conventional Commits 规范
+
+Conventional Commits 是最流行的提交信息规范之一：
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+### Type 类型
+
+| Type | 说明 | 示例 |
+|------|------|------|
+| `feat` | 新功能 | `feat(auth): 添加 OAuth2 登录` |
+| `fix` | Bug 修复 | `fix(login): 修复密码校验逻辑` |
+| `docs` | 文档变更 | `docs(readme): 更新安装说明` |
+| `style` | 代码格式（不影响逻辑） | `style: 统一缩进为 2 空格` |
+| `refactor` | 重构（非新功能/非修复） | `refactor(db): 重构数据库连接池` |
+| `perf` | 性能优化 | `perf(query): 优化 SQL 查询` |
+| `test` | 测试相关 | `test(auth): 添加登录单元测试` |
+| `chore` | 构建/工具变更 | `chore: 升级依赖版本` |
+| `ci` | CI/CD 变更 | `ci(github): 添加 lint 检查` |
+| `revert` | 回退提交 | `revert: 回退 feat(auth)` |
+
+### Scope 作用域
+
+scope 标识变更影响的模块或范围：
+
+```
+feat(user): 添加用户个人资料页面
+fix(api): 修复 /users 接口的分页 bug
+docs(readme): 更新快速开始指南
+refactor(core): 重构事件总线
+```
+
+scope 是可选的，但对大型项目很有帮助。
+
+### Breaking Changes 标注
+
+有两种方式标注破坏性变更：
+
+#### 方式 1：footer 标注
+
+```
+feat(api): 修改用户查询接口
+
+将 /users 接口的分页参数从 offset/limit 改为 cursor 模式。
+
+BREAKING CHANGE: /users 接口不再支持 offset 和 limit 参数，
+请使用 cursor 和 page_size 替代。
+
+Closes #456
+```
+
+#### 方式 2：标题行标注
+
+```
+feat(api)!: 修改用户查询接口为 cursor 分页
+```
+
+或：
+
+```
+feat!: 移除旧的认证中间件
+```
+
+注意 `!` 在 type 后面、冒号前面。
+
+## Co-authored-by 多作者标注
+
+当多个人合作完成一个功能时：
+
+```
+feat(search): 实现全文搜索功能
+
+使用 Elasticsearch 实现全文搜索，支持中文分词。
+
+Co-authored-by: 王五 <wangwu@example.com>
+Co-authored-by: 赵六 <zhaoliu@example.com>
+```
+
+GitHub 会自动识别并显示多位作者。
+
+### GitHub PR 自动添加
+
+在 GitHub 上合并 PR 时，可以选择 "Squash and merge"，GitHub 会自动收集所有贡献者的 Co-authored-by。
+
+## 关联 Issue/PR
+
+### 关键词自动关闭
+
+在提交信息中使用特定关键词，可以自动关闭关联 Issue：
+
+```
+fix(auth): 修复登录超时问题
+
+Closes #123
+Closes #456
+Fixes #789
+Resolves #100
+```
+
+支持的关键词：`close`, `closes`, `closed`, `fix`, `fixes`, `fixed`, `resolve`, `resolves`, `resolved`
+
+### 引用但不关闭
+
+```
+feat(user): 添加用户导出功能
+
+相关讨论见 #123
+参见 #456 的 API 设计
+```
+
+## 工具支持
+
+### commitlint
+
+commitlint 检查提交信息是否符合规范：
+
+```bash
+# 安装
+npm install --save-dev @commitlint/cli @commitlint/config-conventional
+
+# 配置 commitlint.config.js
+module.exports = {
+  extends: ['@commitlint/config-conventional'],
+  rules: {
+    'header-max-length': [2, 'always', 72],
+    'body-max-line-length': [2, 'always', 100],
+  },
+};
+
+# 测试提交信息
+echo "feat: add login" | npx commitlint
+```
+
+### Husky 集成
+
+在提交时自动检查：
+
+```bash
+# 安装 husky
+npm install --save-dev husky
+
+# 启用 husky
+npx husky init
+
+# 添加 commit-msg hook
+echo 'npx --no-install commitlint --edit "$1"' > .husky/commit-msg
+chmod +x .husky/commit-msg
+```
+
+### Commitizen
+
+交互式生成符合规范的提交信息：
+
+```bash
+# 安装
+npm install --save-dev commitizen @commitlint/cz-commitlint
+
+# 初始化
+npx commitizen init cz-conventional-changelog --save-dev --save-exact
+
+# 使用 cz 代替 git commit
+npx cz
+# 交互式选择 type、scope、description 等
+```
+
+交互过程：
+
+```
+? Select the type of change you are committing:
+❯ feat:     A new feature
+  fix:      A bug fix
+  docs:     Documentation only changes
+  ...
+
+? What is the scope of this change? (e.g. component or file name)
+auth
+
+? Write a short, imperative tense description of the change:
+add OAuth2 login support
+```
+
+### conventional-changelog
+
+自动生成 changelog：
+
+```bash
+# 安装
+npm install -g conventional-changelog-cli
+
+# 生成 changelog
+conventional-changelog -p angular -i CHANGELOG.md -s -r 0
+
+# 基于从第一个 tag 开始的所有提交生成
+conventional-changelog -p angular -i CHANGELOG.md -s
+```
+
+## 团队规范建议
+
+### 最小可行规范
+
+对于小团队，不必追求完整规范，建议从以下最小规范开始：
+
+1. **标题行清晰描述改动**（谁、做了什么）
+2. **正文说明原因**（为什么做这个改动）
+3. **关联 Issue**（用 `#123` 关联）
+
+```
+修复登录超时问题
+
+用户反馈登录后 5 分钟就超时，实际应为 30 分钟。
+session 配置的 TTL 值设置错误。
+
+Closes #123
+```
+
+### 中大型团队规范
+
+1. 使用 Conventional Commits
+2. 配置 commitlint + husky 自动检查
+3. 使用 conventional-changelog 自动生成 changelog
+4. 在 PR 模板中提醒提交信息规范
+
+### 强制 vs 建议
+
+- **强制检查**：CI 中运行 commitlint，不合规则合并失败
+- **建议检查**：在 PR 模板中提醒，由 reviewer 判断
+
+## 注意事项
+
+1. **一致性比完美更重要**：团队使用同一规范比规范本身更重要
+2. **自动化检查减少人工负担**：用工具而不是人工审查格式
+3. **英文项目用英文写**：国际化项目建议提交信息用英文
+4. **标题行是关键**：很多人只看标题，确保标题信息完整
+5. **scope 不要太细**：scope 用于快速过滤，太细反而降低可用性
+
+## 总结
+
+| 场景 | 推荐做法 |
+|------|---------|
+| 个人项目 | 清晰的标题 + 必要时的正文 |
+| 小团队 | Conventional Commits + 人工审查 |
+| 中大型团队 | Conventional Commits + commitlint + husky + 自动 changelog |
+| 开源项目 | 严格遵循 Conventional Commits + CI 检查 |
+| 企业合作 | 自定义规范 + 强制检查 + PR 模板 |
+
+好的提交信息是团队长期可维护性的基石。花 1 分钟写好提交信息，未来可能节省 1 小时的调试时间。
