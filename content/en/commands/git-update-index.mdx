@@ -48,31 +48,32 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 
 ## What problem this command solves in a workflow
 
-`git update-index` lives closer to Git’s implementation model: objects, refs, and the index. It is best suited for scripting, automation, and advanced debugging rather than being your first manual tool.
+`git update-index` solves the problem of "directly modifying index entries and attributes". It is a low-level write command that allows direct manipulation of file entries in the index, setting flags like assume-unchanged and skip-worktree, or manually adding/removing index entries.
 
 ## Typical use cases
 
-- Use `git update-index` when you need precise control over objects, refs, or index state in a scriptable flow.
-- Reach for `git update-index` when learning internals or validating low-level repository state during debugging.
-- Use `git update-index` only when porcelain commands no longer express the exact operation you need.
+- Mark a file as "assume unchanged" by running `git update-index --assume-unchanged path/to/file` to tell Git to ignore local modifications to that file (useful for local config files).
+- Manually build the index in a low-level script by using `git update-index --add --cacheinfo` to directly add entries to the index.
+- Set the skip-worktree flag with `git update-index --skip-worktree` to prevent Git from overwriting local files during checkout.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Objects, refs, and index path"
-  caption="Plumbing commands are powerful because they operate directly on Git internals, not because they are “more advanced” in the everyday workflow sense."
-  inputsLabel="Internal inputs"
-  inputs="Object database|Tree objects|Index|Refs"
+  title="Directly modify index entries"
+  caption="update-index is a low-level write command that directly manipulates file entries and attribute flags in the index. It changes index state and requires careful use."
+  inputsLabel="Index operation"
+  inputs="File path|Entry attributes (assume-unchanged / skip-worktree)|cacheinfo data"
   commandLabel="git update-index"
   outputsLabel="Results"
-  outputs="Scriptable output|Updated low-level state|Fine-grained control"
-  note="If you are still thinking only in terms of branches and files, pause and separate objects, refs, and index state first."
+  outputs="Updated index|Attribute flag changes|Added/removed index entries"
+  note="update-index writes directly to the index — it is a write operation, not a read-only query. Understand the current index state before operating."
 />
 
 ## Special cases and boundaries
 
-- The real risk in plumbing commands is not just that they can fail, but that they can successfully perform the wrong low-level action.
-- Before running `git update-index` in a real repo, test it in a tiny disposable repository and verify whether a safer porcelain command would do the job.
-- If arguments contain refs, trees, index paths, or raw object IDs, inspect those inputs independently before performing writes.
-- This command manipulates index entries, not the ordinary “edit files and commit” model, so validate scripts on a disposable repo first.
+- `git update-index` is a write operation that directly modifies index content. After execution, the index state changes, which can affect subsequent commit and checkout behavior.
+- `--assume-unchanged` merely tells Git "assume this file has not changed" — if the file is actually modified, Git may not detect it, leading to potential issues.
+- `--skip-worktree` differs from `--assume-unchanged`: the former means "I don't want Git to touch this file", suitable for local config files; the latter means "this file is large, I don't want to check if it changed".
+- When manually adding entries with `--cacheinfo`, you must correctly specify the mode, blob hash, and path — incorrect data can corrupt the index.
+- Before manipulating the index, it is recommended to first run `git ls-files --stage` to see the current index state and confirm the existing attributes of the target entry.
 

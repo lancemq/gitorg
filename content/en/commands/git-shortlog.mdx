@@ -49,30 +49,31 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 
 ## What problem this command solves in a workflow
 
-In the workflow, `git shortlog` is mostly a “inspect first, decide second” command. It usually does not rewrite history by itself; instead, it helps you confirm the current state of the working tree, index, refs, or commit objects.
+`git shortlog` solves the problem of "I need commit information grouped by author." It takes `git log` output, groups commits by author, and counts them — suitable for generating release notes, contributor lists, or team workload statistics.
 
 ## Typical use cases
 
-- Use `git shortlog` before changing files or history so you have observable evidence first.
-- Put `git shortlog` into review, debugging, and incident-analysis flow so the team can align on the same context.
-- When you need to explain why the repository looks the way it does, let `git shortlog` surface verifiable information first.
+- When releasing a new version, use `git shortlog -sn v1.0..v2.0` to generate a contributor list sorted by commit count for the release notes.
+- Review a version's changes with `git shortlog --no-merges` to filter out merge commits and see only actual code contributions.
+- Use `git shortlog -sne` to display author names, emails, and commit counts together for contributor reports.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Where inspection commands operate"
-  caption="These commands mainly read repository state and emit information. The key is knowing which layer you are observing."
-  inputsLabel="Observed layers"
-  inputs="Working tree|Index|Commit history|Refs"
+  title="Commit summarization by author"
+  caption="shortlog reads commit history, groups by author, and summarizes commit subjects into a human-readable report format."
+  inputsLabel="Commit history"
+  inputs="Commit records|Author info|Commit subjects|Commit range"
   commandLabel="git shortlog"
-  outputsLabel="Outputs"
-  outputs="Console output|Diff context|Decision signal"
-  note="If the output looks wrong, the first thing to question is usually the scope you inspected, not whether the command “worked”."
+  outputsLabel="Output"
+  outputs="Grouped by author|Commit count stats|Summarized commit subjects"
+  note="shortlog output can be used directly in release notes, but by default it reads from stdin — add a commit range like HEAD or v1.0..v2.0 when running directly."
 />
 
 ## Special cases and boundaries
 
-- Most inspection commands do not mutate history, but their output still depends on which HEAD, path, range, or ref you asked them to inspect.
-- If `git shortlog` shows something unexpected, first verify whether you are looking at the working tree, the index, the current branch, or a historical commit.
-- Combining `git shortlog` with `git status`, `git log`, and `git show` is usually safer than trusting a single output in isolation.
+- `git shortlog` reads from stdin by default (commonly used in a pipe like `git log | git shortlog`). If run directly without a tty it may produce no output. When running directly, add a commit range like `HEAD` or `v1.0..v2.0`.
+- It only reads commit history and does not modify anything in the repository — it is a purely read-only command.
+- With `-s` only the count is shown; without it, each commit's subject line is also displayed.
+- Merge commits are also counted; to exclude them, pair with `--no-merges` (usually via `git log --no-merges | git shortlog`).
 

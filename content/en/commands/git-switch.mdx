@@ -59,31 +59,31 @@ That is valid for temporary inspection or experiments. If the resulting commits 
 
 ## What problem this command solves in a workflow
 
-`git switch` sits close to the working tree, the index, and the current branch. The most important question is not “which flag exists,” but “which layer will this command modify?”
+`git switch` is the dedicated command for moving between branches. It changes HEAD to point at a different branch ref and updates the working tree files to match that branch's content. By separating branch switching from file restoration (which `git restore` handles), it makes the intent unambiguous.
 
 ## Typical use cases
 
-- Use `git switch` inside the daily loop of edit, inspect, stage, and commit so local state stays intentional.
-- Reach for `git switch` when you need to prepare a clean handoff between file changes, staging decisions, and branch movement.
-- Use `git switch` to clean up local state before collaboration steps that are more expensive to recover from later.
+- Switch to an existing branch with `git switch <branch>`, updating the working tree to match that branch.
+- Create and switch to a new branch in one step with `git switch -c <branch>`, the modern replacement for `git checkout -b`.
+- Jump back to the previous branch with `git switch -`, handy when alternating between two branches during review or debugging.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Working tree / index / ref relationship"
-  caption="State-oriented commands revolve around file content, staging state, and the current branch pointer."
-  inputsLabel="Input state"
-  inputs="Working tree files|Index snapshot|Current branch"
+  title="Branch switching flow"
+  caption="switch changes HEAD to point at a different branch and updates working tree files to match the target branch's content."
+  inputsLabel="Input"
+  inputs="Target branch name|Current working tree state|Current HEAD"
   commandLabel="git switch"
-  outputsLabel="Possible changes"
-  outputs="File content|Staging result|Current ref"
-  note="A quick before-and-after git status check is often enough to validate whether a state command behaved as intended."
+  outputsLabel="Output"
+  outputs="HEAD pointing at new branch|Updated working tree files|Previous branch preserved"
+  note="switch only handles branch movement. For file restoration, use git restore instead."
 />
 
 ## Special cases and boundaries
 
-- The risk in state-changing commands is usually not the syntax itself, but whether you correctly identified which layer they will touch.
-- If there are still valuable local edits in the working tree, decide whether they should be committed, stashed, or discarded before running `git switch`.
-- Running `git status` before and after `git switch` is often the fastest way to confirm what really changed.
 - If Git warns that switching would overwrite local changes, decide whether to commit, stash, or discard before continuing.
+- `git switch -c` creates a new branch from the current HEAD and switches to it immediately.
+- `git switch --detach <commit>` enters detached HEAD state for temporary inspection; create a branch right away if the resulting commits matter.
+- Unlike `git checkout`, `git switch` cannot restore individual file paths — its sole responsibility is branch movement.
 

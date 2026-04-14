@@ -48,30 +48,34 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 
 ## What problem this command solves in a workflow
 
-`git verify-tag` focuses on object storage, pack files, reachability, and repository maintenance quality. It is usually a diagnostic or maintenance tool, not part of the normal commit loop.
+`git verify-tag` validates the GPG signature on a signed tag, confirming that the tag was created by a trusted party and that the tagged object has not been tampered with. It is a read-only security verification tool — it does not modify history, packs, or storage. The output is a GPG verification result indicating whether the signature is valid, which key signed it, and whether the key is trusted in your GPG keyring.
 
 ## Typical use cases
 
-- Use `git verify-tag` when the repository grows large, when object integrity is in question, or when you need to understand storage layout.
-- Put `git verify-tag` into maintenance flow when you need visibility into packs, object counts, and reachability.
-- Use `git verify-tag` during performance, size, or integrity investigations when porcelain commands do not expose enough storage detail.
+- Verifying release tags before deploying or distributing software — confirming the tag was signed by a known maintainer.
+- Checking tag authenticity after fetching from a remote, ensuring the downloaded tag object matches its claimed origin.
+- CI/CD pipeline gates: automatically rejecting builds based on unsigned or unverified tags in release workflows.
+- Auditing: confirming which tags in a repository carry valid cryptographic signatures and which keys were used.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Storage and maintenance view"
-  caption="Storage-oriented commands work against the object database, pack files, and reachability model to verify, analyze, or clean repository state."
-  inputsLabel="Storage inputs"
-  inputs="Object database|Pack files|Reachability data"
+  title="Tag signature verification"
+  caption="Verify-tag reads a signed tag object, extracts the GPG signature, and validates it against your GPG keyring. The result confirms authenticity and integrity."
+  inputsLabel="Inputs"
+  inputs="Signed tag object|GPG keyring|Trust database"
   commandLabel="git verify-tag"
   outputsLabel="Results"
-  outputs="Diagnostics|Maintenance actions|Size / integrity signals"
-  note="If a command may prune, compress, or reorganize storage, confirm whether you are still in a phase where recovery clues matter."
+  outputs="Signature validity|Signing key identity|Trust level|No objects modified"
+  note="Verify-tag is purely diagnostic — it checks signatures without changing any repository state."
 />
 
 ## Special cases and boundaries
 
-- Maintenance commands are usually better scheduled in a controlled window than improvised during a stressful release moment.
-- If you are actively doing recovery or incident analysis, verify that `git verify-tag` will not remove useful evidence before continuing.
-- When something looks wrong, preserve diagnostics first and choose cleanup second.
+- Verify-tag only works on signed tags (created with `git tag -s`). Unsigned tags will fail verification with an error.
+- The result depends on your local GPG keyring. If the signing key is not imported or not trusted, verification may fail even though the signature is cryptographically valid.
+- `git verify-tag` checks the tag object's signature, not the GPG signature of individual commits within the tagged range. For commit signatures, use `git verify-commit`.
+- A valid signature confirms authenticity (the tag was signed by this key) and integrity (the tag object was not modified), but not trustworthiness (you must decide whether to trust the key).
+- Verify-tag is entirely read-only. It never modifies tags, objects, refs, or any part of the repository.
+- If a tag's underlying object (commit, tree) was corrupted, the signature will still verify if the tag object itself is intact — verify-tag checks the tag's signature, not the health of the tagged content.
 

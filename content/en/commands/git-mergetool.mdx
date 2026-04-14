@@ -48,30 +48,34 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 
 ## What problem this command solves in a workflow
 
-`git mergetool` directly affects history shape, ref position, or relationships between commits. The first decision is whether you are organizing private local history or touching history that is already shared with others.
+`git mergetool` is a conflict-resolution assistant that launches an external merge tool (vimdiff, meld, kdiff3, Beyond Compare, etc.) to help you resolve merge conflicts. It does not automatically fix conflicts — it presents the conflicting files with three views (base, local, remote) in a visual interface, making it easier to combine changes correctly than editing conflict markers by hand. After you save the resolved file in the tool, git mergetool stages the result.
 
 ## Typical use cases
 
-- Use `git mergetool` when integrating branches, undoing changes, selecting commits, or reshaping a sequence of commits.
-- Put `git mergetool` inside a “backup first, mutate second, verify last” flow so higher-risk history operations stay recoverable.
-- Use `git mergetool` to understand ancestry, recovery paths, and commit causality during conflict resolution or post-incident analysis.
+- Resolving merge conflicts during `git merge`, `git rebase`, or `git cherry-pick` when multiple files have overlapping changes.
+- Using a visual diff tool to understand complex three-way merges where conflict markers alone are hard to reason about.
+- Standardizing conflict resolution across a team by configuring a shared mergetool (e.g., `git config merge.tool meld`).
+- Working through a rebase with many conflicts one file at a time, with the tool handling the staging automatically.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="What history commands act on"
-  caption="History-oriented commands revolve around commit sequences, branch pointers, and ancestry. The difference is whether they add history, move refs, or rewrite an existing sequence."
+  title="Mergetool conflict resolution"
+  caption="Mergetool launches an external program with three file versions (base, local, remote). You resolve conflicts in the tool's interface, and the result is staged automatically."
   inputsLabel="Inputs"
-  inputs="Commit sequence|Current branch|Ancestry"
+  inputs="Conflict markers in working tree|Base version|Local version|Remote version"
   commandLabel="git mergetool"
   outputsLabel="Results"
-  outputs="New commit relations|Moved refs|Recovery path"
-  note="The highest-value preflight question for this category is simple: “Has this history already been shared?”"
+  outputs="Resolved files staged|Unresolved files remain|External tool UI"
+  note="Mergetool assists resolution — it does not auto-resolve. You must review and save the correct result in the external tool."
 />
 
 ## Special cases and boundaries
 
-- The most expensive failure mode in history commands is rewriting or moving commits that other people already depend on.
-- If the operation might affect team flow, run `git status`, `git log --oneline --graph`, and `git reflog` first so the recovery path is visible.
-- When in doubt, create a backup branch before continuing so you preserve an obvious way back.
+- The external tool must be installed and configured. Run `git mergetool --tool-help` to see available options, then set `merge.tool` in your config.
+- Backup files (`.orig`) may be left behind after resolution. Use `mergetool.keepBackup = false` to suppress them if you don't need them.
+- Mergetool only handles files with active conflict markers. Clean files (already resolved or conflict-free) are skipped.
+- After all conflicts are resolved, you must still complete the operation — run `git commit` (for merge) or `git rebase --continue` (for rebase).
+- Mergetool modifies the working tree and index as you save resolved files. Unlike the read-only tools above, it does change repository state — but only within the scope of the ongoing merge/rebase operation.
+- If the external tool crashes or you close it without saving, the conflict markers remain and you can re-run mergetool.
 

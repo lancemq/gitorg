@@ -49,30 +49,33 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 
 ## What problem this command solves in a workflow
 
-`git merge-base` directly affects history shape, ref position, or relationships between commits. The first decision is whether you are organizing private local history or touching history that is already shared with others.
+`git merge-base` is a read-only analysis tool that computes the best common ancestor(s) between two or more commits. It does not modify history, move refs, or create new objects. Instead, it answers: "where did these branches diverge?" This is the foundation that Git uses internally for three-way merges, rebase operations, and diff calculations.
 
 ## Typical use cases
 
-- Use `git merge-base` when integrating branches, undoing changes, selecting commits, or reshaping a sequence of commits.
-- Put `git merge-base` inside a “backup first, mutate second, verify last” flow so higher-risk history operations stay recoverable.
-- Use `git merge-base` to understand ancestry, recovery paths, and commit causality during conflict resolution or post-incident analysis.
+- Determining the exact point where two branches split, so you can construct a meaningful diff: `git diff $(git merge-base A B)..B`.
+- Scripting: programmatically computing merge bases in CI/CD pipelines, release scripts, or automation that needs to compare branches at the divergence point.
+- Understanding branch topology: when multiple branches exist, merge-base reveals the actual shared ancestry versus what a linear log might suggest.
+- Preparing for rebases or cherry-picks: knowing the merge base helps you understand what range of commits will be replayed.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="What history commands act on"
-  caption="History-oriented commands revolve around commit sequences, branch pointers, and ancestry. The difference is whether they add history, move refs, or rewrite an existing sequence."
+  title="Merge-base ancestry calculation"
+  caption="Merge-base walks the commit graph backward from both tips to find the most recent shared ancestor. This commit is the divergence point between the two branches."
   inputsLabel="Inputs"
-  inputs="Commit sequence|Current branch|Ancestry"
+  inputs="Commit A|Commit B|Commit graph"
   commandLabel="git merge-base"
   outputsLabel="Results"
-  outputs="New commit relations|Moved refs|Recovery path"
-  note="The highest-value preflight question for this category is simple: “Has this history already been shared?”"
+  outputs="Best common ancestor commit hash|No refs changed|No history modified"
+  note="Merge-base is purely analytical — it reads the commit graph and reports a result without changing anything."
 />
 
 ## Special cases and boundaries
 
-- The most expensive failure mode in history commands is rewriting or moving commits that other people already depend on.
-- If the operation might affect team flow, run `git status`, `git log --oneline --graph`, and `git reflog` first so the recovery path is visible.
-- When in doubt, create a backup branch before continuing so you preserve an obvious way back.
+- With `--fork-point`, merge-base uses reflog data to find a more accurate divergence point, which is especially useful after a rebase has rewritten commit hashes.
+- When branches have multiple common ancestors (criss-cross merges), `git merge-base --all` lists all of them. The "best" single ancestor may not capture the full picture.
+- Merge-base returns only commit hashes — it does not produce diffs or explain what changed. Pair it with `git diff` or `git log` for full context.
+- For octopus merges (more than two branches), merge-base can compute a common base across all inputs, but the result may be less intuitive than pairwise analysis.
+- Merge-base is entirely read-only. It never writes to the repository, moves refs, or creates objects.
 

@@ -27,31 +27,31 @@ git push origin --tags
 
 ## What problem this command solves in a workflow
 
-`git tag` sits close to the working tree, the index, and the current branch. The most important question is not “which flag exists,” but “which layer will this command modify?”
+`git tag` operates at the reference layer, binding a stable name to a specific commit. Unlike branches, tags typically never move once created, so it solves the problem of "giving a permanent name to a point in history" rather than managing day-to-day development workflow.
 
 ## Typical use cases
 
-- Use `git tag` inside the daily loop of edit, inspect, stage, and commit so local state stays intentional.
-- Reach for `git tag` when you need to prepare a clean handoff between file changes, staging decisions, and branch movement.
-- Use `git tag` to clean up local state before collaboration steps that are more expensive to recover from later.
+- Tag release versions (e.g., `v1.0.0`) so the team and CI/CD systems have a clear release anchor point.
+- Use annotated tags (`-a`) to record the tagger and a message, which suits formal release processes.
+- Lightweight tags are handy for local, temporary markers that you do not need to push to the team.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Working tree / index / ref relationship"
-  caption="State-oriented commands revolve around file content, staging state, and the current branch pointer."
-  inputsLabel="Input state"
-  inputs="Working tree files|Index snapshot|Current branch"
+  title="Where tags sit in the reference system"
+  caption="Tags are references pointing at commits. Once created they typically do not move, in contrast to branch references."
+  inputsLabel="Input"
+  inputs="Target commit|Tag name|（Annotated: author/message）"
   commandLabel="git tag"
-  outputsLabel="Possible changes"
-  outputs="File content|Staging result|Current ref"
-  note="A quick before-and-after git status check is often enough to validate whether a state command behaved as intended."
+  outputsLabel="Output"
+  outputs="New ref under refs/tags/|（Annotated: a standalone tag object）"
+  note="Tags are not pushed automatically; you need `git push origin <tag>` or `git push origin --tags` explicitly."
 />
 
 ## Special cases and boundaries
 
-- The risk in state-changing commands is usually not the syntax itself, but whether you correctly identified which layer they will touch.
-- If there are still valuable local edits in the working tree, decide whether they should be committed, stashed, or discarded before running `git tag`.
-- Running `git status` before and after `git tag` is often the fastest way to confirm what really changed.
-- Lightweight and annotated tags serve different purposes, and release workflows usually benefit more from annotated tags.
+- When a tag name and a branch name conflict in the same namespace, ambiguity arises, so naming should be distinctive.
+- Tags are created locally by default and are not automatically synced to the remote with `git push`.
+- A lightweight tag is just a reference pointer, while an annotated tag is a full object with metadata — prefer annotated tags for releases.
+- Renaming a commit that already has a tag requires `-f` to force-overwrite, but use caution to avoid misleading collaborators.
 

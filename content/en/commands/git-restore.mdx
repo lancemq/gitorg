@@ -64,31 +64,31 @@ If your real question is “How do I get this file back?”, start with `restore
 
 ## What problem this command solves in a workflow
 
-`git restore` sits close to the working tree, the index, and the current branch. The most important question is not “which flag exists,” but “which layer will this command modify?”
+`git restore` is dedicated to recovering file content to a known state. It focuses on paths, not on moving branch pointers. The command can restore the working tree from the index, unstage files back to HEAD, or pull content from any specific commit — making it the clearest tool for "how do I get this file back?" questions.
 
 ## Typical use cases
 
-- Use `git restore` inside the daily loop of edit, inspect, stage, and commit so local state stays intentional.
-- Reach for `git restore` when you need to prepare a clean handoff between file changes, staging decisions, and branch movement.
-- Use `git restore` to clean up local state before collaboration steps that are more expensive to recover from later.
+- Discard unstaged working tree changes with `git restore <path>`, reverting the file to match the index.
+- Undo `git add` with `git restore --staged <path>`, resetting the staged version back to HEAD without touching the working tree.
+- Recover a file from a specific commit using `git restore --source=<commit> <path>`, without moving the entire branch.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Working tree / index / ref relationship"
-  caption="State-oriented commands revolve around file content, staging state, and the current branch pointer."
-  inputsLabel="Input state"
-  inputs="Working tree files|Index snapshot|Current branch"
+  title="File restoration paths"
+  caption="restore targets file content recovery: it can write to the working tree, reset the index, or both, depending on flags."
+  inputsLabel="Source"
+  inputs="Index snapshot|HEAD commit|Any specified commit (--source)"
   commandLabel="git restore"
-  outputsLabel="Possible changes"
-  outputs="File content|Staging result|Current ref"
-  note="A quick before-and-after git status check is often enough to validate whether a state command behaved as intended."
+  outputsLabel="Output"
+  outputs="Restored working tree file|Updated index (with --staged)|Both (with both flags)"
+  note="restore focuses on file state only. It never moves branch pointers or rewrites commit history."
 />
 
 ## Special cases and boundaries
 
-- The risk in state-changing commands is usually not the syntax itself, but whether you correctly identified which layer they will touch.
-- If there are still valuable local edits in the working tree, decide whether they should be committed, stashed, or discarded before running `git restore`.
-- Running `git status` before and after `git restore` is often the fastest way to confirm what really changed.
-- When `git restore` touches both staged and working tree content, pay close attention to `--staged`, `--worktree`, and `--source`.
+- `git restore <path>` discards unstaged changes in the working tree; the overwritten content is not recoverable through Git.
+- `--staged` resets the index to match HEAD, effectively undoing `git add` without touching working tree files.
+- Using both `--staged` and `--worktree` together restores the file completely to the source commit's version.
+- The `--source` flag lets you recover content from any commit, tag, or ref, not just HEAD — useful for selective file recovery from history.
 

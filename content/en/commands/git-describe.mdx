@@ -48,30 +48,31 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 
 ## What problem this command solves in a workflow
 
-In the workflow, `git describe` is mostly a “inspect first, decide second” command. It usually does not rewrite history by itself; instead, it helps you confirm the current state of the working tree, index, refs, or commit objects.
+`git describe` generates a human-readable version identifier based on the nearest reachable tag, producing output like `v1.2.3-5-gabc1234`. Think of it in the context of "how do I give commits meaningful version numbers?"
 
 ## Typical use cases
 
-- Use `git describe` before changing files or history so you have observable evidence first.
-- Put `git describe` into review, debugging, and incident-analysis flow so the team can align on the same context.
-- When you need to explain why the repository looks the way it does, let `git describe` surface verifiable information first.
+- In build pipelines, use `git describe` to automatically generate build identifiers that include version numbers and commit information.
+- After tagging a release, use describe to confirm the current HEAD's position relative to the latest tag.
+- Use `git describe --tags --always` to ensure a meaningful identifier is always output, even when no tags are reachable.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Where inspection commands operate"
-  caption="These commands mainly read repository state and emit information. The key is knowing which layer you are observing."
-  inputsLabel="Observed layers"
-  inputs="Working tree|Index|Commit history|Refs"
+  title="Version identifier generation"
+  caption="The describe command walks up the commit history to find the nearest tag, then generates a formatted version string."
+  inputsLabel="Input"
+  inputs="Target commit (default HEAD)|Repository tag history"
   commandLabel="git describe"
-  outputsLabel="Outputs"
-  outputs="Console output|Diff context|Decision signal"
-  note="If the output looks wrong, the first thing to question is usually the scope you inspected, not whether the command “worked”."
+  outputsLabel="Output"
+  outputs="Version identifier (e.g., v1.2.3-5-gabc1234)"
+  note="describe does not modify anything — it only outputs a human-readable version string based on tags."
 />
 
 ## Special cases and boundaries
 
-- Most inspection commands do not mutate history, but their output still depends on which HEAD, path, range, or ref you asked them to inspect.
-- If `git describe` shows something unexpected, first verify whether you are looking at the working tree, the index, the current branch, or a historical commit.
-- Combining `git describe` with `git status`, `git log`, and `git show` is usually safer than trusting a single output in isolation.
+- If the current commit has no reachable tags and `--always` is not used, describe will error and exit.
+- The `--tags` flag makes describe consider non-annotated tags (annotated tags are the default search target).
+- The output format is `nearest-tag-name - number-of-commits-since-tag - gshort-hash`, suitable for direct use as a build version number.
+- Annotated tags and lightweight tags are handled differently by describe — prefer annotated tags for release versions.
 

@@ -48,30 +48,34 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 
 ## What problem this command solves in a workflow
 
-`git notes` directly affects history shape, ref position, or relationships between commits. The first decision is whether you are organizing private local history or touching history that is already shared with others.
+`git notes` attaches supplementary annotations to existing commits without modifying the original commit object. Notes are stored separately under `refs/notes/` and displayed alongside commits in `git log`. This is useful for adding post-hoc information — bug tracker references, review comments, audit metadata — that was not available when the commit was originally authored. The original commit hash remains unchanged.
 
 ## Typical use cases
 
-- Use `git notes` when integrating branches, undoing changes, selecting commits, or reshaping a sequence of commits.
-- Put `git notes` inside a “backup first, mutate second, verify last” flow so higher-risk history operations stay recoverable.
-- Use `git notes` to understand ancestry, recovery paths, and commit causality during conflict resolution or post-incident analysis.
+- Adding bug-tracker IDs or ticket numbers to commits after the fact, without rewriting history.
+- Attaching code review comments or approval metadata to commits that have already been pushed.
+- Enriching CI/CD pipeline results (build status, test coverage, deployment targets) as notes on specific commits.
+- Maintaining team-specific annotations that should travel with commits but not alter their immutable content.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="What history commands act on"
-  caption="History-oriented commands revolve around commit sequences, branch pointers, and ancestry. The difference is whether they add history, move refs, or rewrite an existing sequence."
+  title="Notes attachment model"
+  caption="Notes are stored as separate objects linked to commit hashes. The original commit is never modified — notes add a parallel layer of metadata that git log can display."
   inputsLabel="Inputs"
-  inputs="Commit sequence|Current branch|Ancestry"
+  inputs="Target commit|Note text|Notes ref namespace"
   commandLabel="git notes"
   outputsLabel="Results"
-  outputs="New commit relations|Moved refs|Recovery path"
-  note="The highest-value preflight question for this category is simple: “Has this history already been shared?”"
+  outputs="New note object|Original commit unchanged|Notes ref updated"
+  note="Notes do not rewrite commits. They create a parallel metadata layer that references existing commits by hash."
 />
 
 ## Special cases and boundaries
 
-- The most expensive failure mode in history commands is rewriting or moving commits that other people already depend on.
-- If the operation might affect team flow, run `git status`, `git log --oneline --graph`, and `git reflog` first so the recovery path is visible.
-- When in doubt, create a backup branch before continuing so you preserve an obvious way back.
+- Adding a note to a commit that already has a note in the same namespace causes a conflict. Use `git notes append` to add to an existing note, or `git notes edit` to modify it.
+- Notes are stored under a specific ref namespace (`refs/notes/commits` by default). You can create multiple namespaces with `--ref=<name>` for different types of annotations.
+- Notes are not pushed or fetched by default. To share notes with a team, configure `notes.ref` or use `git push origin refs/notes/*`.
+- Because notes don't change commit hashes, they are safe to add to shared/published commits — no history rewrite is involved.
+- `git log --show-notes` displays notes inline with commit messages. Without this flag, notes are hidden from normal log output.
+- Removing notes requires `git notes remove` or direct manipulation of the notes ref. Accidentally deleting notes is recoverable via reflog.
 

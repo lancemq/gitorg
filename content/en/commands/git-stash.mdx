@@ -126,33 +126,33 @@ Stash records a set of changes, but the surrounding code may have changed by the
 
 ## What problem this command solves in a workflow
 
-`git stash` is less about a single commit and more about managing working copies, directory layout, or temporary local state. It helps solve questions like “how do I parallelize local work?” and “how do I preserve or clean my current scene?”
+`git stash` solves the problem of "I need to temporarily set aside my uncommitted work so I can switch branches and come back later." It saves both the working tree and index state onto a stack, letting you park unfinished changes without committing them.
 
 ## Typical use cases
 
-- Use `git stash` when juggling multiple tasks, temporarily switching context, or cleaning up local workspace state.
-- Place `git stash` inside team habits that reduce dirty-working-tree friction and improve local task switching.
-- Use `git stash` in large repos, submodule-heavy environments, or multi-worktree setups to lower checkout cost and local cognitive load.
+- When you need to jump to another branch quickly but your current work is not ready to commit, use `git stash push` to save the state and get a clean working tree.
+- Inspect saved stashes with `git stash list` and review their content with `git stash show -p stash@{0}` before reapplying.
+- Use `git stash push -u` to also include untracked files in the stash entry, so nothing is left behind when you switch context.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Workspace-oriented command scope"
-  caption="These commands focus on managing local working copies rather than simply producing new commits."
-  inputsLabel="Local context"
-  inputs="Branches|Directories|Worktrees|Uncommitted edits"
+  title="Temporarily shelving uncommitted changes"
+  caption="stash captures the working tree and index state as a commit-like object on a stack, letting you restore it later with apply or pop."
+  inputsLabel="Input"
+  inputs="Working tree changes|Index state|Untracked files (with -u)"
   commandLabel="git stash"
-  outputsLabel="Results"
-  outputs="Extra checkouts|Saved context|Cleaned workspace"
-  note="Whenever a command may alter what is visible on disk, ask whether the current local scene still needs to be preserved."
+  outputsLabel="Output"
+  outputs="Stash entry on stack|Clean working tree|Saved index state"
+  note="Treat stash as a short-term holding area, not a long-term archive — use branches for work that lives longer than a quick context switch."
 />
 
 ## Special cases and boundaries
 
-- These commands often change what is physically present on disk, so think about file preservation before you think about syntax.
-- If there are still active edits, decide whether they should move with you, be parked temporarily, or be removed explicitly.
-- When multiple directories or nested repositories are involved, validate the scope on a small example first.
-- Use `-u` or `-a` when you also need untracked or ignored files to travel with the stash entry.
+- Stash records a set of changes, but the surrounding code may have changed by the time you reapply it — apply and pop can still produce conflicts.
+- Use `apply` to restore changes while keeping the stash entry as a safety net, or `pop` to restore and remove the entry in one step.
+- Untracked files only travel with the stash entry when you use `-u` (or `-a` for ignored files too).
+- For important work that will continue for hours or days, a branch is usually a better fit than a growing stash pile.
 
 ## Try it yourself
 

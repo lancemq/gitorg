@@ -48,31 +48,31 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 
 ## What problem this command solves in a workflow
 
-`git sparse-checkout` is less about a single commit and more about managing working copies, directory layout, or temporary local state. It helps solve questions like “how do I parallelize local work?” and “how do I preserve or clean my current scene?”
+`git sparse-checkout` controls which paths are visible in the working tree, allowing you to check out only a subset of a repository's directories. Think of it in the context of "how do I work with only the parts of a large monorepo that I actually need?"
 
 ## Typical use cases
 
-- Use `git sparse-checkout` when juggling multiple tasks, temporarily switching context, or cleaning up local workspace state.
-- Place `git sparse-checkout` inside team habits that reduce dirty-working-tree friction and improve local task switching.
-- Use `git sparse-checkout` in large repos, submodule-heavy environments, or multi-worktree setups to lower checkout cost and local cognitive load.
+- In large monorepos, use sparse checkout to check out only the directories relevant to your work, reducing disk usage and cognitive load.
+- Combine with `git clone --filter` for a partial clone that downloads only the objects needed for the specified paths.
+- Toggle sparse checkout patterns on and off as your work shifts between different areas of a large repository.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Workspace-oriented command scope"
-  caption="These commands focus on managing local working copies rather than simply producing new commits."
-  inputsLabel="Local context"
-  inputs="Branches|Directories|Worktrees|Uncommitted edits"
+  title="Working tree visibility control"
+  caption="sparse-checkout filters which paths appear in the working tree, while the full repository history remains available locally."
+  inputsLabel="Input"
+  inputs="Path patterns (directories/files to include)|Full repository data"
   commandLabel="git sparse-checkout"
-  outputsLabel="Results"
-  outputs="Extra checkouts|Saved context|Cleaned workspace"
-  note="Whenever a command may alter what is visible on disk, ask whether the current local scene still needs to be preserved."
+  outputsLabel="Output"
+  outputs="Filtered working tree|Specified paths only visible"
+  note="The repository still contains the full history — sparse-checkout only controls what is checked out to disk."
 />
 
 ## Special cases and boundaries
 
-- These commands often change what is physically present on disk, so think about file preservation before you think about syntax.
-- If there are still active edits, decide whether they should move with you, be parked temporarily, or be removed explicitly.
-- When multiple directories or nested repositories are involved, validate the scope on a small example first.
 - Sparse checkout changes which paths are visible in the working tree, so scripts and tooling should be verified against partial visibility.
+- The repository still contains all objects and history — only the working tree checkout is filtered.
+- Use `git sparse-checkout set <paths>` to define the visible paths, and `git sparse-checkout disable` to restore full checkout.
+- When combined with partial clone (`--filter`), you can reduce both network transfer and working tree scope, but operations that require filtered-out objects will trigger on-demand downloads.
 

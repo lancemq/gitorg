@@ -44,33 +44,34 @@ git update-index --assume-unchanged path/to/file
 
 ## 这条命令在流程里解决什么问题
 
-`git update-index` 靠近 Git 的对象、引用和索引实现层。它更适合脚本、自动化和高级排障，而不是日常手工协作中的第一选择。
+`git update-index` 解决的是"需要直接修改索引中的条目和属性"的问题。它是一个底层写命令，允许直接操作索引中的文件条目，设置 assume-unchanged、skip-worktree 等标记，或手动添加/删除索引条目。
 
 ## 典型用例
 
-- 在需要精确控制对象、引用或索引时，用 `git update-index` 搭建脚本化流程。
-- 把 `git update-index` 放进排障与内部机制学习中，帮助你验证 Git 低层状态。
-- 当高层命令无法清楚表达目标时，用 `git update-index` 做更小粒度的底层操作。
+- 标记某个文件为"假设未修改"，用 `git update-index --assume-unchanged path/to/file` 让 Git 忽略本地对该文件的修改（如本地配置文件）。
+- 在底层脚本中手动构建索引，用 `git update-index --add --cacheinfo` 直接向索引添加条目。
+- 设置 skip-worktree 标记，用 `git update-index --skip-worktree` 让 Git 在检出时不覆盖本地文件。
 
 ## 图例理解
 
 <CommandFlowFigure
-  title="底层对象 / 引用 / 索引路径"
-  caption="plumbing 命令的核心不是“更高级”，而是它直接接触 Git 内部模型。"
-  inputsLabel="内部对象"
-  inputs="对象数据库|树对象|索引|引用"
+  title="直接修改索引条目"
+  caption="update-index 是一个底层写命令，直接操作索引中的文件条目和属性标记。它会改变索引状态，需要谨慎使用。"
+  inputsLabel="索引操作"
+  inputs="文件路径|条目属性(assume-unchanged/skip-worktree)|cacheinfo 数据"
   commandLabel="git update-index"
   outputsLabel="结果"
-  outputs="脚本友好输出|更新后的低层状态|更细粒度控制"
-  note="如果你还在用“分支和文件”这层心智模型看命令，先停一下，把对象、引用和索引分别想清楚。"
+  outputs="更新后的索引|属性标记变更|新增/删除的索引条目"
+  note="update-index 直接写入索引，是写操作而非只读查询。操作前建议先了解索引的当前状态。"
 />
 
 ## 特殊情况与边界
 
-- 底层命令的风险不一定在“它会失败”，而在“它可能成功地做了你并不想做的那件事”。
-- 在真实仓库执行 `git update-index` 前，先用最小可复现仓库演练，并确认自己是否真的不该改用更安全的高层命令。
-- 如果参数里出现 refs、tree、index 或对象 ID，最好先把这些对象单独检查清楚，再执行写操作。
-- 它操作的是索引条目，不是普通“修改文件”的心智模型；脚本里用之前先做最小仓库演练。
+- `git update-index` 是写操作，直接修改索引内容。执行后索引状态会被改变，可能影响后续的 commit 和 checkout 行为。
+- `--assume-unchanged` 只是告诉 Git "假设这个文件没变"，如果文件实际被修改了，Git 可能不会检测到，导致潜在问题。
+- `--skip-worktree` 与 `--assume-unchanged` 不同：前者表示"我不想让 Git 碰这个文件"，适合本地配置文件；后者表示"这个文件很大，我不想检查它是否变化"。
+- 手动用 `--cacheinfo` 添加条目时，需要正确指定模式（mode）、blob hash 和路径，错误的数据会导致索引损坏。
+- 操作索引前建议先用 `git ls-files --stage` 查看当前索引状态，确认目标条目的现有属性。
 
 
 ## 延伸阅读

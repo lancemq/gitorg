@@ -56,13 +56,13 @@ git remote remove upstream
   inputs="本地引用|远端引用|补丁 / 工件"
   commandLabel="git remote"
   outputsLabel="结果"
-  outputs="更新后的跟踪引用|发布的提交|传输产物"
-  note="只要涉及共享分支，就优先确认目标引用和团队约定，再执行真正的发布或整合动作。"
+  outputs="远端列表|添加/修改/删除结果"
+  note="remote 管理的是本地仓库中记录的远端定义，不会直接与远端服务器通信。"
 />
 
 ## 特殊情况与边界
 
 - 远端类命令最常见的误区，是把“下载”“整合”“发布”混成同一件事。先拆清动作，再决定参数。
 - 如果操作结果会影响共享分支或对外发布，执行 `git remote` 前最好再确认一次目标远端、目标引用和权限边界。
-- 和 `git fetch`、`git push`、`git remote -v` 一起看，通常更容易判断问题出在同步、认证还是引用选择。
+- 和 `git fetch`、`git push`、`git branch -vv` 一起看，通常更容易判断问题出在同步、认证还是引用选择。
 

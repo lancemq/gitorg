@@ -33,31 +33,32 @@ Always preview first with `-n`.
 
 ## What problem this command solves in a workflow
 
-`git clean` is less about a single commit and more about managing working copies, directory layout, or temporary local state. It helps solve questions like “how do I parallelize local work?” and “how do I preserve or clean my current scene?”
+`git clean` solves the problem of "there are untracked files in the working tree that need to be removed." It deletes files and directories that Git does not track, commonly used for cleaning up after builds, purging the environment before switching branches, or removing accidentally created temporary files.
 
 ## Typical use cases
 
-- Use `git clean` when juggling multiple tasks, temporarily switching context, or cleaning up local workspace state.
-- Place `git clean` inside team habits that reduce dirty-working-tree friction and improve local task switching.
-- Use `git clean` in large repos, submodule-heavy environments, or multi-worktree setups to lower checkout cost and local cognitive load.
+- After a build or test run leaves behind compiled artifacts and temporary files, use `git clean -fd` to remove all untracked files and directories in one step.
+- Before switching branches, preview what would be deleted with `git clean -n`, confirm, and then execute to get a clean working tree.
+- Use the `-x` flag to also clean files listed in `.gitignore` (e.g., IDE configs, local environment files), but exercise extreme caution.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Workspace-oriented command scope"
-  caption="These commands focus on managing local working copies rather than simply producing new commits."
-  inputsLabel="Local context"
-  inputs="Branches|Directories|Worktrees|Uncommitted edits"
+  title="Removing untracked files"
+  caption="git clean deletes files not tracked by Git, leaving tracked files untouched. But since these files are not in version history, they cannot be recovered after deletion."
+  inputsLabel="Working tree state"
+  inputs="Tracked files|Untracked files|Ignore rules|Directory structure"
   commandLabel="git clean"
-  outputsLabel="Results"
-  outputs="Extra checkouts|Saved context|Cleaned workspace"
-  note="Whenever a command may alter what is visible on disk, ask whether the current local scene still needs to be preserved."
+  outputsLabel="Output"
+  outputs="Tracked files preserved|Untracked files deleted|Cleaner working tree"
+  note="Files removed by clean are not in Git history — once deleted, they are gone. Always use -n to preview first."
 />
 
 ## Special cases and boundaries
 
-- These commands often change what is physically present on disk, so think about file preservation before you think about syntax.
-- If there are still active edits, decide whether they should move with you, be parked temporarily, or be removed explicitly.
-- When multiple directories or nested repositories are involved, validate the scope on a small example first.
-- Run `git clean -n` first so you can inspect exactly which untracked files and directories would be removed.
+- **Irreversible operation**: Untracked files deleted by `git clean` are not in Git history and cannot be recovered through Git.
+- **Always dry-run first**: Run `git clean -n` or `git clean -nd` (including directories) to preview the deletion list before adding `-f` to actually execute.
+- **Danger of `-x`**: The `-x` flag also deletes files listed in `.gitignore`, which may include IDE configs, local environment files, and other important content — always inspect with `-n` first.
+- **`-f` is required**: Unless `clean.requireForce=false` is configured, you must add `-f` to actually perform deletion — this is Git's safety mechanism.
+- `git clean` does not affect tracked files; modifications to tracked files must be handled with `git checkout` or `git restore`.
 

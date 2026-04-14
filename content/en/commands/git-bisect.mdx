@@ -43,30 +43,33 @@ The command is most powerful when your test step is stable and repeatable.
 
 ## What problem this command solves in a workflow
 
-`git bisect` directly affects history shape, ref position, or relationships between commits. The first decision is whether you are organizing private local history or touching history that is already shared with others.
+`git bisect` is a read-only diagnostic tool — it does not reshape history or move refs. It answers a single question: "which commit first introduced this regression?" You supply two anchor points (one known-good commit and one known-bad commit), and Git performs a binary search across the range, checking out midpoint commits and asking you to classify them until the culprit is isolated. The output is a single commit hash — the first bad commit.
 
 ## Typical use cases
 
-- Use `git bisect` when integrating branches, undoing changes, selecting commits, or reshaping a sequence of commits.
-- Put `git bisect` inside a “backup first, mutate second, verify last” flow so higher-risk history operations stay recoverable.
-- Use `git bisect` to understand ancestry, recovery paths, and commit causality during conflict resolution or post-incident analysis.
+- Regressions with a clear good/bad outcome (a test passes or fails, a bug reproduces or does not).
+- Large history ranges that are too expensive to inspect manually — bisect cuts the search space logarithmically.
+- Bugs with a reproducible test that can be automated via `git bisect run <script>`.
+- Post-incident analysis where you need to pinpoint exactly when a behavior changed.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="What history commands act on"
-  caption="History-oriented commands revolve around commit sequences, branch pointers, and ancestry. The difference is whether they add history, move refs, or rewrite an existing sequence."
+  title="Bisect search flow"
+  caption="Bisect narrows the search space by repeatedly checking out the midpoint between the remaining good and bad bounds. The result is a single commit hash — the first bad commit."
   inputsLabel="Inputs"
-  inputs="Commit sequence|Current branch|Ancestry"
+  inputs="Known-good commit|Known-bad commit|Classification feedback"
   commandLabel="git bisect"
   outputsLabel="Results"
-  outputs="New commit relations|Moved refs|Recovery path"
-  note="The highest-value preflight question for this category is simple: “Has this history already been shared?”"
+  outputs="First bad commit hash|No new commits created|No refs moved"
+  note="Bisect is read-only. It only checks out existing commits and records your classification — it never rewrites history."
 />
 
 ## Special cases and boundaries
 
-- The most expensive failure mode in history commands is rewriting or moving commits that other people already depend on.
-- If the operation might affect team flow, run `git status`, `git log --oneline --graph`, and `git reflog` first so the recovery path is visible.
-- When in doubt, create a backup branch before continuing so you preserve an obvious way back.
+- Bisect requires a binary (good/bad) decision for each tested commit. If a commit is untestable (build broken, irrelevant area changed), use `git bisect skip` — but skipping reduces precision.
+- `git bisect run` can fully automate the search when you have a script that returns 0 for good and 1 for bad. This is the most powerful mode.
+- Always finish with `git bisect reset` to return to your original branch. Forgetting to reset leaves your repo in a detached HEAD state.
+- Bisect operates on your local checkout. If your working tree has uncommitted changes that conflict with bisect's checkouts, stash or commit them first.
+- If the regression is in build artifacts rather than source (e.g., compiler version changed), bisect may give misleading results — ensure your test validates the right thing.
 

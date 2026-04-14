@@ -48,30 +48,32 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 
 ## What problem this command solves in a workflow
 
-`git rev-list` lives closer to Git’s implementation model: objects, refs, and the index. It is best suited for scripting, automation, and advanced debugging rather than being your first manual tool.
+`git rev-list` solves the problem of "listing commits in a script-friendly way". It outputs commit hashes in a compact format, with rich range filtering and traversal options, making it the go-to tool for scripts and automation that process commit sets.
 
 ## Typical use cases
 
-- Use `git rev-list` when you need precise control over objects, refs, or index state in a scriptable flow.
-- Reach for `git rev-list` when learning internals or validating low-level repository state during debugging.
-- Use `git rev-list` only when porcelain commands no longer express the exact operation you need.
+- Count commits between two versions by running `git rev-list --count v1.0..v2.0` to get an exact number.
+- Iterate over all commits on a branch in a CI script by using `git rev-list main` to output a list of commit hashes.
+- Find a commit that introduced a problem by using `git rev-list --ancestry-path OLD..NEW` to limit the commit range.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Objects, refs, and index path"
-  caption="Plumbing commands are powerful because they operate directly on Git internals, not because they are “more advanced” in the everyday workflow sense."
-  inputsLabel="Internal inputs"
-  inputs="Object database|Tree objects|Index|Refs"
+  title="Enumerate commits in a script-friendly way"
+  caption="rev-list reads commit history and outputs commit hashes for a given range. It is a pure read-only operation that never modifies the repository."
+  inputsLabel="Commit range"
+  inputs="Start commit|End commit|Path filter|Traversal options"
   commandLabel="git rev-list"
-  outputsLabel="Results"
-  outputs="Scriptable output|Updated low-level state|Fine-grained control"
-  note="If you are still thinking only in terms of branches and files, pause and separate objects, refs, and index state first."
+  outputsLabel="Outputs"
+  outputs="Commit hash list|Commit count|First/newest commit"
+  note="rev-list outputs plain-text hash lists, ideal for piping to other commands in scripts."
 />
 
 ## Special cases and boundaries
 
-- The real risk in plumbing commands is not just that they can fail, but that they can successfully perform the wrong low-level action.
-- Before running `git rev-list` in a real repo, test it in a tiny disposable repository and verify whether a safer porcelain command would do the job.
-- If arguments contain refs, trees, index paths, or raw object IDs, inspect those inputs independently before performing writes.
+- `git rev-list` is a pure read-only command — it never modifies the repository, index, or working tree.
+- By default it outputs in reverse chronological order (newest first); use `--reverse` to flip the order.
+- The output format is very compact (one hash per line) — unlike `git log`, it does not include commit messages or other human-readable details.
+- Rich filtering options are available: `--count` outputs only the number, `--max-count` limits output, and `--after`/`--before` filter by date.
+- For very large repositories, output can be extremely long — consider using `--count` or `--max-count` to limit the volume.
 

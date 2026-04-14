@@ -44,33 +44,34 @@ git update-ref refs/heads/feature HEAD
 
 ## 这条命令在流程里解决什么问题
 
-`git update-ref` 靠近 Git 的对象、引用和索引实现层。它更适合脚本、自动化和高级排障，而不是日常手工协作中的第一选择。
+`git update-ref` 解决的是"需要以底层方式直接更新引用（创建、修改或删除分支和标签）"的问题。它绕过高层命令（如 `git branch`、`git tag`），直接操作引用文件，支持原子性的旧值校验。
 
 ## 典型用例
 
-- 在需要精确控制对象、引用或索引时，用 `git update-ref` 搭建脚本化流程。
-- 把 `git update-ref` 放进排障与内部机制学习中，帮助你验证 Git 低层状态。
-- 当高层命令无法清楚表达目标时，用 `git update-ref` 做更小粒度的底层操作。
+- 在脚本中创建或移动分支，用 `git update-ref refs/heads/feature HEAD` 将 feature 分支指向当前提交。
+- 原子性地更新引用并防止并发冲突，用 `git update-ref refs/heads/branch NEW_HASH OLD_HASH`，只有当旧值匹配时才更新。
+- 删除一个引用，用 `git update-ref -d refs/heads/old-branch` 直接删除分支引用。
 
 ## 图例理解
 
 <CommandFlowFigure
-  title="底层对象 / 引用 / 索引路径"
-  caption="plumbing 命令的核心不是“更高级”，而是它直接接触 Git 内部模型。"
-  inputsLabel="内部对象"
-  inputs="对象数据库|树对象|索引|引用"
+  title="以底层方式更新引用"
+  caption="update-ref 直接写入引用文件（.git/refs 或 packed-refs），可以创建、修改或删除引用。它是写操作，支持原子性旧值校验。"
+  inputsLabel="引用操作"
+  inputs="引用路径(如 refs/heads/main)|目标 commit hash|旧值校验(可选)"
   commandLabel="git update-ref"
   outputsLabel="结果"
-  outputs="脚本友好输出|更新后的低层状态|更细粒度控制"
-  note="如果你还在用“分支和文件”这层心智模型看命令，先停一下，把对象、引用和索引分别想清楚。"
+  outputs="更新后的引用|新创建的分支/标签|被删除的引用"
+  note="update-ref 是直接写入引用的底层命令。绕过高层命令的安全检查，使用时需确认引用名称和目标 hash 正确。"
 />
 
 ## 特殊情况与边界
 
-- 底层命令的风险不一定在“它会失败”，而在“它可能成功地做了你并不想做的那件事”。
-- 在真实仓库执行 `git update-ref` 前，先用最小可复现仓库演练，并确认自己是否真的不该改用更安全的高层命令。
-- 如果参数里出现 refs、tree、index 或对象 ID，最好先把这些对象单独检查清楚，再执行写操作。
-- 直接写引用时最好带上旧值校验，避免并发场景把别人的更新静默覆盖掉。
+- `git update-ref` 是写操作，直接修改引用指向。创建或移动分支、标签等引用都会改变仓库的状态。
+- 使用旧值校验（第三个参数）可以实现原子性的条件更新：只有当引用的当前值与预期旧值一致时才更新，防止并发场景下静默覆盖别人的更新。
+- 直接写引用时绕过了 `git branch`、`git tag` 等高层命令的验证和保护，拼错引用名可能意外创建不需要的分支。
+- `update-ref` 不检查目标 hash 是否指向有效的提交对象——即使 hash 不存在，引用也会被创建。
+- 使用 `-d` 删除引用时，如果引用不存在会报错；加 `-no-deref` 可以删除符号引用本身而不是它指向的目标。
 
 
 ## 延伸阅读
