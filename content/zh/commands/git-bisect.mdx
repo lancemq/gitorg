@@ -69,6 +69,152 @@ git bisect good <good-commit>
   note="bisect 是只读操作，不会影响仓库历史、引用或工作区。结束后必须运行 git bisect reset 恢复正常状态。"
 />
 
+## git bisect run 自动化排查
+
+当你要排查的范围很大、手动判断太慢时，`git bisect run` 是最强大的武器——它接受一个脚本，自动在每一个中间提交上执行，根据脚本返回值判断 good/bad。
+
+### 编写测试脚本
+
+脚本返回值的约定：
+- **0** = good（当前提交没问题）
+- **1-127** = bad（当前提交有 bug）
+- **125** = skip（无法判断，跳过）
+- **>127** = 中止 bisect
+
+```bash
+#!/bin/bash
+# test-bug.sh - 自动测试脚本
+make clean && make || exit 125  # 构建失败，跳过
+./run-tests --filter "user_login" || exit 1  # 测试失败，标记 bad
+exit 0  # 测试通过，标记 good
+```
+
+### 完整自动化流程
+
+```bash
+git bisect start
+git bisect bad HEAD
+git bisect good v1.0.0
+git bisect run ./test-bug.sh
+```
+
+运行完毕后，Git 会自动输出第一个 bad 提交：
+
+```
+<commit-hash> is the first bad commit
+commit <hash>
+Author: ...
+Date: ...
+
+    fix: update user login validation
+```
+
+### 自动化排查的优势
+
+- 几十个甚至上百个提交范围也能在几分钟内完成
+- 排查逻辑可复用，团队成员可以共享测试脚本
+- 脚本可以结合 `curl`、`pytest`、`cargo test` 等各种测试手段
+
+## git bisect skip 跳过无法测试的提交
+
+在二分查找过程中，某些提交可能因为构建失败、依赖不兼容或环境问题而无法测试：
+
+```bash
+git bisect start
+git bisect bad HEAD
+git bisect good v1.0.0
+# Git 切换到中间提交，但构建失败了
+git bisect skip
+```
+
+`skip` 会让 Git 跳过当前提交，尝试其他中间点。但需要注意：**跳过太多提交会导致结果不够精确**，Git 可能只能给出一个"可疑范围"而非精确的单个提交。
+
+### 批量 skip
+
+```bash
+# 跳过 v1.1.0 到 v1.2.0 之间的所有提交
+git bisect skip v1.1.0..v1.2.0
+```
+
+## 误标 good/bad 的后果与纠正
+
+二分查找完全依赖你手动标记的准确性。如果不小心标错了：
+
+### 标错了会怎样
+
+```bash
+# 假设当前提交实际上是 good，但你误标为 bad
+git bisect bad  # ❌ 错误标记
+```
+
+这会导致：
+- Git 缩小错误的范围
+- 最终找到的"第一个 bad 提交"可能根本不是问题源头
+- 排查结果完全不可信
+
+### 纠正方法
+
+1. **重置重来**：
+```bash
+git bisect reset  # 回到原始 HEAD
+git bisect start  # 重新开始
+git bisect bad HEAD
+git bisect good <correct-good-commit>
+```
+
+2. **使用 bisect log 检查历史**：
+```bash
+git bisect log
+# 输出类似：
+# git bisect start
+# git bisect good abc1234
+# git bisect bad def5678
+# git bisect good 9ab0123
+# git bisect bad 4cd5678
+```
+
+通过日志可以回溯每一步的标记，确认哪一步标错了。
+
+## bisect 日志与状态输出解读
+
+### bisect log
+
+```bash
+git bisect log
+```
+
+输出完整的 bisect 操作历史，可以保存后复用：
+
+```bash
+git bisect log > bisect-log.txt
+# 下次可以直接回放：
+git bisect replay bisect-log.txt
+```
+
+### bisect visualize
+
+```bash
+git bisect visualize
+# 或
+git bisect view
+```
+
+用 `git log` 或图形工具（gitk）查看当前剩余的候选提交范围，帮助理解 bisect 进展。
+
+### bisect progress info
+
+每次标记 good/bad 后，Git 会输出类似信息：
+
+```
+Bisecting: 12 revisions left to test after this (roughly 4 steps)
+[abc1234] fix: optimize database query
+```
+
+这告诉你：
+- 还有多少个提交待排查
+- 大概还需要几步
+- 当前切到了哪个提交
+
 ## 特殊情况与边界
 
 - bisect 过程中会频繁切换 HEAD，如果有未提交的工作区改动，会拒绝切换。可以先 `git stash` 保存。

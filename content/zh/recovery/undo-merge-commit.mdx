@@ -1,0 +1,291 @@
+export const metadata = {
+  title: "合并提交后怎么撤销",
+  slug: "undo-merge-commit",
+  locale: "zh",
+  section: "recovery",
+  summary: "merge commit 创建后发现有问题时的正确撤销方法。重点讲解 git revert -m 的 parent 编号原理和常见误区。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-revert",
+    "https://git-scm.com/docs/git-merge",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+  ],
+};
+
+# 合并提交后怎么撤销
+
+## 一句话理解
+
+合并提交（merge commit）有多个 parent，撤销它时需要用 `git revert -m` 指定哪个 parent 作为"基准"来还原。选错 parent 会导致意想不到的结果。
+
+## 理解 merge commit 的结构
+
+普通的提交只有一个 parent（前一个提交），但 merge commit 有两个或更多 parent：
+
+```
+parent 1 (当前分支)          parent 2 (被合并分支)
+      │                            │
+      ▼                            ▼
+    A --- B --- C --- M ---       D --- E --- F
+                                (feature)   │
+                                            merge commit M:
+                                            parent 1 = C (main)
+                                            parent 2 = F (feature)
+```
+
+```bash
+$ git cat-file -p <merge-commit-sha>
+tree abc123...
+parent ccc111...    ← parent 1: main 分支上 merge 前的提交
+parent fff222...    ← parent 2: feature 分支的最后一个提交
+author Alice <alice@example.com>
+committer Alice <alice@example.com>
+
+Merge branch 'feature' into main
+```
+
+**关键理解**：merge commit 的 tree（文件快照）是 parent 1 和 parent 2 合并后的结果。revert 一个 merge 时，Git 需要知道相对于哪个 parent 来"回退"。
+
+## 场景一：本地 merge 后后悔了，还没 push
+
+这是最简单的情况。merge 只发生在本地，远端还不知道。
+
+```bash
+# 当前状态
+$ git log --oneline -3
+m1a2b3c (HEAD -> main) Merge branch 'feature' into main
+abc1234 feat: 实现新功能
+def5678 fix: 修复 bug
+
+# 直接 reset 到 merge 之前
+git reset --hard HEAD~1
+
+# 验证
+$ git log --oneline -3
+def5678 (HEAD -> main) fix: 修复 bug
+...
+```
+
+`reset --hard HEAD~1` 直接让 main 分支回退到 merge 之前的提交，merge commit 和它带来的所有合并效果都消失了。
+
+## 场景二：已经 push 到远端，需要安全撤销
+
+一旦 merge commit 已经 push 到远端，就不能用 `reset`（会改写公共历史），必须用 `revert`。
+
+```bash
+# 撤销最近的 merge commit
+git revert -m 1 HEAD
+```
+
+### `-m` 参数详解
+
+`-m` 后面跟的是 parent 编号，从 1 开始：
+
+```bash
+# parent 编号规则：
+# -m 1 → 第一个 parent = merge 时所在的分支（通常是 main）
+# -m 2 → 第二个 parent = 被合并进来的分支（通常是 feature）
+
+# 撤销 merge，恢复到 parent 1（main）的状态
+git revert -m 1 HEAD
+
+# 撤销 merge，恢复到 parent 2（feature）的状态（很少用）
+git revert -m 2 HEAD
+```
+
+**99% 的情况下你应该用 `-m 1`**，因为你想要"退回到合并之前 main 分支的状态"。
+
+### revert merge 之后发生了什么
+
+```
+... C --- M --- R
+         │      │
+    (merge) (revert of merge)
+```
+
+R 是一个新的提交，它的改动恰好抵消了 M 的效果。文件内容回到了 merge 之前的状态。
+
+## 场景三：revert merge 后，又想重新合并同一个分支
+
+这是最常见的坑！revert 一个 merge 之后，你不能直接再 merge 同一个分支。
+
+### 为什么会这样
+
+Git 在 merge 时会检查两个分支的共同祖先和各自的改动。当你 revert 了 merge 之后：
+
+```
+main:    A --- M --- R
+                   │
+feature:            B --- C --- D
+```
+
+Git 看到 R 已经包含了 feature 分支所有改动的"反向版本"，所以当你再次 `git merge feature` 时，Git 认为 feature 的改动已经被"处理过了"，不会重新应用。
+
+### 正确的重新合并方法
+
+**方法一：revert the revert**
+
+```bash
+# 撤销那个 revert，恢复 merge 的效果
+git revert HEAD  # HEAD 指向那个 revert 提交
+
+# 或者直接 revert 那个 revert 提交
+git revert <revert-commit-sha>
+```
+
+**方法二：rebase feature 分支后再 merge**
+
+```bash
+# 在 feature 分支上 rebase，创建新的提交
+git checkout feature
+git rebase main
+
+# 回到 main 重新 merge
+git checkout main
+git merge feature
+```
+
+rebase 会创建新的提交（新的 SHA），Git 不再认为这些改动已经被处理过。
+
+**方法三：reset main 到 merge 之前，然后重新 merge**
+
+```bash
+# 只在你确定没有人基于这个 merge 工作时才能用！
+git checkout main
+git reset --hard <merge之前的提交>
+git push --force-with-lease  # 危险：改写公共历史
+git merge feature
+```
+
+## 常见误区
+
+### 误区 1：直接 `git revert HEAD`（不指定 -m）
+
+```bash
+$ git revert HEAD
+error: commit abc123 is a merge but no -m option was given.
+fatal: revert failed
+```
+
+Git 拒绝 revert 一个 merge commit，除非你明确指定 `-m` 参数。这是因为 Git 不知道该相对于哪个 parent 来回退。
+
+### 误区 2：选错 parent 编号
+
+```bash
+# 错误：用 -m 2 会把 main 变成 feature 的状态
+git revert -m 2 HEAD
+
+# 后果：main 分支现在包含的是 feature 分支的内容
+# 而 main 原有的改动被丢弃了
+```
+
+用 `-m 2` revert 几乎总是一个错误。它会让当前分支变成被合并分支的状态。
+
+### 误区 3：用 `git reset` 撤销已 push 的 merge
+
+```bash
+# 这样做会改写公共历史
+git reset --hard HEAD~1
+git push --force
+
+# 后果：
+# 1. 其他协作者的本地仓库会与远端冲突
+# 2. 如果有人基于你的 merge commit 做了新工作，他们的提交会"悬空"
+# 3. 团队协作会陷入混乱
+```
+
+**规则**：一旦 push 到共享分支，永远用 `revert` 而不是 `reset`。
+
+## 实际操作示例
+
+### 完整示例：撤销一个有问题的 merge
+
+```bash
+# 1. 查看当前状态
+$ git log --oneline --graph -5
+*   m1a2b3c (HEAD -> main) Merge branch 'bugfix-hot' into main
+|\
+| * f4e5d6c (bugfix-hot) fix: 修复紧急 bug（但引入了新问题）
+* | a1b2c3d feat: 添加新功能
+|/
+* 9876543 prev: 之前的提交
+
+# 2. 确认 merge commit 的 parents
+$ git cat-file -p m1a2b3c
+tree ...
+parent a1b2c3d...   ← parent 1 (main)
+parent f4e5d6c...   ← parent 2 (bugfix-hot)
+
+# 3. 安全撤销（用 -m 1 回到 main 的状态）
+$ git revert -m 1 HEAD
+[main d7c8b9a] Revert "Merge branch 'bugfix-hot' into main"
+ 1 file changed, 3 insertions(+), 15 deletions(-)
+
+# 4. 推送到远端
+$ git push origin main
+
+# 5. 验证
+$ git log --oneline -3
+d7c8b9a (HEAD -> main) Revert "Merge branch 'bugfix-hot' into main"
+m1a2b3c Merge branch 'bugfix-hot' into main
+a1b2c3d feat: 添加新功能
+```
+
+### 撤销后重新合并修复好的分支
+
+```bash
+# bugfix-hot 分支修复了问题，现在想重新合并
+
+# 方法一：revert the revert
+$ git revert HEAD  # HEAD = d7c8b9a (那个 revert 提交)
+$ git push origin main
+
+# 方法二：rebase 后再 merge
+$ git checkout bugfix-hot
+$ git rebase main
+$ git checkout main
+$ git merge bugfix-hot
+```
+
+## 快速决策
+
+```
+merge 之后后悔了？
+        │
+   ┌────┴────┐
+   还没 push？     已经 push？
+       │            │
+       ↓            ↓
+  git reset     git revert -m 1 HEAD
+  --hard HEAD~1      │
+       │             ↓
+       │        想重新 merge 同一分支？
+       ↓             │
+   完成 ✓       ┌────┴────┐
+              是          否
+              │           │
+              ↓           ↓
+        revert the    完成 ✓
+        revert
+        或 rebase 分支
+```
+
+## 预防措施
+
+1. **merge 前先创建备份分支**
+   ```bash
+   git branch backup/before-merge
+   ```
+
+2. **用 `--no-commit` 预览合并结果**
+   ```bash
+   git merge --no-commit --no-ff feature
+   # 检查改动
+   git diff --cached
+   # 满意则 git commit，不满意则 git merge --abort
+   ```
+
+3. **优先使用 `--no-ff` 创建明确的 merge commit**
+   ```bash
+   git merge --no-ff feature
+   ```
+   这样即使之后需要 revert，也有一个明确的 merge commit 可以操作。

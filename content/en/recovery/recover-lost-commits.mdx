@@ -1,0 +1,393 @@
+export const metadata = {
+  title: "Recovering lost commits",
+  slug: "recover-lost-commits",
+  locale: "en",
+  section: "recovery",
+  summary: "Recovery strategies for 'lost' commits across scenarios: detached HEAD commits, post-filter-branch, deleted branches, and over-reset. Core tools are reflog and fsck.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-reflog",
+    "https://git-scm.com/docs/git-fsck",
+    "https://git-scm.com/book/en/v2/Git-Internals-Maintenance-and-Data-Recovery",
+  ],
+};
+
+# Recovering lost commits
+
+## The short version
+
+Commits in Git are rarely truly deleted. In most cases, the commit object still exists in `.git/objects/` — it just lost its reference path (the branch pointer moved away). Using reflog and fsck, you can recover almost any "lost" commit.
+
+## Why commits appear to be "lost"
+
+The commit itself doesn't vanish, but the path to access it can disappear. Common scenarios:
+
+### Scenario 1: Committed on detached HEAD, then switched branches
+
+```bash
+# You checked out an old commit (detached HEAD)
+git checkout abc1234
+
+# Made changes and committed
+git add .
+git commit -m "emergency fix"
+# Now: HEAD -> (new commit def5678 on top of abc1234)
+
+# Then switched back to main
+git checkout main
+# Now: HEAD -> main
+# Commit def5678 still exists, but no branch points to it!
+```
+
+```
+    main
+     │
+     ▼
+A --- B --- C
+     \
+      D --- E (detached HEAD commit, no name)
+```
+
+### Scenario 2: Reset --hard went too far
+
+```bash
+# Meant to go back 2 commits, accidentally went back 20
+git reset --hard HEAD~20
+
+# The 18 commits in between are "lost"
+```
+
+### Scenario 3: Accidentally deleted a branch
+
+```bash
+# Deleted a branch with important unmerged commits
+git branch -D feature-important
+
+# Commits on that branch are "lost"
+```
+
+### Scenario 4: Old commits replaced after rebase
+
+```bash
+git rebase main
+# Old commits replaced by new ones (same content, different SHA)
+# Old commits became unreachable
+```
+
+### Scenario 5: Original history after filter-branch / filter-repo
+
+```bash
+git filter-branch --force --tree-filter 'rm -f passwords.txt' HEAD
+# Old history is rewritten, original commits become unreachable
+```
+
+## Key insight: commit objects are usually still there
+
+```
+Branch pointers (refs/heads/*)
+       │
+       ▼
+    Commit A ──→ Commit B ──→ Commit C (current)
+                 │
+           ┌─────┘
+           ▼
+       Commit X ──→ Commit Y  (orphaned commits, but objects still in .git/objects/)
+```
+
+As long as you haven't run `git gc` and the reflog hasn't expired, commit objects sit safely in `.git/objects/`.
+
+## Recovery tool 1: git reflog (most common)
+
+The reflog records every movement of HEAD and each branch. It's the first tool to reach for when recovering lost commits.
+
+### Viewing the reflog
+
+```bash
+# View HEAD movement history
+$ git reflog
+d4e5f6a (HEAD -> main) HEAD@{0}: reset: moving to HEAD~20
+a1b2c3d HEAD@{1}: commit: commit 20
+b2c3d4e HEAD@{2}: commit: commit 19
+c3d4e5f HEAD@{3}: commit: commit 18
+...
+e5f6a7b HEAD@{20}: commit: commit 1
+f6a7b8c HEAD@{21}: checkout: moving from feature to main
+```
+
+```bash
+# View a specific branch's reflog
+git reflog show feature
+
+# View all reflogs
+git reflog show --all
+```
+
+### Recovering with reflog
+
+```bash
+# Method 1: Reset to a reflog position
+git reset --hard HEAD@{3}  # back to before step 3
+
+# Method 2: Use the SHA directly
+git reset --hard c3d4e5f
+
+# Method 3: Create a new branch to catch it (safer)
+git branch recovered/c3d4e5f c3d4e5f
+```
+
+### Reflog time window
+
+Reflog entries are not kept forever:
+
+| State | Retention period |
+|-------|-----------------|
+| Current branch reflog | Default 90 days |
+| Other branch reflogs | Default 30 days |
+| After expiry | May be cleaned up on next `git gc` |
+
+```bash
+# View reflog expiry configuration
+git config gc.reflogExpire        # current branch: 90 days
+git config gc.reflogExpireUnreachable  # other branches: 30 days
+
+# Manually expire reflogs
+git reflog expire --expire=now --all
+```
+
+**Important**: Reflog is local — it doesn't get pushed to the remote. If you clone a fresh repo, you won't have old reflog entries.
+
+## Recovery tool 2: git fsck --lost-found
+
+When reflog can't help (expired or cleaned), use `fsck` to find dangling commit objects.
+
+### Finding dangling commits
+
+```bash
+# Find all dangling commit objects
+$ git fsck --lost-found
+Checking object directories: 100% (256/256), done.
+dangling commit a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0
+dangling commit b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1
+dangling blob c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2
+```
+
+```bash
+# Inspect these dangling commits
+git show a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0
+
+# One-line summary
+git log --oneline -1 a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0
+```
+
+```bash
+# More focused output
+git fsck --no-reflog --unreachable | grep commit
+```
+
+### Batch-check all dangling commits
+
+```bash
+# List all dangling commits with their info
+for sha in $(git fsck --lost-found 2>&1 | grep "dangling commit" | awk '{print $3}'); do
+  echo "--- $sha ---"
+  git log --oneline -1 $sha
+done
+```
+
+### Recovering a dangling commit
+
+```bash
+# Once you find the commit you need, create a branch for it
+git branch recovered/lost-work a1b2c3d4
+
+# Or cherry-pick it onto your current branch
+git cherry-pick a1b2c3d4
+```
+
+## Recovery tool 3: Between reflog and fsck
+
+### Finding commits containing a specific file
+
+```bash
+# You know the lost commit contained a certain file
+git log --all --full-history -- src/important-file.js
+
+# Or use rev-list
+git rev-list --all -- src/important-file.js
+```
+
+### Finding commits in a time range
+
+```bash
+# Find commits within a time window
+git reflog --since="2026-04-10" --until="2026-04-14"
+
+# Or
+git log --all --since="2026-04-10" --until="2026-04-14"
+```
+
+## Step-by-step recovery for each scenario
+
+### Scenario 1: Committed on detached HEAD, then switched
+
+```bash
+# 1. Find the commit in reflog
+$ git reflog
+a1b2c3d HEAD@{2}: checkout: moving from <sha> to main
+b2c3d4e HEAD@{3}: commit: emergency fix  ← this is the lost commit!
+
+# 2. Create a branch to catch it
+git branch recovered/emergency-fix b2c3d4e
+
+# 3. Inspect the recovered commit
+git log --oneline recovered/emergency-fix -3
+
+# 4. Merge or cherry-pick back to main
+git checkout main
+git merge recovered/emergency-fix
+# or
+git cherry-pick b2c3d4e
+```
+
+### Scenario 2: Reset --hard went too far
+
+```bash
+# 1. Check reflog for the pre-reset position
+$ git reflog
+d4e5f6a HEAD@{0}: reset: moving to HEAD~20  ← the over-reset
+a1b2c3d HEAD@{1}: commit: commit 20  ← go back here
+...
+
+# 2. Restore to before the reset
+git reset --hard HEAD@{1}
+# or
+git reset --hard a1b2c3d
+```
+
+### Scenario 3: Accidentally deleted branch
+
+```bash
+# 1. Use fsck to find dangling commits
+git fsck --lost-found
+
+# 2. Check which one is the tip of the deleted branch
+git show <dangling-commit-sha>
+
+# 3. Recreate the branch
+git branch feature-important <dangling-commit-sha>
+
+# Or use reflog
+git reflog show feature-important
+git branch feature-important feature-important@{1}
+```
+
+### Scenario 4: Recover original commits after filter-branch
+
+```bash
+# filter-branch saves original refs in refs/original/
+git log refs/original/refs/heads/main
+
+# If you need to restore the entire branch
+git checkout -b original-main refs/original/refs/heads/main
+```
+
+## What to do after finding the lost commit
+
+Once you've located the lost commit, you have several ways to reintegrate it:
+
+```bash
+# Option 1: Create a branch (safest)
+git branch recovered/work <sha>
+
+# Option 2: Cherry-pick onto current branch
+git cherry-pick <sha>
+
+# Option 3: Reset to that commit (discard everything after)
+git reset --hard <sha>
+
+# Option 4: Merge it in
+git merge <sha>
+```
+
+## Time windows and truly unrecoverable cases
+
+Commit objects may be permanently deleted when:
+
+1. **Reflog expires** (default 30-90 days)
+2. **`git gc` runs** after reflog expiry
+3. **`git gc --prune=now`** cleans up immediately
+4. **Fresh clone** (no old reflog)
+5. **Remote repositories** (remotes typically don't have reflog)
+
+```bash
+# If you want to permanently purge all unreachable objects
+git reflog expire --expire=now --all
+git gc --prune=now --aggressive
+```
+
+## Preventive measures
+
+### 1. Create backup branches before risky operations
+
+```bash
+# Before reset, rebase, filter-branch
+git branch backup/before-reset
+git branch backup/before-rebase
+```
+
+### 2. Push to remote regularly
+
+Pushing to remote creates an extra backup. Even if local reflog is lost, the remote still has the commit records.
+
+```bash
+git push origin feature
+```
+
+### 3. Use stash for uncertain temporary changes
+
+If you're unsure whether to keep some changes:
+
+```bash
+git stash push -m "temporary changes, might need later"
+# Safer than commit, doesn't pollute history
+```
+
+### 4. Extend reflog retention
+
+```bash
+# Keep reflogs longer
+git config gc.reflogExpire 180.days
+git config gc.reflogExpireUnreachable 90.days
+```
+
+### 5. Use git bundle for offline backups
+
+```bash
+# Package the entire repo (all refs and objects)
+git bundle create backup-$(date +%Y%m%d).bundle --all
+
+# Restore from bundle
+git clone backup-20260414.bundle recovered-repo
+```
+
+## Quick decision flowchart
+
+```
+Commit "lost"?
+      │
+  ┌───┴───┐
+  Remember    Don't remember
+  the SHA?    the SHA?
+  │           │
+  ↓           ↓
+ git reflog   git fsck --lost-found
+  │           │
+  ↓           ↓
+  After finding:   After finding:
+  git branch       git show to inspect
+  recovered/xxx    git branch recovered/xxx <sha>
+  <sha>            │
+  │               Cherry-pick or merge
+  ↓               once confirmed
+  cherry-pick
+  or merge
+```

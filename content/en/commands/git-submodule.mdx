@@ -70,6 +70,104 @@ Read it alongside git status, git log, and git show so it is easier to see how t
   note="The parent repo stores only the submodule's commit hash, not its file content — submodule content must be fetched separately."
 />
 
+## The submodule lifecycle: add → update → sync → remove
+
+### Adding a submodule
+
+```bash
+git submodule add <url> <path>
+git commit -m "Add submodule at <path>"
+```
+
+This creates an entry in `.gitmodules`, clones the repository into the specified path, and stages both for commit.
+
+### Updating submodules
+
+After cloning a repo with submodules, or when the parent repo's submodule pointer changes:
+
+```bash
+git submodule update --init --recursive
+```
+
+- `--init` initializes any uninitialized submodules
+- `--recursive` handles nested submodules (submodules within submodules)
+- Use `--remote` to fetch the latest upstream changes instead of the pinned commit
+
+### Syncing submodule URLs
+
+When a submodule's URL changes (e.g., migrating from HTTPS to SSH):
+
+```bash
+git submodule sync --recursive
+git submodule update --init --recursive
+```
+
+`sync` updates the internal `.git/config` entries to match `.gitmodules`.
+
+### Removing a submodule
+
+There is no single `git submodule rm` command. To properly remove one:
+
+```bash
+git submodule deinit <path>
+git rm <path>
+git commit -m "Remove submodule <path>"
+```
+
+This removes the submodule's entry from `.gitmodules`, cleans up `.git/config`, and removes the working directory.
+
+## Nested submodules
+
+Submodules can contain their own submodules. The `--recursive` flag handles these:
+
+```bash
+git submodule update --init --recursive
+```
+
+Nested submodules add complexity:
+- Each level requires its own fetch and checkout
+- CI pipelines may need significant time to initialize deep hierarchies
+- Use `--depth` to shallow-fetch if you don't need full history
+
+## Understanding the `.gitmodules` file
+
+`.gitmodules` lives at the root of your repository and tracks each submodule:
+
+```ini
+[submodule "libs/shared-utils"]
+    path = libs/shared-utils
+    url = https://github.com/example/shared-utils.git
+    branch = main
+```
+
+Key fields:
+- **path**: where the submodule is checked out in the parent repo
+- **url**: the remote repository URL
+- **branch**: (optional) the default branch to track with `--remote`
+
+Commit this file — it's the source of truth for submodule configuration.
+
+## Common pitfall: submodule pointer vs content mismatch
+
+A submodule in Git is represented as a **special entry** in the parent repo's tree that stores only a commit SHA. This leads to a frequent problem:
+
+1. You update the submodule's content locally (cd into it, pull, make changes)
+2. But forget to `git add` the updated pointer in the parent repo
+3. The parent still points to the old commit
+
+**Symptom:** `git status` in the parent shows `modified: <path> (new commits, modified content)`.
+
+**Fix:**
+```bash
+cd <submodule-path>
+git commit -am "Update submodule content"
+cd ..
+git add <submodule-path>
+git commit -m "Update submodule pointer"
+```
+
+Always verify with `git diff --submodule` to see exactly what changed.
+
 ## Special cases and boundaries
 
 - Submodule updates are not automatically "absorbed" by the parent repo; you still need to commit the updated submodule pointer in the superproject.

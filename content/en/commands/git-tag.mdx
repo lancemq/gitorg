@@ -48,6 +48,110 @@ git push origin --tags
   note="Tags are not pushed automatically; you need `git push origin <tag>` or `git push origin --tags` explicitly."
 />
 
+## Signed tag workflow (GPG)
+
+Signed tags provide cryptographic proof of who created the tag and that it hasn't been tampered with.
+
+### Setup
+
+First, generate or import a GPG key, then tell Git which key to use:
+
+```bash
+# Generate a new GPG key (if you don't have one)
+gpg --full-generate-key
+
+# List your keys and find the key ID
+gpg --list-secret-keys --keyid-format=long
+
+# Configure Git to use this key
+git config --global user.signingkey <KEY-ID>
+```
+
+### Creating and verifying signed tags
+
+```bash
+# Create a signed tag (-s implies annotated)
+git tag -s v2.0.0 -m "Release v2.0.0"
+
+# Verify a signed tag
+git tag -v v2.0.0
+```
+
+Verification shows the GPG signature status and the tag message. A "Good signature" confirms the tag is authentic.
+
+## Tag push strategies
+
+Tags are **not pushed automatically** with `git push`. You must push them explicitly:
+
+```bash
+# Push a specific tag
+git push origin v1.0.0
+
+# Push all local tags at once
+git push origin --tags
+
+# Push only tags reachable from a specific branch
+git push origin --follow-tags
+```
+
+**Recommendation:** Use `--follow-tags` (with `push.followTags true` in config) to push only annotated tags that are on the current branch. This avoids accidentally pushing experimental lightweight tags.
+
+## Lightweight vs annotated tags
+
+| Feature | Lightweight Tag | Annotated Tag |
+|---------|----------------|---------------|
+| Created with | `git tag v1.0` | `git tag -a v1.0 -m "message"` |
+| Git object | Reference only | Full tag object |
+| Metadata | None | Tagger, date, message |
+| Can be signed | No | Yes (`-s` flag) |
+| Best for | Local markers, quick references | Releases, public version points |
+| Shown in `git log` | As commit hash | As tag object with message |
+| Pushed by default | No | No (requires explicit push) |
+
+**Rule of thumb:** Use annotated tags for anything you share with the team. Use lightweight tags only for private, temporary markers.
+
+## Tag naming conventions
+
+Consistent tag names make automation and collaboration easier:
+
+- **SemVer:** `v1.2.3` — the most common convention. The `v` prefix is widely adopted by CI/CD tools.
+- **Date-based:** `2024-01-15-release` — useful for time-driven release schedules.
+- **Pre-release:** `v1.0.0-alpha.1`, `v1.0.0-beta.2`, `v1.0.0-rc.1` — following SemVer pre-release identifiers.
+- **Avoid spaces and special characters** — use hyphens and dots only.
+
+Configure `push.followTags` to automatically push annotated tags:
+
+```bash
+git config --global push.followTags true
+```
+
+## Deleting tags
+
+### Local deletion
+
+```bash
+git tag -d v1.0.0
+```
+
+### Remote deletion
+
+```bash
+# Using --delete
+git push origin --delete v1.0.0
+
+# Or push nothing to the remote tag ref
+git push origin :refs/tags/v1.0.0
+```
+
+### Delete all local tags and re-fetch from remote
+
+```bash
+git tag -l | xargs git tag -d
+git fetch --tags
+```
+
+**Caution:** Deleting a published tag that others have already fetched can cause confusion. If you must correct a tag, communicate the change to your team.
+
 ## Special cases and boundaries
 
 - When a tag name and a branch name conflict in the same namespace, ambiguity arises, so naming should be distinctive.

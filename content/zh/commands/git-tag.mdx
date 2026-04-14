@@ -61,6 +61,225 @@ git push origin --tags
   note="标签不会自动推送到远端，需要显式 `git push origin <tag>` 或 `git push origin --tags`。"
 />
 
+## 签名标签完整流程
+
+对于正式发布，推荐使用签名标签（signed tag），它提供了身份验证和完整性保证。
+
+### GPG 密钥准备
+
+```bash
+# 生成 GPG 密钥（如果没有的话）
+gpg --full-generate-key
+# 按提示选择：RSA and RSA, 4096 位
+
+# 查看密钥 ID
+gpg --list-secret-keys --keyid-format long
+# 输出类似：
+# sec   rsa4096/ABC123DEF4567890 2024-01-01 [SC]
+#       Your Name <you@example.com>
+```
+
+### 配置 Git 使用 GPG
+
+```bash
+# 告诉 Git 使用哪个 GPG 密钥
+git config --global user.signingkey ABC123DEF4567890
+
+# 或者让 Git 自动使用 user.email 对应的密钥
+git config --global commit.gpgsign true
+```
+
+### 创建签名标签
+
+```bash
+# -s 参数创建签名标签
+git tag -s v2.0.0 -m "Release v2.0.0"
+
+# 验证标签签名
+git tag -v v2.0.0
+# 输出：
+# object abc1234567890...
+# type commit
+# tag v2.0.0
+# tagger Your Name <you@example.com> ...
+#
+# Release v2.0.0
+# gpg: Signature made ... using RSA key ABC123DEF4567890
+# gpg: Good signature from "Your Name <you@example.com>"
+```
+
+### 推送签名标签
+
+```bash
+# 单个推送
+git push origin v2.0.0
+
+# 批量推送所有标签
+git push origin --tags
+```
+
+## tag 推送策略
+
+### 推送单个标签（推荐）
+
+```bash
+# 只推送新创建的标签，精确可控
+git push origin v1.0.0
+git push origin v1.1.0
+```
+
+**优点**：
+- 精确控制推送了哪些标签
+- 不会意外推送未准备好的标签
+- 适合 CI/CD 流程中的自动化发布
+
+### 推送所有标签
+
+```bash
+# 推送所有本地标签到远端
+git push origin --tags
+```
+
+**使用场景**：
+- 批量同步多个标签
+- 团队统一约定标签管理规范时
+- 新成员初始化环境时同步所有历史标签
+
+**风险**：
+- 可能推送测试/实验标签到生产远端
+- 如果本地有不该推送的标签，会一起推上去
+
+### 默认行为
+
+`git push` 默认**不会**推送标签：
+
+```bash
+git push origin main
+# 只会推送 main 分支，不包含任何标签
+```
+
+这是 Git 的安全设计，防止意外发布标签。
+
+### 自动推送标签（可选配置）
+
+```bash
+# 配置 push 时自动推送匹配的标签
+git config --global push.followTags true
+```
+
+开启后，`git push` 会自动推送与本次推送的 commit 关联的标签。
+
+## 轻量标签 vs 附注标签对比
+
+| 维度 | 轻量标签 (Lightweight) | 附注标签 (Annotated) |
+|------|----------------------|---------------------|
+| 创建命令 | `git tag v1.0.0` | `git tag -a v1.0.0 -m "msg"` |
+| Git 对象 | 只是一个引用指针 | 独立的 tag 对象 |
+| 元数据 | 无 | 包含 tagger、日期、消息 |
+| 签名支持 | ❌ 不支持 | ✅ 支持 (`-s`) |
+| 存储位置 | `refs/tags/v1.0.0` | `refs/tags/v1.0.0` + tag 对象 |
+| `git show` 输出 | 显示 commit 信息 | 显示 tag 信息 + commit 信息 |
+| 适用场景 | 本地临时标记、个人使用 | 正式发布、团队协作 |
+| 是否推荐用于发布 | ❌ 不推荐 | ✅ 强烈推荐 |
+
+### 直观对比
+
+```bash
+# 轻量标签
+git tag v1.0-beta
+git show v1.0-beta
+# 输出直接显示 commit 内容
+
+# 附注标签
+git tag -a v1.0.0 -m "Release v1.0.0"
+git show v1.0.0
+# 输出先显示 tag 元数据，再显示 commit 内容
+# tag v1.0.0
+# Tagger: Name <email>
+# Date:   ...
+#
+# Release v1.0.0
+```
+
+## tag 命名惯例
+
+### SemVer（语义化版本）
+
+最主流的命名方式，格式：`主版本.次版本.补丁版本`
+
+```
+v1.0.0     ← 正式版
+v1.0.1     ← 补丁修复
+v1.1.0     ← 新功能
+v2.0.0     ← 不兼容的大版本更新
+```
+
+### Pre-release（预发布）
+
+在正式发布前的测试版本：
+
+```
+v1.0.0-alpha.1     ← 内部测试版
+v1.0.0-alpha.2
+v1.0.0-beta.1      ← 公测版
+v1.0.0-beta.2
+v1.0.0-rc.1        ← 候选发布版
+v1.0.0-rc.2
+v1.0.0             ← 最终正式版
+```
+
+### 日期标签
+
+适合频繁发布的场景：
+
+```
+release-2024-01-15
+release-20240115
+2024.01.15
+```
+
+### 命名建议
+
+- **始终加 `v` 前缀**：`v1.0.0` 比 `1.0.0` 更清晰
+- **避免空格和特殊字符**：`/`、`:` 等可能在远端有问题
+- **保持一致性**：团队统一命名规范
+- **不要用标签名覆盖已有标签**：即使使用 `-f` 也不推荐
+
+## 删除标签
+
+### 删除本地标签
+
+```bash
+git tag -d v1.0.0
+# Deleted tag 'v1.0.0' (was abc1234)
+```
+
+### 删除远端标签
+
+```bash
+# 方法 1：使用 --delete
+git push origin --delete v1.0.0
+
+# 方法 2：推送空引用（传统方式）
+git push origin :refs/tags/v1.0.0
+```
+
+### 批量删除
+
+```bash
+# 删除所有本地预发布标签
+git tag -l | grep -E 'alpha|beta|rc' | xargs git tag -d
+
+# 同步删除远端对应标签
+git tag -l | grep -E 'alpha|beta|rc' | xargs -I {} git push origin --delete {}
+```
+
+### 删除后的注意事项
+
+- 删除远端标签后，其他协作者可能需要 `git fetch --prune --prune-tags` 来清理本地缓存
+- 已经下载的 tag 不会因为远端删除而自动消失
+- 建议在删除前确认标签没有被 CI/CD 系统引用
+
 ## 特殊情况与边界
 
 - 标签名和分支名在同一个命名空间里冲突时会有歧义，所以命名时要有区分度。

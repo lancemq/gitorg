@@ -66,6 +66,210 @@ git submodule update --init --recursive
   note="父仓库记录的是子仓库的 commit hash，不是分支名——所以 submodule 默认不会自动跟进子仓库的新提交。"
 />
 
+## 子模块完整生命周期
+
+### 添加子模块
+
+```bash
+git submodule add https://github.com/user/lib.git libs/mylib
+git commit -m "add mylib submodule"
+```
+
+执行后：
+- 在 `.gitmodules` 中写入子模块的 URL 和路径
+- 克隆子模块到 `libs/mylib`
+- 在主仓库暂存区添加子模块的 commit hash（特殊文件模式 160000）
+
+### 初始化与更新
+
+```bash
+# 克隆后首次初始化
+git submodule update --init --recursive
+
+# 更新子模块到父仓库记录的最新 commit
+git submodule update
+
+# 让子模块跟着远程分支走（--remote）
+git submodule update --remote --merge
+```
+
+### 同步 URL 变更
+
+如果子模块的远程 URL 变了（比如从 GitHub 迁移到 GitLab）：
+
+```bash
+# 修改 .gitmodules 中的 URL 后，同步到本地配置
+git submodule sync --recursive
+git submodule update --init --recursive
+```
+
+### 删除子模块（手动但完整的流程）
+
+Git 没有内置的 `submodule remove` 命令，需要手动清理：
+
+```bash
+# 1. 取消暂存子模块
+git submodule deinit -f libs/mylib
+
+# 2. 删除子模块目录（如果存在）
+rm -rf .git/modules/libs/mylib
+
+# 3. 从暂存区移除
+git rm -f libs/mylib
+
+# 4. 清理 .gitmodules 中的条目
+git add .gitmodules
+git commit -m "remove mylib submodule"
+```
+
+## 嵌套子模块的处理
+
+子模块本身可以包含自己的子模块，形成多层嵌套：
+
+```
+父仓库/
+├── libs/
+│   ├── lib-a/          ← 一级子模块
+│   │   └── vendor/
+│   │       └── lib-b/  ← 二级子模块（lib-a 的 submodule）
+│   └── lib-c/
+```
+
+### 克隆时处理嵌套
+
+```bash
+# 一次性递归克隆所有层级
+git clone --recursive https://github.com/user/repo.git
+
+# 或者先克隆，再递归初始化
+git clone https://github.com/user/repo.git
+cd repo
+git submodule update --init --recursive
+```
+
+### 嵌套更新
+
+```bash
+# 更新所有层级的子模块
+git submodule update --recursive
+
+# 让所有层级跟随远程分支
+git submodule update --remote --recursive --merge
+```
+
+**注意**：嵌套越深，维护成本越高。如果超过 3 层嵌套，建议重新考虑架构设计。
+
+## 从 submodule 迁移到 subtree
+
+当子模块管理过于复杂时，可以转用 subtree 将代码合并到主仓库历史中：
+
+```bash
+# 1. 添加 subtree（将子模块代码合并进来）
+git subtree add --prefix=libs/mylib https://github.com/user/lib.git main --squash
+
+# 2. 移除 submodule
+git submodule deinit -f libs/mylib
+rm -rf .git/modules/libs/mylib
+git rm -f libs/mylib
+git commit -m "remove mylib submodule"
+
+# 3. 清理 .gitmodules
+```
+
+后续更新 subtree：
+```bash
+git subtree pull --prefix=libs/mylib https://github.com/user/lib.git main --squash
+```
+
+**subtree vs submodule 选择指南**：
+
+| 维度 | submodule | subtree |
+|------|-----------|---------|
+| 代码可见性 | 独立仓库，需要额外 clone | 合并到主仓库历史中 |
+| 版本锁定 | 精确到 commit hash | 跟随分支或手动拉取 |
+| 克隆速度 | 快（默认不拉子模块） | 慢（所有代码一起拉） |
+| 修改依赖 | 需要在子仓库中提交 | 直接在主仓库提交 |
+| 适用场景 | 大型、独立、少改动的依赖 | 小型、需频繁修改的依赖 |
+
+## .gitmodules 文件结构
+
+`.gitmodules` 是 Git 自动维护的子模块配置文件，格式为 INI：
+
+```ini
+[submodule "libs/mylib"]
+    path = libs/mylib
+    url = https://github.com/user/lib.git
+    branch = main
+    shallow = true
+    update = checkout
+```
+
+字段说明：
+- **path**：子模块在工作区中的路径（相对路径）
+- **url**：子模块的远程仓库地址
+- **branch**：指定跟随的分支名（可选，需要 `--remote` 更新）
+- **shallow**：是否使用浅克隆（可选，加快克隆速度）
+- **update**：更新策略，可选值：
+  - `checkout`（默认）：检出到记录的 commit
+  - `rebase`：rebase 到记录 commit
+  - `merge`：merge 到记录 commit
+  - `none`：不自动更新
+
+## 常见坑：子模块指针与实际内容不一致
+
+### 问题现象
+
+```bash
+git status
+# modified:   libs/mylib (new commits, modified content)
+```
+
+这表示子模块的 commit hash 和实际检出的内容不匹配。
+
+### 常见原因
+
+1. **在子模块中做了修改但没提交**：
+```bash
+cd libs/mylib
+# 做了修改，但没 commit
+cd ../..
+git status  # 显示 modified content
+```
+**解决**：在子模块中提交或丢弃修改。
+
+2. **父仓库记录了新 hash 但子模块未更新**：
+```bash
+git pull  # 拉取到父仓库的新提交
+git submodule status
+# -abc1234 libs/mylib (heads/main)
+# 前面有 - 号，表示未初始化
+```
+**解决**：运行 `git submodule update`。
+
+3. **子模块被切换到不同分支**：
+```bash
+cd libs/mylib
+git checkout develop  # 切到别的分支
+cd ../..
+git status  # 显示 modified content
+```
+**解决**：回到父仓库记录的 commit，或在父仓库中更新指针。
+
+### 一键排查
+
+```bash
+# 查看所有子模块状态
+git submodule status
+# 状态前缀含义：
+# 无  = 正常匹配
+# -   = 未初始化
+# +   = 内容已修改
+# U   = 有合并冲突
+
+# 检查哪些子模块有本地修改
+git submodule foreach --recursive 'git status --porcelain'
+```
+
 ## 特殊情况与边界
 
 - 子模块状态不是"自动跟着父仓库走"，父仓库记录的是子仓库的特定 commit hash，更新子模块后必须在父仓库中提交新的指针。

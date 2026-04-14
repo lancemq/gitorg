@@ -1,0 +1,398 @@
+export const metadata = {
+  title: "Understanding .gitattributes",
+  slug: "git-attributes",
+  locale: "en",
+  section: "concepts",
+  summary: "A deep dive into .gitattributes for controlling line endings, merge strategies, diff drivers, and binary file handling in Git.",
+  sourceUrls: ["https://git-scm.com/docs/gitattributes"],
+};
+
+# Understanding .gitattributes
+
+## What is .gitattributes?
+
+While `.gitignore` tells Git **which** files to track, `.gitattributes` tells Git **how** to handle those files. It is a plain text file that assigns attributes to paths, influencing how Git performs operations like merging, diffing, exporting, and line-ending normalization.
+
+The `.gitattributes` file uses the same glob pattern syntax as `.gitignore` and should be committed to your repository so that all contributors share the same configuration.
+
+```
+my-project/
+├── .gitattributes     ← applies to the entire repo
+├── src/
+│   └── .gitattributes ← scoped to src/
+└── docs/
+```
+
+## Line Ending Normalization
+
+Line endings are one of the most common sources of cross-platform confusion. Windows uses CRLF (`\r\n`), while Unix-based systems (Linux, macOS) use LF (`\n`). Without proper configuration, the same file can show different content depending on the operating system.
+
+### How Git Handles Line Endings
+
+Git stores file contents in its object database using **LF** (Unix-style) line endings. When checking files out to your working directory, Git can convert them to the platform-appropriate format. The `.gitattributes` file gives you fine-grained control over this behavior.
+
+### The `text` Attribute
+
+```gitattributes
+# Mark all files as text — Git will normalize line endings
+* text=auto
+
+# Explicitly mark specific file types as text
+*.c text
+*.h text
+*.java text
+*.py text
+*.js text
+*.ts text
+*.css text
+*.html text
+*.xml text
+*.json text
+*.md text
+*.txt text
+
+# Explicitly mark files as binary (no line ending conversion)
+*.png binary
+*.jpg binary
+*.gif binary
+*.exe binary
+*.dll binary
+*.zip binary
+*.pdf binary
+```
+
+### The `eol` Attribute
+
+The `eol` attribute forces a specific line ending in the working directory, regardless of the platform:
+
+```gitattributes
+# Force LF line endings (Unix-style) for shell scripts
+*.sh text eol=lf
+
+# Force CRLF line endings (Windows-style) for batch files
+*.bat text eol=crlf
+*.cmd text eol=crlf
+```
+
+### `core.autocrlf` vs .gitattributes
+
+Git also has a global config option `core.autocrlf`:
+
+| Setting | Behavior |
+|---------|----------|
+| `core.autocrlf = true` | Convert LF → CRLF on checkout (Windows) |
+| `core.autocrlf = input` | Convert CRLF → LF on commit (macOS/Linux) |
+| `core.autocrlf = false` | No conversion |
+
+**Recommendation**: Use `.gitattributes` with `* text=auto` instead of `core.autocrlf`. The `.gitattributes` file is committed to the repo, ensuring consistent behavior across all team members, while `core.autocrlf` is a per-user setting that can vary.
+
+### Best Practice Configuration
+
+```gitattributes
+# Auto-detect text files and normalize line endings
+* text=auto
+
+# Ensure shell scripts always use LF
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Ensure Windows batch files always use CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+```
+
+## Merge Strategies for Specific File Types
+
+When two branches modify the same file, Git attempts a three-way merge. For some file types, a standard merge doesn't make sense. The `merge` attribute lets you customize this behavior.
+
+### Union Merge Strategy
+
+The `union` strategy keeps **all** changes from both branches, appending non-conflicting additions. This is useful for files where duplicate entries are harmless:
+
+```gitattributes
+# Use union merge for .gitignore — combines rules from both branches
+.gitignore merge=union
+
+# Good for dependency files where entries can safely be combined
+Pipfile.lock merge=union
+package-lock.json merge=union
+```
+
+### Ours Merge Strategy
+
+The `ours` strategy keeps **your branch's** version and discards the other branch's changes for that file:
+
+```gitattributes
+# Always keep the current branch's version of generated files
+generated/config.yml merge=ours
+
+# Keep the main branch's database schema
+schema.sql merge=ours
+```
+
+### Custom Merge Drivers
+
+You can define custom merge drivers in your Git config:
+
+```gitattributes
+# Use custom driver for JSON files
+*.json merge=json-merge
+```
+
+```bash
+# Configure the custom driver
+git config merge.json-merge.name "JSON merge driver"
+git config merge.json-merge.driver "python3 merge-json.py %O %A %B"
+```
+
+The driver receives three arguments:
+- `%O` — the common ancestor (base) version
+- `%A` — your branch's version (modified in-place)
+- `%B` — the other branch's version
+
+## Diff Drivers
+
+The `diff` attribute controls how `git diff` displays changes for specific file types.
+
+### Binary Files
+
+```gitattributes
+# Mark binary files so git diff shows a simple message instead of garbled output
+*.png diff=binary
+*.jpg diff=binary
+*.pdf diff=binary
+*.exe diff=binary
+```
+
+This produces output like:
+```
+Binary files a/image.png and b/image.png differ
+```
+
+### Custom Diff Drivers
+
+You can set up custom diff drivers for specific file formats:
+
+```gitattributes
+# Use custom diff for Word documents
+*.docx diff=word
+
+# Use custom diff for images
+*.png diff=image
+```
+
+```bash
+# Configure a Word document diff driver
+git config diff.word.textconv "antiword"
+
+# Configure an image diff driver (shows dimensions and size)
+git config diff.image.textconv "identify"
+```
+
+### Word and PDF Diffs
+
+For documents, you can extract text content for meaningful diffs:
+
+```gitattributes
+*.docx diff=docx
+*.pdf diff=pdf
+```
+
+```bash
+# Using pandoc for .docx
+git config diff.docx.textconv "pandoc --to=plain"
+
+# Using pdftotext for .pdf
+git config diff.pdf.textconv "pdftotext -layout -"
+```
+
+## Export Attributes
+
+The `export-ignore` attribute controls which files are excluded when creating an archive with `git archive`. This is useful for creating distribution packages that exclude development files.
+
+```gitattributes
+# Exclude development files from archives
+.gitattributes export-ignore
+.gitignore export-ignore
+.github/ export-ignore
+tests/ export-ignore
+.eslintrc export-ignore
+.prettierrc export-ignore
+tsconfig.json export-ignore
+jest.config.js export-ignore
+```
+
+```bash
+# Create an archive that respects export-ignore rules
+git archive --format=tar.gz --prefix=my-project-1.0/ HEAD -o my-project-1.0.tar.gz
+```
+
+The resulting archive will not include any files marked with `export-ignore`.
+
+## Language Detection and Linguist
+
+GitHub uses the `linguist` attributes to determine the primary language of a repository and to display language breakdown statistics.
+
+```gitattributes
+# Override language detection
+# Treat .inc files as PHP instead of Assembly
+*.inc linguist-language=PHP
+
+# Treat a specific file as a different language
+Makefile linguist-language=Makefile
+
+# Mark files as generated (excluded from language stats)
+*.min.js linguist-generated=true
+*.min.css linguist-generated=true
+dist/* linguist-generated=true
+build/* linguist-generated=true
+
+# Mark files as vendored (third-party code)
+vendor/* linguist-vendored=true
+node_modules/* linguist-vendored=true
+third_party/* linguist-vendored=true
+
+# Mark documentation files
+docs/* linguist-documentation=true
+*.md linguist-documentation=true
+```
+
+## Submodule and Path-Specific Attributes
+
+```gitattributes
+# Treat submodule directories specially
+modules/* -text
+
+# Override attributes for specific paths
+important-config.yml -text
+secrets/* -text
+```
+
+## Common Complete .gitattributes File
+
+Here's a production-ready `.gitattributes` configuration that covers most projects:
+
+```gitattributes
+# ============================================================
+# Line Ending Normalization
+# ============================================================
+# Auto-detect text files and normalize to LF in the repository
+* text=auto
+
+# Ensure shell scripts always use LF
+*.sh text eol=lf
+*.bash text eol=lf
+*.zsh text eol=lf
+
+# Windows scripts use CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Source code files
+*.c text
+*.cpp text
+*.h text
+*.java text
+*.py text
+*.js text
+*.jsx text
+*.ts text
+*.tsx text
+*.go text
+*.rs text
+*.rb text
+*.php text
+*.swift text
+*.kt text
+*.css text
+*.scss text
+*.html text
+*.xml text
+*.json text
+*.yaml text
+*.yml text
+*.toml text
+*.sql text
+*.md text
+*.txt text
+*.cfg text
+*.ini text
+*.conf text
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.otf binary
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+*.a binary
+*.lib binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.tgz binary
+*.rar binary
+*.7z binary
+*.pdf binary
+*.doc binary
+*.docx binary
+*.xls binary
+*.xlsx binary
+*.ppt binary
+*.pptx binary
+
+# ============================================================
+# Merge Strategies
+# ============================================================
+.gitignore merge=union
+
+# ============================================================
+# Diff Drivers
+# ============================================================
+*.png diff=binary
+*.jpg diff=binary
+*.gif diff=binary
+*.pdf diff=binary
+*.exe diff=binary
+
+# ============================================================
+# Archive Exclusion
+# ============================================================
+.gitattributes export-ignore
+.gitignore export-ignore
+.github/ export-ignore
+tests/ export-ignore
+
+# ============================================================
+# Linguist
+# ============================================================
+*.min.js linguist-generated=true
+*.min.css linguist-generated=true
+vendor/* linguist-vendored=true
+```
+
+## Summary
+
+| Attribute | Purpose |
+|-----------|---------|
+| `text` | Controls line ending normalization |
+| `eol` | Forces specific line ending in working directory |
+| `binary` | Shorthand for `-text -diff` |
+| `merge` | Custom merge strategy for specific file types |
+| `diff` | Custom diff behavior for specific file types |
+| `export-ignore` | Excludes files from `git archive` output |
+| `linguist-*` | GitHub language detection overrides |
+
+`.gitattributes` is a powerful but often overlooked Git feature. Proper configuration prevents line-ending conflicts, enables meaningful diffs for binary files, and ensures clean distribution archives. Add it to your project templates alongside `.gitignore` for a more robust repository setup.

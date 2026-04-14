@@ -1,0 +1,346 @@
+export const metadata = {
+  title: "Recovering from a broken interactive rebase",
+  slug: "fix-broken-interactive-rebase",
+  locale: "en",
+  section: "recovery",
+  summary: "Common errors during interactive rebase (wrong actions, conflicts, editor issues) and how to recover, including --abort, --edit-todo, and reflog-based recovery.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rebase",
+    "https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History",
+  ],
+};
+
+# Recovering from a broken interactive rebase
+
+## The short version
+
+Interactive rebase (`git rebase -i`) lets you reorder, modify, squash, or drop commits while replaying them. When things go wrong, Git provides `--abort`, `--edit-todo`, and reflog as layered recovery mechanisms.
+
+## What interactive rebase does
+
+```
+Before rebase:
+A --- B --- C --- D --- E (feature)
+       \
+        X --- Y (main)
+
+After rebase:
+A --- B --- C --- D --- E (feature, old, to be discarded)
+       \
+        X --- Y --- B' --- C' --- D' --- E' (feature, new)
+```
+
+Interactive rebase opens an editor listing the commits to replay, each with an action prefix:
+
+```
+pick B    apply commit B
+pick C    apply commit C
+pick D    apply commit D
+pick E    apply commit E
+
+# Commands:
+# p, pick <commit> = use commit
+# r, reword <commit> = use commit, but edit the commit message
+# e, edit <commit> = use commit, but stop for amending
+# s, squash <commit> = use commit, but meld into previous commit
+# f, fixup <commit> = like squash, but discard this commit's log message
+# d, drop <commit> = remove commit
+```
+
+## Scenario 1: Conflict during rebase
+
+Like a normal rebase or cherry-pick, conflicts can occur when replaying a commit.
+
+```bash
+$ git rebase -i HEAD~4
+# After saving the editor...
+
+$ git rebase main
+Auto-merging src/auth.js
+CONFLICT (content): Merge conflict in src/auth.js
+error: could not apply abc1234... feat: update auth logic
+hint: Resolve all conflicts manually, mark them as resolved with
+hint: "git add/rm <conflicted_files>", then run "git rebase --continue".
+hint: You can instead skip this commit with "git rebase --skip".
+hint: To abort and get back to the original branch before "git rebase",
+hint: run "git rebase --abort".
+
+$ git status
+interactive rebase in progress; onto def5678
+Last command done (1 command done):
+   pick abc1234 feat: update auth logic
+Next commands to do (3 remaining commands):
+   pick bcd2345 fix: correct edge case
+   squash cde3456 feat: add error handling
+  (use "git rebase --edit-todo" to view and edit)
+You are currently rebasing branch 'feature' on 'def5678'.
+  (fix conflicts and then run "git rebase --continue")
+  (use "git rebase --skip" to skip this patch)
+  (use "git rebase --abort" to check out the original branch)
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+        both modified:   src/auth.js
+```
+
+### Your four options:
+
+**Option A: Resolve conflicts and continue**
+
+```bash
+# 1. Edit conflicted files
+vim src/auth.js
+
+# 2. Mark as resolved
+git add src/auth.js
+
+# 3. Continue
+git rebase --continue
+# Git may open an editor for the commit message (for edit/reword actions)
+```
+
+**Option B: Skip the current commit**
+
+```bash
+# Don't apply this conflicting commit, move on to the next
+git rebase --skip
+```
+
+**Option C: Abort entirely**
+
+```bash
+# Go back to the pre-rebase state
+git rebase --abort
+```
+
+**Option D: Modify the rebase plan**
+
+```bash
+# Open the editor to modify the remaining rebase plan
+git rebase --edit-todo
+# For example, change a pick to drop or squash
+# Save and continue
+git rebase --continue
+```
+
+## Scenario 2: Wrong action in the rebase editor
+
+### Accidentally wrote `drop` instead of `pick`
+
+```
+# You meant to pick this commit but typed drop by mistake
+drop abc1234 feat: important new feature  ← this commit gets discarded!
+```
+
+**Recovery**:
+
+```bash
+# Method 1: If rebase is still in progress
+git rebase --abort
+
+# Method 2: If rebase already finished, use reflog
+git reflog
+# Find the pre-rebase state
+# git reset --hard feature@{1}  or
+# git reset --hard <pre-rebase-SHA>
+```
+
+### Lost commit info after squash
+
+```
+# Squash combines commit messages, but you might accidentally delete important descriptions
+pick abc1234 feat: base framework
+squash bcd2345 fix: correct issue
+```
+
+After squash, the editor opens for the combined message. If you saved an incomplete message:
+
+```bash
+# Amend the most recent commit message
+git commit --amend
+
+# If rebase is already complete
+git rebase -i HEAD~1  # use reword to fix
+```
+
+### Stuck after an `edit` action
+
+```
+# You chose edit for a commit, rebase stopped:
+$ git status
+interactive rebase in progress; onto def5678
+Last command done (1 command done):
+   edit abc1234 feat: update auth logic
+  (use "git commit --amend" to amend the commit)
+  (use "git rebase --continue" to continue)
+```
+
+```bash
+# 1. Make your changes
+vim src/auth.js
+git add src/auth.js
+
+# 2. Amend the commit message (optional)
+git commit --amend
+
+# 3. Continue rebase
+git rebase --continue
+```
+
+## Scenario 3: Editor problems
+
+### Don't know how to use the editor
+
+Interactive rebase uses your default editor. If you're unfamiliar with Vim:
+
+```bash
+# Temporarily use a different editor
+GIT_SEQUENCE_EDITOR="code --wait" git rebase -i HEAD~4
+
+# Or set a global default editor
+git config --global core.editor "code --wait"  # VS Code
+git config --global core.editor "nano"          # nano
+git config --global core.editor "vim"           # vim
+```
+
+### Rebase errors after saving the editor
+
+```bash
+$ git rebase -i HEAD~4
+error: invalid line 3: blahblah blahblah
+Could not execute editor
+```
+
+This usually means the rebase todo file has a syntax error. Git tells you which line is wrong.
+
+```bash
+# Fix it
+git rebase --edit-todo
+# Correct the bad line (ensure action is pick/reword/edit/squash/fixup/drop)
+git rebase --continue
+```
+
+## Scenario 4: Rebase completed but result is wrong
+
+Rebase finished cleanly, but the outcome isn't what you wanted.
+
+### Use reflog to recover the pre-rebase state
+
+```bash
+# Check the reflog
+$ git reflog
+a1b2c3d (HEAD -> feature) HEAD@{0}: rebase (finish): returning to refs/heads/feature
+a1b2c3d HEAD@{1}: rebase (pick): feat: add error handling
+b2c3d4e HEAD@{2}: rebase (pick): fix: correct edge case
+c3d4e5f HEAD@{3}: rebase (pick): feat: update auth logic
+d4e5f6a HEAD@{4}: rebase (start): checkout main
+e5f6a7b HEAD@{5}: checkout: moving from main to feature  ← pre-rebase position!
+e5f6a7b (feature@{1}) feat: last commit (before rebase)
+
+# Return to pre-rebase state
+git reset --hard e5f6a7b
+# or
+git reset --hard feature@{1}
+```
+
+### Partial recovery
+
+If only a specific commit is wrong, find its old SHA in the reflog and cherry-pick the correct version:
+
+```bash
+# Find the old commit SHA in reflog
+git reflog --all | grep "important commit message"
+
+# Cherry-pick the old version
+git cherry-pick <old-sha>
+```
+
+## Scenario 5: Rebased onto the wrong branch
+
+```bash
+# Accidentally ran
+git rebase -i main   # meant to rebase onto develop
+
+# Recovery
+git rebase --abort   # if still in progress
+
+# If already finished
+git reset --hard feature@{1}  # back to before rebase
+git rebase -i develop          # rebase onto the correct branch
+```
+
+## Interactive rebase command quick reference
+
+| Command | Purpose |
+|---------|---------|
+| `git rebase --continue` | Continue after resolving conflicts or editing |
+| `git rebase --abort` | Cancel entirely, return to pre-rebase state |
+| `git rebase --skip` | Skip the current commit |
+| `git rebase --edit-todo` | Edit the remaining rebase plan |
+| `git rebase --quit` | Stop rebase but keep current progress (don't return to pre-rebase) |
+
+Difference between `--quit` and `--abort`:
+- `--abort`: fully returns to the pre-rebase state
+- `--quit`: stops rebase but keeps already-replayed commits on the current branch
+
+## Preventive measures
+
+### 1. Create a backup branch before rebasing
+
+```bash
+# The most important preventive step!
+git branch backup/feature-before-rebase
+```
+
+If the rebase goes wrong, you can always:
+```bash
+git reset --hard backup/feature-before-rebase
+```
+
+### 2. Preview commits before rebasing
+
+```bash
+# See what commits will be rebased
+git log --oneline main..feature
+# Confirm the list of commits to rebase
+```
+
+### 3. Experiment on a copy
+
+```bash
+# Create a copy branch
+git checkout -b feature/rebase-trial
+# Experiment with rebase on the copy
+git rebase -i HEAD~4
+# Once satisfied, delete original and rename the copy
+git branch -D feature
+git branch -m feature
+```
+
+### 4. Automate with `GIT_SEQUENCE_EDITOR`
+
+If you know what operations you need, use a script instead of manual editing:
+
+```bash
+# Squash the 3rd commit
+GIT_SEQUENCE_EDITOR="sed -i '3s/pick/squash/'" git rebase -i HEAD~4
+
+# Drop all commits containing "WIP"
+GIT_SEQUENCE_EDITOR="sed -i '/WIP/s/pick/drop/'" git rebase -i HEAD~10
+```
+
+## Quick decision flowchart
+
+```
+Rebase went wrong?
+      │
+  ┌───┴───┐
+  Still in progress?   Already finished?
+  │            │
+  ↓            ↓
+  Conflict?   Recover via reflog
+  │            │
+  ├─ Resolve → --continue   git reflog
+  ├─ Skip → --skip          git reset --hard <old-sha>
+  └─ Give up → --abort
+```

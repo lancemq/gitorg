@@ -153,7 +153,11 @@ export type RecoverySlug =
   | "recover-deleted-branch"
   | "detached-head-rescue"
   | "undo-after-pull"
-  | "assess-force-push-impact";
+  | "assess-force-push-impact"
+  | "recover-after-cherry-pick"
+  | "undo-merge-commit"
+  | "fix-broken-interactive-rebase"
+  | "recover-lost-commits";
 
 export type LearningPathSlug =
   | "quick-start"
@@ -161,6 +165,15 @@ export type LearningPathSlug =
   | "stage-and-commit"
   | "sync-with-remote"
   | "first-feature-branch";
+
+export type ConceptsSlug =
+  | "git-history"
+  | "git-ignore"
+  | "git-attributes"
+  | "git-hooks"
+  | "git-subtree"
+  | "git-lfs"
+  | "git-shallow";
 
 export function isValidLocale(value: string): value is Locale {
   return locales.includes(value as Locale);
@@ -699,7 +712,21 @@ export const recoverySlugs = [
   "detached-head-rescue",
   "undo-after-pull",
   "assess-force-push-impact",
+  "recover-after-cherry-pick",
+  "undo-merge-commit",
+  "fix-broken-interactive-rebase",
+  "recover-lost-commits",
 ] as const satisfies readonly RecoverySlug[];
+
+export const conceptSlugs = [
+  "git-history",
+  "git-ignore",
+  "git-attributes",
+  "git-hooks",
+  "git-subtree",
+  "git-lfs",
+  "git-shallow",
+] as const satisfies readonly ConceptsSlug[];
 
 export const internalsSlugs = [
   "object-database",
