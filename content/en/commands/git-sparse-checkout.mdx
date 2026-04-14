@@ -76,3 +76,293 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 - Use `git sparse-checkout set <paths>` to define the visible paths, and `git sparse-checkout disable` to restore full checkout.
 - When combined with partial clone (`--filter`), you can reduce both network transfer and working tree scope, but operations that require filtered-out objects will trigger on-demand downloads.
 
+## Cone mode details
+
+Cone mode is the default and recommended mode for `git sparse-checkout`. It uses a simplified pattern matching strategy that significantly improves performance.
+
+### What is cone mode?
+
+In cone mode, Git treats each path you specify as a **directory cone** — meaning it automatically includes:
+- The specified directory
+- All files directly inside it
+- All subdirectories and their contents
+
+```bash
+# Enables cone mode by default and includes src/ and docs/
+git sparse-checkout set src docs
+```
+
+### Why cone mode is faster
+
+- Patterns are compiled into efficient directory-matching rules
+- Git avoids expensive glob pattern evaluation
+- Index operations scale better with large repositories
+- Rules are **auto-inferred** from the paths you provide
+
+### Verify cone mode is active
+
+```bash
+git sparse-checkout list
+# If cone mode is on, paths show without complex glob patterns
+```
+
+### Non-cone mode (legacy)
+
+If you need complex glob patterns, you can disable cone mode:
+
+```bash
+git sparse-checkout set --no-cone 'src/**/*.ts' '!src/internal/*'
+```
+
+**Note**: Non-cone mode is deprecated and will be removed in a future Git version. Stick with cone mode whenever possible.
+
+## Migration from legacy sparse checkout
+
+If you are using the old sparse checkout method (manually editing `.git/info/sparse-checkout`), migrate to the new cone-mode approach:
+
+### Step 1: Check your current state
+
+```bash
+# Old method leaves a sparse-checkout file with glob patterns
+cat .git/info/sparse-checkout
+```
+
+### Step 2: Disable the old method
+
+```bash
+git sparse-checkout disable
+```
+
+### Step 3: Re-enable with cone mode
+
+```bash
+git sparse-checkout init --cone
+git sparse-checkout set src/ docs/
+```
+
+### Step 4: Verify
+
+```bash
+git sparse-checkout list
+git config core.sparseCheckout      # should be empty or unset
+git config core.sparseCheckoutCone  # should be true
+```
+
+### Migration benefits
+
+| Feature | Legacy | Cone Mode |
+|---------|--------|-----------|
+| Performance | Slow with many patterns | Optimized directory matching |
+| Syntax | Complex globs | Simple directory paths |
+| Maintenance | Manual file editing | `set`/`add`/`remove` commands |
+| Git support | Deprecated | Actively maintained |
+
+## Monorepo practice: team-focused subdirectories
+
+Sparse checkout is particularly powerful in monorepos where teams only need specific parts of the codebase.
+
+### Example: frontend team in a full-stack monorepo
+
+```bash
+# Clone with partial fetch (only needed objects)
+git clone --filter=blob:none --no-checkout https://github.com/org/monorepo.git
+cd monorepo
+
+# Enable sparse checkout with cone mode
+git sparse-checkout init --cone
+
+# Frontend team only needs frontend/ and shared/
+git sparse-checkout set frontend shared
+
+# Checkout
+git checkout main
+```
+
+### Team-specific setup scripts
+
+```bash
+#!/bin/bash
+# setup-frontend.sh
+git sparse-checkout set frontend shared packages/ui
+
+#!/bin/bash
+# setup-backend.sh
+git sparse-checkout set backend shared packages/api packages/db
+```
+
+### Updating sparse checkout when your focus shifts
+
+```bash
+# Add more directories
+git sparse-checkout add docs/
+
+# Remove a directory
+git sparse-checkout reapply  # re-apply current rules after config change
+
+# Completely change scope
+git sparse-checkout set backend/ packages/db/ shared/
+```
+
+## Combine with partial clone
+
+Sparse checkout and partial clone work together to minimize both disk usage and network transfer:
+
+### Full combo setup
+
+```bash
+# Step 1: Partial clone (no blobs, only metadata)
+git clone --filter=blob:none --no-checkout https://github.com/org/large-repo.git
+cd large-repo
+
+# Step 2: Enable sparse checkout
+git sparse-checkout init --cone
+
+# Step 3: Define paths
+git sparse-checkout set src/frontend/
+
+# Step 4: Checkout (only downloads needed blobs)
+git checkout main
+```
+
+### Filter options
+
+| Filter | What it skips | Best for |
+|--------|--------------|----------|
+| `--filter=blob:none` | All file contents | Sparse checkout companion |
+| `--filter=blob:limit=1M` | Blobs over 1MB | Large binary repos |
+| `--filter=tree:0` | All trees except needed | Extreme minimal clone |
+| `--filter=combine:` | Multiple filters combined | Fine-grained control |
+
+### On-demand fetching
+
+When you access a file that was not downloaded during the initial clone, Git fetches it on demand:
+
+```bash
+# This triggers a fetch for the file's blob
+cat src/newly-accessed/file.ts
+```
+
+## Common pitfalls
+
+### 1. Forgetting that sparse checkout does not reduce clone size by itself
+
+```bash
+# WRONG: This still downloads everything
+git clone https://github.com/org/huge-repo.git
+cd huge-repo
+git sparse-checkout set small-part/  # too late, everything is already downloaded
+
+# RIGHT: Combine with partial clone
+git clone --filter=blob:none --no-checkout https://github.com/org/huge-repo.git
+cd huge-repo
+git sparse-checkout init --cone
+git sparse-checkout set small-part/
+git checkout main
+```
+
+### 2. Scripts expecting all files to be present
+
+Build scripts, linters, or test runners may fail if they reference paths outside your sparse checkout:
+
+```bash
+# Check what's visible
+git sparse-checkout list
+
+# Temporarily disable for a full build
+git sparse-checkout disable
+# run full build
+git sparse-checkout set src/
+```
+
+### 3. Merge conflicts with sparse checkout
+
+When merging branches that modify files outside your sparse checkout, Git may behave unexpectedly. Always verify your sparse checkout covers the relevant paths before merging.
+
+### 4. `git add` only works on visible paths
+
+You cannot stage files that are not in your working tree:
+
+```bash
+# This will fail if src/backend/ is not in your sparse checkout
+git add src/backend/new-file.ts
+```
+
+### 5. Accidentally expanding to full checkout
+
+Running `git sparse-checkout set --cone /` or forgetting the path arguments will restore all paths:
+
+```bash
+# This reverts to checking out everything!
+git sparse-checkout set --cone
+
+# Be explicit about what you want
+git sparse-checkout set src/ docs/
+```
+
+## List, modify, and remove rules
+
+### List current rules
+
+```bash
+git sparse-checkout list
+```
+
+Shows the current set of included paths:
+
+```
+docs
+src
+packages/shared
+```
+
+### Add paths
+
+```bash
+# Add without removing existing paths
+git sparse-checkout add tests/
+```
+
+### Remove paths
+
+There is no direct `remove` command, but you can redefine the set:
+
+```bash
+# Redefine to exclude a path
+git sparse-checkout set src docs  # removes tests/ that was added before
+```
+
+### Reapply rules after configuration changes
+
+```bash
+# After editing git config or changing branch
+git sparse-checkout reapply
+```
+
+### Disable sparse checkout entirely
+
+```bash
+# Restore full working tree checkout
+git sparse-checkout disable
+```
+
+### Check sparse checkout status
+
+```bash
+# Is sparse checkout enabled?
+git config core.sparseCheckoutCone
+
+# What are the current rules?
+git sparse-checkout list
+
+# What is the sparse-checkout file content?
+cat .git/info/sparse-checkout
+```
+
+### Disable from the command line
+
+```bash
+# Quick toggle
+git sparse-checkout disable   # turn off
+git sparse-checkout init --cone  # turn back on
+git sparse-checkout set src/     # define paths
+```

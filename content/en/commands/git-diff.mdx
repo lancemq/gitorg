@@ -134,6 +134,234 @@ That routine catches a lot of avoidable mistakes:
 
 ## Try it yourself
 
+## Advanced diff output formats
+
+The default diff format is verbose and shows full context patches. Git offers several alternative output formats for different workflows.
+
+### `--stat` — summary of changes per file
+
+Shows a compact per-file summary with insertions and deletions, plus an ASCII histogram:
+
+```bash
+git diff --stat
+```
+
+```
+ src/auth/login.ts  |  15 +++++++--------
+ src/utils/helpers.ts |  3 +++
+ tests/login.test.ts | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 54 insertions(+), 6 deletions(-)
+```
+
+Best for: quick code reviews and pull request summaries.
+
+### `--numstat` — machine-readable numbers
+
+Outputs a tab-separated list with additions, deletions, and file path — easy to parse in scripts:
+
+```bash
+git diff --numstat
+```
+
+```
+15	8	src/auth/login.ts
+3	0	src/utils/helpers.ts
+42	0	tests/login.test.ts
+```
+
+Best for: automated changelog generation and metrics collection.
+
+### `--raw` — low-level status codes
+
+Shows the raw diff header with mode changes, SHA-1 hashes, and status letters (A/M/D/R/C):
+
+```bash
+git diff --raw
+```
+
+```
+:100644 100644 ab12cd3 ef45gh6 M	src/auth/login.ts
+:000000 100644 0000000 7890abc A	src/utils/helpers.ts
+```
+
+Best for: Git plumbing scripts and internal tooling.
+
+| Flag | Human-readable | Script-friendly | Detail level |
+|------|----------------|-----------------|--------------|
+| Default diff | Yes | No | Full patch |
+| `--stat` | Yes | Partial | Summary + histogram |
+| `--numstat` | Partial | Yes | Add/del counts |
+| `--raw` | No | Yes | SHA-1, mode, status |
+
+## Custom diff drivers via .gitattributes
+
+Git lets you define custom diff behavior for specific file types through `.gitattributes`.
+
+### Define a custom diff driver
+
+In `.git/config`:
+
+```ini
+[diff "word"]
+  command = git diff --word-diff
+```
+
+In `.gitattributes`:
+
+```
+*.md diff=word
+*.txt diff=word
+```
+
+### Binary file detection
+
+Git automatically detects binary files and suppresses text diff output. You can override this:
+
+```
+*.png diff=exiftool
+```
+
+Then define an `exiftool` diff command to show image metadata differences instead.
+
+### Language-aware diffs
+
+For minified or generated code, you can normalize content before diffing:
+
+```
+*.min.js diff=javascript
+```
+
+## External diff tool integration
+
+Replace Git's default unified diff with a richer visual tool by setting `GIT_EXTERNAL_DIFF` or configuring `diff.external`.
+
+### delta
+
+[delta](https://github.com/dandavison/delta) adds syntax highlighting, side-by-side view, and line numbers:
+
+```bash
+git config --global core.pager delta
+git config --global interactive.diffFilter "delta --color-only"
+```
+
+### diff-so-fancy
+
+[diff-so-fancy](https://github.com/so-fancy/diff-so-fancy) highlights changed words within lines:
+
+```bash
+git config --global core.pager "diff-so-fancy | less --tabs=4 -RFX"
+```
+
+### icdiff
+
+[icdiff](https://github.com/jeffkaufman/icdiff) provides side-by-side colored diff:
+
+```bash
+git config --global diff.external icdiff
+```
+
+### Using difftool
+
+Git also has a built-in `difftool` command that launches your configured GUI:
+
+```bash
+git config --global diff.tool vscode
+git difftool HEAD~1 HEAD
+```
+
+## Path-specific diff
+
+You already saw `git diff -- <path>`, but there are more powerful path-scoping options:
+
+### Multiple paths
+
+```bash
+git diff -- src/ tests/
+```
+
+### Glob patterns
+
+```bash
+git diff -- '*.test.ts'
+```
+
+### Directory exclusion (no built-in flag, use combination)
+
+```bash
+git diff -- . ':!vendor/'
+```
+
+### Diff from a subdirectory
+
+When you run `git diff` inside a subdirectory, paths are relative to that directory. Use `--no-prefix` to see full paths:
+
+```bash
+git diff --no-prefix -- src/
+```
+
+## Historical range diff
+
+### Compare a file across arbitrary commits
+
+```bash
+git diff v1.0..v2.0 -- README.md
+```
+
+### Three-dot range for merge-base comparison
+
+```bash
+git diff main...feature -- src/
+```
+
+This shows changes from the merge base of `main` and `feature` to the tip of `feature` — exactly what a pull request would introduce.
+
+### Diff between two commits (ignoring working tree)
+
+```bash
+git diff abc123 def456
+```
+
+### Diff a commit against its parent
+
+```bash
+git diff HEAD~1 HEAD
+# or simply:
+git show HEAD
+```
+
+## Word-level diff
+
+When line-level diff is too coarse, `--word-diff` highlights changes at the word level:
+
+```bash
+git diff --word-diff
+```
+
+Output uses color and markers: `[-removed-]` and `{+added+}`.
+
+### Word-diff variants
+
+```bash
+# Color-only highlighting (best for terminals)
+git diff --word-diff=color
+
+# Porcelain format (for scripts)
+git diff --word-diff=porcelain
+
+# Plain markers
+git diff --word-diff=plain
+```
+
+### Regex-based word boundaries
+
+Customize what counts as a "word":
+
+```bash
+git diff --word-diff-regex="[^[:space:]]+"
+```
+
+This treats every non-whitespace character as its own word boundary, giving character-level diff granularity.
+
 <PracticeLab
   title="Exercise: inspect unstaged, staged, and branch-level diffs"
   intro="The goal is to build reflexes for which diff form answers which question."

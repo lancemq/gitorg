@@ -1,0 +1,353 @@
+export const metadata = {
+  title: "Trunk-based development workflow",
+  slug: "trunk-based-development",
+  locale: "en",
+  section: "workflows",
+  summary: "Trunk-based development vs branch-based development comparison, feature flag integration, short branch lifecycle, and small-step commit practices.",
+  sourceUrls: [
+    "https://trunkbaseddevelopment.com/",
+    "https://github.com/features/actions",
+  ],
+};
+
+# Trunk-based development workflow
+
+## The short version
+
+Trunk-Based Development (TBD) is a branching strategy where all developers work directly on trunk (main/master), or create extremely short-lived feature branches (< 1-2 days) that merge back to trunk quickly. This contrasts sharply with Gitflow and other long-lived branching strategies.
+
+## What is trunk-based development
+
+### Core principles
+
+```
+main ───●──●──●──●──●──●──●──●──
+        ↑  ↑     ↑  ↑     ↑  ↑
+      commit merge commit merge commit merge
+      (frequent, small steps)
+```
+
+- **Single main branch**: main (or trunk) is the only long-lived branch
+- **Short-lived feature branches**: feature branches live < 1-2 days
+- **Frequent merges**: merge to trunk at least daily
+- **Continuous integration**: every merge goes through automated tests
+
+### Comparison with Gitflow
+
+#### Gitflow model
+
+```
+main ───────●──────────────●──────── (merge only at release)
+             ↖            ↗
+develop ───────●──●──●──●──●──●──
+              ↗  ↗    ↗  ↗
+feature1 ──●──●    ─●──●
+feature2 ────●──●──●
+release ───────────────●──●──●──
+```
+
+Characteristics:
+- Long-lived develop branch
+- Feature branches may survive for weeks
+- Release branches managed independently
+- Infrequent merges, high conflict risk
+
+#### TBD model
+
+```
+main ───●──●──●──●──●──●──●──●──
+       ↗  ↗  ↗  ↗  ↗  ↗  ↗
+f1 ──●──●
+f2 ─────●──●
+f3 ─────────●
+f4 ────────────●──●
+```
+
+Characteristics:
+- No develop branch
+- Extremely short feature branches (hours to 1-2 days)
+- Direct commits to trunk are common
+- Very frequent merges
+
+## Short branch lifecycle
+
+### Why branches should be short
+
+```bash
+# Problems with long-lived branches
+# Day 1: Create feature branch from main
+git checkout -b feature-huge main
+
+# Day 7: Still developing, main has moved 50 commits
+git fetch origin
+git log main..origin/main | wc -l
+# 50
+
+# Day 14: Merge reveals massive conflicts
+git checkout main
+git merge feature-huge
+# CONFLICT! Dozens of file conflicts...
+```
+
+### Short branch strategy
+
+```bash
+# Day 1: Create branch, start work
+git checkout -b feature-small main
+
+# Day 1 afternoon: Feature complete, submit PR
+git add .
+git commit -m "feat: add small feature"
+git push origin feature-small
+# Create PR/MR
+
+# Day 2 morning: Review approved, merged
+# PR merged to main
+git checkout main
+git pull
+```
+
+### Branch lifetime guidelines
+
+| Branch type | Max lifetime | Description |
+|------------|-------------|-------------|
+| Feature branch | < 1 day | Small feature, one PR |
+| Large feature branch | < 2 days | Needs feature flag splitting |
+| Bug fix branch | < 4 hours | Urgent fixes |
+| Experiment branch | As needed | Uncertain if merging |
+
+## Feature flag integration strategy
+
+### Why feature flags are needed
+
+In TBD, unfinished features must also merge to trunk. Feature flags make unfinished features invisible to end users:
+
+```javascript
+// Use feature flag to control feature visibility
+if (featureFlags.isEnabled('new-search')) {
+    // New search feature (still in development)
+    renderNewSearch();
+} else {
+    // Old search feature
+    renderOldSearch();
+}
+```
+
+### Feature flag implementation methods
+
+#### Environment variables
+
+```javascript
+const ENABLE_NEW_UI = process.env.ENABLE_NEW_UI === 'true';
+
+if (ENABLE_NEW_UI) {
+    renderNewUI();
+}
+```
+
+#### Config file
+
+```json
+// feature-flags.json
+{
+  "new-search": { "enabled": false, "rollout": 0 },
+  "dark-mode": { "enabled": true, "rollout": 100 },
+  "beta-api": { "enabled": true, "rollout": 10 }
+}
+```
+
+#### Professional tools
+
+```javascript
+// Using LaunchDarkly / Split.io etc.
+import { LDClient } from 'launchdarkly-node-server-sdk';
+
+const client = LDClient.init('your-sdk-key');
+const showNewFeature = await client.variation('new-feature', user, false);
+
+if (showNewFeature) {
+    // New feature
+}
+```
+
+### Feature flag lifecycle
+
+```
+1. Create flag (default off)
+   ↓
+2. Develop feature under flag protection
+   ↓
+3. Merge to trunk (flag off, users can't see)
+   ↓
+4. Enable flag in test environment
+   ↓
+5. Gradual production rollout (10% → 50% → 100%)
+   ↓
+6. Remove flag after full release
+```
+
+### Clean up expired flags
+
+```bash
+# Regularly search and clean up no-longer-needed flags
+grep -rn "featureFlags.isEnabled" src/
+
+# Create cleanup tasks
+# TODO(flag): Remove new-search flag after v2.0 release
+```
+
+## Small-step commit practices
+
+### What are small-step commits
+
+```bash
+# Bad practice — big commit
+git add .
+git commit -m "complete user module"
+# Contains 200 files of changes, impossible to code review
+
+# Good practice — small commits
+git add src/user/model.js
+git commit -m "feat(user): add user data model"
+
+git add src/user/service.js
+git commit -m "feat(user): implement user service layer"
+
+git add src/user/controller.js tests/user/
+git commit -m "feat(user): add user controller and tests"
+```
+
+### Benefits of small-step commits
+
+1. **Easy code review**: Each PR has small changes, high review quality
+2. **Easy bug location**: When issues arise, quickly pinpoint the specific commit
+3. **Fewer merge conflicts**: Frequent merges, small conflict scope
+4. **Continuous feedback**: Every commit goes through CI, early problem detection
+
+### Commit size recommendations
+
+| Metric | Recommendation |
+|--------|---------------|
+| Files per PR | < 10 files |
+| Lines per PR | < 400 lines |
+| Files per commit | < 5 files |
+| PR review time | < 30 minutes |
+
+## Team size and TBD
+
+### Small teams (1-5 people)
+
+- **Recommendation**: ★★★★★
+- **Practice**: Commit directly to main, or use extremely short feature branches
+- **CI requirement**: Basic automated tests are sufficient
+
+### Medium teams (5-20 people)
+
+- **Recommendation**: ★★★★☆
+- **Practice**: Short feature branches + PR review + CI
+- **CI requirement**: Complete test suite + automated deployment
+
+### Large teams (20+ people)
+
+- **Recommendation**: ★★★☆☆
+- **Practice**: Requires feature flags + code ownership + strict CI
+- **Considerations**: May need to split into sub-repos or monorepo by module
+
+## When TBD doesn't fit
+
+### Unsuitable scenarios
+
+1. **Strictly regulated industries**: Healthcare, finance requiring strict change approval
+2. **Projects without automated testing**: Embedded systems, hardware-related
+3. **Long release cycle projects**: Traditional software released a few times per year
+4. **Open source with many external contributors**: Can't guarantee commit quality
+
+### Alternatives
+
+| Scenario | Recommended workflow |
+|----------|---------------------|
+| Large enterprise, strict process | Gitflow |
+| Web apps, continuous deployment | GitHub Flow |
+| Multi-version maintenance | Gitflow or GitLab Flow |
+| Fast-iterating SaaS | TBD + Feature Flags |
+
+## CI/CD integration
+
+### TBD requires strong CI
+
+```yaml
+# .github/workflows/ci.yml
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run tests
+        run: npm test
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to staging
+        run: ./deploy.sh staging
+```
+
+### Branch protection
+
+```bash
+# Protect main branch
+# GitHub: Settings > Branches > Branch protection rules
+# - Require pull request reviews
+# - Require status checks to pass
+# - Require branches to be up to date
+# - Include administrators
+```
+
+## Best practices summary
+
+1. **Merge at least daily**: Don't let branches survive more than a day
+2. **Feature flags are essential**: Protect unfinished features
+3. **CI must be fast and reliable**: Slow CI blocks frequent merges
+4. **Small-step commits**: Keep each PR reviewable in size
+5. **Automate everything**: Tests, lint, build all automated
+6. **Clean up flags promptly**: Remove flags after features go live
+7. **Code review is not optional**: TBD doesn't mean no review
+
+## Key takeaways
+
+1. **TBD ≠ "no branches"**: Feature branches are still useful, just very short-lived
+2. **Requires team discipline**: Frequent merges need everyone's cooperation
+3. **CI is foundational**: TBD without reliable CI is a disaster
+4. **Adopt incrementally**: Start by reducing branch lifetime, transition gradually
+5. **Monitor merge frequency**: Track PR survival time, optimize continuously
+
+## Summary
+
+| Dimension | TBD | Gitflow |
+|-----------|-----|---------|
+| Branch count | Few (1 main) | Many (main + develop + feature + release) |
+| Merge frequency | Multiple times daily | Weekly / per release cycle |
+| Feature release | Feature flags | Release branches |
+| CI requirement | High (must be fast & reliable) | Medium |
+| Suitable teams | Agile, continuous delivery | Traditional, fixed releases |
+| Learning curve | Medium (needs habit change) | High (complex process) |
+
+TBD is an increasingly popular branching strategy in modern software development. It reduces integration risk through frequent merges, enables flexible releases through feature flags, and is one of the best practices for continuous delivery.

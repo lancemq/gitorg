@@ -27,7 +27,28 @@ git-archive 用于从某个提交或树对象导出归档包。
 git archive --format=zip HEAD > source.zip
 ```
 
-## 读这条命令时最该注意什么
+## 压缩格式对比
+
+`git archive` 支持多种格式，最常见的两种是 tar 和 zip：
+
+```bash
+# tar 格式（Linux/macOS 原生友好）
+git archive --format=tar HEAD > source.tar
+
+# tar + gzip 压缩
+git archive --format=tar.gz HEAD > source.tar.gz
+
+# zip 格式（Windows 友好）
+git archive --format=zip HEAD > source.zip
+```
+
+| 格式 | 优点 | 缺点 | 适用场景 |
+|------|------|------|----------|
+| `tar` | 保留权限、符号链接等元数据 | 不压缩，体积大 | Unix/Linux 分发 |
+| `tar.gz` / `tgz` | 高压缩率，Unix 标准 | Windows 需要额外工具 | 服务器部署、源码发布 |
+| `zip` | 跨平台通用，Windows 原生支持 | 不支持符号链接和权限 | 跨平台分发、Windows 用户 |
+
+如果不指定 `--format`，Git 会根据输出文件后缀自动推断格式。
 
 这类命令通常会改变仓库布局或协作方式，团队内最好先统一约定。
 
@@ -35,11 +56,104 @@ git archive --format=zip HEAD > source.zip
 
 先用小范围实验仓库验证流程，再推广到主仓库或自动化。
 
-## 补充理解角度
+## 进阶用法
 
-- 分发代码或历史
-- 降低克隆和检出范围
-- 在多仓库或多工作树场景下协作
+### 指定目录前缀
+
+使用 `--prefix` 可以为归档中的所有文件添加目录前缀，这样解压后文件会放在指定的子目录中：
+
+```bash
+git archive --format=tar.gz --prefix=myproject-1.0/ v1.0 > myproject-1.0.tar.gz
+```
+
+解压后的目录结构：
+
+```
+myproject-1.0/
+├── src/
+├── docs/
+├── README.md
+└── ...
+```
+
+这在发布版本时非常实用，让用户解压后直接得到一个干净的版本目录。
+
+### 导出指定路径
+
+你可以只导出仓库中的部分目录：
+
+```bash
+# 只导出 src 目录
+git archive HEAD src/ > src-only.tar
+
+# 导出多个指定路径
+git archive HEAD src/ docs/ README.md > subset.tar
+
+# 结合前缀使用
+git archive --prefix=release/ HEAD src/ docs/ > release.tar
+```
+
+注意：路径参数需要是 Git 跟踪的路径，不能是任意文件系统路径。
+
+### 特定版本/标签导出
+
+```bash
+# 导出特定标签
+git archive v2.1.0 --format=zip --prefix=myapp-v2.1.0/ > myapp-v2.1.0.zip
+
+# 导出特定提交
+git archive a1b2c3d --format=tar.gz > snapshot.tar.gz
+
+# 导出最近的标签
+git archive $(git describe --tags --abbrev=0) > latest-release.tar.gz
+```
+
+标签导出是发布流程中的标准做法，确保每次发布都有可追溯的归档文件。
+
+### 排除文件（export-ignore）
+
+通过 `.gitattributes` 文件中的 `export-ignore` 规则，可以在归档时自动排除某些文件：
+
+```
+# .gitattributes
+tests/ export-ignore
+.github/ export-ignore
+.gitignore export-ignore
+*.test.js export-ignore
+docs/internal/ export-ignore
+```
+
+然后正常执行 `git archive`，被标记的文件会自动排除在归档之外。这在发布源码时非常有用——用户不需要你的测试文件和 CI 配置。
+
+### 远程归档
+
+Git 还支持从远程仓库直接创建归档：
+
+```bash
+# 从远程仓库归档（需要服务器支持）
+git archive --remote=git@example.com:repo.git HEAD > remote-source.tar
+```
+
+不过需要注意：大多数 Git 服务器出于安全考虑默认禁用了 `upload-archive` 功能，所以这个特性在实际中使用较少。
+
+### CI 集成：自动生成 tarball
+
+在 CI/CD 流程中集成 `git archive` 是发布自动化的标准做法：
+
+```yaml
+# GitHub Actions 示例
+- name: Create release archive
+  run: |
+    VERSION=$(git describe --tags --always)
+    git archive --format=tar.gz --prefix="myproject-${VERSION}/" "${VERSION}" > "myproject-${VERSION}.tar.gz"
+    git archive --format=zip --prefix="myproject-${VERSION}/" "${VERSION}" > "myproject-${VERSION}.zip"
+
+- name: Upload artifacts
+  uses: actions/upload-artifact@v4
+  with:
+    name: release-${{ github.ref_name }}
+    path: myproject-*.tar.gz
+```
 
 
 ## 这条命令在流程里解决什么问题

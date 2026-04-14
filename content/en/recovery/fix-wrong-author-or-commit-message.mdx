@@ -1,0 +1,314 @@
+export const metadata = {
+  title: "Fixing wrong author or commit message after commit",
+  slug: "fix-wrong-author-or-commit-message",
+  locale: "en",
+  section: "recovery",
+  summary: "How to fix wrong author info, commit messages, or forgotten files after committing. Covers amend, interactive rebase, and batch author modification with filter-repo.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-commit",
+    "https://git-scm.com/docs/git-rebase",
+    "https://github.com/newren/git-filter-repo",
+  ],
+};
+
+# Fixing wrong author or commit message after commit
+
+## The short version
+
+Git commits are immutable — you can't "edit" an existing commit, but you can create a new one to replace it. The fix method depends on where the error occurred (latest commit vs middle of history).
+
+## Fixing the latest commit
+
+### Changing the commit message
+
+```bash
+# Amend the most recent commit message
+git commit --amend -m "New commit message"
+
+# Opens your default editor for editing
+git commit --amend
+```
+
+### Changing the author
+
+```bash
+# Change the author of the most recent commit
+git commit --amend --author="John Doe <john@example.com>"
+
+# Change both message and author
+git commit --amend -m "Fixed login bug" --author="John Doe <john@example.com>"
+```
+
+### Adding forgotten files
+
+```bash
+# You committed but forgot to add a file
+git add forgotten-file.js
+
+# Add the file to the last commit (no new commit created)
+git commit --amend --no-edit
+
+# --no-edit keeps the original commit message unchanged
+```
+
+### Understanding --amend
+
+`git commit --amend` actually creates a **new commit** with:
+- Content = current staging area
+- Parent = the original commit's parent (skipping the original)
+- A new SHA
+
+```
+A --- B (old commit, will be replaced)
+     \
+      B' (new commit, after amend)
+```
+
+The original commit B still exists (visible in reflog) but is no longer referenced by any branch.
+
+## Fixing commits in the middle of history
+
+### Method 1: Interactive rebase (recommended)
+
+```bash
+# To amend the 3rd commit from HEAD
+git rebase -i HEAD~3
+```
+
+This opens an editor showing:
+
+```
+pick abc1234 add user authentication
+pick def5678 fix login bug
+pick ghi9012 update dependencies
+```
+
+#### Changing commit message (reword)
+
+Change `pick` to `reword` (or `r`):
+
+```
+reword abc1234 add user authentication
+pick def5678 fix login bug
+pick ghi9012 update dependencies
+```
+
+After saving, Git opens the editor for each reword-marked commit to let you change the message.
+
+#### Changing commit content (edit)
+
+```
+pick abc1234 add user authentication
+edit def5678 fix login bug
+pick ghi9012 update dependencies
+```
+
+After saving, Git pauses at the edit-marked commit:
+
+```bash
+# HEAD is now at the commit you want to modify
+# Modify files
+vim bug-fix.js
+git add bug-fix.js
+
+# Amend the commit (can change message, author, content)
+git commit --amend
+
+# Continue the rebase
+git rebase --continue
+```
+
+### Method 2: Changing author in history
+
+At the edit pause point during interactive rebase:
+
+```bash
+git rebase -i HEAD~3
+# Mark target commit as edit
+
+# When paused, change the author
+git commit --amend --author="New Author <new@email.com>" --no-edit
+
+git rebase --continue
+```
+
+## Batch-modifying authors in history
+
+### Method 1: Using git filter-repo (recommended)
+
+```bash
+# Install git-filter-repo
+pip install git-filter-repo
+
+# Create a mailmap file
+cat > mailmap << EOF
+John Doe <john@example.com> <old-wrong@email.com>
+Jane Smith <jane@example.com> <another-old@email.com>
+EOF
+
+# Apply mailmap to all commits
+git filter-repo --mailmap mailmap --force
+```
+
+Mailmap format: `New Name <new@email> <old-email>` or `New Name <new@email> Old Name <old-email>`
+
+### Method 2: Using .mailmap file (display only)
+
+```bash
+# Create .mailmap in project root
+cat > .mailmap << EOF
+John Doe <john@example.com> <old-wrong@email.com>
+EOF
+
+# This doesn't modify history, only affects git log display
+git log --use-mailmap
+```
+
+### Method 3: Environment variables (for future commits)
+
+```bash
+# Permanent global config
+git config --global user.name "John Doe"
+git config --global user.email "john@example.com"
+
+# Or repo-specific
+git config user.name "John Doe"
+git config user.email "john@example.com"
+
+# Temporary override (next commit only)
+git commit -m "commit" --author="Temp Author <temp@email.com>"
+```
+
+## Adding Co-authored-by
+
+### Manual addition
+
+Add to the end of your commit message:
+
+```bash
+git commit -m "Implemented search feature
+
+Search feature implemented together with @colleague.
+
+Co-authored-by: Colleague <colleague@example.com>
+Co-authored-by: Another Colleague <another@example.com>"
+```
+
+Note: `Co-authored-by:` must be at the **end** of the commit body, preceded by a blank line.
+
+### GitHub's automatic recognition
+
+GitHub recognizes the `Co-authored-by: Name <email>` format and displays multiple authors. It can also be auto-added during PR merges.
+
+## Fixing already-pushed commits
+
+### The problem
+
+Rewriting pushed history causes local and remote divergence:
+
+```
+Remote: A --- B --- C
+Local:  A --- B' --- C'  (B and C were amended/rebased)
+```
+
+### Solution: Force push
+
+```bash
+# Force push (overwrites remote history)
+git push --force-with-lease origin main
+
+# --force-with-lease is safer than --force:
+# rejects if remote has new commits you haven't pulled
+```
+
+### Team collaboration considerations
+
+- **Notify the team first**: Before rewriting history, inform all collaborators
+- **Avoid rewriting shared branches**: main/master should rarely need force push
+- **Use --force-with-lease**: Never use bare `--force`
+- **Consider fixup commits**: For pushed commits, fixup commits are safer than history rewrite
+
+## Fixup commit technique
+
+```bash
+# Create a fixup commit (automatically marked as fixing a specific commit)
+git commit --fixup abc1234
+
+# View commit history
+git log --oneline
+# def5678 (HEAD) fixup! add user authentication
+# abc1234 add user authentication
+
+# Auto-squash all fixup commits
+git rebase -i --autosquash HEAD~5
+
+# Or set up a convenient alias
+git rebase -i --autosquash HEAD~5
+```
+
+Set up aliases for easier use:
+
+```bash
+git config --global alias.fixup 'commit --fixup'
+git config --global alias.squash-fix 'rebase -i --autosquash'
+
+# Usage
+git fixup abc1234
+git squash-fix HEAD~5
+```
+
+## FAQ
+
+### Q: What do I do about SHA changes after amend?
+
+This is normal. A commit's SHA includes content, author, timestamp, and parent info — any change produces a new SHA.
+
+### Q: Can I use reset and re-commit instead?
+
+```bash
+# Go back one commit but keep changes
+git reset --soft HEAD~1
+
+# All changes are now staged, ready to re-commit
+git commit -m "New commit message"
+```
+
+This is similar to `commit --amend` but more flexible (you can adjust files).
+
+### Q: Can't push after modifying many historical commits?
+
+```bash
+# Check the difference between local and remote
+git log origin/main..HEAD
+git log HEAD..origin/main
+
+# If remote has commits you need, fetch first
+git fetch origin
+git rebase origin/main
+
+# Then force push
+git push --force-with-lease
+```
+
+## Key takeaways
+
+1. **Be careful with pushed commits**: Rewriting forces all collaborators to resync
+2. **--force-with-lease is the minimum**: Always safer than bare --force
+3. **Use fixup commits for small errors**: More team-friendly than history rewrite
+4. **Set team conventions for history rewriting**: Define which branches allow force push
+5. **Verify after changing authors**: Use `git log --format="%h %an <%ae>"` to check
+
+## Summary
+
+| Scenario | Method | Rewrites history? |
+|----------|--------|-------------------|
+| Latest commit message wrong | `git commit --amend` | Yes |
+| Latest commit author wrong | `git commit --amend --author=...` | Yes |
+| Latest commit forgot files | `git add` + `git commit --amend` | Yes |
+| Middle commit message wrong | `git rebase -i` + reword | Yes |
+| Middle commit content wrong | `git rebase -i` + edit | Yes |
+| Batch author changes | `git filter-repo --mailmap` | Yes |
+| Small error after push | Fixup commit + rebase | Yes |
+| Display-only changes | `.mailmap` file | No |
+
+Core principle: Git commits are immutable; "modifying" means creating replacement commits.

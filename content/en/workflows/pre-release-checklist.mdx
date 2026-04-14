@@ -1,0 +1,353 @@
+export const metadata = {
+  title: "Pre-release Git checklist",
+  slug: "pre-release-checklist",
+  locale: "en",
+  section: "workflows",
+  summary: "Complete pre-release Git checklist: branch status, tag creation, changelog generation, version numbers, and CI verification.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Basics-Tagging",
+    "https://git-scm.com/docs/git-log",
+  ],
+};
+
+# Pre-release Git checklist
+
+## The short version
+
+Software releases require careful verification. This checklist helps you confirm everything is ready before releasing through Git, preventing missed steps that could cause release issues.
+
+## Phase 1: Branch status confirmation
+
+### 1. Confirm current branch
+
+```bash
+# Confirm you're on the right branch (usually main or release branch)
+git branch --show-current
+# Expected: main or release/x.x.x
+
+# If not, switch
+git checkout main
+```
+
+### 2. Check for uncommitted changes
+
+```bash
+git status
+
+# Should output "nothing to commit, working tree clean"
+# If there are uncommitted changes:
+# - Important: commit or stash first
+# - Unimportant: stash or clean
+git stash
+```
+
+### 3. Confirm synced with remote
+
+```bash
+# Fetch latest remote changes
+git fetch origin
+
+# Check if local is behind remote
+git status
+# If shows "Your branch is behind 'origin/main' by X commits"
+git pull --rebase origin main
+
+# Check for unpushed local commits
+git log origin/main..HEAD
+# If there's output, you have local commits not yet pushed
+git push origin main
+```
+
+### 4. Confirm no merge conflict residue
+
+```bash
+# Check for .orig or .rej files
+find . -name "*.orig" -o -name "*.rej"
+
+# Check for incomplete merge/rebase
+ls .git/MERGE_HEAD 2>/dev/null && echo "Incomplete merge"
+ls .git/REBASE_HEAD 2>/dev/null && echo "Incomplete rebase"
+```
+
+## Phase 2: Code quality checks
+
+### 5. Confirm all CI passed
+
+```bash
+# View latest CI status
+# GitHub: https://github.com/<user>/<repo>/actions
+# GitLab: https://gitlab.com/<user>/<repo>/-/pipelines
+
+# Or check via CLI
+gh run list --limit 5  # GitHub CLI
+```
+
+### 6. Run local tests
+
+```bash
+# Ensure all tests pass
+npm test  # or pytest, make test, etc.
+
+# Run lint
+npm run lint
+
+# Run type checks
+npm run type-check
+```
+
+### 7. Confirm no debug code residue
+
+```bash
+# Search for common debug code
+grep -rn "console.log" src/
+grep -rn "debugger" src/
+grep -rn "TODO\|FIXME" src/ | head -20
+
+# Search for sensitive info
+grep -rn "password\|secret\|api_key" src/ --include="*.js" --include="*.ts"
+```
+
+## Phase 3: Version number and Tag
+
+### 8. Update version number
+
+```bash
+# View current version
+cat package.json | grep version  # npm
+cat pyproject.toml | grep version  # python
+
+# Update version (semantic versioning)
+npm version patch  # 1.0.0 -> 1.0.1
+npm version minor  # 1.0.0 -> 1.1.0
+npm version major  # 1.0.0 -> 2.0.0
+
+# This auto-creates commit and tag
+# To only modify file, skip tag
+npm version patch --no-git-tag-version
+```
+
+### 9. Create Tag
+
+```bash
+# Create annotated tag (recommended)
+git tag -a v1.2.3 -m "Release v1.2.3"
+
+# Lightweight tag (not recommended for releases)
+git tag v1.2.3
+
+# Tag an older commit
+git tag -a v1.2.3 <commit-hash> -m "Release v1.2.3"
+
+# Verify tag
+git tag -v v1.2.3
+
+# View tag info
+git show v1.2.3
+```
+
+### 10. Push Tag
+
+```bash
+# Push specific tag
+git push origin v1.2.3
+
+# Push all tags
+git push origin --tags
+```
+
+## Phase 4: Changelog generation
+
+### 11. Generate Changelog
+
+```bash
+# View commits between two tags
+git log v1.2.2..v1.2.3 --oneline
+
+# View by type
+git log v1.2.2..v1.2.3 --oneline --grep="feat"
+git log v1.2.2..v1.2.3 --oneline --grep="fix"
+
+# Generate changelog (using conventional-changelog)
+npx conventional-changelog -p angular -i CHANGELOG.md -s -r 1
+
+# Or manually generate
+echo "# v1.2.3 ($(date +%Y-%m-%d))" > CHANGELOG-new.md
+echo "" >> CHANGELOG-new.md
+echo "## New Features" >> CHANGELOG-new.md
+git log v1.2.2..v1.2.3 --oneline --grep="feat" >> CHANGELOG-new.md
+echo "" >> CHANGELOG-new.md
+echo "## Bug Fixes" >> CHANGELOG-new.md
+git log v1.2.2..v1.2.3 --oneline --grep="fix" >> CHANGELOG-new.md
+```
+
+### 12. Verify Changelog accuracy
+
+```bash
+# View changelog
+cat CHANGELOG.md
+
+# Confirm it includes all important changes
+# Confirm version number is correct
+# Confirm date is correct
+```
+
+## Phase 5: Release
+
+### 13. Final confirmation
+
+```bash
+# Full status check
+echo "=== Current Branch ==="
+git branch --show-current
+
+echo "=== Working State ==="
+git status --short
+
+echo "=== Recent Commits ==="
+git log --oneline -5
+
+echo "=== Latest Tag ==="
+git describe --tags --abbrev=0
+
+echo "=== Remotes ==="
+git remote -v
+
+echo "=== Pending Pushes ==="
+git log origin/main..HEAD --oneline
+git tag --list | tail -3
+```
+
+### 14. Execute release
+
+```bash
+# Push all changes
+git push origin main
+git push origin v1.2.3
+
+# Create Release on GitHub/GitLab
+# GitHub CLI:
+gh release create v1.2.3 --title "Release v1.2.3" --notes-file CHANGELOG.md
+
+# Or via Web UI
+```
+
+### 15. Post-release verification
+
+```bash
+# Confirm tag pushed
+git ls-remote --tags origin | grep v1.2.3
+
+# Confirm Release created
+gh release view v1.2.3
+
+# Clone verification (from clean repo)
+git clone https://github.com/user/repo.git --branch v1.2.3 --depth 1 verify-release
+cd verify-release
+# Run build and test
+npm install && npm test
+cd .. && rm -rf verify-release
+```
+
+## Phase 6: Post-release cleanup
+
+### 16. Clean up temporary branches
+
+```bash
+# List all merged branches
+git branch --merged
+
+# Delete merged local branches (keep main and current)
+git branch --merged | grep -v "main\|master\|\*" | xargs git branch -d
+
+# Clean up remote merged branches
+git fetch origin --prune
+```
+
+### 17. Prepare next development cycle
+
+```bash
+# If preparing next version
+npm version prerelease --preid=alpha  # 1.2.3 -> 1.2.4-alpha.0
+
+# Update development branch
+git checkout -b develop
+```
+
+## Complete checklist quick reference
+
+```
+□ 1. Correct branch (main/release)
+□ 2. No uncommitted changes
+□ 3. Synced with remote (fetch + pull)
+□ 4. No merge conflict residue
+□ 5. All CI passed
+□ 6. Local tests passed
+□ 7. No debug code residue
+□ 8. Version number updated
+□ 9. Tag created (annotated)
+□ 10. Changelog generated and reviewed
+□ 11. All changes pushed (code + tag)
+□ 12. Release created on platform
+□ 13. Post-release verification (clean clone + test)
+□ 14. Temporary branches cleaned up
+□ 15. Next development cycle prepared
+```
+
+## Automation script
+
+```bash
+#!/bin/bash
+# pre-release-check.sh
+
+set -e
+
+VERSION=${1:?Usage: ./pre-release-check.sh <version>}
+
+echo "🚀 Pre-release check v${VERSION}"
+
+echo "📋 1. Checking branch..."
+BRANCH=$(git branch --show-current)
+if [[ "$BRANCH" != "main" && "$BRANCH" != "master" ]]; then
+    echo "⚠️  Current branch: $BRANCH (expected main/master)"
+    read -p "Continue? (y/N) " -n 1 -r
+    echo
+fi
+
+echo "📋 2. Checking working tree..."
+if [[ -n $(git status --porcelain) ]]; then
+    echo "❌ Working tree is not clean"
+    exit 1
+fi
+
+echo "📋 3. Checking remote sync..."
+git fetch origin
+BEHIND=$(git rev-list --count HEAD..origin/${BRANCH})
+if [[ $BEHIND -gt 0 ]]; then
+    echo "❌ Behind remote by $BEHIND commits"
+    exit 1
+fi
+
+echo "📋 4. Running tests..."
+npm test || { echo "❌ Tests failed"; exit 1; }
+
+echo "📋 5. Creating tag..."
+git tag -a "v${VERSION}" -m "Release v${VERSION}"
+
+echo "📋 6. Generating changelog..."
+npx conventional-changelog -p angular -i CHANGELOG.md -s -r 1
+
+echo "✅ All checks passed!"
+echo "Next: git push origin ${BRANCH} && git push origin v${VERSION}"
+```
+
+## Key takeaways
+
+1. **Annotated tags > lightweight tags**: Annotated tags include tagger name, email, date, and signature
+2. **Semantic versioning**: Follow MAJOR.MINOR.PATCH convention
+3. **Notify the team before release**: Make sure everyone knows a release is coming
+4. **Preserve rollback capability**: Keep tags after release, don't delete them casually
+5. **Automation > manual**: Script common check steps whenever possible
+
+## Summary
+
+Pre-release checks are a critical part of ensuring software quality. With a systematic checklist, you can significantly reduce release risk. After scripting common check steps, you can further improve efficiency and consistency.

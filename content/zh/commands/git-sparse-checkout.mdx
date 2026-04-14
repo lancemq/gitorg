@@ -27,6 +27,51 @@ git-sparse-checkout 用于只检出仓库中的部分目录。
 git sparse-checkout set src docs
 ```
 
+## Cone 模式详解
+
+从 Git 2.27 开始引入了 **cone 模式**，这是 sparse checkout 的推荐用法。
+
+```bash
+# 初始化 sparse checkout（默认启用 cone 模式）
+git sparse-checkout init --cone
+
+# 设置要检出的目录
+git sparse-checkout set src docs
+
+# 查看当前规则
+git sparse-checkout list
+```
+
+### cone 模式 vs 传统模式
+
+| 特性 | cone 模式 | 传统模式 |
+|------|-----------|----------|
+| 性能 | 高，Git 自动推断规则 | 较低，手动编写 pattern |
+| 配置 | 简单，只需指定目录名 | 复杂，需要写 glob 规则 |
+| 适用场景 | monorepo、按目录划分 | 需要精细匹配规则的复杂场景 |
+
+Cone 模式的优势在于：
+- **性能更好**：Git 可以针对 cone 模式做专门的索引优化
+- **规则自动推断**：只需指定目录名，Git 自动处理包含关系
+- **减少错误**：不需要手动编写复杂的 glob 模式
+
+## 迁移旧版 sparse checkout
+
+如果你的仓库使用的是旧版 sparse checkout（手动编辑 `.git/info/sparse-checkout`），可以迁移到 cone 模式：
+
+```bash
+# 检查当前模式
+git config core.sparseCheckoutCone
+
+# 迁移到 cone 模式
+git sparse-checkout init --cone
+
+# 确认迁移成功
+git sparse-checkout list
+```
+
+`core.sparseCheckoutCone` 配置项控制是否启用 cone 模式。Git 2.37+ 默认启用此模式。
+
 ## 读这条命令时最该注意什么
 
 这类命令通常会改变仓库布局或协作方式，团队内最好先统一约定。
@@ -35,11 +80,108 @@ git sparse-checkout set src docs
 
 先用小范围实验仓库验证流程，再推广到主仓库或自动化。
 
-## 补充理解角度
+## 进阶用法
 
-- 分发代码或历史
-- 降低克隆和检出范围
-- 在多仓库或多工作树场景下协作
+### Monorepo 实践
+
+在 monorepo 中，不同团队只关心自己负责的子目录。sparse-checkout 可以让每个团队只检出所需内容：
+
+```bash
+# 前端团队只关心前端相关目录
+git sparse-checkout set apps/web packages/ui packages/shared
+
+# 后端团队只关心后端相关目录
+git sparse-checkout set apps/api packages/database packages/shared
+
+# 文档团队只需要文档
+git sparse-checkout set docs website
+```
+
+这种模式让 monorepo 的开发者体验接近多仓库——克隆快、检出快、IDE 索引也快。
+
+### 与 partial clone 组合使用
+
+sparse-checkout 只控制工作区中检出哪些文件，但不减少 `.git` 目录的大小。如果仓库很大，建议与 partial clone 一起使用：
+
+```bash
+# partial clone + sparse checkout 组合拳
+git clone --filter=blob:none --sparse <url>
+cd repo
+git sparse-checkout set src/module-a docs
+```
+
+| 技术 | 减少什么 | 不减少什么 |
+|------|----------|------------|
+| `sparse-checkout` | 工作区文件 | `.git` 目录中的对象 |
+| `partial clone`（`--filter=blob:none`） | 大 blob 对象 | 目录树元数据 |
+| 两者组合 | 工作区文件 + blob 对象 | 目录树元数据 |
+
+对于几十 GB 的超大仓库，这个组合可以显著降低克隆时间和磁盘占用。
+
+### 列出/修改/移除规则
+
+```bash
+# 查看当前稀疏检出规则
+git sparse-checkout list
+
+# 添加新目录（保留已有规则）
+git sparse-checkout add apps/web
+
+# 重新设置规则（覆盖已有规则）
+git sparse-checkout set apps/api packages/shared
+
+# 移除某个目录
+git sparse-checkout reapply    # 应用最新规则
+git sparse-checkout set apps/web    # 不包含 apps/api 了
+
+# 完全禁用 sparse checkout（恢复完整检出）
+git sparse-checkout disable
+```
+
+注意 `set` 和 `add` 的区别：`set` 会**替换**所有规则，`add` 会**追加**到现有规则。
+
+### 常见陷阱
+
+**规则匹配问题**：
+- Cone 模式下的规则基于目录名，不是 glob 模式
+- `git sparse-checkout set src` 会包含 `src/` 下所有文件，但不会包含 `other-src/`
+- 如果需要匹配多个目录，用空格分隔：`git sparse-checkout set src docs tests`
+
+**性能问题**：
+- 频繁修改规则会导致 checkout 变慢，因为 Git 需要重新计算工作区状态
+- 如果只关心极少数目录，建议同时使用 partial clone
+- cone 模式下规则变化时，Git 的优化效果仍然很好，但极端情况（数千个规则）仍需注意
+
+**与子模块的交互**：
+- sparse-checkout 不直接影响子模块，子模块有自己的 sparse-checkout 配置
+- 在 monorepo + 子模块的场景中，需要分别配置
+
+**切换分支时的行为**：
+- 切换分支后，sparse-checkout 规则仍然有效
+- 如果目标分支缺少 sparse-checkout 指定的目录，Git 会报告路径不存在
+
+### 工作流程建议
+
+```bash
+# 1. 克隆时启用 sparse
+git clone --filter=blob:none --sparse <url>
+cd repo
+
+# 2. 初始化 cone 模式
+git sparse-checkout init --cone
+
+# 3. 设置需要的目录
+git sparse-checkout set src/my-module docs
+
+# 4. 日常工作中需要新目录时
+git sparse-checkout add tests/my-module
+
+# 5. 查看当前生效的规则
+git sparse-checkout list
+
+# 6. 不再需要时，恢复完整检出
+git sparse-checkout disable
+```
 
 
 ## 这条命令在流程里解决什么问题

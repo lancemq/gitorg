@@ -85,7 +85,10 @@ export type BestPracticeSlug =
   | "conflict-resolution-routine"
   | "release-hygiene"
   | "safe-cherry-picks"
-  | "small-batch-review";
+  | "small-batch-review"
+  | "git-aliases"
+  | "commit-message-advanced"
+  | "security-with-git";
 
 export type WorkflowSlug =
   | "fetch-vs-pull"
@@ -111,7 +114,10 @@ export type WorkflowSlug =
   | "squash-vs-rebase-merge"
   | "long-lived-branch-maintenance"
   | "long-lived-branch-conflict-governance"
-  | "submodule-update-flow";
+  | "submodule-update-flow"
+  | "pre-release-checklist"
+  | "ci-optimization-with-git"
+  | "trunk-based-development";
 
 export type GithubSlug =
   | "github-flow-basics"
@@ -157,7 +163,10 @@ export type RecoverySlug =
   | "recover-after-cherry-pick"
   | "undo-merge-commit"
   | "fix-broken-interactive-rebase"
-  | "recover-lost-commits";
+  | "recover-lost-commits"
+  | "recover-from-corrupted-repo"
+  | "fix-detached-head-accidentally-committed"
+  | "fix-wrong-author-or-commit-message";
 
 export type LearningPathSlug =
   | "quick-start"
@@ -675,6 +684,9 @@ export const bestPracticeSlugs = [
   "release-hygiene",
   "safe-cherry-picks",
   "small-batch-review",
+  "git-aliases",
+  "commit-message-advanced",
+  "security-with-git",
 ] as const satisfies readonly BestPracticeSlug[];
 
 export const workflowSlugs = [
@@ -702,6 +714,9 @@ export const workflowSlugs = [
   "long-lived-branch-maintenance",
   "long-lived-branch-conflict-governance",
   "submodule-update-flow",
+  "pre-release-checklist",
+  "ci-optimization-with-git",
+  "trunk-based-development",
 ] as const satisfies readonly WorkflowSlug[];
 
 export const recoverySlugs = [
@@ -716,6 +731,9 @@ export const recoverySlugs = [
   "undo-merge-commit",
   "fix-broken-interactive-rebase",
   "recover-lost-commits",
+  "recover-from-corrupted-repo",
+  "fix-detached-head-accidentally-committed",
+  "fix-wrong-author-or-commit-message",
 ] as const satisfies readonly RecoverySlug[];
 
 export const conceptSlugs = [

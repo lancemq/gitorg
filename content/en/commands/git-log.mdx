@@ -125,6 +125,225 @@ If `git log` shows something surprising, the next question is often not “is Gi
 
 ## Try it yourself
 
+## Custom format placeholders
+
+The `--format` flag lets you define exactly what information `git log` displays. Git provides dozens of placeholders:
+
+```bash
+git log --format="%h - %an, %ar : %s"
+```
+
+### Common placeholders
+
+| Placeholder | Meaning |
+|-------------|---------|
+| `%H` | Full commit hash |
+| `%h` | Abbreviated commit hash |
+| `%an` | Author name |
+| `%ae` | Author email |
+| `%ad` | Author date (respects `--date` format) |
+| `%ar` | Author date, relative |
+| `%cn` | Committer name |
+| `%s` | Subject (first line of commit message) |
+| `%b` | Body (full commit message) |
+| `%D` | Ref names (decorations like tags, branches) |
+| `%p` | Parent hashes |
+| `%G?` | GPG verification status |
+
+### Date formatting
+
+```bash
+git log --date=short --format="%h | %ad | %s"
+git log --date=relative --format="%h | %ad | %an | %s"
+git log --date=format:"%Y-%m-%d %H:%M" --format="%h | %ad | %s"
+```
+
+### Pretty presets
+
+```bash
+git log --pretty=oneline      # hash + subject
+git log --pretty=short        # hash, author, subject
+git log --pretty=medium       # default
+git log --pretty=full         # author + committer
+git log --pretty=fuller       # all dates too
+git log --pretty=email        # patch + email header format
+git log --pretty=raw          # raw commit object
+git log --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset"
+```
+
+The last example uses color codes (`%Cred`, `%Creset`, etc.) for rich terminal output.
+
+## Search history
+
+### Content search: `-S`
+
+`-S<string>` finds commits where the **number of occurrences** of a string changed:
+
+```bash
+git log -S"TODO" --oneline
+git log -S"api_key" --source --all
+```
+
+Useful for tracking when a specific piece of text was added or removed.
+
+### Content search: `-G` (regex)
+
+`-G<regex>` finds commits where a diff line **matches a regex**:
+
+```bash
+git log -G"password" --oneline
+git log -G"import.*from.*react" --oneline
+```
+
+Difference from `-S`: `-G` matches any changed line against the regex, while `-S` counts exact string occurrences.
+
+### Message search: `--grep`
+
+Search commit messages:
+
+```bash
+git log --grep="fix" --oneline
+git log --grep="bug" --grep="crash" --all-match --oneline
+git log --grep="TODO" --regexp-ignore-case
+```
+
+`--all-match` requires **all** `--grep` patterns to match (AND logic).
+
+### Author and committer search
+
+```bash
+git log --author="Alice" --oneline
+git log --committer="Bob" --oneline
+git log --author="Alice" --since="2024-01-01" --oneline
+```
+
+You can also use `--grep` with `--author` to combine filters.
+
+## File tracking with `--follow`
+
+When a file is renamed, `git log` normally stops at the rename. Use `--follow` to trace history across renames:
+
+```bash
+git log --follow -- src/old-name.ts
+```
+
+This follows the file through renames all the way back to its original name.
+
+### Important notes on `--follow`
+
+- Only works with **one file path** at a time
+- Only follows renames, not copies
+- Works best with `git log --follow -p` to see the actual changes
+- Does not work with `--all` or `--branches` simultaneously
+
+## Statistics output
+
+### `--shortstat` — minimal summary
+
+```bash
+git log --oneline --shortstat
+```
+
+Shows one summary line per commit:
+
+```
+a1b2c3d Fix login validation
+ 2 files changed, 15 insertions(+), 3 deletions(-)
+```
+
+### `--stat` — per-file detail
+
+```bash
+git log --stat -3
+```
+
+Shows which files changed and how many lines per file, plus the overall summary.
+
+### `--numstat` — machine-friendly
+
+```bash
+git log --numstat -1
+```
+
+Useful for scripting and metrics dashboards.
+
+### Combined with filters
+
+```bash
+git log --author="Alice" --since="2024-01-01" --shortstat
+git log main..feature --stat
+```
+
+## Time range filtering
+
+```bash
+# Commits after a date
+git log --since="2024-01-01" --oneline
+
+# Commits before a date
+git log --before="2024-06-30" --oneline
+
+# Relative dates
+git log --since="2 weeks ago" --oneline
+git log --since="3 months ago" --before="1 month ago" --oneline
+
+# Combined with author
+git log --author="Alice" --since="2024-01-01" --oneline
+
+# Since a specific tag
+git log --since="v1.0" --oneline
+```
+
+Date formats accepted: `YYYY-MM-DD`, `YYYY-MM-DD HH:MM:SS`, relative (`2 weeks ago`), and more.
+
+## Graph output with colors
+
+### Full graph with decorations
+
+```bash
+git log --oneline --graph --decorate --all
+```
+
+This is the most commonly useful graph view:
+
+```
+*   a1b2c3d (HEAD -> main) Merge feature/auth
+|\
+| * d4e5f6g (feature/auth) Add OAuth support
+| * h7i8j9k Add JWT middleware
+* | l0m1n2o Fix config loading
+* | p3q4r5s Update dependencies
+|/
+* s6t7u8v (tag: v1.0) Release 1.0
+```
+
+### Colored graph output
+
+Git colors graph lines by default. You can enhance with:
+
+```bash
+git log --oneline --graph --decorate --all \
+  --format="%C(auto)%h%d %s %C(green)(%cr)%Creset %C(bold blue)<%an>%Creset"
+```
+
+### Graph for specific branches
+
+```bash
+git log --oneline --graph --decorate main..feature
+git log --oneline --graph feature/login feature/api
+```
+
+### Aliases for daily use
+
+Add these to your `~/.gitconfig`:
+
+```ini
+[alias]
+  lg = log --oneline --graph --decorate --all
+  lg10 = log --oneline --graph --decorate --all -10
+  lgstat = log --oneline --graph --decorate --all --stat -5
+```
+
 <PracticeLab
   title="Exercise: inspect branch divergence before integration"
   intro="The goal is to use `git log` as a decision tool rather than a passive viewer."
