@@ -12,9 +12,17 @@ export const metadata = {
 
 # 安全使用 cherry-pick专题
 
-## 为什么 cherry-pick 容易“看上去简单，实际很容易出事”
+## 为什么 cherry-pick 容易"看上去简单，实际很容易出事"
 
-`git cherry-pick` 表面上只是“把某个提交拿过来”，但真正困难的地方在于：那个提交原本存在于某个上下文里。  
+<CherryPickFigure
+  title="安全 Cherry-Pick 实践"
+  caption="Cherry-pick 适合回移修复、挑选特定提交到发布分支等场景。使用前确认提交是独立的、没有隐式依赖。"
+  sourceLabel="源分支 (main)"
+  targetLabel="目标分支 (release/2.x)"
+  transferLabel="git cherry-pick -x <commit>"
+/>
+
+cherry-pick 表面上只是一个命令，
 如果你没先确认目标分支的状态，cherry-pick 很容易出现：
 
 - 重复引入已有改动

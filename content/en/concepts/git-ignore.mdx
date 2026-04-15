@@ -24,6 +24,17 @@ my-project/
 └── tests/
 ```
 
+<CommandFlowFigure
+  title=".gitignore Matching Flow"
+  caption="Git checks every untracked file in the working tree against .gitignore rules line by line. The last matching rule determines whether the file is ignored."
+  inputsLabel="Working Tree Files"
+  inputs="src/index.js|node_modules/|.env|build/output.js|.DS_Store"
+  commandLabel=".gitignore Match"
+  outputsLabel="Result"
+  outputs="✅ src/index.js → tracked|❌ node_modules/ → ignored|❌ .env → ignored|❌ build/ → ignored|❌ .DS_Store → ignored"
+  note="The last matching rule takes effect. Negation rules ! only work on files that were previously ignored."
+/>
+
 ## Rule Syntax and Glob Patterns
 
 Git's ignore patterns use a simplified form of **glob patterns** (similar to shell wildcards). Here are the key symbols and their meanings:

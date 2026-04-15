@@ -15,6 +15,15 @@ export const metadata = {
 
 ## 先记住：rebase 出错时最怕继续慌着重试
 
+<RebaseFigure
+  title="Rebase 出错后的恢复思路"
+  caption="Rebase 会重写提交历史，产生新 ID 的提交。旧提交不会立刻消失——通过 reflog 可以找到 rebase 前的状态，用 --abort 可以在中途放弃。"
+  beforeLabel="rebase 前（安全状态）"
+  afterLabel="rebase 后（可能有问题）"
+  modeLabel="恢复：git reflog / git branch rescue"
+/>
+
+
 很多人一看到冲突、提交顺序不对，或者觉得某个提交不见了，就继续 rebase、reset、checkout 来回试。  
 真正更稳的做法是先停下，先把“出问题前的入口”保住。
 

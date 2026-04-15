@@ -38,6 +38,15 @@ Shallow clone (--depth 3):
   Only G, H downloaded (plus E-F as boundary)
 ```
 
+<CommitGraphFigure
+  title="Full History vs Shallow Clone History"
+  caption="A full clone downloads all commits from root to HEAD. A shallow clone only downloads the most recent N commits — earlier commits are cut off at the shallow boundary and are inaccessible locally."
+  linearLabel="Full history (A→B→C→D→E→F→G→H)"
+  mergeLabel="Shallow --depth 3 (F→G→H only)"
+  rewriteLabel="Shallow --depth 1 (H only)"
+  pointerLabel="shallow boundary cutoff"
+/>
+
 ## When Shallow Clones Are Useful
 
 ### CI/CD Pipelines

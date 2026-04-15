@@ -16,6 +16,18 @@ export const metadata = {
 
 ## 一句话理解
 
+<CommandFlowFigure
+  title="仓库损坏的诊断与恢复流程"
+  caption="仓库损坏时，先用 git fsck 诊断问题对象，再从远端重新 clone 获取干净副本。有备份时可直接从备份恢复。关键是定期备份和使用 git bundle。"
+  inputsLabel="损坏症状"
+  inputs="git fsck 报错|pack 文件损坏|对象丢失|磁盘故障后无法读取"
+  commandLabel="诊断 + 恢复"
+  outputsLabel="恢复结果"
+  outputs="fsck 定位损坏对象|从远端重新 clone 获取干净副本|从备份/g bundle 恢复|重建损坏对象"
+  note="预防胜于治疗：定期 git bundle 备份，保持远端同步，使用 git fsck 定期检查。"
+/>
+
+
 Git 仓库损坏虽然不常见，但一旦发生可能让你无法正常工作。好消息是，Git 的内部结构具有很强的冗余性，大多数损坏情况都可以修复或从备份恢复。关键在于快速诊断和采取正确的恢复步骤。
 
 ## 什么会导致仓库损坏

@@ -14,6 +14,17 @@ export const metadata = {
 
 ## The short version
 
+<CommandFlowFigure
+  title="Git Alias System"
+  caption="Simplify common commands with aliases, unify team habits, reduce typos. Aliases should be self-explanatory, not just shorter abbreviations."
+  inputsLabel="Common Commands"
+  inputs="git status|git log --oneline --graph|git branch --merged|git diff --staged"
+  commandLabel="Alias Simplification"
+  outputsLabel="Quick Commands"
+  outputs="git s → status|git lg → log --oneline --graph|git bm → branch --merged|git ds → diff --staged"
+  note="Aliases should make common ops faster, but not sacrifice readability. Teams can share alias configs."
+
+
 Git aliases let you replace verbose native commands with short ones, dramatically boosting daily productivity. Configured via `git config alias.xxx`, they support simple argument substitution and complex shell script execution.
 
 ## What are Git aliases

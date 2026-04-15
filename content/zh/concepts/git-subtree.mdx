@@ -44,6 +44,17 @@ export const metadata = {
 - 多个独立项目共享同一个子项目
 - 子项目有独立的开发团队和发布周期
 
+<CommandFlowFigure
+  title="Subtree 的工作流程"
+  caption="Subtree 将外部仓库的历史作为子目录嵌入到主仓库中。添加、更新和推送回子仓库都有专门的命令。"
+  inputsLabel="外部仓库"
+  inputs="lodash.git (工具库)|docs-site.git (文档站)|shared-lib.git (共享库)"
+  commandLabel="git subtree add/push/pull"
+  outputsLabel="操作结果"
+  outputs="add → 子仓库历史嵌入主仓库|pull → 拉取子仓库更新到子目录|push → 将子目录修改推送回子仓库"
+  note="--squash 参数会将子仓库的多次提交合并为一次，保持主仓库历史简洁。"
+/>
+
 ## 基本操作
 
 ### 添加子树

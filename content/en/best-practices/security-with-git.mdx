@@ -15,6 +15,17 @@ export const metadata = {
 
 ## The short version
 
+<CommandFlowFigure
+  title="Git Security Practices"
+  caption="Git security includes: no secrets in commits, GPG-signed commits, correct .gitignore, regular history scanning for leaks."
+  inputsLabel="Security Risks"
+  inputs="API keys hardcoded|Passwords in config|SSH private key committed|Personal info leaked"
+  commandLabel="Security Protection"
+  outputsLabel="Security Practices"
+  outputs=".gitignore excludes secrets|GPG signs commit identity|git-secrets scans leaks|BFG cleans history"
+  note="Once sensitive info is committed to Git history, even if deleted later, it still exists in history. Prevention beats cure."
+
+
 Git history is immutable — once sensitive info (passwords, keys, tokens) is committed, even if later deleted, it remains in history. Therefore, preventing sensitive info leaks and properly handling leak incidents are the core of Git security.
 
 ## Handling accidentally committed sensitive info

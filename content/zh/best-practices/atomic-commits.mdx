@@ -12,7 +12,18 @@ export const metadata = {
 
 # 原子提交专题
 
-## 为什么“原子提交”不是形式主义
+## 为什么"原子提交"不是形式主义
+
+<CommandFlowFigure
+  title="原子提交流程"
+  caption="每次提交只包含单一逻辑变更：修复 bug、添加功能、重构代码分别独立提交。降低 review 和 revert 成本。"
+  inputsLabel="混合变更"
+  inputs="修复 bug 的代码|重构的代码|格式化修改|调试日志"
+  commandLabel="拆分提交"
+  outputsLabel="原子提交"
+  outputs="commit 1: fix(auth): 修复登录超时|commit 2: refactor(auth): 简化认证逻辑|commit 3: chore: 格式化代码"
+  note="使用 git add -p 可以按代码块选择暂存内容，将不同逻辑拆分到不同提交。"
+/>
 
 原子提交的核心不是让历史看起来整齐，而是让每一条提交都能独立解释、独立 review、独立回滚。只要一次提交里混进多个意图，后面的所有动作都会变重：
 

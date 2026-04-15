@@ -15,6 +15,15 @@ export const metadata = {
 
 ## 一句话理解
 
+<ReflogFigure
+  title="提交丢失后的找回路径"
+  caption="Git 中的提交很少真正被删除。大多数情况下提交对象仍然存在，只是失去了引用路径。通过 reflog 和 git fsck --lost-found 可以找到这些悬挂对象。"
+  historyLabel="reflog 历史（提交操作记录）"
+  rescueLabel="新建分支接住提交"
+  nowLabel="当前分支位置"
+/>
+
+
 Git 中的提交很少真正被删除。大多数情况下，提交对象仍然存在于 `.git/objects/` 中，只是失去了引用路径（分支指针移走了）。通过 reflog 和 fsck，你可以找回几乎所有"丢失"的提交。
 
 ## 提交为什么会"丢失"

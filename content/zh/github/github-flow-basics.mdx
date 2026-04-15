@@ -14,7 +14,17 @@ export const metadata = {
 
 ## 先理解它到底是什么
 
-GitHub Flow 不是一套复杂的分支治理模型，而是一种**尽量轻量的日常协作方式**。  
+<GitflowOverviewFigure
+  title="GitHub Flow 工作流"
+  caption="GitHub Flow 是简化版的分支策略：main 始终可部署，功能分支从 main 切出，通过 PR 合并回 main，合并后立即部署。"
+  releaseLabel="main (始终可部署)"
+  integrationLabel="PR 评审"
+  featureLabel="功能分支"
+  releaseBranchLabel="合并部署"
+  hotfixLabel="紧急修复"
+/>
+
+GitHub Flow 是一套简化的分支策略：
 它的核心节奏非常短：
 
 1. 从主线切出一个分支

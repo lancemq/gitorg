@@ -16,6 +16,18 @@ export const metadata = {
 
 ## The short version
 
+<CommandFlowFigure
+  title="Repository Corruption Diagnosis and Recovery"
+  caption="When the repository is corrupted, first use git fsck to diagnose problematic objects, then re-clone from remote for a clean copy. If you have backups, restore directly. Regular backups and git bundle are key."
+  inputsLabel="Corruption Symptoms"
+  inputs="git fsck errors|pack file corruption|missing objects|disk failure unreadable"
+  commandLabel="Diagnose + Recover"
+  outputsLabel="Recovery Result"
+  outputs="fsck locates corrupted objects|re-clone from remote for clean copy|restore from backup/bundle|rebuild damaged objects"
+  note="Prevention beats cure: regular git bundle backups, keep remote in sync, periodic git fsck checks."
+/>
+
+
 Git repository corruption is uncommon but can halt your work when it happens. The good news is that Git's internal structure has strong redundancy, and most corruption scenarios can be repaired or restored from backups. The key is quick diagnosis and the right recovery steps.
 
 ## What causes repository corruption

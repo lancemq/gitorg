@@ -13,9 +13,20 @@ export const metadata = {
 
 # Pull Request 与 Code Review 教程
 
-## 为什么 PR 不只是“申请合并”
+## 为什么 PR 不只是"申请合并"
 
-很多团队会高频使用 Pull Request，但真正把它用好的人并不多。  
+<CommandFlowFigure
+  title="PR 评审流程"
+  caption="Pull Request 是代码评审的核心工具。从创建 PR、自动检查、同行评审到最终合并，每个环节都有最佳实践。"
+  inputsLabel="PR 创建"
+  inputs="功能分支就绪|PR 描述完整|关联 Issue"
+  commandLabel="PR 评审"
+  outputsLabel="合并或修改"
+  outputs="CI 自动检查|同行代码评审|请求变更或批准|合并到目标分支"
+  note="好的 PR 描述应该包含：变更目的、实现方案、测试情况、截图（如适用）、关联 Issue。"
+/>
+
+很多团队把 PR 当成"我把代码写完了，你帮我看看能不能合"。
 PR 的价值不是单纯防止直接 push，而是把这几件事放到一个共享入口里：
 
 - 说明为什么要改

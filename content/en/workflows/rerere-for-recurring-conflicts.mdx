@@ -14,6 +14,17 @@ export const metadata = {
 
 ## What this workflow solves
 
+<CommandFlowFigure
+  title="Rerere Conflict Reuse Flow"
+  caption="Rerere (reuse recorded resolution) records conflict solutions and auto-applies them next time the same conflict occurs. Especially useful for long-lived branches and frequent rebases."
+  inputsLabel="Conflict Scenario"
+  inputs="First encounter conflict|Manually resolve|rerere records solution"
+  commandLabel="rerere auto-reuse"
+  outputsLabel="Conflict Resolved"
+  outputs="rerere.enabled = true → auto-record|Next same conflict → auto-apply|Confirm with git rerere status"
+  note="rerere is disabled by default. Enable with rerere.enabled = true in repo. Records stored in .git/rr-cache/."
+
+
 On long-lived branches and repeated rebases, the exhausting part is often not conflict itself but solving the same conflict over and over again.
 
 `rerere` helps Git remember how you resolved a conflict before, so similar conflicts can be reused later.

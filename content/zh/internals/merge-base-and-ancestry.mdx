@@ -16,6 +16,15 @@ export const metadata = {
 
 ## 先抓住一个核心概念
 
+<MergeFigure
+  title="Merge Base 与分支分叉"
+  caption="当两个分支从同一个基点分叉后，Git 通过找到最近的共同祖先（merge base）来进行三方比较，判断各自的独立修改。"
+  beforeLabel="分叉前（共同祖先）"
+  afterLabel="分叉后（各自独立历史）"
+  modeLabel="找到 merge base"
+/>
+
+
 当 Git 要比较两个分支、执行一次 merge、判断能不能 fast-forward，或者决定 rebase 应该从哪里开始搬提交时，它通常都要先找一个 **共同祖先**。
 
 这个共同祖先就是常说的 `merge base`。

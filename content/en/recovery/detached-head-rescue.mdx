@@ -15,6 +15,17 @@ export const metadata = {
 
 ## Detached HEAD simply means HEAD points to a commit, not a branch name
 
+<RefsHeadFigure
+  title="Detached HEAD State"
+  caption="When HEAD points directly to a commit instead of a branch name, you are in detached HEAD state. Commits made here have no branch to catch them and are easy to lose when you switch branches."
+  headLabel="Normal state"
+  branchLabel="HEAD → main → latest commit"
+  tagLabel="tag: v1.0 → historical commit"
+  remoteLabel="origin/main → remote commit"
+  detachedLabel="Detached HEAD state"
+/>
+
+
 This often happens when you check out:
 
 - an older commit

@@ -19,6 +19,18 @@ export const metadata = {
 
 ## 最常见的几个变量
 
+<CommandFlowFigure
+  title="Git 环境变量如何决定运行上下文"
+  caption="Git 通过环境变量决定仓库位置、工作区路径和索引文件位置。重写这些变量可以改变 Git 的默认行为，适用于特殊场景。"
+  inputsLabel="环境变量"
+  inputs="GIT_DIR (仓库位置)|GIT_WORK_TREE (工作区路径)|GIT_INDEX_FILE (索引路径)|GIT_CONFIG (配置路径)"
+  commandLabel="Git 上下文决策"
+  outputsLabel="运行行为"
+  outputs="决定仓库根目录|决定工作区位置|决定索引文件路径|决定配置加载顺序"
+  note="默认情况下 Git 自动发现这些路径。手动设置时可以覆盖默认行为，但需谨慎使用。"
+/>
+
+
 Git 官方书里特别值得关注的几个包括：
 
 - `GIT_DIR`

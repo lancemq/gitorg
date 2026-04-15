@@ -15,6 +15,17 @@ export const metadata = {
 
 ## 一句话理解
 
+<RefsHeadFigure
+  title="Detached HEAD 上提交后的状态"
+  caption="在 detached HEAD 状态下创建提交后，新提交没有分支名接住。通过创建新分支或合并到已有分支，可以安全地接住这些提交。"
+  headLabel="正常分支状态"
+  branchLabel="HEAD → main → 持续提交"
+  tagLabel="tag: v1.0 → 固定提交"
+  remoteLabel="origin/main → 远端快照"
+  detachedLabel="Detached HEAD + 新提交"
+/>
+
+
 detached HEAD 意味着 HEAD 直接指向一个提交（commit），而不是指向一个分支名。在这种状态下做的提交不会自动关联到任何分支，但提交本身不会丢失——你只需要创建一个分支来"接住"它们。
 
 ## 什么是 detached HEAD

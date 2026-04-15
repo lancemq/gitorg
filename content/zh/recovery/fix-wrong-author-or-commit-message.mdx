@@ -15,6 +15,16 @@ export const metadata = {
 
 ## 一句话理解
 
+<CommitGraphFigure
+  title="替换错误提交的原理"
+  caption="Git 的提交是不可变的。你不能编辑已有提交，但可以创建新提交来替代它。amend 替换最新提交，rebase -i 可以修改历史中间的提交。"
+  linearLabel="原始提交链（含错误）"
+  mergeLabel="amend 后（替换最新提交）"
+  rewriteLabel="rebase -i 后（新提交链替代旧链）"
+  pointerLabel="分支指向"
+/>
+
+
 Git 的提交是不可变的——你不能"编辑"一个已有提交，但可以创建一个新提交来替代它。根据错误发生的位置（最新提交 vs 历史中间），有不同的修正方法。
 
 ## 修正最后一个提交

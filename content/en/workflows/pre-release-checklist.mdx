@@ -14,6 +14,17 @@ export const metadata = {
 
 ## The short version
 
+<CommandFlowFigure
+  title="Pre-release Checklist Flow"
+  caption="Complete Git checklist before release: confirm branch state, create tag, generate changelog, verify version, ensure CI passes."
+  inputsLabel="Release Prep"
+  inputs="Release branch ready|Changelog pending|Version to bump|CI to verify"
+  commandLabel="Release Check"
+  outputsLabel="Release Confirmed"
+  outputs="✅ Branch state clean|✅ Tag created|✅ Changelog generated|✅ CI all passed"
+  note="Release checklist prevents missing critical steps. Each check should be verifiable."
+
+
 Software releases require careful verification. This checklist helps you confirm everything is ready before releasing through Git, preventing missed steps that could cause release issues.
 
 ## Phase 1: Branch status confirmation

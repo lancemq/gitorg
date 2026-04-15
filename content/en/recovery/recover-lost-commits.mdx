@@ -15,6 +15,15 @@ export const metadata = {
 
 ## The short version
 
+<ReflogFigure
+  title="Finding Lost Commits"
+  caption="Commits in Git are rarely truly deleted. In most cases, commit objects still exist but have lost their reference path. Use reflog and git fsck --lost-found to find these dangling objects."
+  historyLabel="Reflog history (operation records)"
+  rescueLabel="Create branch to catch commits"
+  nowLabel="Current branch position"
+/>
+
+
 Commits in Git are rarely truly deleted. In most cases, the commit object still exists in `.git/objects/` — it just lost its reference path (the branch pointer moved away). Using reflog and fsck, you can recover almost any "lost" commit.
 
 ## Why commits appear to be "lost"

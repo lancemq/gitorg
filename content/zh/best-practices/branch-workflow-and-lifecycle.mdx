@@ -14,7 +14,17 @@ export const metadata = {
 
 ## 为什么团队需要明确的分支生命周期
 
-分支策略最容易被误解成“大家爱怎么切分支就怎么切”。  
+<GitflowOverviewFigure
+  title="分支策略与生命周期"
+  caption="主线 (main) 用于稳定发布，develop 用于集成开发，feature 分支用于独立功能，release 分支用于发布准备，hotfix 用于紧急修复。"
+  releaseLabel="稳定发布"
+  integrationLabel="集成开发"
+  featureLabel="功能开发"
+  releaseBranchLabel="发布准备"
+  hotfixLabel="紧急修复"
+/>
+
+很多团队最大的问题不是"不会建分支"，而是
 真正影响团队质量的不是分支数量，而是这些问题有没有说清楚：
 
 - 哪条分支是稳定基线

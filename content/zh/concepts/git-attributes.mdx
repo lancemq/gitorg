@@ -28,6 +28,17 @@ export const metadata = {
 
 简单来说：`.gitignore` 说"别管这个文件"，`.gitattributes` 说"用特定方式处理这个文件"。
 
+<CommandFlowFigure
+  title=".gitattributes 的文件处理流程"
+  caption=".gitattributes 不决定文件是否被跟踪，而是决定被跟踪的文件在行尾符、合并策略、差异比较等方面如何被处理。"
+  inputsLabel="被跟踪的文件"
+  inputs="*.sh 脚本文件|*.bat 批处理文件|package-lock.json 锁文件|*.png 图片文件|*.docx 文档文件"
+  commandLabel=".gitattributes 规则"
+  outputsLabel="处理策略"
+  outputs="eol=lf 统一行尾符|eol=crlf Windows 行尾符|merge=ours 合并保留当前|diff=exif 图片元数据 diff|diff=docx 文档转文本 diff"
+  note="规则按 pattern 匹配，子目录的 .gitattributes 优先级高于父目录。"
+/>
+
 ## .gitattributes 文件语法
 
 每一行的格式是：

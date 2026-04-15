@@ -14,6 +14,17 @@ export const metadata = {
 
 ## Why reviews slow down when the batch gets too large
 
+<CommandFlowFigure
+  title="Small-Batch Review Flow"
+  caption="Small-batch review examines few changes at a time, higher quality and faster speed. Large PRs easily miss issues and increase reviewer cognitive load."
+  inputsLabel="Change Sets"
+  inputs="< 200 lines changed|Single feature/fix|Self-tested|Docs updated"
+  commandLabel="Small-Batch PR"
+  outputsLabel="High-Quality Review"
+  outputs="Review time < 30 min|Low defect miss rate|More specific feedback|Faster merge"
+  note="Research shows defect detection drops significantly after reviewing 400+ lines. Keep PRs small and focused."
+
+
 Review bottlenecks are often blamed on reviewer availability, but oversized review batches are just as common.  
 Once one review contains many files, multiple topics, and several rounds of exploratory history, reviewers need a lot of setup work before they can offer good feedback.
 

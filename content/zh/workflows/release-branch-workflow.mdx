@@ -15,6 +15,15 @@ export const metadata = {
 
 ## 这个工作流适合什么场景
 
+<GitflowReleaseFigure
+  title="发布分支工作流"
+  caption="从 develop 切出 release 分支进行功能冻结和 bug 修复。修复完成后合并到 main 发布新版本，同时 backmerge 到 develop。"
+  startLabel="开始发布周期"
+  releasePrepLabel="功能冻结 + Bug 修复"
+  releaseBackmergeLabel="合并到 main + develop"
+  hotfixBackmergeLabel="紧急修复双向合并"
+
+
 发布分支通常出现在这些场景：
 
 - 版本已经接近上线，需要冻结功能

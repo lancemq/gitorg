@@ -29,6 +29,14 @@ The goal is not “never conflict.” The goal is to keep drift visible, sync ba
 
 ## Why long-lived branches get expensive
 
+<RebaseFigure
+  title="Long-lived Branch Sync with Main"
+  caption="Long-lived branches need regular rebase or merge with main. Rebase keeps history linear but rewrites commit IDs, merge preserves full history but creates merge commits."
+  beforeLabel="Long-lived branch behind main"
+  afterLabel="After syncing main"
+  modeLabel="git rebase origin/main"
+
+
 Short-lived branches have one huge advantage: their drift window stays small.  
 Long-lived branches invert that:
 

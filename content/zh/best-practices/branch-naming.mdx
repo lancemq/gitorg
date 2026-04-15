@@ -14,6 +14,17 @@ export const metadata = {
 
 ## 为什么分支命名会影响协作效率
 
+<CommandFlowFigure
+  title="分支命名约定"
+  caption="统一的分支命名模式让团队成员一眼就知道分支的用途、负责人和关联任务。也方便自动化工具识别和处理。"
+  inputsLabel="分支类型"
+  inputs="新功能开发|Bug 修复|热修复|实验性功能|发布准备"
+  commandLabel="命名规则"
+  outputsLabel="分支名称"
+  outputs="feature/user-auth|bugfix/login-timeout|hotfix/security-patch|experiment/ai-suggestions|release/2.1.0"
+  note="推荐的命名模式：<type>/<scope> 或 <type>/JIRA-<id>-<description>。保持简洁但有意义。"
+
+
 很多团队低估了分支名的价值，觉得它只是“随便起个名字能推上去就行”。但在真实协作里，分支名会不断出现在：
 
 - pull request 标题和链接里

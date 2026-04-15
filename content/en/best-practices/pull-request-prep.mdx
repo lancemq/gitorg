@@ -14,6 +14,17 @@ export const metadata = {
 
 ## Why “review-ready” branches get better feedback
 
+<CommandFlowFigure
+  title="PR Preparation Flow"
+  caption="Pre-PR checklist: sync main, organize commits, run tests, check diff, write description. Well-prepared PRs review faster and with higher quality."
+  inputsLabel="Dev Complete"
+  inputs="Feature code written|Local tests passed|Docs updated"
+  commandLabel="PR Prep"
+  outputsLabel="High-Quality PR"
+  outputs="✅ Rebased to latest main|✅ Commits organized|✅ All tests pass|✅ Clean diff|✅ Full description"
+  note="A well-prepared PR shows respect for reviewers. Reduces back-and-forth, improves merge efficiency."
+
+
 A lot of review friction comes from sending a branch before it is shaped for review: the base is stale, the commits are noisy, and unrelated changes are still mixed in.  
 That forces the reviewer to do cleanup work before they can even discuss the solution.
 

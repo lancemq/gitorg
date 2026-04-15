@@ -16,7 +16,16 @@ export const metadata = {
 
 `cherry-pick` 把其他分支上的某个提交"摘"到当前分支。遇到冲突或结果不对时，Git 提供了明确的中止、继续和跳过机制，完成后也能安全回退。
 
-## cherry-pick 做了什么
+## cherry-pick 的基本模型
+
+<CherryPickFigure
+  title="Cherry-Pick 操作示意"
+  caption="cherry-pick 把其他分支上的某个提交复制到当前分支，生成内容相近但 ID 不同的新提交。遇到冲突时可以 --abort 中止，或 --continue 继续。"
+  sourceLabel="源分支"
+  targetLabel="目标分支"
+  transferLabel="git cherry-pick <commit>"
+/>
+-pick 做了什么
 
 ```
 原分支:  A --- B --- C --- D

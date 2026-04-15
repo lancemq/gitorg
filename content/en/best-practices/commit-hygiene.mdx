@@ -14,6 +14,17 @@ export const metadata = {
 
 ## Why this topic comes first
 
+<CommandFlowFigure
+  title="Commit Hygiene Practices"
+  caption="Good commit habits: one thing per commit, clear intent in message, run tests before commit, verify after commit."
+  inputsLabel="Before Changes"
+  inputs="Write code|Run tests|Update docs|Update deps"
+  commandLabel="Commit Hygiene"
+  outputsLabel="Clean History"
+  outputs="Single-intent commits|Clear commit messages|Test-passing code|Traceable change records"
+  note="Commit hygiene is not obsession — it makes history a reliable development log. Each commit should tell one story."
+
+
 Many teams know how to use Git and still suffer from collaboration drag because the commits themselves are weak. Oversized commits slow review, make rollback harder, and blur responsibility. Weak messages make future readers guess what actually happened.
 
 The long-running official guidance is simple: each commit should be a logically separate changeset.

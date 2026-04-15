@@ -21,6 +21,14 @@ export const metadata = {
 
 ## 一条更稳的流程
 
+<MergeFigure
+  title="功能分支与主线的协作模式"
+  caption="功能分支从主线切出，独立开发完成后合并回主线。开发期间需要定期同步主线最新变更，避免最终合并时冲突过大。"
+  beforeLabel="功能分支从主线切出"
+  afterLabel="合并回主线"
+  modeLabel="定期同步 origin/main"
+
+
 ```bash
 git switch main
 git pull --ff-only

@@ -21,6 +21,16 @@ Git 最底层不是“文件版本列表”，而是一个把内容写成对象�
 
 ## 为什么对象模型是第一层基础
 
+<CommitGraphFigure
+  title="Git 对象数据库的四类对象"
+  caption="Git 以四类对象为核心：blob 存储文件内容，tree 组织目录结构，commit 记录历史快照，tag 为提交打标签。所有对象通过哈希 ID 互相链接。"
+  linearLabel="Blob → 文件内容"
+  mergeLabel="Tree → 目录结构"
+  rewriteLabel="Commit → 历史快照 | Tag → 命名标记"
+  pointerLabel="引用指向"
+/>
+
+
 很多 Git 现象只有放到对象模型里才说得通：
 
 - 为什么一次 commit 会生成新的对象

@@ -14,6 +14,15 @@ export const metadata = {
 
 ## The short version
 
+<CherryPickFigure
+  title="Cherry-Pick Operation"
+  caption="Cherry-pick copies a commit from another branch to the current branch, creating a new commit with similar content but a different ID. On conflict, you can --abort, or --continue."
+  sourceLabel="Source branch"
+  targetLabel="Target branch"
+  transferLabel="git cherry-pick <commit>"
+/>
+
+
 `cherry-pick` copies a commit from another branch onto your current branch. When it hits conflicts or produces wrong results, Git gives you clear options to abort, continue, skip, or undo after the fact.
 
 ## What cherry-pick actually does

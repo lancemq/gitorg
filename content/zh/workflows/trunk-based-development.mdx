@@ -14,6 +14,15 @@ export const metadata = {
 
 ## 一句话理解
 
+<CommitGraphFigure
+  title="主干开发 vs 分支开发"
+  caption="主干开发要求开发者直接在 main 上工作或使用生命周期极短（< 1-2 天）的分支。通过 feature flag 控制未发布功能。"
+  linearLabel="主干开发 (短分支 → 快速合并)"
+  mergeLabel="功能分支 (长期独立开发)"
+  rewriteLabel="主干开发 + Feature Flag"
+  pointerLabel="main 分支"
+
+
 主干开发（Trunk-Based Development, TBD）是一种分支策略：所有开发者直接在主干（main/master）上工作，或者创建生命周期极短（< 1-2 天）的功能分支，尽快合并回主干。这与 Gitflow 等长期分支策略形成鲜明对比。
 
 ## 什么是主干开发

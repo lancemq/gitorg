@@ -15,6 +15,15 @@ export const metadata = {
 
 ## 一句话理解
 
+<MergeFigure
+  title="撤销 Merge Commit 的原理"
+  caption="Merge commit 有多个 parent，撤销时需要用 git revert -m 指定哪个 parent 作为还原基准。选错 parent 会导致后续合并困难。也可以通过 reset 回退到 merge 前的位置。"
+  beforeLabel="Merge 前（两条独立分支）"
+  afterLabel="Merge 后（汇合为一个节点）"
+  modeLabel="撤销：git revert -m <parent-num>"
+/>
+
+
 合并提交（merge commit）有多个 parent，撤销它时需要用 `git revert -m` 指定哪个 parent 作为"基准"来还原。选错 parent 会导致意想不到的结果。
 
 ## 理解 merge commit 的结构

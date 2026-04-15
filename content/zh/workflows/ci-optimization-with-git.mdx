@@ -14,6 +14,17 @@ export const metadata = {
 
 ## 一句话理解
 
+<CommandFlowFigure
+  title="CI/CD Git 优化流程"
+  caption="CI 环境中的 Git 优化策略：浅克隆减少下载量，缓存 .git 目录加速后续运行，partial clone 按需获取对象。"
+  inputsLabel="完整克隆"
+  inputs="下载完整历史 (.git/)|解压所有对象|构建工作区"
+  commandLabel="CI 优化策略"
+  outputsLabel="优化结果"
+  outputs="--depth 1 浅克隆|缓存 .git 目录|partial clone 按需获取|只拉取变更的文件"
+  note="CI/CD 通常只需要最新代码，不需要完整历史。浅克隆可减少 80-95% 的下载时间。"
+
+
 CI/CD 流水线中，Git clone 和 checkout 经常是最耗时的步骤之一，尤其是大型仓库。通过浅克隆、缓存、partial clone 等策略，可以将 Git 操作时间从分钟级降低到秒级。
 
 ## 为什么 CI/CD 中 Git 操作慢

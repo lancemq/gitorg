@@ -15,6 +15,14 @@ export const metadata = {
 
 ## Why this deserves a workflow decision
 
+<MergeFigure
+  title="Squash Merge vs Rebase Merge"
+  caption="Squash merge compresses all commits into one, clean history but loses commit details. Rebase merge keeps linear history and preserves each commit, but changes commit IDs."
+  beforeLabel="Feature branch (multiple commits)"
+  afterLabel="After merging to trunk"
+  modeLabel="squash merge → single commit"
+
+
 Many teams are not blocked by "can we merge this?" They are blocked by "what shape should history have after merge?"
 
 - squash merge keeps main shorter

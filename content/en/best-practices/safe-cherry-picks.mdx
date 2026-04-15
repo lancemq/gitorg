@@ -14,6 +14,14 @@ export const metadata = {
 
 ## Why cherry-pick feels simpler than it really is
 
+<CherryPickFigure
+  title="Safe Cherry-Pick Practices"
+  caption="Cherry-pick suits backporting fixes, picking specific commits to release branches. Verify commits are standalone with no hidden dependencies before use."
+  sourceLabel="Source (main)"
+  targetLabel="Target (release/2.x)"
+  transferLabel="git cherry-pick -x <commit>"
+
+
 `git cherry-pick` looks like “just copy that commit over here,” but the real difficulty is context. The original commit lived inside a branch history, with assumptions before and after it.
 
 That is why unsafe cherry-picks often create:

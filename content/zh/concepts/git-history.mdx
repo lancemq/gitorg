@@ -2,7 +2,7 @@ export const metadata = {
   title: "Git 历史说明",
   slug: "git-history",
   locale: "zh",
-  section: "internals",
+  section: "concepts",
   summary: "系统解释 Git 如何记录历史、为什么提交历史是一个有向图，以及这对协作、恢复和变更审查意味着什么。",
   sourceUrls: [
     "https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History",
@@ -15,7 +15,18 @@ export const metadata = {
 
 ## 一句话理解
 
-Git 的“历史”不是一串简单的文本日志，而是一组由提交对象连接起来的有向图。每个提交都记录了当前项目快照、作者信息、提交说明，以及它的父提交。
+Git 的"历史"不是一串简单的文本日志，而是一组由提交对象连接起来的有向图。每个提交都记录了当前项目快照、作者信息、提交说明，以及它的父提交。
+
+<CommitGraphFigure
+  title="Git 历史的三种基本形态"
+  caption="Git 历史可以是简单的线性链、带汇合点的合并结构，也可以是经过重写后的新提交序列。理解这三种形态，是掌握所有历史操作的基础。"
+  linearLabel="线性历史"
+  mergeLabel="合并结构"
+  rewriteLabel="重写后历史"
+  pointerLabel="分支指向"
+/>
+
+理解这张图的关键不是记住字母本身，而是看到三种不同的历史形态：**线性**（每个提交一个父节点）、**合并**（汇合点有两个父节点）、**重写**（原提交被新 ID 的提交替代）。
 
 ## 为什么 Git 历史这么重要
 

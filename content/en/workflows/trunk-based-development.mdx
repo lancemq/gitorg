@@ -14,6 +14,15 @@ export const metadata = {
 
 ## The short version
 
+<CommitGraphFigure
+  title="Trunk-Based Development vs Branch-Based"
+  caption="Trunk-based development requires developers to work directly on main or use very short-lived branches (< 1-2 days). Feature flags control unreleased features."
+  linearLabel="Trunk-based (short branches → fast merge)"
+  mergeLabel="Feature branches (long independent dev)"
+  rewriteLabel="Trunk-based + Feature Flags"
+  pointerLabel="main branch"
+
+
 Trunk-Based Development (TBD) is a branching strategy where all developers work directly on trunk (main/master), or create extremely short-lived feature branches (< 1-2 days) that merge back to trunk quickly. This contrasts sharply with Gitflow and other long-lived branching strategies.
 
 ## What is trunk-based development

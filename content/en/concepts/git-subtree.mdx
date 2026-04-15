@@ -54,6 +54,17 @@ Before diving into subtree commands, it's important to understand when to use su
 - The subproject is relatively small
 - You want a single-clone experience (no `--recurse-submodules`)
 
+<CommandFlowFigure
+  title="Subtree Workflow"
+  caption="Subtree embeds an external repository's history as a subdirectory in the main repository. Adding, updating, and pushing back to the subrepo all have dedicated commands."
+  inputsLabel="External Repository"
+  inputs="lodash.git (utility)|docs-site.git (documentation)|shared-lib.git (shared library)"
+  commandLabel="git subtree add/push/pull"
+  outputsLabel="Operation Result"
+  outputs="add → subrepo history embedded in main repo|pull → fetch subrepo updates into subdirectory|push → push subdirectory changes back to subrepo"
+  note="The --squash flag collapses the subrepo's multiple commits into one, keeping the main repo history clean."
+/>
+
 ### When to Choose Submodule
 
 - The subproject is large and you don't want to bloat the main repo

@@ -18,6 +18,18 @@ Git does not store every operation as a naïve full copy of the project. It reus
 
 ## 1. Why packfiles matter at all
 
+<CommandFlowFigure
+  title="Loose Objects → Packfiles Storage Flow"
+  caption="Newly created Git objects are initially stored as individual loose objects. As the object count grows, Git compresses and packs them into packfiles via gc, drastically reducing disk usage."
+  inputsLabel="Loose Objects"
+  inputs="newly created blob objects|newly created tree objects|newly created commit objects"
+  commandLabel="git gc / auto pack"
+  outputsLabel="Packfiles"
+  outputs="pack-*.pack compressed storage|pack-*.idx index file|object reuse and delta compression"
+  note="Loose objects are individual files. Packfiles are compressed bundles. git repack can trigger optimization manually."
+/>
+
+
 People often learn that Git has an object database and then immediately wonder:
 
 - why repositories do not grow without bound in the most naïve way

@@ -15,6 +15,14 @@ export const metadata = {
 
 ## Where this workflow fits
 
+<CherryPickFigure
+  title="Cherry-Pick Backport"
+  caption="Pick specific fix commits from main branch and apply them to old version maintenance branch. Each cherry-pick creates a new commit with same content but different ID."
+  sourceLabel="main (trunk)"
+  targetLabel="release/2.x (maintenance)"
+  transferLabel="git cherry-pick <commit-hash>"
+
+
 When a fix already landed on main but an older maintenance line still needs it, the usual problem is:
 
 "I need this one repair, not the whole branch history."

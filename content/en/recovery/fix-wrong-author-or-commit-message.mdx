@@ -15,6 +15,16 @@ export const metadata = {
 
 ## The short version
 
+<CommitGraphFigure
+  title="Replacing Wrong Commits"
+  caption="Git commits are immutable. You cannot edit an existing commit, but you can create a new one to replace it. Amend replaces the latest commit. Interactive rebase can fix commits in the middle of history."
+  linearLabel="Original chain (with error)"
+  mergeLabel="After amend (replaced latest)"
+  rewriteLabel="After rebase -i (new chain replaces old)"
+  pointerLabel="Branch points to"
+/>
+
+
 Git commits are immutable — you can't "edit" an existing commit, but you can create a new one to replace it. The fix method depends on where the error occurred (latest commit vs middle of history).
 
 ## Fixing the latest commit

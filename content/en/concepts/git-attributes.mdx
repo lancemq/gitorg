@@ -15,6 +15,17 @@ While `.gitignore` tells Git **which** files to track, `.gitattributes` tells Gi
 
 The `.gitattributes` file uses the same glob pattern syntax as `.gitignore` and should be committed to your repository so that all contributors share the same configuration.
 
+<CommandFlowFigure
+  title=".gitattributes File Processing Flow"
+  caption=".gitattributes does not decide which files are tracked — it decides how tracked files are handled for line endings, merge strategies, diff comparisons, and more."
+  inputsLabel="Tracked Files"
+  inputs="*.sh scripts|*.bat batch files|package-lock.json lock file|*.png images|*.docx documents"
+  commandLabel=".gitattributes Rules"
+  outputsLabel="Handling Strategy"
+  outputs="eol=lf unified line endings|eol=crlf Windows line endings|merge=ours keep current on merge|diff=exif image metadata diff|diff=docx document-to-text diff"
+  note="Rules match by pattern. Subdirectory .gitattributes takes priority over parent directory."
+/>
+
 ```
 my-project/
 ├── .gitattributes     ← applies to the entire repo

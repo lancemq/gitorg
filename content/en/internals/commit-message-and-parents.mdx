@@ -14,7 +14,19 @@ export const metadata = {
 
 A commit is not just "some saved changes plus a message." It is the object that ties together a repository snapshot, parent history, authorship metadata, and message text into one node of the history graph.
 
+## How commits link through parents
+
+<CommitGraphFigure
+  title="How Commits Link Through Parents to Form History"
+  caption="Each commit object contains a reference to a tree, one or more parent commits, author and committer metadata, and a commit message. Parent commits are the key links in the history graph."
+  linearLabel="Normal commit (one parent)"
+  mergeLabel="Merge commit (two parents)"
+  rewriteLabel="Rebased commits (new ID chain)"
+  pointerLabel="HEAD points to"
+/>
+
 ## What a commit object contains
+
 
 A commit object typically includes:
 

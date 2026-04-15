@@ -13,7 +13,21 @@ export const metadata = {
 
 If you want to understand Git below the command surface, blobs are one of the best places to start. A blob is one of Git's most basic object types, and it explains why Git can treat content itself as the primary identity.
 
+## How blob, tree, and commit connect
+
+<CommandFlowFigure
+  title="Blob → Tree → Commit Chain"
+  caption="File content is first stored as blob objects, organized into directory structures by tree objects, and finally pointed to by commit objects to form complete snapshots."
+  inputsLabel="Content Layer"
+  inputs="blob: file A content|blob: file B content|blob: file C content"
+  commandLabel="tree organizes"
+  outputsLabel="Structure Layer"
+  outputs="tree: root directory|sub-tree: src/ directory|commit: snapshot + author + parent"
+  note="Identical content shares the same blob. Blobs do not store filenames or paths."
+/>
+
 ## What a blob stores
+
 
 A blob stores raw file content.
 

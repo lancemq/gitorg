@@ -15,6 +15,15 @@ export const metadata = {
 
 ## The short version
 
+<MergeFigure
+  title="Undoing a Merge Commit"
+  caption="Merge commits have multiple parents. To undo, use git revert -m to specify which parent to restore to. Choosing the wrong parent causes future merge difficulties. You can also reset back to the pre-merge position."
+  beforeLabel="Before merge (two independent branches)"
+  afterLabel="After merge (converged into one node)"
+  modeLabel="Undo: git revert -m <parent-num>"
+/>
+
+
 A merge commit has multiple parents. To undo it, you must use `git revert -m` to specify which parent to revert back to. Choosing the wrong parent leads to unexpected results.
 
 ## Understanding merge commit structure

@@ -22,6 +22,17 @@ Two tools help a lot:
 
 ## A common scenario
 
+<CommandFlowFigure
+  title="Monorepo Sparse Checkout + Worktree"
+  caption="In monorepo, sparse-checkout limits checked-out directories, worktree provides parallel workspaces. Combined, they drastically reduce context burden."
+  inputsLabel="Full Monorepo"
+  inputs="packages/frontend/|packages/backend/|packages/shared/|docs/|infra/"
+  commandLabel="sparse-checkout + worktree"
+  outputsLabel="Limited Workspace"
+  outputs="wt-frontend/ → only frontend + shared|wt-backend/ → only backend + shared|Each worktree contains only relevant dirs"
+  note="Cone mode sparse-checkout performs better. Combined with worktree for true parallel monorepo development."
+
+
 You only need the frontend app, but the repo also contains backend services, infra code, tooling, and shared packages.
 
 ## A practical flow

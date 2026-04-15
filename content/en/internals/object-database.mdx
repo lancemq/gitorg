@@ -13,7 +13,19 @@ export const metadata = {
 
 ## The short version
 
-At the lowest level, Git is not a list of file versions. It is a database that stores objects and locates them again by IDs derived from their content.
+## Why the object model is the first layer of foundation
+
+<CommitGraphFigure
+  title="Git Object Database: Four Object Types"
+  caption="Git is built around four object types: blob for file content, tree for directory structure, commit for history snapshots, and tag for named references. All objects link to each other through hash IDs."
+  linearLabel="Blob → file content"
+  mergeLabel="Tree → directory structure"
+  rewriteLabel="Commit → history snapshot | Tag → named reference"
+  pointerLabel="Ref points to"
+/>
+
+At the lowest level, Git is not a list of file versions.
+ It is a database that stores objects and locates them again by IDs derived from their content.
 
 <MentalModelBox title="Do not picture Git as cloud storage">
   <p>A steadier model is this: Git stores objects first, then uses refs, HEAD, and tags as names that point at those objects. Most day-to-day commands move names around durable objects.</p>

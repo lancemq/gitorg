@@ -15,6 +15,17 @@ export const metadata = {
 
 ## What this workflow solves
 
+<CommandFlowFigure
+  title="Worktree Parallel Work Mode"
+  caption="Multiple worktrees of the same repo share .git directory but can checkout different branches. Suitable for handling bug fix, feature and review simultaneously."
+  inputsLabel="Single Workspace Pain"
+  inputs="Feature development interrupted|Need urgent bug fix|Review requires immediate changes"
+  commandLabel="git worktree add"
+  outputsLabel="Multi-workspace Parallel"
+  outputs="../fix/ → checkout hotfix branch|../review/ → checkout review branch|Main dir continues feature dev"
+  note="All worktrees share the same .git directory, commits and objects are shared. Deleting worktree doesn't affect commit history."
+
+
 Many team interruptions are not about branch syntax. They happen because you are deep into one working directory and suddenly need to:
 
 - ship a hotfix

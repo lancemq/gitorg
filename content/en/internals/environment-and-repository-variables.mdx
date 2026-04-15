@@ -17,7 +17,19 @@ That is usually fine for ordinary work, but Git actually allows many parts of it
 
 That tells you something important: Git is not relying only on “is there a `.git` directory here?” It can work from a more flexible context model.
 
-## The most important variables to know
+## The most important variables
+
+<CommandFlowFigure
+  title="How Environment Variables Define Git Context"
+  caption="Git uses environment variables to determine repository location, worktree path, and index file location. Overriding these variables can change Git's default behavior for special scenarios."
+  inputsLabel="Environment Variables"
+  inputs="GIT_DIR (repo location)|GIT_WORK_TREE (worktree path)|GIT_INDEX_FILE (index path)|GIT_CONFIG (config path)"
+  commandLabel="Git context decision"
+  outputsLabel="Runtime Behavior"
+  outputs="determines repo root|determines worktree location|determines index file path|determines config load order"
+  note="By default Git auto-discovers these paths. Manual override can change default behavior but should be used carefully."
+/>
+riables to know
 
 Some especially revealing variables are:
 

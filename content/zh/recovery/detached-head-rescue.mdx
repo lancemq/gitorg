@@ -13,7 +13,17 @@ export const metadata = {
 
 # detached HEAD 状态下如何自救
 
-## detached HEAD 不是灾难，本质上只是“HEAD 没指向分支名”
+## detached HEAD 不是灾难，本质上只是"HEAD 没指向分支名"
+
+<RefsHeadFigure
+  title="Detached HEAD 状态示意"
+  caption="HEAD 直接指向一个提交而不是分支名时，处于 detached HEAD 状态。在这个状态下产生的提交没有分支接住，切换分支后容易丢失。"
+  headLabel="正常状态"
+  branchLabel="HEAD → main → 最新提交"
+  tagLabel="tag: v1.0 → 历史提交"
+  remoteLabel="origin/main → 远端提交"
+  detachedLabel="Detached HEAD 状态"
+/>
 
 当你 checkout 某个旧提交、标签或特定对象时，`HEAD` 可能直接指向一个提交，而不是某个分支。  
 这就叫 detached HEAD。

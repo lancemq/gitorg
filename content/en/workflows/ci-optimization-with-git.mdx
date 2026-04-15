@@ -14,6 +14,17 @@ export const metadata = {
 
 ## The short version
 
+<CommandFlowFigure
+  title="CI/CD Git Optimization Flow"
+  caption="Git optimization strategies in CI: shallow clone reduces download, caching .git directory speeds up subsequent runs, partial clone fetches objects on demand."
+  inputsLabel="Full Clone"
+  inputs="Download full history (.git/)|Extract all objects|Build workspace"
+  commandLabel="CI Optimization"
+  outputsLabel="Optimization Result"
+  outputs="--depth 1 shallow clone|Cache .git directory|Partial clone on-demand|Only pull changed files"
+  note="CI/CD usually only needs latest code, not full history. Shallow clone can reduce download time by 80-95%."
+
+
 In CI/CD pipelines, Git clone and checkout are often among the most time-consuming steps, especially for large repositories. Through shallow clone, caching, partial clone, and other strategies, you can reduce Git operation time from minutes to seconds.
 
 ## Why Git operations are slow in CI/CD

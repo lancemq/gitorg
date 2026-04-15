@@ -15,7 +15,16 @@ export const metadata = {
 
 ## 为什么不要把所有工作都堆在一个长期分支上
 
-主题分支的核心价值不是“分支多一点更专业”，而是把工作边界和历史边界对齐。你在做登录校验、导航修复、发布文档时，其实应该拥有三段不同的历史，而不是一条混在一起的提交串。
+<CommitGraphFigure
+  title="主题分支工作流"
+  caption="主题分支是为单一功能或任务创建的短生命周期分支。完成后合并到主线并删除，保持仓库整洁。"
+  linearLabel="main 主线"
+  mergeLabel="feature/auth 合并回主线"
+  rewriteLabel="合并后删除分支"
+  pointerLabel="分支生命周期"
+/>
+
+很多团队习惯性地
 
 ## 1. 每项工作一个分支
 

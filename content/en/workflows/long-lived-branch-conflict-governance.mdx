@@ -15,6 +15,17 @@ export const metadata = {
 
 ## Why this deserves its own workflow
 
+<CommandFlowFigure
+  title="Conflict Governance Flow"
+  caption="Upgrade conflict handling from firefighting to governable process: regular sync reduces conflicts, identify conflict hotspots, reuse resolved conflicts with rerere."
+  inputsLabel="Conflict Scenarios"
+  inputs="Long-lived branch syncs main|Frequent rebase produces same conflicts|Multiple developers modify same area"
+  commandLabel="Conflict Governance"
+  outputsLabel="Governance Result"
+  outputs="Regular sync → fewer conflicts|Identify hotspots → prioritize architecture fixes|rerere → auto-reuse resolutions"
+  note="rerere (reuse recorded resolution) records conflict solutions and auto-applies them next time the same conflict occurs."
+
+
 Long-lived branches do not just "have conflicts." They tend to produce recurring, predictable, high-cost conflict zones.
 
 The real upgrade is moving from repeated firefighting to deliberate governance.

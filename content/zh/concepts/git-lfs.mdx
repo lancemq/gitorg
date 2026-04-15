@@ -56,6 +56,17 @@ size 123456789
 
 3. 当你 checkout 或 clone 时，Git LFS 会下载指针指向的实际文件，替换指针文件
 
+<CommandFlowFigure
+  title="Git LFS 的工作流程"
+  caption="LFS 追踪的文件在提交时被替换为指针文件上传到仓库，实际文件内容上传到 LFS 服务器。clone 或 checkout 时，LFS 自动下载实际文件替换指针。"
+  inputsLabel="被追踪的大文件"
+  inputs="model.pt (500MB)|dataset.csv (1GB)|video.mp4 (200MB)|image.psd (50MB)"
+  commandLabel="git lfs track + commit"
+  outputsLabel="存储结果"
+  outputs="仓库中 → 指针文件 (几十字节)|LFS 服务器 → 实际文件 (原大小)|clone 时 → 按需下载实际文件"
+  note="仓库体积从 500MB×10 次 = 5GB 缩小到 几十字节×10 次 + 按需下载。"
+/>
+
 ### 架构概览
 
 ```

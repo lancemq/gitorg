@@ -14,6 +14,17 @@ export const metadata = {
 
 ## Why release-time Git mistakes are expensive
 
+<CommandFlowFigure
+  title="Release Hygiene Practices"
+  caption="Release hygiene ensures each release is traceable, repeatable, and rollbackable. Includes version management, tag standards, changelog maintenance and release verification."
+  inputsLabel="Release Prep"
+  inputs="Code frozen|Tests passed|Changelog pending|Version to bump"
+  commandLabel="Release Flow"
+  outputsLabel="Clean Release"
+  outputs="SemVer vX.Y.Z|Annotated tag + signature|Changelog grouped by version|Post-release verification checklist"
+  note="Release hygiene is not process burden — it's quality assurance. Every release should be a trustworthy event."
+
+
 A little Git ambiguity during development becomes much more costly at release time. A mistargeted tag, a release from the wrong branch, or a dirty working tree can make future version tracking much harder.
 
 Release hygiene is really about making one thing crystal clear: which exact history produced this release.

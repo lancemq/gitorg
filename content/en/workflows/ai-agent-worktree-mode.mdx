@@ -26,6 +26,17 @@ At that point, `stash + switch` tends to become fragile. `git worktree` is usual
 
 ## Why worktree fits AI agents especially well
 
+<CommandFlowFigure
+  title="AI Agent + Worktree Parallel Mode"
+  caption="Each worktree corresponds to an independent branch and Agent task, avoiding context pollution. One worktree handles bug fix, another continues feature development."
+  inputsLabel="Multi-task Scenarios"
+  inputs="Bug fix task|Feature A development|Code review changes|Agent experiments"
+  commandLabel="git worktree management"
+  outputsLabel="Independent Workspaces"
+  outputs="wt-bugfix/ → fix/login-timeout|wt-feature/ → feature/ai-integration|wt-review/ → review/comments|Each worktree: independent branch, independent context"
+  note="AI agent runs in worktree without interfering with your main workspace. Delete worktree when task is done."
+
+
 AI agents tend to:
 
 - switch tasks frequently

@@ -15,6 +15,17 @@ export const metadata = {
 
 ## Why a push checklist reduces incidents
 
+<CommandFlowFigure
+  title="Safe Push Flow"
+  caption="Before push: confirm accurate messages, no surprise diffs, tests pass, no secrets leaked. After push: verify remote state."
+  inputsLabel="Local Commits"
+  inputs="git log confirm commits|git diff --staged check content|git status confirm clean"
+  commandLabel="Safe Push"
+  outputsLabel="Push to Remote"
+  outputs="git push --dry-run → preflight|git push → actual push|git log origin/main → confirm remote"
+  note="Push is irreversible (unless force push). Last check before push is your final opportunity."
+
+
 A lot of Git problems do not come from lacking commands. They come from publishing history too early, without a final inspection. Review-ready history is just a lightweight quality gate before that history leaves your branch.
 
 ## 1. Clean up the stack before review

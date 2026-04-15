@@ -22,6 +22,17 @@ The names look similar, but they play very different roles in Git's sync model.
 
 ## Why Git keeps them separate
 
+<RefsHeadFigure
+  title="Local Branch vs Remote-Tracking Ref"
+  caption="main is your local branch that you can freely commit to and switch. origin/main is a snapshot of the remote state that only updates on fetch. They can diverge."
+  headLabel="Normal state (main = origin/main)"
+  branchLabel="main → local commit F"
+  tagLabel="origin/main → remote commit D"
+  remoteLabel="Remote snapshot"
+  detachedLabel="Diverged state"
+/>
+
+
 If Git directly rewrote your local working branch every time it learned something new from the remote, it would be much harder to:
 
 - inspect upstream changes first

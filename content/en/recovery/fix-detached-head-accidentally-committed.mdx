@@ -15,6 +15,17 @@ export const metadata = {
 
 ## The short version
 
+<RefsHeadFigure
+  title="Commits Made in Detached HEAD"
+  caption="After creating commits in detached HEAD, new commits have no branch name catching them. Create a new branch or merge into an existing branch to safely preserve these commits."
+  headLabel="Normal branch state"
+  branchLabel="HEAD → main → ongoing commits"
+  tagLabel="tag: v1.0 → fixed commit"
+  remoteLabel="origin/main → remote snapshot"
+  detachedLabel="Detached HEAD + new commits"
+/>
+
+
 Detached HEAD means HEAD points directly to a commit rather than to a branch name. Commits made in this state don't automatically belong to any branch, but the commits themselves aren't lost — you just need to create a branch to "catch" them.
 
 ## What is detached HEAD

@@ -46,6 +46,15 @@ git clone --depth 1 https://github.com/torvalds/linux.git
 | 可用功能 | 全部 | 部分受限 |
 | 适用场景 | 日常开发 | CI/CD、代码审查、快速查看 |
 
+<CommitGraphFigure
+  title="完整历史 vs 浅克隆历史"
+  caption="完整克隆下载从 root commit 到最新提交的全部历史。浅克隆只下载最近 N 次提交，更早的提交被截断（shallow boundary），本地无法访问。"
+  linearLabel="完整历史（A→B→C→D→E→F→G→H）"
+  mergeLabel="浅克隆 --depth 3（仅 F→G→H）"
+  rewriteLabel="浅克隆 --depth 1（仅 H）"
+  pointerLabel="shallow boundary 截断点"
+/>
+
 ## 基本操作
 
 ### 浅克隆

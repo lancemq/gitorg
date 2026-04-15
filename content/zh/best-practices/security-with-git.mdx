@@ -15,7 +15,18 @@ export const metadata = {
 
 ## 一句话理解
 
-Git 的历史是不可变的——一旦敏感信息（密码、密钥、Token）被提交，即使后来删除，它仍然存在于历史记录中。因此，预防敏感信息泄露和正确处理泄露事件是 Git 安全的核心。
+<CommandFlowFigure
+  title="Git 安全实践"
+  caption="Git 安全包括：不提交敏感信息、使用 GPG 签名提交、配置正确的 .gitignore、定期扫描历史中的泄露。"
+  inputsLabel="安全隐患"
+  inputs="API 密钥硬编码|密码写在配置中|SSH 私钥被提交|个人信息泄露"
+  commandLabel="安全防护"
+  outputsLabel="安全实践"
+  outputs=".gitignore 排除敏感文件|GPG 签名验证提交身份|git-secrets 扫描泄露|BFG 清理历史"
+  note="一旦敏感信息被提交到 Git 历史，即使后来删除，它仍然存在于历史中。预防胜于治疗。"
+/>
+
+Git 安全问题通常不是因为黑客多厉害，
 
 ## 敏感信息误提交后的处理
 

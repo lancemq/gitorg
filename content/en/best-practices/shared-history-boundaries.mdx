@@ -15,6 +15,15 @@ export const metadata = {
 
 ## Why this matters more than memorizing commands
 
+<CommitGraphFigure
+  title="Shared History Boundaries"
+  caption="Once commits are pushed to shared remote, they become team's shared history. Should not rewrite this part. Local cleanup can happen before push."
+  linearLabel="Local history (safe to rewrite)"
+  mergeLabel="Pushed history (should not rewrite)"
+  rewriteLabel="Team shared history (no force push)"
+  pointerLabel="Push boundary"
+
+
 The biggest danger is rarely a single command. The bigger issue is using a history-rewriting command on the wrong kind of history. `commit --amend`, `rebase -i`, `reset --soft`, and force-push can all be useful, but the risk changes completely once others may depend on that history.
 
 ## 1. A practical classification

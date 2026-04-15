@@ -15,7 +15,15 @@ export const metadata = {
 
 对象“还在仓库里”和“你还容易找到它”不是一回事。
 
-## 先把“可达”理解成什么
+## 先把"可达"理解成什么
+
+<ReflogFigure
+  title="对象可达性与垃圾回收"
+  caption="只要对象还能从分支、tag 或 reflog 等入口追踪到，它就是可达的。失去引用的对象会成为 unreachable 对象，最终被 gc 清理。"
+  historyLabel="历史引用链"
+  rescueLabel="救援入口"
+  nowLabel="当前 HEAD"
+/>
 
 Git 内部保存的是对象：blob、tree、commit、tag。  
 这些对象不是平铺地放在那里，而是通过引用和对象之间的指向关系串起来。

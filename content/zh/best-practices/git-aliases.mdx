@@ -14,7 +14,18 @@ export const metadata = {
 
 ## 一句话理解
 
-Git 别名让你用简短的命令替代冗长的原生命令，大幅提升日常操作效率。通过 `git config alias.xxx` 配置，支持简单参数替换和复杂 Shell 脚本执行。
+<CommandFlowFigure
+  title="Git 别名体系"
+  caption="通过别名简化常用命令，统一团队操作习惯，减少输入错误。别名应该是自解释的，而不是更短的缩写。"
+  inputsLabel="常用命令"
+  inputs="git status|git log --oneline --graph|git branch --merged|git diff --staged"
+  commandLabel="别名简化"
+  outputsLabel="快捷命令"
+  outputs="git s → status|git lg → log --oneline --graph|git bm → branch --merged|git ds → diff --staged"
+  note="别名应该让常用操作更快，但不要牺牲可读性。团队可以共享一套别名配置。"
+/>
+
+Git 别名就是把你经常使用的完整命令，
 
 ## 什么是 Git 别名
 

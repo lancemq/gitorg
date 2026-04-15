@@ -15,6 +15,16 @@ export const metadata = {
 
 ## First, identify what you actually lost
 
+<ResetFigure
+  title="Reset Three-Layer Impact and Recovery"
+  caption="git reset affects HEAD, index, and working tree simultaneously. soft moves HEAD only, mixed also resets index, hard also overwrites working tree files. Reflog can find the pre-reset position."
+  layersLabel="Impact layer"
+  softLabel="--soft"
+  mixedLabel="--mixed"
+  hardLabel="--hard"
+/>
+
+
 `git reset` is scary because it may affect three different layers:
 
 - where the branch and `HEAD` point

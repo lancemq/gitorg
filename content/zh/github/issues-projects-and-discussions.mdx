@@ -15,7 +15,18 @@ export const metadata = {
 
 ## 为什么不能把所有协作都塞进 PR
 
-很多团队一开始使用 GitHub 时，会自然把 Pull Request 当成所有讨论的中心。  
+<CommandFlowFigure
+  title="GitHub Issue 管理流程"
+  caption="Issue 用于跟踪 bug、功能请求和任务。通过 Labels 分类、Milestones 分组、Assignees 分配负责人、Projects 管理进度。"
+  inputsLabel="问题发现"
+  inputs="Bug 报告|功能请求|改进建议|任务跟踪"
+  commandLabel="Issue 管理"
+  outputsLabel="问题解决"
+  outputs="Labels 分类优先级|Assignees 分配负责人|Milestone 关联版本|Projects 跟踪进度"
+  note="好的 Issue 应该包含：清晰的描述、复现步骤、预期行为、实际行为、环境信息。"
+/>
+
+很多团队的沟通都集中在 PR 评论里，
 但真正成熟的协作不会只靠 PR，因为有很多话题其实不属于“这次代码改了什么”，比如：
 
 - 需求讨论

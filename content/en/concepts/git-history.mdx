@@ -2,7 +2,7 @@ export const metadata = {
   title: "Git History Explained",
   slug: "git-history",
   locale: "en",
-  section: "internals",
+  section: "concepts",
   summary: "Explains how Git records history, why commit history is a graph, and what that means for collaboration, recovery, and code review.",
   sourceUrls: [
     "https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History",
@@ -16,6 +16,17 @@ export const metadata = {
 ## The short version
 
 Git history is not just a text log. It is a directed graph of commit objects, where each commit records a project snapshot, author metadata, a message, and one or more parent commits.
+
+<CommitGraphFigure
+  title="Three Basic Shapes of Git History"
+  caption="Git history can be a simple linear chain, a merge structure with join points, or a rewritten sequence with new commit IDs. Understanding these three shapes is the foundation for all history operations."
+  linearLabel="Linear"
+  mergeLabel="Merge"
+  rewriteLabel="Rewritten"
+  pointerLabel="Branch points to"
+/>
+
+The key thing to see in this figure is not the letters themselves, but the three different history shapes: **linear** (one parent per commit), **merge** (a join point with two parents), and **rewritten** (original commits replaced by new IDs).
 
 ## Why this matters
 

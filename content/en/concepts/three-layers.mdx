@@ -1,0 +1,210 @@
+export const metadata = {
+  title: "Git's Three-Layer Model: Working Tree, Index, and Objects",
+  slug: "three-layers",
+  locale: "en",
+  section: "concepts",
+  summary: "Explain Git's core three-layer architecture — Working Tree, Index (Staging Area), and Objects Database — and how they work together.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F",
+    "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+    "https://git-scm.com/book/en/v2/Git-Internals-Git-Objects",
+  ],
+};
+
+# Git's Three-Layer Model: Working Tree, Index, and Objects
+
+## In One Sentence
+
+Git is not a "file management system" — it's a **three-layer snapshot engine**: you edit files in the working tree, prepare snapshots through the index, and finally commit into the objects database to form permanent history.
+
+<ThreeLayersFigure
+  title="Git's Three-Layer Data Flow"
+  caption="Files in the working tree enter the index via git add, then flow into the objects database via git commit. At any point you can restore the working tree from the index, or restore from the objects database."
+  worktreeLabel="Working Tree"
+  indexLabel="Index"
+  objectsLabel="Objects DB"
+  addLabel="git add →"
+  commitLabel="git commit →"
+  restoreLabel="← git restore / git checkout"
+/>
+
+Understanding the relationship between these three layers is the key to mastering all Git commands. Many "why isn't my change in the commit?" questions fundamentally stem from confusion about the boundaries between these layers.
+
+## Layer 1: Working Tree
+
+The working tree is the set of project files you can **see and touch** — the files you open, edit, and save in your editor.
+
+### Characteristics of the Working Tree
+
+- These are actual files on your disk
+- You can modify them with any editor
+- Git does **not automatically track** these changes
+- `git status` shows which files have been modified in the working tree
+
+### Example
+
+```bash
+# See what's changed in the working tree
+git status
+
+# See the actual content of changes
+git diff
+```
+
+When you modify a file but haven't done any Git operations yet, that change exists only in the working tree.
+
+## Layer 2: Index (Staging Area)
+
+The index is a Git-specific concept — an **intermediate buffer** that lets you precisely control what goes into the next commit.
+
+### Characteristics of the Index
+
+- It's not a directory you can browse directly
+- It's stored in `.git/index` within your project
+- It is the **exact blueprint** for the next commit
+- You can modify the index repeatedly without affecting the working tree or history
+
+### Why the Index Exists
+
+Many version control systems don't have this concept — they only have "modify → commit" in two steps. Git introduces the index so you can do three important things before committing:
+
+1. **Split one messy work session into multiple logical commits**: separate bug fixes from refactoring
+2. **Review what's about to enter history**: use `git diff --staged` for a final check
+3. **Hold experimental changes back**: some changes are still being tested and shouldn't mix with the formal commit
+
+### Example
+
+```bash
+# Add changes to the index
+git add src/login.ts
+
+# Interactively choose changes by hunk
+git add --patch
+
+# See what's in the index
+git diff --staged
+
+# Unstage something
+git restore --staged src/login.ts
+```
+
+## Layer 3: Objects Database
+
+The objects database is Git's **permanent history storage**, located in the `.git/objects/` directory. Once content is written here, it stays until garbage collection removes it.
+
+### Characteristics of the Objects Database
+
+- Stored in `.git/objects/`
+- Content is organized by SHA hash — identical content is stored only once
+- Contains three object types: blob (file content), tree (directory structure), commit (commit record)
+- **Immutable after writing** — you cannot modify an existing object
+
+### Three Object Types
+
+| Type | Purpose | Analogy |
+|------|---------|---------|
+| blob | Stores file content (without filename) | "The content itself" of a file |
+| tree | Stores directory structure and filenames | "The directory listing" of a folder |
+| commit | Stores message, author, parent(s), points to a tree | A "commit record" |
+
+### Example
+
+```bash
+# View objects in the database
+git cat-file -p HEAD^{tree}
+
+# View content of a specific blob
+git cat-file -p <blob-hash>
+
+# Check an object's type
+git cat-file -t <hash>
+```
+
+## Data Flow Between the Three Layers
+
+Understanding the three-layer model means understanding how data flows between them:
+
+```
+Working Tree ──git add──→ Index ──git commit──→ Objects DB
+     ↑                      ↓                       ↓
+     └──git restore────────┘                       │
+     └──git checkout / git restore─────────────────┘
+```
+
+### Top-to-Bottom (Forward Flow)
+
+1. **Edit files** → changes exist only in the working tree
+2. **git add** → selected changes are copied into the index
+3. **git commit** → the index snapshot is written into the objects database
+
+### Bottom-to-Top (Restore Flow)
+
+1. **git restore <file>** → overwrite working tree with index content
+2. **git checkout <commit> -- <file>** → overwrite working tree with a version from the objects database
+3. **git reset HEAD** → clear the index without changing the working tree
+
+## Understanding Common Commands Through the Three-Layer Model
+
+### What git status Tells You
+
+`git status` output is essentially comparing differences between these three layers:
+
+- "Changes not staged for commit" → differences between working tree and index
+- "Changes to be committed" → differences between index and latest commit
+- "Untracked files" → files in the working tree that Git isn't managing at all
+
+### Three Modes of git diff
+
+```bash
+# Working tree vs index (default)
+git diff
+
+# Index vs latest commit
+git diff --staged
+
+# Working tree vs latest commit (skip the index)
+git diff HEAD
+```
+
+### Three-Layer Impact of git reset
+
+| Mode | HEAD | Index | Working Tree |
+|------|------|-------|-------------|
+| `--soft` | Moves | Unchanged | Unchanged |
+| `--mixed` (default) | Moves | Resets | Unchanged |
+| `--hard` | Moves | Resets | Resets |
+
+## Common Misconceptions
+
+### "I changed the file, why isn't it in the commit?"
+
+Because you only modified the working tree — you haven't `git add`'d the changes into the index yet.
+
+### "I already added it, why aren't my later changes included?"
+
+`git add` only puts the snapshot **at that moment** into the index. New changes you make to the working tree afterwards need another `git add`.
+
+### "What's wrong with git add .?"
+
+It adds **all** changes in the working tree to the index, including debug code and temporary logs you're not ready to commit. A safer approach is to specify files explicitly or use `--patch`.
+
+## A Practical Mental Model
+
+Think of Git like taking photos:
+
+- **Working tree** = you're arranging the scene
+- **git add** = you're framing the shot through the viewfinder
+- **git commit** = pressing the shutter, the photo goes into the album
+- **git diff** = comparing the current scene with the last photo
+- **git restore** = resetting the scene to match the last photo
+
+This model helps you remember: the index is your "final checkpoint" before committing, not an "auto-save."
+
+## Continue Learning
+
+After understanding the three-layer model, continue with:
+
+1. `git add` — how to precisely control staged content
+2. `git commit` — how to turn an index snapshot into permanent history
+3. `git diff` — how to compare differences between layers
+4. `Git Internal Objects` — detailed structure of blob, tree, and commit

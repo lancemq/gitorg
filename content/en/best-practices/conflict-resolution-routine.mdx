@@ -14,6 +14,14 @@ export const metadata = {
 
 ## Why conflict handling breaks down under pressure
 
+<MergeFigure
+  title="Standard Conflict Resolution Flow"
+  caption="Establish fixed conflict resolution flow: identify conflicted files, understand cause, communicate with developers, resolve, run tests to verify."
+  beforeLabel="Before merge (separate changes)"
+  afterLabel="After conflict resolution"
+  modeLabel="Standard flow: identify → understand → communicate → resolve → verify"
+
+
 Conflicts are rarely dangerous because the commands are mysterious. They become dangerous because people improvise: edit files first, guess later, and eventually lose track of whether they are in merge, rebase, or cherry-pick.
 
 The fix is not more panic-driven command memorization. The fix is a routine.

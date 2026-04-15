@@ -18,6 +18,17 @@ Git hooks are **scripts** that run automatically when specific Git events occur.
 
 Hook scripts can be written in any scripting language — Bash, Python, Ruby, Node.js, or any executable — as long as they have a proper shebang line (e.g., `#!/bin/bash`) and the executable bit set.
 
+<CommandFlowFigure
+  title="Hook Trigger Mechanism"
+  caption="Git automatically detects and runs the corresponding hook scripts at key operation points. Pre-* hooks that return a non-zero exit code will interrupt the entire Git operation."
+  inputsLabel="Trigger Events"
+  inputs="git commit|git merge|git push|git checkout|git rebase"
+  commandLabel="Git Auto-Detects"
+  outputsLabel="Execution Result"
+  outputs="Check passes → continue|Check fails → abort|Post-action → notify/cleanup"
+  note="Each hook corresponds to a script file in .git/hooks/. Remove the .sample suffix to enable it."
+/>
+
 ## Hook Location
 
 Git hooks live in the `.git/hooks/` directory of your repository:

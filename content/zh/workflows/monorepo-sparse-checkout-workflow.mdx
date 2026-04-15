@@ -22,6 +22,17 @@ monorepo 最常见的问题不是 Git 失效，而是工作范围太大。
 
 ## 一个常见场景
 
+<CommandFlowFigure
+  title="Monorepo 稀疏检出 + Worktree"
+  caption="在 monorepo 中，sparse-checkout 限定检出的目录范围，worktree 提供并行工作空间。两者结合大幅降低上下文负担。"
+  inputsLabel="完整 Monorepo"
+  inputs="packages/frontend/|packages/backend/|packages/shared/|docs/|infra/"
+  commandLabel="sparse-checkout + worktree"
+  outputsLabel="限定工作空间"
+  outputs="wt-frontend/ → 只检出 frontend + shared|wt-backend/ → 只检出 backend + shared|每个 worktree 只包含相关目录"
+  note="cone 模式下 sparse-checkout 性能更好。配合 worktree 实现真正的并行 monorepo 开发。"
+
+
 你只改前端应用，但仓库里还有后端、脚本、基础设施和大量共享包。  
 如果每次都把整棵树都拉起来，成本会很高。
 

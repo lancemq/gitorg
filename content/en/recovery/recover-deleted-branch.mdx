@@ -13,7 +13,15 @@ export const metadata = {
 
 # Recover a deleted branch
 
-## Do not confuse “the branch name is gone” with “the commits are gone”
+## Do not confuse "the branch name is gone" with "the commits are gone"
+
+<ReflogFigure
+  title="Recovering Deleted Branch via Reflog"
+  caption="Deleting a branch only removes the branch name — underlying commits usually still exist. Use reflog to find where the branch pointed before deletion, then recreate it with git branch."
+  historyLabel="Reflog history"
+  rescueLabel="Create rescue branch"
+  nowLabel="Current HEAD position"
+/>
 
 Deleting a branch usually removes a name first, not necessarily the underlying commits.  
 If another ref, reflog entry, or recent history still points near those commits, recovery is often straightforward.

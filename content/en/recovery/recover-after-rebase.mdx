@@ -15,6 +15,15 @@ export const metadata = {
 
 ## The main mistake is usually continuing blindly
 
+<RebaseFigure
+  title="Rebase Recovery Strategy"
+  caption="Rebase rewrites commit history, producing new-ID commits. Old commits do not disappear immediately — reflog can show the pre-rebase state, and --abort can be used mid-process."
+  beforeLabel="Before rebase (safe state)"
+  afterLabel="After rebase (may be problematic)"
+  modeLabel="Recover: git reflog / git branch rescue"
+/>
+
+
 When people see conflicts, strange ordering, or “missing” commits after a rebase, they often respond by trying more rebase, reset, and checkout commands in panic.  
 The safer move is to stop and preserve the last trustworthy state first.
 

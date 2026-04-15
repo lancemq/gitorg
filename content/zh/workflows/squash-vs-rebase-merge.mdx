@@ -15,6 +15,14 @@ export const metadata = {
 
 ## 为什么这个选择值得单独讨论
 
+<MergeFigure
+  title="Squash Merge vs Rebase Merge"
+  caption="Squash merge 将所有提交压缩为一个，历史简洁但丢失提交细节。Rebase merge 保持线性历史且保留每个提交，但会改变提交 ID。"
+  beforeLabel="功能分支 (多个提交)"
+  afterLabel="合并到主线后"
+  modeLabel="squash merge → 单个提交"
+
+
 很多团队真正卡住的不是“能不能合并”，而是“合并后历史要长成什么样”。
 
 `squash merge` 和 `rebase merge` 都能让主线保持相对线性，但它们保留的信息完全不同：

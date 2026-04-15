@@ -25,6 +25,17 @@ export const metadata = {
 - **保护敏感信息**：`.env`、密钥文件等不应出现在版本历史中
 - **加速操作**：Git 不需要扫描大量无关文件，`status`、`diff` 等命令更快
 
+<CommandFlowFigure
+  title=".gitignore 的匹配流程"
+  caption="Git 对工作区的每个未跟踪文件按 .gitignore 规则逐行匹配，最后一条匹配的规则决定是否忽略该文件。"
+  inputsLabel="工作区文件"
+  inputs="src/index.js|node_modules/|.env|build/output.js|.DS_Store"
+  commandLabel=".gitignore 匹配"
+  outputsLabel="匹配结果"
+  outputs="✅ src/index.js → 被跟踪|❌ node_modules/ → 被忽略|❌ .env → 被忽略|❌ build/ → 被忽略|❌ .DS_Store → 被忽略"
+  note="最后一条匹配的规则生效。取反规则 ! 只对被忽略过的文件有效。"
+/>
+
 ## .gitignore 规则语法
 
 `.gitignore` 使用 glob 模式匹配文件路径。以下是核心语法规则：

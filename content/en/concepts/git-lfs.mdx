@@ -56,6 +56,17 @@ Git LFS:
 
 The pointer file is tiny (~130 bytes), so the Git repository stays small regardless of how many large files it references.
 
+<CommandFlowFigure
+  title="Git LFS Workflow"
+  caption="LFS-tracked files are replaced with pointer files in the repository during commit, while actual file content is uploaded to the LFS server. On clone or checkout, LFS automatically downloads the real files to replace pointers."
+  inputsLabel="Tracked Large Files"
+  inputs="model.pt (500MB)|dataset.csv (1GB)|video.mp4 (200MB)|image.psd (50MB)"
+  commandLabel="git lfs track + commit"
+  outputsLabel="Storage Result"
+  outputs="Repository → pointer files (~130 bytes each)|LFS server → actual files (original size)|On clone → download actual files on demand"
+  note="Repository size drops from 500MB × 10 = 5GB to ~130 bytes × 10 + on-demand downloads."
+/>
+
 ## Installation
 
 ### macOS

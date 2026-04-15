@@ -12,9 +12,18 @@ export const metadata = {
 
 # 小步提交与主题分支整洁度
 
-## 为什么“提交小一点”不是形式主义
+## 为什么"提交小一点"不是形式主义
 
-小步提交真正带来的收益不是历史看起来漂亮，而是三个更现实的结果：
+<CommitGraphFigure
+  title="聚焦提交与主题分支"
+  caption="每个提交聚焦单一意图，每个主题分支聚焦单一功能。提交是微观的原子，分支是宏观的主题。"
+  linearLabel="短生命周期分支 (< 2 天)"
+  mergeLabel="定期 rebase 同步主线"
+  rewriteLabel="提交前：git diff --staged 确认"
+  pointerLabel="主题分支"
+/>
+
+很多人觉得提交拆细是"高级技巧"，
 
 - reviewer 更容易理解每一步为什么存在
 - 你自己更容易在 rebase 时整理历史

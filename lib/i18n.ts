@@ -176,6 +176,7 @@ export type LearningPathSlug =
   | "first-feature-branch";
 
 export type ConceptsSlug =
+  | "three-layers"
   | "git-history"
   | "git-ignore"
   | "git-attributes"
@@ -737,6 +738,7 @@ export const recoverySlugs = [
 ] as const satisfies readonly RecoverySlug[];
 
 export const conceptSlugs = [
+  "three-layers",
   "git-history",
   "git-ignore",
   "git-attributes",
