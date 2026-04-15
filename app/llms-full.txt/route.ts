@@ -1,4 +1,4 @@
-import { getAllDocs, getDocHref } from "@/lib/content";
+import { getAllDocMetadata, getDocHref } from "@/lib/content";
 import { locales } from "@/lib/i18n";
 import { getSiteUrl } from "@/lib/site";
 
@@ -9,7 +9,7 @@ export async function GET() {
   const localizedDocs = await Promise.all(
     locales.map(async (locale) => ({
       locale,
-      docs: await getAllDocs(locale),
+      docs: await getAllDocMetadata(locale),
     })),
   );
 

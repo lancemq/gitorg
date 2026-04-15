@@ -952,6 +952,11 @@ function extractMetadataField(source: string, key: keyof Omit<DocMetadata, "sour
   return match?.[1];
 }
 
+function extractMetadataSourceUrls(source: string) {
+  const sourceUrlsBlock = source.match(/sourceUrls:\s*\[([\s\S]*?)\]/)?.[1] ?? "";
+  return Array.from(sourceUrlsBlock.matchAll(/"([^"]+)"/g), (match) => match[1]);
+}
+
 async function readDocMetadata(locale: Locale, docPath: DocPath): Promise<DocMetadata> {
   const absolutePath = getDocAbsolutePath(locale, docPath);
   const source = await readFile(absolutePath, "utf8");
@@ -971,7 +976,7 @@ async function readDocMetadata(locale: Locale, docPath: DocPath): Promise<DocMet
     locale,
     summary,
     section,
-    sourceUrls: [],
+    sourceUrls: extractMetadataSourceUrls(metadataBlock),
   };
 }
 
@@ -1009,6 +1014,10 @@ export async function getAllDocs(locale: Locale) {
   const docs = await Promise.all(indexedDocs.map(async ({ path: docPath }) => getDocByPath(locale, docPath)));
 
   return docs;
+}
+
+export async function getAllDocMetadata(locale: Locale) {
+  return getIndexedDocs(locale);
 }
 
 function toDocCard(locale: Locale, doc: Awaited<ReturnType<typeof getDocByPath>>): DocCard {
@@ -1085,10 +1094,12 @@ function sortBySeriesOrder<T extends { path: DocPath }>(docs: T[]) {
 
 function sortByTierAndSeriesOrder<T extends { path: DocPath }>(docs: T[]) {
   const ordered = sortBySeriesOrder(docs);
+  const order = new Map(ordered.map((doc, index) => [doc.path, index]));
+
   return [...ordered].sort(
     (a, b) =>
       tierRank[getDocTier(a.path)] - tierRank[getDocTier(b.path)] ||
-      ordered.findIndex((doc) => doc.path === a.path) - ordered.findIndex((doc) => doc.path === b.path),
+      (order.get(a.path) ?? Number.MAX_SAFE_INTEGER) - (order.get(b.path) ?? Number.MAX_SAFE_INTEGER),
   );
 }
 
