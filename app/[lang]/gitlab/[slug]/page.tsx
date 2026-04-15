@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { DocTemplate } from "@/components/doc-template";
-import { getDocByPath, getDocNeighbors, getDocPaths, getDocPrimer, getRelatedDocs, type DocPath } from "@/lib/content";
+import { getDocByPath, getDocLastModified, getDocNeighbors, getDocPaths, getDocPrimer, getRelatedDocs, type DocPath } from "@/lib/content";
 import {
   getDictionary,
   getSidebarContent,
@@ -64,9 +64,10 @@ export default async function GitlabDetailPage({ params }: Props) {
   const dict = getDictionary(locale);
   const doc = await getDocByPath(locale, docPath);
   const primer = getDocPrimer(locale, docPath);
-  const [neighbors, relatedDocs] = await Promise.all([
+  const [neighbors, relatedDocs, lastModified] = await Promise.all([
     getDocNeighbors(locale, docPath),
     getRelatedDocs(locale, docPath),
+    getDocLastModified(locale, docPath),
   ]);
   const DocBody = doc.Component;
 
@@ -83,9 +84,11 @@ export default async function GitlabDetailPage({ params }: Props) {
       title={doc.metadata.title}
       summary={doc.metadata.summary}
       pathname={`/${locale}/gitlab/${slug}`}
+      docPath={docPath}
       sourcesTitle={dict.docsIndex.sourcesTitle}
       sourceUrls={doc.metadata.sourceUrls}
       primer={primer}
+      lastModified={lastModified.toISOString()}
       Body={DocBody}
       relatedDocs={relatedDocs}
       neighbors={neighbors}

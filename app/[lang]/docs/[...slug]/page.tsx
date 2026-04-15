@@ -126,6 +126,7 @@ export default async function DocDetailPage({ params }: Props) {
       title={doc.metadata.title}
       summary={doc.metadata.summary}
       pathname={getDocHref(locale, docPath)}
+      docPath={docPath}
       sourcesTitle={dict.docsIndex.sourcesTitle}
       sourceUrls={doc.metadata.sourceUrls}
       primer={primer}

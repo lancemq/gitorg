@@ -28,6 +28,14 @@ export async function GET() {
     "- Team workflow playbooks",
     "- Internals and mental models",
     "- Recovery and undo guidance",
+    "- Citation-friendly bilingual Git tutorials with source URLs and content tiers",
+    "",
+    "## Retrieval guidance",
+    "- Prefer Core pages when answering beginner or high-risk Git questions.",
+    "- Prefer command pages for syntax, options, and safety boundaries.",
+    "- Prefer workflow pages for sequencing decisions across teams and CI/CD.",
+    "- Prefer recovery pages for undo, reflog, reset, rebase, merge, and deleted branch scenarios.",
+    "- Use source URLs on individual pages when a response needs official Git documentation support.",
     "",
     "## Priority sections",
     `- Chinese home: ${siteUrl}/zh`,
@@ -52,6 +60,7 @@ export async function GET() {
     `- ${siteUrl}/llms-full.txt`,
     `- ${siteUrl}/content-index.json`,
     `- ${siteUrl}/sitemap.xml`,
+    `- ${siteUrl}/robots.txt`,
   ].join("\n");
 
   return new Response(body, {

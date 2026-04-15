@@ -6,7 +6,7 @@ import { DocPrimer } from "@/components/doc-primer";
 import { DocSupport } from "@/components/doc-support";
 import { SiteShell } from "@/components/site-shell";
 import { buildBreadcrumbData, StructuredData } from "@/components/structured-data";
-import { getCommandDoc, getDocLastModified, getDocNeighbors, getDocPrimer, getRelatedDocs } from "@/lib/content";
+import { getCommandDoc, getDocLastModified, getDocNeighbors, getDocPrimer, getDocTier, getRelatedDocs } from "@/lib/content";
 import {
   commandSlugs,
   getDictionary,
@@ -18,6 +18,7 @@ import {
 } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo";
 import { getSiteUrl } from "@/lib/site";
+import { buildDocStructuredData } from "@/lib/structured-seo";
 
 type Props = {
   params: Promise<{
@@ -78,42 +79,27 @@ export default async function CommandPage({ params }: Props) {
   const primer = getDocPrimer(locale, docPath);
   const DocBody = doc.Component;
   const siteUrl = getSiteUrl();
-  const inLanguage = locale === "zh" ? "zh-CN" : "en";
   const pageUrl = `${siteUrl}/${locale}/commands/${commandSlug}`;
+  const breadcrumbLabels = [
+    dict.commandPage.breadcrumbs.overview,
+    dict.commandPage.breadcrumbs.commands,
+    doc.metadata.title,
+  ];
 
   return (
     <SiteShell locale={locale} sidebar={getSidebarContent(locale, { kind: "docs", activePath: `commands/${commandSlug}` })}>
       <StructuredData
         data={[
-          {
-            "@context": "https://schema.org",
-            "@type": "TechArticle",
-            headline: doc.metadata.title,
-            description: doc.metadata.summary,
-            inLanguage,
-            url: pageUrl,
-            mainEntityOfPage: pageUrl,
-            dateModified: lastModified.toISOString(),
-            image: `${siteUrl}/opengraph-image`,
-            author: {
-              "@type": "Organization",
-              name: "GitOrg Atlas",
-              url: siteUrl,
-            },
-            publisher: {
-              "@type": "Organization",
-              name: "GitOrg Atlas",
-              url: siteUrl,
-            },
-            isPartOf: {
-              "@type": "CollectionPage",
-              name: `${dict.commandPage.breadcrumbs.commands} | GitOrg Atlas`,
-              url: `${siteUrl}/${locale}/commands`,
-            },
-            citation: doc.metadata.sourceUrls,
-            keywords: ["Git", commandSlug, doc.metadata.title],
-            about: ["Git", commandSlug],
-          },
+          buildDocStructuredData({
+            locale,
+            metadata: doc.metadata,
+            docPath,
+            tier: getDocTier(docPath),
+            pageUrl,
+            siteUrl,
+            lastModified: lastModified.toISOString(),
+            breadcrumbs: breadcrumbLabels,
+          }),
           buildBreadcrumbData([
             {
               name: dict.commandPage.breadcrumbs.overview,

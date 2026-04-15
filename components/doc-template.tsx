@@ -5,8 +5,16 @@ import { DocPrimer } from "@/components/doc-primer";
 import { DocSupport } from "@/components/doc-support";
 import { SiteShell } from "@/components/site-shell";
 import { buildBreadcrumbData, StructuredData } from "@/components/structured-data";
+import { buildDocStructuredData } from "@/lib/structured-seo";
 import type { Locale, SidebarContent } from "@/lib/i18n";
-import type { DocCard, DocNeighbors, DocPrimer as DocPrimerType } from "@/lib/content";
+import {
+  getDocTier,
+  type DocCard,
+  type DocNeighbors,
+  type DocPath,
+  type DocPrimer as DocPrimerType,
+  type DocSection,
+} from "@/lib/content";
 import { getSiteUrl } from "@/lib/site";
 
 type DocTemplateProps = {
@@ -20,6 +28,7 @@ type DocTemplateProps = {
   title: string;
   summary: string;
   pathname: string;
+  docPath: DocPath;
   sourcesTitle: string;
   sourceUrls: string[];
   lastModified?: string;
@@ -38,6 +47,7 @@ export function DocTemplate({
   title,
   summary,
   pathname,
+  docPath,
   sourcesTitle,
   sourceUrls,
   lastModified,
@@ -48,45 +58,34 @@ export function DocTemplate({
   neighbors,
 }: DocTemplateProps) {
   const siteUrl = getSiteUrl();
-  const inLanguage = locale === "zh" ? "zh-CN" : "en";
   const breadcrumbItems = breadcrumbs.map((item) => ({
     name: item.label,
     url: `${siteUrl}${item.href ?? pathname}`,
   }));
+  const metadata = {
+    title,
+    slug: docPath.split("/").at(-1) ?? title,
+    locale,
+    summary,
+    section: docPath.split("/")[0] as DocSection,
+    sourceUrls,
+  };
 
   return (
     <SiteShell locale={locale} sidebar={sidebar}>
       <article className="doc-page">
         <StructuredData
           data={[
-            {
-              "@context": "https://schema.org",
-              "@type": "TechArticle",
-              headline: title,
-              description: summary,
-              inLanguage,
-              url: `${siteUrl}${pathname}`,
-              mainEntityOfPage: `${siteUrl}${pathname}`,
-              dateModified: lastModified,
-              image: `${siteUrl}/opengraph-image`,
-              author: {
-                "@type": "Organization",
-                name: "GitOrg Atlas",
-                url: siteUrl,
-              },
-              publisher: {
-                "@type": "Organization",
-                name: "GitOrg Atlas",
-                url: siteUrl,
-              },
-              isPartOf: {
-                "@type": "WebSite",
-                name: "GitOrg Atlas",
-                url: `${siteUrl}/${locale}`,
-              },
-              about: breadcrumbs.map((item) => item.label),
-              citation: sourceUrls,
-            },
+            buildDocStructuredData({
+              locale,
+              metadata,
+              docPath,
+              tier: getDocTier(docPath),
+              pageUrl: `${siteUrl}${pathname}`,
+              siteUrl,
+              lastModified,
+              breadcrumbs: breadcrumbs.map((item) => item.label),
+            }),
             buildBreadcrumbData(breadcrumbItems),
           ]}
         />

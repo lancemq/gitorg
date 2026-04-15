@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { DocTemplate } from "@/components/doc-template";
-import { getDocByPath, getDocNeighbors, getRelatedDocs } from "@/lib/content";
+import { getDocByPath, getDocLastModified, getDocNeighbors, getRelatedDocs } from "@/lib/content";
 import { getDictionary, getSidebarContent, isValidLocale, locales, type Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo";
 
@@ -44,9 +44,10 @@ export default async function GitHistoryPage({ params }: Props) {
   const locale = lang as Locale;
   const dict = getDictionary(locale);
   const doc = await getDocByPath(locale, "concepts/git-history");
-  const [neighbors, relatedDocs] = await Promise.all([
+  const [neighbors, relatedDocs, lastModified] = await Promise.all([
     getDocNeighbors(locale, "concepts/git-history"),
     getRelatedDocs(locale, "concepts/git-history"),
+    getDocLastModified(locale, "concepts/git-history"),
   ]);
   const DocBody = doc.Component;
 
@@ -62,8 +63,10 @@ export default async function GitHistoryPage({ params }: Props) {
       title={doc.metadata.title}
       summary={doc.metadata.summary}
       pathname={`/${locale}/history`}
+      docPath="concepts/git-history"
       sourcesTitle={dict.docsIndex.sourcesTitle}
       sourceUrls={doc.metadata.sourceUrls}
+      lastModified={lastModified.toISOString()}
       Body={DocBody}
       relatedDocs={relatedDocs}
       neighbors={neighbors}
