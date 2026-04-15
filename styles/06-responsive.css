@@ -1,0 +1,173 @@
+@media (max-width: 1120px) {
+  .doc-search {
+    top: 18px;
+    right: 18px;
+  }
+
+  .search-trigger-text {
+    display: none;
+  }
+
+  .search-overlay {
+    padding: 72px 16px 16px;
+  }
+
+  .shell,
+  .hero,
+  .command-hero,
+  .doc-primer,
+  .learning-path-head,
+  .two-column,
+  .dual-section,
+  .cta {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: relative;
+    height: auto;
+  }
+
+  .content {
+    padding-top: 0;
+  }
+
+  .sequence-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .history-figure,
+  .stash-figure,
+  .command-flow-figure,
+  .refs-figure,
+  .layers-figure {
+    grid-template-columns: 1fr;
+  }
+
+  .history-arrow,
+  .stash-arrow-group,
+  .command-flow-center,
+  .refs-divider,
+  .layers-arrow-stack {
+    justify-self: start;
+  }
+
+  .reset-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .commit-graph-figure,
+  .practice-lab-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 860px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    gap: 18px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .content {
+    padding: 20px;
+  }
+
+  .card-grid-three,
+  .meta-grid,
+  .learning-path-signals,
+  .learning-track-grid,
+  .channel-highlight-grid,
+  .docs-list,
+  .entry-tab-grid,
+  .doc-related-grid,
+  .repo-layout-figure,
+  .revision-range-figure,
+  .platform-hierarchy-figure {
+    grid-template-columns: 1fr;
+  }
+
+  .split-figure,
+  .transfer-figure,
+  .history-figure,
+  .layers-figure {
+    grid-template-columns: 1fr;
+  }
+
+  .split-figure-divider,
+  .transfer-center,
+  .history-arrow,
+  .layers-arrow-stack {
+    justify-self: start;
+  }
+
+  .entry-tab-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .entry-tab-copy {
+    padding-right: 0;
+  }
+
+  .entry-tab-intro {
+    max-width: none;
+  }
+
+  .entry-tab-bar {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .entry-tab-button {
+    flex: 1;
+  }
+
+  .learning-path-flow::before {
+    left: 20px;
+  }
+
+  .learning-path-step-card {
+    grid-template-columns: 40px minmax(0, 1fr);
+    padding: 0;
+  }
+
+  .learning-path-step-number {
+    min-height: 100%;
+    border-right: 1px solid rgba(17, 17, 17, 0.08);
+  }
+
+  .learning-path-step-copy {
+    padding: 14px 14px 14px 0;
+  }
+
+  .learning-path-step-head {
+    flex-direction: column;
+    align-items: start;
+    gap: 8px;
+  }
+
+  .learning-path-step-arrow {
+    display: none;
+  }
+
+  .learning-track-card {
+    padding: 16px;
+  }
+
+  .section-head {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  h1 {
+    font-size: 1.38rem;
+  }
+
+  h2 {
+    font-size: 1.02rem;
+  }
+}
