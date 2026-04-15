@@ -202,7 +202,8 @@ h3 {
 .side-card p,
 .cta p,
 .meta-card span,
-.note-card p {
+.note-card p,
+.entry-card p {
   margin: 0;
   color: var(--text-muted);
   line-height: 1.65;
@@ -581,12 +582,6 @@ h3 {
   margin: 0;
   max-width: 18ch;
   line-height: 1.35;
-}
-
-.entry-card p {
-  margin: 0;
-  color: var(--text-muted);
-  line-height: 1.65;
 }
 
 .section-latest .docs-card {

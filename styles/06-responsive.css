@@ -19,7 +19,16 @@
   .learning-path-head,
   .two-column,
   .dual-section,
-  .cta {
+  .cta,
+  .sequence-grid,
+  .history-figure,
+  .stash-figure,
+  .command-flow-figure,
+  .refs-figure,
+  .layers-figure,
+  .reset-grid,
+  .commit-graph-figure,
+  .practice-lab-grid {
     grid-template-columns: 1fr;
   }
 
@@ -32,33 +41,12 @@
     padding-top: 0;
   }
 
-  .sequence-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .history-figure,
-  .stash-figure,
-  .command-flow-figure,
-  .refs-figure,
-  .layers-figure {
-    grid-template-columns: 1fr;
-  }
-
   .history-arrow,
   .stash-arrow-group,
   .command-flow-center,
   .refs-divider,
   .layers-arrow-stack {
     justify-self: start;
-  }
-
-  .reset-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .commit-graph-figure,
-  .practice-lab-grid {
-    grid-template-columns: 1fr;
   }
 }
 
@@ -87,14 +75,12 @@
   .doc-related-grid,
   .repo-layout-figure,
   .revision-range-figure,
-  .platform-hierarchy-figure {
-    grid-template-columns: 1fr;
-  }
-
+  .platform-hierarchy-figure,
   .split-figure,
   .transfer-figure,
   .history-figure,
-  .layers-figure {
+  .layers-figure,
+  .entry-tab-panel {
     grid-template-columns: 1fr;
   }
 
@@ -103,10 +89,6 @@
   .history-arrow,
   .layers-arrow-stack {
     justify-self: start;
-  }
-
-  .entry-tab-panel {
-    grid-template-columns: 1fr;
   }
 
   .entry-tab-copy {

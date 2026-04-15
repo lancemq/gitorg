@@ -377,7 +377,10 @@
   align-items: center;
 }
 
-.history-lane {
+.history-lane,
+.history-branches,
+.gitflow-release-column,
+.commit-graph-merge {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -388,12 +391,6 @@
   font-size: 0.78rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-}
-
-.history-branches {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 }
 
 .history-branch {
@@ -670,7 +667,9 @@
   transform: translateX(-50%) rotate(45deg);
 }
 
-.transfer-figure {
+.transfer-figure,
+.command-flow-figure,
+.refs-figure {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   gap: 16px;
@@ -740,7 +739,13 @@
   gap: 16px;
 }
 
-.gitflow-lane {
+.gitflow-lane,
+.gitflow-support-card,
+.gitflow-release-card,
+.commit-graph-card,
+.refs-column,
+.layers-card,
+.practice-lab-card {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -786,17 +791,6 @@
   gap: 14px;
 }
 
-.gitflow-support-card,
-.gitflow-release-card {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  background: #fff;
-}
-
 .gitflow-support-card {
   min-height: 100%;
 }
@@ -822,12 +816,6 @@
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   gap: 16px;
   align-items: stretch;
-}
-
-.gitflow-release-column {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 }
 
 .gitflow-release-card-soft {
@@ -1001,13 +989,6 @@
   color: #8d4c00;
 }
 
-.command-flow-figure {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  gap: 16px;
-  align-items: center;
-}
-
 .command-flow-card {
   display: flex;
   flex-direction: column;
@@ -1083,19 +1064,6 @@
   gap: 14px;
 }
 
-.commit-graph-card,
-.refs-column,
-.layers-card,
-.practice-lab-card {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  background: #fff;
-}
-
 .practice-lab-card {
   position: relative;
   min-height: 100%;
@@ -1158,12 +1126,6 @@
   pointer-events: none;
 }
 
-.commit-graph-merge {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
 .commit-graph-branch {
   padding-left: 22px;
 }
@@ -1194,13 +1156,6 @@
   border: 1px solid var(--border);
   background: var(--surface-muted);
   font-size: 0.8rem;
-}
-
-.refs-figure {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  gap: 16px;
-  align-items: center;
 }
 
 .refs-divider {
