@@ -29,6 +29,11 @@ import {
 
 const components: MDXComponents = {
   h1: () => null,
+  table: (props) => (
+    <div className="mdx-table-scroll">
+      <table {...props} />
+    </div>
+  ),
   CherryPickFigure,
   CommitGraphFigure,
   CommandFlowFigure,
