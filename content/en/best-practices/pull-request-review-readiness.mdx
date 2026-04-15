@@ -14,6 +14,18 @@ export const metadata = {
 
 ## Why review quality is not only the reviewer's responsibility
 
+<CommandFlowFigure
+  title="Review Readiness Check"
+  caption="Review-ready is more than code done: self-tested, docs updated, clear commit messages, clean diff, no debug code left behind."
+  inputsLabel="Code Development"
+  inputs="Feature implemented|Edge cases handled|Error handling added"
+  commandLabel="Readiness Check"
+  outputsLabel="Reviewable State"
+  outputs="✅ Self-test covers main scenarios|✅ Docs/comments updated|✅ No debug code|✅ Diff focused on single change"
+  note="Review-ready state = you're comfortable showing this code to others. If hesitating, it's not ready."
+/>
+
+
 Teams often talk about review as if it begins when the reviewer opens the diff. In practice, review quality is heavily shaped before that moment:
 
 - how well the branch was cleaned up

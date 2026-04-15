@@ -55,6 +55,7 @@ Over-bundling increases file size and may leak unrelated refs.
 Receiver-side failures are costlier to debug later.
 
 ### Mistake 3: using bundle as continuous sync replacement
+`git bundle` packages repository history into a single file that can be transferred offline. Unlike `git archive`, it includes the full Git history and objects, making it suitable for scenarios where the recipient needs a complete repository but cannot access the network.
 
 Bundle is better for batch snapshots than high-frequency bidirectional collaboration.
 
@@ -63,4 +64,27 @@ Bundle is better for batch snapshots than high-frequency bidirectional collabora
 1. `git-fetch`
 2. `git-request-pull`
 3. `cross repository integration workflow`
+- Transfer repository history across an air-gapped network by creating a bundle file on one machine and fetching from it on another.
+- Create a backup of repository history as a single portable file that can be restored with `git clone` or `git fetch`.
+- Share a subset of history (e.g., specific branches or a commit range) without setting up a remote server.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="Bundle packaging for offline transfer"
+  caption="bundle packages Git objects and refs into a single file that can serve as a transport mechanism for history without network access."
+  inputsLabel="Input"
+  inputs="Refs to include (branches, tags)|Commit range (optional)"
+  commandLabel="git bundle"
+  outputsLabel="Output"
+  outputs="Single .bundle file|Complete Git history and objects"
+  note="The receiving side still needs to know which refs and prerequisite objects are required to use the bundle."
+/>
+
+## Special cases and boundaries
+
+- Bundles work well for offline history transfer, but the receiving side still needs to know which refs and prerequisite objects are required.
+- Use `git bundle verify <file>` to check whether a bundle is complete and can be applied to the current repository.
+- A bundle created with `--all` includes all refs, but you can limit the scope to specific branches or commit ranges for smaller files.
+- The receiving repository must already contain any prerequisite commits referenced by the bundle; otherwise, you need to transfer those first.
 

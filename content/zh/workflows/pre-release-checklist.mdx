@@ -1,0 +1,365 @@
+export const metadata = {
+  title: "发布前的 Git 检查清单",
+  slug: "pre-release-checklist",
+  locale: "zh",
+  section: "workflows",
+  summary: "发布前的完整 Git 检查清单：分支状态、tag 创建、changelog 生成、版本号、CI 验证。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Basics-Tagging",
+    "https://git-scm.com/docs/git-log",
+  ],
+};
+
+# 发布前的 Git 检查清单
+
+## 一句话理解
+
+<CommandFlowFigure
+  title="发布前检查流程"
+  caption="发布前的完整 Git 检查清单：确认分支状态、创建 tag、生成 changelog、验证版本号、确保 CI 通过。"
+  inputsLabel="发布准备"
+  inputs="release 分支就绪|changelog 待更新|版本号待升级|CI 待验证"
+  commandLabel="发布检查"
+  outputsLabel="发布确认"
+  outputs="✅ 分支状态干净|✅ tag 已创建|✅ changelog 已生成|✅ CI 全部通过"
+  note="发布检查清单避免遗漏关键步骤。每项检查都应该是可验证的。"
+/>
+
+
+软件发布是一个需要细致检查的过程。这份清单帮助你在发布前通过 Git 确认所有准备工作就绪，避免遗漏关键步骤导致发布问题。
+
+## 第一阶段：分支状态确认
+
+### 1. 确认当前分支
+
+```bash
+# 确认你在正确的分支上（通常是 main 或 release 分支）
+git branch --show-current
+# 预期输出: main 或 release/x.x.x
+
+# 如果不是，切换到正确分支
+git checkout main
+```
+
+### 2. 检查是否有未提交的改动
+
+```bash
+git status
+
+# 应该输出 "nothing to commit, working tree clean"
+# 如果有未提交的改动：
+# - 重要的：先提交或 stash
+# - 不重要的：stash 或清理
+git stash
+```
+
+### 3. 确认与远端同步
+
+```bash
+# 拉取最新的远端变更
+git fetch origin
+
+# 检查本地是否落后于远端
+git status
+# 如果显示 "Your branch is behind 'origin/main' by X commits"
+git pull --rebase origin main
+
+# 检查本地是否有未推送的提交
+git log origin/main..HEAD
+# 如果有输出，说明有本地提交未推送
+git push origin main
+```
+
+### 4. 确认没有合并冲突遗留
+
+```bash
+# 检查是否有 .orig 或 .rej 文件
+find . -name "*.orig" -o -name "*.rej"
+
+# 检查是否有未完成的合并/变基
+ls .git/MERGE_HEAD 2>/dev/null && echo "未完成合并"
+ls .git/REBASE_HEAD 2>/dev/null && echo "未完成变基"
+```
+
+## 第二阶段：代码质量检查
+
+### 5. 确认 CI 全部通过
+
+```bash
+# 查看最近一次 CI 状态
+# GitHub: https://github.com/<user>/<repo>/actions
+# GitLab: https://gitlab.com/<user>/<repo>/-/pipelines
+
+# 或者通过 CLI 检查
+gh run list --limit 5  # GitHub CLI
+```
+
+### 6. 运行本地测试
+
+```bash
+# 确保测试全部通过
+npm test  # 或 pytest, make test 等
+
+# 运行 lint
+npm run lint
+
+# 运行类型检查
+npm run type-check
+```
+
+### 7. 确认没有调试代码残留
+
+```bash
+# 搜索常见调试代码
+grep -rn "console.log" src/
+grep -rn "debugger" src/
+grep -rn "TODO\|FIXME" src/ | head -20
+
+# 搜索敏感信息
+grep -rn "password\|secret\|api_key" src/ --include="*.js" --include="*.ts"
+```
+
+## 第三阶段：版本号和 Tag
+
+### 8. 更新版本号
+
+```bash
+# 查看当前版本
+cat package.json | grep version  # npm
+cat pyproject.toml | grep version  # python
+
+# 更新版本号（根据语义化版本规范）
+npm version patch  # 1.0.0 -> 1.0.1
+npm version minor  # 1.0.0 -> 1.1.0
+npm version major  # 1.0.0 -> 2.0.0
+
+# 这会自动创建 commit 和 tag
+# 如果只需要修改文件，不加 tag
+npm version patch --no-git-tag-version
+```
+
+### 9. 创建 Tag
+
+```bash
+# 创建 annotated tag（推荐）
+git tag -a v1.2.3 -m "Release v1.2.3"
+
+# 轻量 tag（不推荐用于发布）
+git tag v1.2.3
+
+# 给旧提交打 tag
+git tag -a v1.2.3 <commit-hash> -m "Release v1.2.3"
+
+# 验证 tag
+git tag -v v1.2.3
+
+# 查看 tag 信息
+git show v1.2.3
+```
+
+### 10. 推送 Tag
+
+```bash
+# 推送特定 tag
+git push origin v1.2.3
+
+# 推送所有 tag
+git push origin --tags
+```
+
+## 第四阶段：Changelog 生成
+
+### 11. 生成 Changelog
+
+```bash
+# 查看两个 tag 之间的提交
+git log v1.2.2..v1.2.3 --oneline
+
+# 按类型分类查看
+git log v1.2.2..v1.2.3 --oneline --grep="feat"
+git log v1.2.2..v1.2.3 --oneline --grep="fix"
+
+# 生成 changelog（使用 conventional-changelog）
+npx conventional-changelog -p angular -i CHANGELOG.md -s -r 1
+
+# 或者手动生成
+echo "# v1.2.3 ($(date +%Y-%m-%d))" > CHANGELOG-new.md
+echo "" >> CHANGELOG-new.md
+echo "## 新功能" >> CHANGELOG-new.md
+git log v1.2.2..v1.2.3 --oneline --grep="feat" >> CHANGELOG-new.md
+echo "" >> CHANGELOG-new.md
+echo "## Bug 修复" >> CHANGELOG-new.md
+git log v1.2.2..v1.2.3 --oneline --grep="fix" >> CHANGELOG-new.md
+```
+
+### 12. 确认 Changelog 准确
+
+```bash
+# 查看 changelog
+cat CHANGELOG.md
+
+# 确认包含所有重要变更
+# 确认版本号正确
+# 确认日期正确
+```
+
+## 第五阶段：发布
+
+### 13. 最终确认
+
+```bash
+# 完整状态检查
+echo "=== 当前分支 ==="
+git branch --show-current
+
+echo "=== 工作状态 ==="
+git status --short
+
+echo "=== 最近提交 ==="
+git log --oneline -5
+
+echo "=== 最近的 tag ==="
+git describe --tags --abbrev=0
+
+echo "=== 远端状态 ==="
+git remote -v
+
+echo "=== 待推送的内容 ==="
+git log origin/main..HEAD --oneline
+git tag --list | tail -3
+```
+
+### 14. 执行发布
+
+```bash
+# 推送所有变更
+git push origin main
+git push origin v1.2.3
+
+# 在 GitHub/GitLab 创建 Release
+# GitHub CLI:
+gh release create v1.2.3 --title "Release v1.2.3" --notes-file CHANGELOG.md
+
+# 或通过 Web 界面创建 Release
+```
+
+### 15. 发布后验证
+
+```bash
+# 确认 tag 已推送
+git ls-remote --tags origin | grep v1.2.3
+
+# 确认 Release 已创建
+gh release view v1.2.3
+
+# 克隆验证（从干净的仓库验证）
+git clone https://github.com/user/repo.git --branch v1.2.3 --depth 1 verify-release
+cd verify-release
+# 运行构建和测试
+npm install && npm test
+cd .. && rm -rf verify-release
+```
+
+## 第六阶段：发布后清理
+
+### 16. 清理临时分支
+
+```bash
+# 列出所有已合并的分支
+git branch --merged
+
+# 删除已合并的本地分支（保留 main 和当前分支）
+git branch --merged | grep -v "main\|master\|\*" | xargs git branch -d
+
+# 清理远端已合并分支
+git fetch origin --prune
+```
+
+### 17. 创建下一个开发周期
+
+```bash
+# 如果需要准备下一个版本
+npm version prerelease --preid=alpha  # 1.2.3 -> 1.2.4-alpha.0
+
+# 更新开发分支
+git checkout -b develop
+```
+
+## 完整检查清单速查表
+
+```
+□ 1. 当前分支正确（main/release）
+□ 2. 无未提交改动
+□ 3. 与远端同步（fetch + pull）
+□ 4. 无合并冲突遗留
+□ 5. CI 全部通过
+□ 6. 本地测试通过
+□ 7. 无调试代码残留
+□ 8. 版本号已更新
+□ 9. Tag 已创建（annotated）
+□ 10. Changelog 已生成并审核
+□ 11. 所有变更已推送（代码 + tag）
+□ 12. Release 已在平台创建
+□ 13. 发布后验证（干净 clone + 测试）
+□ 14. 临时分支已清理
+□ 15. 下一个开发周期已准备
+```
+
+## 自动化脚本
+
+```bash
+#!/bin/bash
+# pre-release-check.sh
+
+set -e
+
+VERSION=${1:?Usage: ./pre-release-check.sh <version>}
+
+echo "🚀 发布前检查 v${VERSION}"
+
+echo "📋 1. 检查分支..."
+BRANCH=$(git branch --show-current)
+if [[ "$BRANCH" != "main" && "$BRANCH" != "master" ]]; then
+    echo "⚠️  当前分支: $BRANCH (预期 main/master)"
+    read -p "继续？(y/N) " -n 1 -r
+    echo
+fi
+
+echo "📋 2. 检查工作树..."
+if [[ -n $(git status --porcelain) ]]; then
+    echo "❌ 工作树不干净"
+    exit 1
+fi
+
+echo "📋 3. 检查远端同步..."
+git fetch origin
+BEHIND=$(git rev-list --count HEAD..origin/${BRANCH})
+if [[ $BEHIND -gt 0 ]]; then
+    echo "❌ 落后远端 $BEHIND 个提交"
+    exit 1
+fi
+
+echo "📋 4. 运行测试..."
+npm test || { echo "❌ 测试失败"; exit 1; }
+
+echo "📋 5. 创建 tag..."
+git tag -a "v${VERSION}" -m "Release v${VERSION}"
+
+echo "📋 6. 生成 changelog..."
+npx conventional-changelog -p angular -i CHANGELOG.md -s -r 1
+
+echo "✅ 所有检查通过！"
+echo "下一步: git push origin ${BRANCH} && git push origin v${VERSION}"
+```
+
+## 注意事项
+
+1. **annotated tag 优于轻量 tag**：annotated tag 包含标签名、邮箱、日期和签名
+2. **语义化版本**：遵循 MAJOR.MINOR.PATCH 规范
+3. **发布前通知团队**：确保所有人知道即将发布
+4. **保留回滚能力**：发布后保留 tag，不要随意删除
+5. **自动化优于手动**：尽可能将检查步骤自动化
+
+## 总结
+
+发布前检查是确保软件质量的重要环节。通过系统化的检查清单，可以大幅降低发布风险。将常见检查步骤脚本化后，可以进一步提升效率和一致性。

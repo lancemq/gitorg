@@ -52,31 +52,31 @@ People often confuse `main` with `origin/main`. The first is your local branch. 
 
 ## What problem this command solves in a workflow
 
-`git branch` sits close to the working tree, the index, and the current branch. The most important question is not “which flag exists,” but “which layer will this command modify?”
+`git branch` operates at the reference layer, responsible for creating, renaming, listing, and deleting branches. It does not touch working tree content or the staging area — its core duty is managing "names that point at commits," letting you organize work across different development lines.
 
 ## Typical use cases
 
-- Use `git branch` inside the daily loop of edit, inspect, stage, and commit so local state stays intentional.
-- Reach for `git branch` when you need to prepare a clean handoff between file changes, staging decisions, and branch movement.
-- Use `git branch` to clean up local state before collaboration steps that are more expensive to recover from later.
+- Use `git branch` to list all local branches and quickly understand what development lines exist.
+- Use `git branch -vv` to see each branch's upstream tracking relationship and latest commit — a frequent pattern for diagnosing sync status.
+- Use `git branch -d` to safely delete already-merged branches and keep the branch list tidy; confirm you want a force delete with `-D`.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Working tree / index / ref relationship"
-  caption="State-oriented commands revolve around file content, staging state, and the current branch pointer."
-  inputsLabel="Input state"
-  inputs="Working tree files|Index snapshot|Current branch"
+  title="Creation and management of branch references"
+  caption="Branches are essentially references pointing at commits. The branch command manages CRUD operations on these refs, without touching file content."
+  inputsLabel="Input"
+  inputs="Branch name|Target commit (when creating)|Current HEAD"
   commandLabel="git branch"
-  outputsLabel="Possible changes"
-  outputs="File content|Staging result|Current ref"
-  note="A quick before-and-after git status check is often enough to validate whether a state command behaved as intended."
+  outputsLabel="Output"
+  outputs="New ref under refs/heads/|Updated branch list|Deleted refs"
+  note="branch only manages the refs themselves; use switch/checkout to switch branches and merge/rebase to integrate changes."
 />
 
 ## Special cases and boundaries
 
-- The risk in state-changing commands is usually not the syntax itself, but whether you correctly identified which layer they will touch.
-- If there are still valuable local edits in the working tree, decide whether they should be committed, stashed, or discarded before running `git branch`.
-- Running `git status` before and after `git branch` is often the fastest way to confirm what really changed.
-- Before deleting or renaming a branch, confirm whether it is fully merged and whether any remote or worktree still depends on it.
+- `git branch` creates branch refs only; it does not switch to them — use `git switch` for that.
+- Deleting a branch does not delete commits: as long as other refs or the reflog still point at them, the commit objects remain.
+- `git branch -d` refuses to delete unmerged branches as a safety measure; use `-D` to force when you are sure.
+- Remote-tracking refs (e.g., `origin/main`) and local branches (e.g., `main`) are independent: fetch updates the former, and you need merge or rebase to integrate into the latter.
 

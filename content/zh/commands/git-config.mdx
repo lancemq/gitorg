@@ -49,7 +49,7 @@ git config --global user.name "Maqi"
 
 ## 典型用例
 
-- 在新仓库、新机器或新团队规范落地时，用 `git config` 建立稳定默认行为。
+- 在新仓库或新机器上，用 `git config` 设置用户信息和偏好选项。
 - 把 `git config` 放进 onboarding 和环境检查流程，减少“每个人本地行为不一致”的问题。
 - 在排查 Git 行为差异时，用 `git config` 先确认仓库基础设置和帮助入口。
 
@@ -65,6 +65,250 @@ git config --global user.name "Maqi"
   outputs="初始化状态|生效配置|可参考文档"
   note="这类命令的价值往往不在“立即生成提交”，而在于让后面的所有命令更稳定可预测。"
 />
+
+## 配置优先级与生效层级
+
+Git 配置分为多个层级，**后面的层级会覆盖前面的层级**：
+
+```
+系统级 (system) → 全局级 (global) → 仓库级 (local) → worktree级 → 命令行 (-c)
+```
+
+| 层级 | 文件位置 | 命令 | 适用范围 |
+|------|---------|------|---------|
+| system | `/etc/gitconfig` | `--system` | 整个机器的所有用户 |
+| global | `~/.gitconfig` | `--global` | 当前用户的所有仓库 |
+| local | `.git/config` | `--local`（默认） | 当前仓库 |
+| worktree | `.git/worktrees/.../config.worktree` | `--worktree` | 特定 worktree |
+| command line | - | `-c key=value` | 单次命令 |
+
+### 查看配置优先级
+
+```bash
+# 查看某个配置的值及其来源
+git config --show-origin user.name
+# 输出：
+# file:/home/user/.gitconfig    Maqi
+
+# 查看同一 key 的所有层级值
+git config --show-origin --get-all user.name
+```
+
+### 命令行覆盖
+
+```bash
+# 临时用不同的用户名提交（不修改任何配置文件）
+git -c user.name="临时用户" -c user.email="temp@example.com" commit -m "临时提交"
+```
+
+## 常用配置清单
+
+### 用户信息
+
+```bash
+git config --global user.name "你的名字"
+git config --global user.email "your@email.com"
+```
+
+### 核心设置
+
+```bash
+# 默认编辑器
+git config --global core.editor "vim"
+
+# 行结束符（跨平台协作必设）
+git config --global core.autocrlf input    # Linux/Mac
+git config --global core.autocrlf true     # Windows
+
+# 文件大小限制
+git config --global core.bigFileThreshold 512m
+
+# 压缩级别（1-9，9 最压缩但最慢）
+git config --global core.compression 9
+```
+
+### push/pull 行为
+
+```bash
+# push 默认行为：只推送当前分支
+git config --global push.default current
+
+# pull 时使用 rebase 而非 merge（保持线性历史）
+git config --global pull.rebase true
+
+# fetch 时顺便 prune 已删除的远程分支
+git config --global fetch.prune true
+```
+
+### diff 设置
+
+```bash
+# 使用更友好的 diff 算法
+git config --global diff.algorithm histogram
+
+# 显示空格差异
+git config --global core.whitespace trailing-space,space-before-tab
+
+# diff 工具（如使用 meld）
+git config --global diff.tool meld
+git config --global difftool.prompt false
+```
+
+### merge 设置
+
+```bash
+# 默认 merge 策略
+git config --global merge.defaultToUpstream true
+
+# 冲突时显示完整合并信息
+git config --global merge.conflictstyle diff3
+
+# merge 工具
+git config --global merge.tool meld
+```
+
+### 输出美化
+
+```bash
+# 彩色输出
+git config --global color.ui auto
+
+# log 格式别名
+git config --global alias.lg "log --oneline --graph --decorate --all"
+```
+
+## 条件配置 includeIf
+
+`includeIf` 让你可以根据工作目录路径或分支，应用不同的配置——**非常适合区分工作和生活项目**。
+
+### 按路径条件配置
+
+```bash
+# ~/.gitconfig
+[includeIf "gitdir:~/work/"]
+    path = .gitconfig-work
+
+[includeIf "gitdir:~/personal/"]
+    path = .gitconfig-personal
+```
+
+然后在对应的配置文件中设置不同身份：
+
+```bash
+# ~/.gitconfig-work
+[user]
+    name = 工作姓名
+    email = work@company.com
+
+# ~/.gitconfig-personal
+[user]
+    name = 个人昵称
+    email = personal@gmail.com
+```
+
+### 实际效果
+
+```bash
+# 在 ~/work/project/ 中
+git config user.email
+# 输出：work@company.com
+
+# 在 ~/personal/hobby/ 中
+git config user.email
+# 输出：personal@gmail.com
+```
+
+### 按分支条件配置
+
+```bash
+# 只在特定分支上使用不同的配置
+[includeIf "hasconfig:remote.*.url:git@github.com:**"]
+    path = .gitconfig-github
+
+[includeIf "hasconfig:remote.*.url:git@gitlab.com:**"]
+    path = .gitconfig-gitlab
+```
+
+## 别名系统（alias）
+
+别名让你可以为常用命令创建短名称或复杂组合。
+
+### 在配置文件中添加
+
+```bash
+# 基本别名
+git config --global alias.st status
+git config --global alias.co checkout
+git config --global alias.br branch
+git config --global alias.ci commit
+git config --global alias.df diff
+git config --global alias.lg "log --oneline --graph --decorate"
+
+# 高级别名（带参数的 shell 命令）
+git config --global alias.undo "reset --soft HEAD~1"
+git config --global alias.amend "commit --amend --no-edit"
+git config --global alias.wip "add -A && commit -m 'WIP'"
+git config --global alias.uncommit "reset --mixed HEAD~1"
+
+# 查看被谁改了什么
+git config --global alias.blame-who "blame --line-porcelain | grep '^author '"
+
+# 查找包含某个字符串的提交
+git config --global alias.search "log --all --grep"
+```
+
+### 常用别名速查表
+
+| 别名 | 展开命令 | 用途 |
+|------|---------|------|
+| `st` | `status` | 快速查看状态 |
+| `co` | `checkout` | 切换分支 |
+| `br` | `branch` | 列出分支 |
+| `ci` | `commit` | 提交 |
+| `df` | `diff` | 查看差异 |
+| `lg` | `log --oneline --graph --decorate` | 美化日志 |
+| `last` | `log -1 HEAD` | 最近一次提交 |
+| `unstage` | `reset HEAD --` | 取消暂存 |
+| `amend` | `commit --amend --no-edit` | 追加到上次提交 |
+| `wip` | `add -A && commit -m 'WIP'` | 快速暂存提交 |
+
+## 查看完整配置
+
+```bash
+# 列出所有生效的配置（包含所有层级，已合并）
+git config --list
+
+# 列出所有配置并显示来源
+git config --list --show-origin
+
+# 只看某个层级的配置
+git config --global --list
+git config --local --list
+git config --system --list
+
+# 查询特定 key 的值
+git config user.name
+git config --global core.editor
+
+# 查看配置文件的实际内容
+git config --global --edit     # 编辑 ~/.gitconfig
+git config --local --edit      # 编辑 .git/config
+```
+
+### 排查配置冲突
+
+当你发现 Git 行为与预期不符时，用以下流程排查：
+
+```bash
+# 1. 查看所有生效配置
+git config --list --show-origin
+
+# 2. 检查特定 key 在各层级的值
+git config --show-origin --get-all user.email
+
+# 3. 确认当前命令使用的配置
+git -c user.name=Test commit --dry-run
+```
 
 ## 特殊情况与边界
 

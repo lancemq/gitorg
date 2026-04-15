@@ -50,10 +50,14 @@ git worktree remove ../repo-hotfix
 失去隔离收益。
 
 ### 误区 2：删除目录不用 `git worktree remove`
+`git worktree` 解决的是"需要在同一仓库的多个分支上并行工作"的问题。它从同一个 `.git` 目录创建多个独立的工作目录，每个工作目录可以检出不同的分支，无需反复 stash 或 clone。
 
 可能留下脏元数据，后续列表异常。
 
 ### 误区 3：在工作树间共享临时构建产物
+- 在 main 分支开发时，突然需要修复一个紧急 bug，用 `git worktree add` 创建独立的 hotfix 工作目录，两个目录并行工作互不干扰。
+- 在 CI 环境中，用 worktree 同时检出多个分支进行对比测试或基准测试。
+- review 同事的 PR 时，在不离开当前分支的情况下，用 worktree 检出 PR 分支进行本地验证。
 
 容易造成“看似同分支、实则状态不同”的错觉。
 
@@ -63,3 +67,232 @@ git worktree remove ../repo-hotfix
 2. `ai agent worktree mode`
 3. `git-switch`
 
+<CommandFlowFigure
+  title="多工作树并行开发"
+  caption="worktree 共享同一个 .git 目录，但每个工作目录有独立的 HEAD 和工作区，实现真正的并行开发。"
+  inputsLabel="共享仓库"
+  inputs="同一个 .git 目录|不同分支|独立工作目录路径"
+  commandLabel="git worktree"
+  outputsLabel="结果"
+  outputs="多个工作目录|各自的 HEAD|并行开发环境"
+  note="同一个分支通常不能同时在多个 worktree 里作为可写检出目标，规划前先确认分支占用情况。"
+/>
+
+## 多 worktree 的分支限制
+
+### 核心限制：同一分支不能同时被多个 worktree 检出
+
+这是 worktree 最常见的一个陷阱。同一个分支只能在一个 worktree 中作为"可写"检出目标：
+
+```bash
+# 在主仓库
+git checkout main
+# 尝试创建 worktree 也检出 main
+git worktree add ../repo-main main
+# fatal: 'main' is already checked out at '/path/to/repo'
+```
+
+### 解决方案
+
+**方法 1：使用 --detach（分离头指针）**
+
+```bash
+# 以分离模式检出，不绑定分支
+git worktree add ../repo-main --detach main
+```
+
+这样可以查看 main 的内容，但不能直接提交。
+
+**方法 2：创建新分支**
+
+```bash
+# 为 worktree 创建独立分支
+git worktree add ../repo-hotfix -b hotfix-urgent main
+```
+
+这是推荐做法，每个 worktree 使用独立分支。
+
+**方法 3：列出分支占用情况**
+
+```bash
+git worktree list
+# 输出：
+# /path/to/repo        abc1234 [main]
+# /path/to/repo-hotfix def5678 [hotfix-urgent]
+```
+
+在创建新 worktree 前，先查看哪些分支已被占用。
+
+## 清理 orphaned worktree
+
+### 什么是 orphaned worktree
+
+当你直接用 `rm -rf` 删除 worktree 目录时，Git 不会自动清理相关的元数据，残留的条目称为"孤儿 worktree"：
+
+```bash
+# 错误做法
+rm -rf ../repo-hotfix
+# 此时 git worktree list 可能还会显示残留条目
+```
+
+### 正确清理流程
+
+```bash
+# 方法 1：使用 git worktree remove（推荐，Git 2.5+）
+git worktree remove ../repo-hotfix
+
+# 方法 2：手动删除后，清理残留
+rm -rf ../repo-hotfix
+git worktree prune  # 清理孤儿条目
+
+# 查看当前所有 worktree
+git worktree list
+```
+
+### 预防 orphaned worktree
+
+始终使用 `git worktree remove` 而不是直接删除目录：
+
+```bash
+# 好的做法
+git worktree remove ../repo-hotfix
+
+# 如果需要保留 worktree 目录但解除关联
+git worktree lock ../repo-hotfix
+```
+
+`lock` 可以防止 worktree 被意外 `prune`，适合长期保留的 worktree。
+
+## CI 场景下的 worktree 使用
+
+### 问题背景
+
+在 CI/CD 流水线中，经常需要：
+- 在多个分支上同时运行测试
+- 对比不同分支的性能基准
+- 构建并部署多个版本
+
+如果每次都要 `clone` 一个新仓库，速度太慢且占用大量磁盘。
+
+### 使用 worktree 的方案
+
+```bash
+# CI 脚本示例
+#!/bin/bash
+
+# 1. 克隆一次主仓库
+git clone https://github.com/user/repo.git ci-workspace
+cd ci-workspace
+
+# 2. 为不同分支创建 worktree
+git worktree add ../ci-main main
+git worktree add ../ci-feature feature-branch
+git worktree add ../ci-develop develop
+
+# 3. 在不同 worktree 中并行运行测试
+cd ../ci-main && npm test &
+cd ../ci-feature && npm test &
+cd ../ci-develop && npm test &
+wait
+
+# 4. 清理
+git worktree prune
+```
+
+### 优势
+
+- **共享对象数据库**：不需要重复下载 commit 和 blob
+- **磁盘节省**：多个 worktree 只共享一个 `.git` 目录
+- **速度更快**：创建 worktree 几乎是瞬时的
+- **隔离性好**：每个 worktree 的工作区和暂存区完全独立
+
+### CI 注意事项
+
+- CI 容器通常是临时的，记得在清理阶段调用 `git worktree prune`
+- 如果 CI runner 有磁盘限制，注意 worktree 的工作区是独立的文件副本
+- 并行测试时注意不同 worktree 不会互相影响
+
+## worktree 与 stash/branch 的对比
+
+| 场景 | stash | branch + checkout | worktree |
+|------|-------|-------------------|----------|
+| 临时切换分支 | ✅ 适合短操作 | ⚠️ 需要来回 checkout | ✅ 最佳方案 |
+| 长期并行开发 | ❌ 不适合 | ❌ 不能同时工作 | ✅ 最佳方案 |
+| 查看他人 PR | ❌ 不行 | ⚠️ 可以但影响当前工作 | ✅ 独立 worktree 查看 |
+| CI 多分支测试 | ❌ 不行 | ⚠️ 需要多次 clone | ✅ 最佳方案 |
+| 紧急 hotfix | ⚠️ 可以但可能丢失 | ⚠️ 需要 stash 当前工作 | ✅ 独立 worktree 处理 |
+| 磁盘占用 | 极小 | 中等（需 clone） | 小（共享 .git） |
+
+### 选择决策树
+
+```
+需要在另一个分支上工作？
+├── 临时切换，很快回来
+│   └── 用 stash 或 commit -W
+├── 长期并行开发，不想来回切
+│   └── 用 git worktree
+└── 只是一次性拉取看看
+    └── 用 fetch + checkout（影响当前工作区）
+```
+
+## 实验性分支的 worktree 场景
+
+### 场景描述
+
+你正在 main 分支上开发主要功能，同时想在不影响当前工作的前提下，创建一个实验性分支来验证某个技术方案。
+
+### 传统做法的痛点
+
+```bash
+# 传统做法：来回切换分支
+git stash                          # 保存当前工作
+git checkout -b experiment-xyz     # 创建实验分支
+# 做实验...
+git checkout main                  # 切回来
+git stash pop                      # 恢复工作
+# 每次实验都要来回切，很麻烦
+```
+
+### 使用 worktree
+
+```bash
+# 在主目录旁边创建实验性 worktree
+git worktree add ../repo-experiment -b experiment-xyz main
+
+# 现在你有两个独立的开发环境：
+# ~/project/repo/        ← main 分支，正常开发
+# ~/project/repo-experiment/  ← experiment-xyz 分支，随意实验
+
+# 在实验 worktree 中自由尝试
+cd ../repo-experiment
+# 随意提交、修改、甚至 rebase，不会影响主目录
+git commit -m "experiment: try new approach"
+git push origin experiment-xyz
+
+# 实验成功后，可以在主目录合并
+cd ../repo
+git merge experiment-xyz
+
+# 实验失败，直接删除 worktree
+git worktree remove ../repo-experiment
+git branch -D experiment-xyz
+```
+
+### 优势总结
+
+- 实验分支的改动完全隔离，不会意外污染主分支
+- 可以随时在两个目录之间切换，不需要 stash
+- 实验失败时，清理只需一条命令
+- 适合 A/B 测试、性能基准对比、技术方案验证
+
+## 特殊情况与边界
+
+- 同一个分支通常不能同时在多个 worktree 里作为可写检出目标，规划前先确认分支占用情况。
+- worktree 共享同一个 `.git` 目录，所以 fetch、pull 等操作对所有 worktree 都生效。
+- 删除 worktree 目录后，需要用 `git worktree prune` 清理残留的 worktree 元数据。
+- worktree 中的未提交改动属于各自独立的工作区，不会互相影响，但都存储在同一个对象数据库中。
+
+
+## 延伸阅读
+
+继续搭配 git status、git log、git show 一起看，通常更容易判断这条命令对历史、索引和工作区分别造成了什么影响。

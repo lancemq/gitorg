@@ -26,7 +26,19 @@ Git 并不是每次都把完整项目重新存一份。它会把对象进行复�
 
 这些问题都和 packfiles 有关。
 
-## 2. loose objects 和 packfiles 的关系
+## 2. loose objects 和 packfiles
+
+<CommandFlowFigure
+  title="Loose Objects → Packfiles 的存储流程"
+  caption="Git 新创建的对象最初以 loose objects 形式单独存储。当对象数量增长时，Git 通过 gc 将它们压缩打包为 packfiles，大幅减少磁盘占用。"
+  inputsLabel="Loose Objects"
+  inputs="新创建的 blob 对象|新创建的 tree 对象|新创建的 commit 对象"
+  commandLabel="git gc / auto pack"
+  outputsLabel="Packfiles"
+  outputs="pack-*.pack 压缩存储|pack-*.idx 索引文件|对象复用和增量压缩"
+  note="loose objects 是独立文件，packfiles 是压缩打包。git repack 可以手动触发优化。"
+/>
+ 的关系
 
 Git 在一些操作早期可能先以较松散的对象形式保存内容，也就是常说的 loose objects。随着仓库发展，它会把对象整理成更适合存储和传输的 packfiles。
 

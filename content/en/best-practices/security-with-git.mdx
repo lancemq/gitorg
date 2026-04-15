@@ -1,0 +1,409 @@
+export const metadata = {
+  title: "Security best practices with Git",
+  slug: "security-with-git",
+  locale: "en",
+  section: "best-practices",
+  summary: "Handling sensitive info leaks, key management, .env security, git-secrets, GPG-signed commits, and SSH key management.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work",
+    "https://github.com/awslabs/git-secrets",
+    "https://github.com/rtyley/bfg-repo-cleaner",
+  ],
+};
+
+# Security best practices with Git
+
+## The short version
+
+<CommandFlowFigure
+  title="Git Security Practices"
+  caption="Git security includes: no secrets in commits, GPG-signed commits, correct .gitignore, regular history scanning for leaks."
+  inputsLabel="Security Risks"
+  inputs="API keys hardcoded|Passwords in config|SSH private key committed|Personal info leaked"
+  commandLabel="Security Protection"
+  outputsLabel="Security Practices"
+  outputs=".gitignore excludes secrets|GPG signs commit identity|git-secrets scans leaks|BFG cleans history"
+  note="Once sensitive info is committed to Git history, even if deleted later, it still exists in history. Prevention beats cure."
+/>
+
+
+Git history is immutable — once sensitive info (passwords, keys, tokens) is committed, even if later deleted, it remains in history. Therefore, preventing sensitive info leaks and properly handling leak incidents are the core of Git security.
+
+## Handling accidentally committed sensitive info
+
+### Scenario: API key accidentally committed
+
+```bash
+# You committed a file containing a key
+git add config.js
+git commit -m "add config"
+git push origin main
+```
+
+Even if you delete it in the next commit:
+
+```bash
+# Delete the file
+git rm config.js
+git commit -m "remove config file"
+git push origin main
+```
+
+**The key still exists in history!**
+
+```bash
+# Anyone can find it via history
+git log --all -- config.js
+git show abc1234:config.js  # Still shows the key
+```
+
+### Using BFG Repo-Cleaner to purge
+
+```bash
+# Download BFG
+# https://rtyley.github.io/bfg-repo-cleaner/
+
+# Create list of files to delete
+cat > banned.txt << EOF
+passwords.txt
+*.pem
+.env
+EOF
+
+# Clean the repo (clone --mirror first)
+git clone --mirror https://github.com/user/repo.git
+cd repo.git
+java -jar bfg.jar --replace-text banned.txt .
+
+# Or delete files containing specific content
+java -jar bfg.jar --delete-files config.js .
+
+# Run gc after cleanup
+git reflog expire --expire=now --all
+git gc --prune=now --aggressive
+
+# Force push
+git push --force
+```
+
+### Using git filter-repo to purge
+
+```bash
+# Install
+pip install git-filter-repo
+
+# Remove specific file from all history
+git filter-repo --path config.js --invert-paths --force
+
+# Replace sensitive content in files
+git filter-repo --replace-text replacements.txt --force
+
+# replacements.txt format
+API_KEY_12345==>REPLACED
+password123==>REPLACED
+```
+
+### Important notes
+
+- After clearing history, you **must** force push
+- All collaborators need to **re-clone** the repository
+- Leaked keys **must be revoked immediately**, don't just rely on history cleanup
+- GitHub and similar platforms scan for and warn about leaked keys
+
+## .gitignore protection for sensitive files
+
+### Basic configuration
+
+```gitignore
+# Environment files
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Key files
+*.pem
+*.key
+*.p12
+*.jks
+
+# Config files
+config/secrets.yml
+credentials.json
+
+# IDE and system files
+.DS_Store
+.idea/
+.vscode/settings.json
+```
+
+### Global .gitignore
+
+```bash
+# Create global ignore file
+cat > ~/.gitignore_global << EOF
+.DS_Store
+*.swp
+*~
+.env
+EOF
+
+# Configure Git to use global ignore
+git config --global core.excludesFile ~/.gitignore_global
+```
+
+### Tracked files can't be ignored by .gitignore
+
+```bash
+# If a file is already tracked, .gitignore won't work
+# First untrack it
+git rm --cached .env
+git commit -m "stop tracking .env file"
+
+# Then .gitignore takes effect
+```
+
+## git-secrets auto-detection
+
+### Installation and configuration
+
+```bash
+# macOS
+brew install git-secrets
+
+# Ubuntu/Debian
+git clone https://github.com/awslabs/git-secrets.git
+cd git-secrets
+sudo make install
+```
+
+### Register AWS and common patterns
+
+```bash
+# Register AWS patterns
+git secrets --register-aws
+
+# Register common patterns (credit cards, passwords, etc.)
+git secrets --register-aws --global
+```
+
+### Add to pre-commit hook
+
+```bash
+# Install hooks in the repo
+git secrets --install
+
+# This adds a pre-commit hook check
+# Automatically detects sensitive info on commit
+```
+
+### Custom patterns
+
+```bash
+# Add custom detection patterns
+git secrets --add 'password\s*=\s*["\x27][^"\x27]+["\x27]'
+git secrets --add 'api_key\s*:\s*\S+'
+
+# Scan history
+git secrets --scan
+git secrets --scan-history
+```
+
+## GPG-signed commits
+
+### Generate GPG key
+
+```bash
+# Generate GPG key (4096 bits recommended)
+gpg --full-generate-key
+
+# Select RSA and RSA
+# Key size 4096
+# Never expires (or set reasonable period)
+# Enter name and email (matching Git config)
+```
+
+### Configure Git to use GPG
+
+```bash
+# List keys
+gpg --list-secret-keys --keyid-format=long
+
+# Example output
+sec   rsa4096/ABC123DEF456 2024-01-01 [SC]
+      1234567890ABCDEF1234567890ABCDEF12345678
+uid                 [ultimate] John Doe <john@example.com>
+ssb   rsa4096/DEF789GHI012 2024-01-01 [E]
+
+# Configure Git to use this key
+git config --global user.signingkey ABC123DEF456
+
+# Enable automatic signing
+git config --global commit.gpgsign true
+
+# Optional: enable tag signing
+git config --global tag.gpgsign true
+```
+
+### Add GPG public key to GitHub/GitLab
+
+```bash
+# Export public key
+gpg --armor --export ABC123DEF456
+
+# Copy the output
+# Add to GitHub: Settings > SSH and GPG keys > New GPG key
+# Add to GitLab: Settings > GPG Keys > Add GPG key
+```
+
+### Verify signatures
+
+```bash
+# View commit signature status
+git log --show-signature -1
+
+# Verify tag signature
+git tag -v v1.0.0
+```
+
+## SSH key management
+
+### Generate strong keys
+
+```bash
+# Use ed25519 algorithm (recommended)
+ssh-keygen -t ed25519 -C "your_email@example.com"
+
+# Or RSA 4096
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+```
+
+### Always use a passphrase
+
+```bash
+# Enter passphrase during generation
+# Don't leave it empty!
+
+# If you have a key without passphrase, regenerate
+ssh-keygen -t ed25519 -C "new key" -f ~/.ssh/id_ed25519_new
+```
+
+### SSH agent management
+
+```bash
+# Start agent
+eval "$(ssh-agent -s)"
+
+# Add key (enter passphrase)
+ssh-add ~/.ssh/id_ed25519
+
+# macOS keychain integration
+ssh-add --apple-use-keychain ~/.ssh/id_ed25519
+```
+
+### SSH config
+
+```bash
+# ~/.ssh/config
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+
+Host gitlab.com
+    HostName gitlab.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+```
+
+## Remote URL security
+
+### HTTPS Token vs SSH Key
+
+```bash
+# Method 1: HTTPS + Personal Access Token (recommended for automation)
+git remote add origin https://<token>@github.com/user/repo.git
+
+# Method 2: SSH Key (recommended for daily development)
+git remote add origin git@github.com:user/repo.git
+```
+
+### Token security
+
+```bash
+# Never hardcode tokens in code
+# Use environment variables or secret managers
+
+# GitHub PAT best practices
+# 1. Set minimum necessary permissions
+# 2. Set expiration date
+# 3. Rotate regularly
+# 4. Never commit to repository
+```
+
+### Credential Helper
+
+```bash
+# macOS keychain
+git config --global credential.helper osxkeychain
+
+# Windows Credential Manager
+git config --global credential.helper manager
+
+# Cache (15 min default)
+git config --global credential.helper 'cache --timeout=3600'
+```
+
+## Leaked key revocation process
+
+### Emergency steps
+
+```
+1. Immediately revoke/rotate the leaked key
+2. Purge sensitive info from Git history
+3. Notify affected parties
+4. Check for unauthorized access
+5. Update security policies
+```
+
+### Key rotation
+
+```bash
+# 1. Generate new key/token
+# 2. Update all services using that key
+# 3. Revoke old key
+# 4. Update repo config (with new key)
+# 5. Purge old key from history (BFG or filter-repo)
+# 6. Force push
+# 7. Notify team to re-clone
+```
+
+### Audit logs
+
+```bash
+# Check which commits contain sensitive files
+git log --all --full-history -- config.js
+
+# Check who pushed sensitive content
+git log --all --format="%h %an %ae %s" -- config.js
+```
+
+## Best practices summary
+
+1. **Prevention > remediation**: Configure .gitignore and git-secrets to prevent sensitive info commits
+2. **Use GPG signing**: Ensure commit sources are verifiable
+3. **SSH keys with passphrase**: An SSH key without a passphrase is like a plaintext password
+4. **Rotate keys regularly**: Tokens and keys should have expiration dates
+5. **Principle of least privilege**: Tokens should only have necessary permissions
+6. **Revoke leaked keys immediately**: Don't just rely on cleaning Git history
+7. **Use secret managers**: 1Password, Vault, etc. for key management
+
+## Key takeaways
+
+1. **Git history is immutable**: Once committed, permanently exists in the object database
+2. **Old data persists after force push**: GitHub and similar platforms may retain old references for some time
+3. **Leaks in forks**: If someone forked your repo, leaked keys may still exist in the fork
+4. **CI/CD logs**: CI logs may also expose sensitive info; clean them regularly
+5. **Collaborative security**: Everyone on the team should follow security practices

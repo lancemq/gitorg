@@ -1,0 +1,301 @@
+export const metadata = {
+  title: "How to recover from a failed cherry-pick",
+  slug: "recover-after-cherry-pick",
+  locale: "en",
+  section: "recovery",
+  summary: "Complete recovery workflow when cherry-pick encounters conflicts, gets aborted, or produces unexpected results. Covers --abort, --continue, --skip, and post-cherry-pick remediation.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-cherry-pick",
+    "https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History",
+  ],
+};
+
+# How to recover from a failed cherry-pick
+
+## The short version
+
+<CherryPickFigure
+  title="Cherry-Pick Operation"
+  caption="Cherry-pick copies a commit from another branch to the current branch, creating a new commit with similar content but a different ID. On conflict, you can --abort, or --continue."
+  sourceLabel="Source branch"
+  targetLabel="Target branch"
+  transferLabel="git cherry-pick <commit>"
+/>
+
+
+`cherry-pick` copies a commit from another branch onto your current branch. When it hits conflicts or produces wrong results, Git gives you clear options to abort, continue, skip, or undo after the fact.
+
+## What cherry-pick actually does
+
+```
+Source branch:  A --- B --- C --- D
+                               \
+Current branch:  X --- Y       Z (cherry-pick of C)
+```
+
+`git cherry-pick C` reads the diff introduced by commit C and applies the same changes to your current branch, creating a **new commit** Z with a different SHA-1.
+
+**Key insight**: cherry-pick does not "move" a commit — it copies it. The original commit C stays exactly where it was on its source branch.
+
+## Scenario 1: Cherry-pick hits a conflict mid-flight
+
+When you run `git cherry-pick <commit>`, Git tries to apply the target commit's changes. If the same files were modified differently on your current branch, a conflict occurs.
+
+### Git's state at this point
+
+```bash
+$ git cherry-pick abc1234
+error: could not apply abc1234... feat: add user authentication
+hint: After resolving the conflicts, mark them with
+hint: "git add/rm <pathspec>", then run
+hint: "git cherry-pick --continue".
+hint: You can instead skip this commit with "git cherry-pick --skip".
+hint: To abort and get back to the state before "git cherry-pick",
+hint: run "git cherry-pick --abort".
+
+$ git status
+On branch main
+You are currently cherry-picking commit abc1234.
+  (fix conflicts and run "git cherry-pick --continue")
+  (use "git cherry-pick --abort" to cancel the cherry-pick operation)
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+        both modified:   src/auth/login.js
+```
+
+Git enters a **CHERRY-PICKING** intermediate state. You have three options:
+
+### Option A: Resolve conflicts and continue
+
+```bash
+# 1. Open the conflicted file, resolve conflict markers
+#    <<<<<<< HEAD
+#    ...your branch's content...
+#    =======
+#    ...cherry-picked content...
+#    >>>>>>> abc1234
+
+# 2. Mark conflict as resolved
+git add src/auth/login.js
+
+# 3. Continue the cherry-pick (opens editor for commit message)
+git cherry-pick --continue
+
+# To accept the default commit message without editing:
+git cherry-pick --continue --no-edit
+```
+
+### Option B: Abort the entire cherry-pick
+
+```bash
+# Cancel completely, return to pre-cherry-pick state
+git cherry-pick --abort
+
+# Verify: HEAD should be back where it was
+git log --oneline -1
+```
+
+`--abort` restores your working tree, staging area, and HEAD to exactly where they were before you ran `git cherry-pick`. It's as if nothing happened.
+
+### Option C: Skip this commit
+
+```bash
+# Don't apply this commit, continue with the next (if any)
+git cherry-pick --skip
+```
+
+`--skip` is useful when cherry-picking a range of commits and one of them is no longer needed on your branch.
+
+## Scenario 2: Cherry-pick completed but the result is wrong
+
+If cherry-pick finished cleanly (commit created) but you realize you picked the wrong commit or the result is incorrect:
+
+### Method 1: Reset (safe if not yet pushed)
+
+```bash
+# Undo the most recent cherry-pick commit
+git reset --hard HEAD~1
+
+# Verify the rollback
+git log --oneline -3
+```
+
+If you cherry-picked multiple commits:
+
+```bash
+# Rollback the last 3 cherry-picked commits
+git reset --hard HEAD~3
+```
+
+### Method 2: Revert (safe if already pushed)
+
+```bash
+# Create an inverse commit that cancels the cherry-pick
+git revert HEAD
+
+# If you cherry-picked a range, revert each one
+git revert HEAD~2..HEAD
+```
+
+`revert` is safer than `reset` because it creates a new commit to undo the changes rather than rewriting history.
+
+## Scenario 3: Cherry-picking a range, one commit fails
+
+```bash
+# Cherry-pick a range of commits
+git cherry-pick A..D
+
+# If a commit in the middle (say, C) conflicts:
+# Resolve conflicts → git add → git cherry-pick --continue
+# Or skip it → git cherry-pick --skip
+```
+
+## Best practices
+
+### 1. Use -x to preserve source information
+
+```bash
+git cherry-pick -x <commit>
+```
+
+`-x` appends `(cherry picked from commit <sha>)` to the commit message, making it easy to trace the origin later.
+
+```
+commit z9y8x7w
+Author: Alice <alice@example.com>
+Date:   Mon Apr 14 10:00:00 2026
+
+    feat: add user authentication
+
+    (cherry picked from commit abc1234ef567890)
+```
+
+### 2. Inspect before you pick
+
+Before cherry-picking, check what the target commit actually changes:
+
+```bash
+# See the commit's diff
+git show <commit>
+
+# See how it would differ from your current branch
+git diff HEAD <commit>
+
+# Apply without committing (dry-run approach)
+git cherry-pick --no-commit <commit>
+# Inspect the changes:
+#   - Satisfied: git commit
+#   - Not satisfied: git reset --hard
+```
+
+### 3. Cherry-pick changes the commit ID
+
+```
+Original commit:  abc1234  (branch-a)
+After cherry-pick:  z9y8x7w  (main)
+
+Same content, different SHA-1!
+The parent, timestamp, and committer info are different.
+```
+
+This means tools like `git cherry` and `git log --cherry-mark` can help identify commits with the same content but different SHAs.
+
+### 4. Avoid duplicate cherry-picks
+
+If you accidentally cherry-pick content that's already on your branch, Git usually detects the empty commit:
+
+```bash
+$ git cherry-pick abc1234
+The previous cherry-pick is now empty, possibly due to conflict resolution.
+If you wish to commit it anyway, use:
+
+    git commit --allow-empty
+
+Otherwise, please use 'git cherry-pick --skip'
+```
+
+Use `git cherry-pick --skip` in this case.
+
+## Quick decision flowchart
+
+```
+Run git cherry-pick <commit>
+         │
+    ┌────┴────┐
+    │Conflict?│ ──→ Resolve → git add → git cherry-pick --continue
+    └────┬────┘          │                    │
+         │               ↓                    ↓
+         │          Don't want it?       Give up?
+         │          git cherry-pick    git cherry-pick
+         │            --skip            --abort
+         ↓
+    No conflict, auto-commits
+         │
+    ┌────┴────┐
+    │Wrong result│ ──→ Not pushed? git reset --hard HEAD~1
+    └────┬────┘          Already pushed? git revert HEAD
+         │
+         ↓
+      All good ✓
+```
+
+## Common errors and fixes
+
+### Error 1: Cherry-picking while on detached HEAD
+
+```bash
+# If you cherry-pick in detached HEAD state
+git checkout abc1234  # detached HEAD
+git cherry-pick def5678  # succeeds, but the commit has "nowhere to go"
+
+# Recovery: create a branch to catch it
+git branch recovery/what-i-just-picked
+git checkout -b feature/xxx
+```
+
+### Error 2: Cherry-picking a merge commit
+
+```bash
+# Direct cherry-pick of a merge commit fails
+$ git cherry-pick merge123
+error: commit merge123 is a merge but no -m option was given.
+
+# Specify a parent (usually 1)
+git cherry-pick -m 1 merge123
+```
+
+### Error 3: Cherry-pick range written backwards
+
+```bash
+# Wrong: A is newer than B, range is invalid
+git cherry-pick newer_commit..older_commit
+
+# Correct: old to new
+git cherry-pick older_commit..newer_commit
+
+# Note: A..B excludes A, includes B
+# To include both ends, use A^..B
+git cherry-pick A^..B
+```
+
+## Preventive measures
+
+1. **Create a backup branch** before large cherry-pick operations:
+   ```bash
+   git branch backup/before-cherry-pick
+   ```
+
+2. **Experiment on a temporary branch first**:
+   ```bash
+   git checkout -b test/cherry-pick
+   git cherry-pick <commit>
+   # Once satisfied, merge back to main
+   ```
+
+3. **Use --no-commit to inspect first**:
+   ```bash
+   git cherry-pick --no-commit <commit>
+   git diff --cached  # inspect staged changes
+   # Satisfied → commit, not satisfied → reset
+   ```

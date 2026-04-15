@@ -15,6 +15,16 @@ export const metadata = {
 
 ## Why long-lived work branches create friction
 
+<CommitGraphFigure
+  title="Topic Branch Workflow"
+  caption="Topic branches are short-lived branches created for a single feature or task. Merge to main when done and delete, keeping the repo clean."
+  linearLabel="main trunk"
+  mergeLabel="feature/auth merged back"
+  rewriteLabel="Delete branch after merge"
+  pointerLabel="Branch lifecycle"
+/>
+
+
 Topic branches are not about creating more branches for the sake of ceremony. They make work boundaries and history boundaries line up. A login fix, a navbar bug, and a docs update should usually be three separate histories, not one mixed stream.
 
 ## 1. Use one branch per unit of work

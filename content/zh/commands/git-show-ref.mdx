@@ -44,32 +44,34 @@ git show-ref --heads --tags
 
 ## 这条命令在流程里解决什么问题
 
-从流程位置看，`git show-ref` 更像“先观察、再决定”的命令。它通常不直接改写历史，而是帮助你确认工作区、暂存区、引用或提交对象当前到底处于什么状态。
+`git show-ref` 解决的是"需要查看仓库中所有引用及其目标 commit hash"的问题。它列出本地仓库中所有的分支、标签和远程跟踪引用，以及它们各自指向的提交哈希值。
 
 ## 典型用例
 
-- 在真正修改历史或文件之前，先用 `git show-ref` 收集当前状态、差异或证据。
-- 把 `git show-ref` 放进代码评审、排障和复盘流程，帮助团队对齐上下文。
-- 当你需要解释“现在仓库为什么会这样”时，让 `git show-ref` 先输出可验证的信息。
+- 排查分支指向问题时，用 `git show-ref --heads` 列出所有本地分支及其目标 commit，确认分支是否指向预期提交。
+- 用 `git show-ref --tags` 查看所有标签及其对应的 commit hash，验证标签版本是否正确。
+- 在脚本中通过 `git show-ref --verify refs/heads/main` 检查某个引用是否存在，并根据退出码做条件判断。
 
 ## 图例理解
 
 <CommandFlowFigure
-  title="观察类命令的作用位置"
-  caption="这类命令主要读取仓库状态并输出信息，重点在于知道自己观察的是哪一层。"
-  inputsLabel="观察对象"
-  inputs="工作区|暂存区|提交历史|引用"
+  title="引用的展示与验证"
+  caption="show-ref 读取 .git/refs 和 packed-refs 中的所有引用，输出引用名称和目标 hash 的对应关系。"
+  inputsLabel="仓库引用"
+  inputs="本地分支|标签|远程跟踪引用|packed-refs"
   commandLabel="git show-ref"
   outputsLabel="产出"
-  outputs="控制台信息|差异上下文|决策依据"
-  note="如果输出看起来“不对”，优先排查的是观察范围，而不是命令本身有没有生效。"
+  outputs="引用名称|目标 commit hash|引用存在性验证"
+  note="show-ref 只显示本地仓库中的引用，不会访问远程服务器获取最新的远程引用信息。"
 />
 
 ## 特殊情况与边界
 
-- 大多数观察命令本身不改历史，但它看到的结果会受 HEAD、路径、提交范围或引用选择影响。
-- 如果 `git show-ref` 的输出和预期不一致，先确认你看的到底是工作区、索引、当前分支，还是某个历史提交。
-- 把 `git show-ref` 和 `git status`、`git log`、`git show` 组合使用，通常比单独看一个输出更稳。
+- `git show-ref` 只读取本地仓库中的引用（`.git/refs` 和 `packed-refs`），不会访问远程服务器获取最新的远程引用。
+- 它是纯只读命令，不修改仓库任何内容。
+- 用 `--verify` 模式可以检查特定引用是否存在，引用不存在时返回非零退出码，适合脚本中的条件判断。
+- HEAD 本身不是一个普通引用，`git show-ref` 默认不显示 HEAD，需要用 `--head` 参数来包含它。
+- 如果引用被打包在 `packed-refs` 文件中（常见于大量引用的仓库），`show-ref` 同样能正确读取。
 
 
 ## 延伸阅读

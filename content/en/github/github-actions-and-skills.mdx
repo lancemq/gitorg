@@ -14,6 +14,18 @@ export const metadata = {
 
 ## Why GitHub learning should include practice
 
+<CommandFlowFigure
+  title="GitHub Actions CI/CD Flow"
+  caption="GitHub Actions defines CI/CD flows via YAML workflow files. Each workflow consists of jobs, jobs consist of steps, executed on runners."
+  inputsLabel="Trigger Events"
+  inputs="Push to branch|Pull request created|Scheduled|Manual trigger"
+  commandLabel="GitHub Actions"
+  outputsLabel="Workflow Execution"
+  outputs="Checkout code|Install deps|Run tests|Build artifacts|Deploy release"
+  note="Actions marketplace has thousands of reusable actions. You can also write custom actions for specific needs."
+/>
+
+
 One of the easiest ways to misunderstand GitHub is to read about automation without ever running it.  
 You may recognize workflow files and job names, but still have weak operational intuition.
 

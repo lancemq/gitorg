@@ -1,0 +1,440 @@
+export const metadata = {
+  title: "Git Hooks 完全指南",
+  slug: "git-hooks",
+  locale: "zh",
+  section: "concepts",
+  summary: "详细解释 Git Hooks 的工作机制、客户端与服务端钩子、常见应用场景，以及如何使用 Husky 等工具管理 Hooks。",
+  sourceUrls: [
+    "https://git-scm.com/docs/githooks",
+    "https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks",
+  ],
+};
+
+# Git Hooks 完全指南
+
+## 一句话理解
+
+Git Hooks 是 Git 在特定事件（如提交、推送、合并）发生时自动触发的脚本，让你可以在这些关键节点上执行自定义操作。
+
+## 什么是 Git Hooks
+
+Git Hooks 本质上是存放在 `.git/hooks/` 目录中的可执行脚本。当 Git 执行某些操作时，它会在操作的前后自动运行对应的钩子脚本。
+
+每个钩子对应一个文件名（如 `pre-commit`、`post-merge`），如果该文件存在且可执行，Git 就会运行它。
+
+<CommandFlowFigure
+  title="Hooks 的触发机制"
+  caption="Git 在关键操作节点自动检测并执行对应的钩子脚本。返回非零退出码的 pre-* 类钩子会中断整个 Git 操作。"
+  inputsLabel="触发事件"
+  inputs="git commit|git merge|git push|git checkout|git rebase"
+  commandLabel="Git 自动检测"
+  outputsLabel="执行结果"
+  outputs="检查通过 → 继续操作|检查失败 → 中断操作|执行后处理 → 通知/清理"
+  note="每个钩子对应 .git/hooks/ 下的一个脚本文件，去掉 .sample 后缀即可启用。"
+/>
+
+## Hooks 的存储位置
+
+```
+your-repo/
+└── .git/
+    └── hooks/
+        ├── applypatch-msg.sample
+        ├── pre-applypatch.sample
+        ├── post-applypatch.sample
+        ├── pre-commit.sample
+        ├── pre-merge-commit.sample
+        ├── pre-push.sample
+        ├── pre-rebase.sample
+        ├── pre-receive.sample
+        ├── commit-msg.sample
+        ├── post-commit.sample
+        ├── post-receive.sample
+        ├── post-rewrite.sample
+        ├── post-update.sample
+        ├── prepare-commit-msg.sample
+        ├── push-to-checkout.sample
+        ├── update.sample
+        └── fsmonitor-watchman.sample
+```
+
+初始化仓库时，Git 会生成这些 `.sample` 文件作为参考。要启用某个钩子，去掉 `.sample` 后缀即可：
+
+```bash
+mv .git/hooks/pre-commit.sample .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+```
+
+## 钩子的分类
+
+Git Hooks 按触发位置分为两大类：**客户端钩子**和**服务端钩子**。
+
+### 客户端钩子
+
+运行在你本地的仓库中，由开发者直接触发：
+
+| 钩子名称 | 触发时机 | 可中断操作 | 典型用途 |
+|---------|---------|-----------|---------|
+| `pre-commit` | `git commit` 之前，生成提交信息前 | ✅ 是 | 代码检查、格式化、lint |
+| `pre-merge-commit` | `git merge` 产生合并提交之前 | ✅ 是 | 合并前检查 |
+| `prepare-commit-msg` | 提交信息编辑器启动前 | ✅ 是 | 自动生成提交信息 |
+| `commit-msg` | 提交信息写入后，提交创建前 | ✅ 是 | 验证提交信息格式 |
+| `post-commit` | 提交创建后 | ❌ 否 | 通知、日志记录 |
+| `post-checkout` | `git checkout` / `git switch` 后 | ❌ 否 | 更新依赖、清理缓存 |
+| `post-merge` | `git merge` 完成后 | ❌ 否 | 安装新依赖、迁移数据库 |
+| `pre-push` | `git push` 之前 | ✅ 是 | 运行测试、检查分支名 |
+| `pre-rebase` | `git rebase` 之前 | ✅ 是 | 防止 rebase 已推送的分支 |
+
+### 服务端钩子
+
+运行在远程服务器（如 Git 服务器）上：
+
+| 钩子名称 | 触发时机 | 可中断操作 | 典型用途 |
+|---------|---------|-----------|---------|
+| `pre-receive` | 接收推送之前 | ✅ 是 | 验证推送内容、权限检查 |
+| `update` | 接收每个 ref 更新之前 | ✅ 是 | 细粒度的 ref 级别控制 |
+| `post-receive` | 推送完成后 | ❌ 否 | CI/CD 触发、通知、部署 |
+
+## 客户端钩子详解
+
+### pre-commit
+
+在 `git commit` 创建提交之前运行。如果脚本返回非零退出码，提交将被中止。
+
+```bash
+#!/bin/sh
+# .git/hooks/pre-commit
+
+# 运行 ESLint
+echo "运行代码检查..."
+npm run lint
+
+# 检查返回码
+if [ $? -ne 0 ]; then
+    echo "代码检查失败，提交中止。"
+    exit 1
+fi
+
+echo "检查通过，继续提交。"
+exit 0
+```
+
+### commit-msg
+
+在提交信息写入后运行，用来验证提交信息是否符合团队规范。
+
+```bash
+#!/bin/sh
+# .git/hooks/commit-msg
+
+commit_msg=$(cat "$1")
+
+# 检查是否以类型前缀开头
+if ! echo "$commit_msg" | grep -qE "^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .+"; then
+    echo "提交信息格式不正确！"
+    echo "格式: <type>(<scope>): <description>"
+    echo "例如: feat(auth): add login endpoint"
+    exit 1
+fi
+
+exit 0
+```
+
+### post-checkout
+
+在 `git checkout` 或 `git switch` 之后运行。接收三个参数：前一个 ref、新的 ref、是否是分支切换（1=是，0=否）。
+
+```bash
+#!/bin/sh
+# .git/hooks/post-checkout
+
+prev_ref=$1
+new_ref=$2
+is_branch_switch=$3
+
+if [ "$is_branch_switch" = "1" ]; then
+    echo "切换分支后检查依赖是否有变化..."
+    
+    # 如果 package.json 变了，重新安装依赖
+    if ! git diff --quiet "$prev_ref" "$new_ref" -- package.json; then
+        echo "package.json 已变更，运行 npm install..."
+        npm install
+    fi
+fi
+
+exit 0
+```
+
+### post-merge
+
+在 `git merge` 完成后运行。没有参数。
+
+```bash
+#!/bin/sh
+# .git/hooks/post-merge
+
+echo "合并完成，检查依赖变更..."
+
+# 检查是否有 package.json 变化
+if git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD | grep -q "package.json"; then
+    echo "检测到 package.json 变化，安装新依赖..."
+    npm install
+fi
+
+# 检查数据库迁移文件
+if git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD | grep -q "migrations/"; then
+    echo "检测到数据库迁移文件，请运行迁移。"
+fi
+
+exit 0
+```
+
+### pre-push
+
+在 `git push` 之前运行。接收远端名称和远端 URL。
+
+```bash
+#!/bin/sh
+# .git/hooks/pre-push
+
+remote="$1"
+url="$2"
+
+# 防止向 main 分支直接推送
+zero="0000000000000000000000000000000000000000"
+while read local_ref local_sha remote_ref remote_sha; do
+    if [ "$remote_ref" = "refs/heads/main" ]; then
+        # 检查是否有本地测试失败
+        if ! npm test 2>/dev/null; then
+            echo "测试未通过，禁止推送到 main 分支。"
+            exit 1
+        fi
+    fi
+done
+
+exit 0
+```
+
+## 服务端钩子详解
+
+### pre-receive
+
+服务端收到推送但尚未应用时运行。从标准输入读取每行：`<old-value> SP <new-value> SP <ref-name> LF`。
+
+```bash
+#!/bin/sh
+# .git/hooks/pre-receive
+
+while read oldrev newrev refname; do
+    # 禁止向 main 分支推送 merge commit
+    if [ "$refname" = "refs/heads/main" ]; then
+        parents=$(git cat-file -p "$newrev" | grep "^parent" | wc -l)
+        if [ "$parents" -gt 1 ]; then
+            echo "禁止向 main 分支推送 merge commit。请使用 rebase。"
+            exit 1
+        fi
+    fi
+done
+
+exit 0
+```
+
+### post-receive
+
+推送完成后运行，常用于触发 CI/CD 或发送通知：
+
+```bash
+#!/bin/sh
+# .git/hooks/post-receive
+
+while read oldrev newrev refname; do
+    branch=$(echo "$refname" | sed 's|refs/heads/||')
+    
+    if [ "$branch" = "main" ]; then
+        echo "main 分支已更新，触发部署..."
+        # 触发 CI/CD 或部署脚本
+        curl -X POST https://ci-server.example.com/deploy \
+            -H "Content-Type: application/json" \
+            -d "{\"branch\": \"$branch\", \"commit\": \"$newrev\"}"
+    fi
+done
+
+exit 0
+```
+
+## 使用 Husky 管理 Hooks
+
+由于 `.git/hooks/` 目录不在版本控制中，团队协作时共享钩子是个问题。[Husky](https://typicode.github.io/husky/) 是流行的解决方案。
+
+### 安装和配置
+
+```bash
+# 安装 Husky
+npm install husky --save-dev
+
+# 启用 Husky
+npx husky init
+
+# 添加钩子
+echo "npm run lint" > .husky/pre-commit
+echo "npm test" > .husky/pre-push
+```
+
+Husky 将钩子脚本放在 `.husky/` 目录中，该目录可以被提交到仓库，确保所有团队成员使用相同的钩子。
+
+### package.json 配置
+
+```json
+{
+  "scripts": {
+    "prepare": "husky",
+    "lint": "eslint .",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "husky": "^9.0.0"
+  }
+}
+```
+
+`prepare` 脚本会在 `npm install` 后自动运行，确保 Husky 被正确设置。
+
+### 配合 lint-staged
+
+`lint-staged` 只检查本次提交涉及的文件，比全量检查快得多：
+
+```bash
+npm install lint-staged --save-dev
+```
+
+```json
+{
+  "lint-staged": {
+    "*.{js,ts,jsx,tsx}": ["eslint --fix", "prettier --write"],
+    "*.{css,scss}": ["stylelint --fix"],
+    "*.md": ["markdownlint --fix"]
+  }
+}
+```
+
+`.husky/pre-commit`：
+
+```bash
+#!/bin/sh
+npx lint-staged
+```
+
+## 跳过 Hooks
+
+在某些情况下你可能需要跳过钩子：
+
+```bash
+# 跳过 pre-commit 钩子
+git commit --no-verify -m "紧急修复"
+
+# 跳过 pre-push 钩子
+git push --no-verify
+
+# 跳过 pre-commit 和 commit-msg
+git commit -n -m "跳过所有检查"
+```
+
+`--no-verify`（或 `-n`）跳过 `pre-commit` 和 `commit-msg` 钩子。
+
+## 调试 Hooks
+
+### 添加日志
+
+在钩子脚本中加入日志输出：
+
+```bash
+#!/bin/sh
+echo "[$(date)] pre-commit 被触发" >> /tmp/git-hooks.log
+echo "参数: $@" >> /tmp/git-hooks.log
+```
+
+### 测试钩子
+
+直接运行钩子脚本来测试：
+
+```bash
+# 手动运行 pre-commit 钩子
+.git/hooks/pre-commit
+
+# 查看返回值
+echo $?
+```
+
+## 常见应用场景
+
+### 1. 提交前代码格式化
+
+```bash
+#!/bin/sh
+# pre-commit
+npx prettier --write $(git diff --cached --name-only --diff-filter=ACM 2>/dev/null | grep -E '\.(js|ts|css|json)$')
+git add $(git diff --cached --name-only 2>/dev/null)
+```
+
+### 2. 提交信息规范化
+
+强制使用 Conventional Commits 格式：
+
+```bash
+#!/bin/sh
+# commit-msg
+msg=$(cat "$1")
+if ! echo "$msg" | grep -qE "^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .+"; then
+    echo "提交信息必须符合 Conventional Commits 格式"
+    exit 1
+fi
+```
+
+### 3. 防止推送大文件
+
+```bash
+#!/bin/sh
+# pre-push
+while read local_ref local_sha remote_ref remote_sha; do
+    large_files=$(git diff --diff-filter=ACM --name-only "$local_sha" "$remote_sha" 2>/dev/null | while read file; do
+        size=$(git cat-file -s "$local_sha:$file" 2>/dev/null)
+        if [ -n "$size" ] && [ "$size" -gt 1048576 ]; then
+            echo "$file (${size} bytes)"
+        fi
+    done)
+    
+    if [ -n "$large_files" ]; then
+        echo "以下文件超过 1MB，请使用 Git LFS:"
+        echo "$large_files"
+        exit 1
+    fi
+done
+```
+
+### 4. 自动更新版本号
+
+```bash
+#!/bin/sh
+# post-commit
+branch=$(git rev-parse --abbrev-ref HEAD)
+if [ "$branch" = "release" ]; then
+    echo "在 release 分支上，自动更新版本号..."
+    npm version patch --no-git-tag-version
+    git add package.json
+    git commit --amend --no-edit --no-verify
+fi
+```
+
+## 注意事项
+
+1. **钩子脚本必须有执行权限**：`chmod +x .git/hooks/pre-commit`
+2. **钩子返回非零值会中断操作**：对于 `pre-*` 类钩子，非零退出码会中止 Git 操作
+3. **钩子脚本的解释器**：第一行的 shebang（如 `#!/bin/bash`）决定使用哪个解释器
+4. **Windows 兼容性**：Windows 上 `.sh` 文件可能无法直接运行，考虑使用 Node.js 脚本或 `.bat` 文件
+5. **钩子不在版本控制中**：除非使用 Husky 等工具，否则 `.git/hooks/` 不会被 `git clone`
+
+## 继续学习建议
+
+1. `git lfs` —— 大文件管理
+2. CI/CD 工具（GitHub Actions、Jenkins）
+3. `git bisect` —— 二分查找 bug

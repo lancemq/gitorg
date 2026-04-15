@@ -17,13 +17,25 @@ blob 是 Git 里最“纯粹”的对象类型之一：它只保存文件内容�
 
 ## 1. 为什么先理解 blob
 
-很多人第一次接触 Git internals，会下意识把“文件”和“Git 对象”当成一回事。  
+很多人第一次接触 Git internals，会下意识把"文件"和"Git 对象"当成一回事。  
 但 Git 其实把这两件事拆开了：
 
 - blob 负责内容
 - tree 负责结构
+- commit 负责把 tree 固定成历史节点
 
 只要这层拆分建立起来，很多底层行为都会突然变得容易理解。
+
+<CommandFlowFigure
+  title="Blob → Tree → Commit 的链接关系"
+  caption="文件内容先编码为 blob 对象，再由 tree 对象组织成目录结构，最终被 commit 对象指向，形成完整的快照。"
+  inputsLabel="内容层"
+  inputs="blob: 文件 A 内容|blob: 文件 B 内容|blob: 文件 C 内容"
+  commandLabel="tree 组织"
+  outputsLabel="结构层"
+  outputs="tree: 根目录（含子目录）|sub-tree: src/ 目录|commit: 快照 + 作者 + 父提交"
+  note="相同内容的文件会复用同一个 blob，blob 不保存文件名和路径。"
+/>
 
 ## 2. blob 到底保存什么
 

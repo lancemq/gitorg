@@ -14,6 +14,18 @@ export const metadata = {
 
 ## Why atomic commits are not just aesthetics
 
+<CommandFlowFigure
+  title="Atomic Commit Flow"
+  caption="Each commit contains a single logical change: fix bug, add feature, refactor code as separate commits. Reduces review and revert cost."
+  inputsLabel="Mixed Changes"
+  inputs="Bug fix code|Refactored code|Formatting changes|Debug logs"
+  commandLabel="Split Commits"
+  outputsLabel="Atomic Commits"
+  outputs="commit 1: fix(auth): fix login timeout|commit 2: refactor(auth): simplify auth logic|commit 3: chore: format code"
+  note="Use git add -p to select hunks interactively, splitting different logic into separate commits."
+/>
+
+
 An atomic commit is not about making history look neat. It is about making each commit explainable, reviewable, and reversible on its own.
 
 Once one commit mixes multiple intentions, every downstream workflow gets heavier:

@@ -14,7 +14,18 @@ export const metadata = {
 
 ## 为什么 review 质量不只是 reviewer 的事
 
-很多团队把 review 看成 reviewer 单方面的工作，但真正决定效率的常常是送审前的准备质量。  
+<CommandFlowFigure
+  title="评审就绪检查"
+  caption="评审就绪不仅仅是代码写完，还包括：自测通过、文档更新、提交信息清晰、diff 简洁、没有遗留的调试代码。"
+  inputsLabel="代码开发"
+  inputs="功能实现完成|边缘情况已处理|错误处理已添加"
+  commandLabel="就绪检查"
+  outputsLabel="可评审状态"
+  outputs="✅ 自测覆盖主要场景|✅ 文档/注释已更新|✅ 无调试代码|✅ diff 聚焦单一变更"
+  note="评审就绪状态 = 你愿意让别人看到这段代码。如果还有犹豫，说明还没准备好。"
+/>
+
+很多团队把 review 质量完全压在
 如果作者没有把边界、背景、风险和检查结果说明清楚，reviewer 只能先花力气补上下文。
 
 ## 1. PR 标题和描述先回答最关键的问题

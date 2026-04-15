@@ -76,7 +76,97 @@ git diff -- src/search/doc-search.tsx
 
 这在仓库改动很多时特别有用。
 
-## 为什么“没有输出”不一定代表“没改动”
+### 查看文件变更概要
+
+```bash
+# --stat：带文件名和变更行数的概要
+git diff --stat
+
+# --numstat：纯数字输出，适合脚本处理
+git diff --numstat
+
+# --raw：最底层的 Git 内部格式
+git diff --raw
+```
+
+三种输出各有用途：
+
+| 选项 | 输出内容 | 适用场景 |
+|------|----------|----------|
+| `--stat` | 文件名 + 增删行数柱状图 | 人工 review，快速了解哪些文件改动最大 |
+| `--numstat` | 每行一个文件：增行数 删行数 文件名 | CI 脚本自动化统计变更规模 |
+| `--raw` | Git 内部格式：模式、SHA1、状态码 | 调试、工具开发，日常极少使用 |
+
+### 查看某个文件的变更历史
+
+```bash
+git diff HEAD~5..HEAD~3 -- src/utils.ts
+```
+
+这会查看指定两个提交之间 `src/utils.ts` 的差异。范围可以是任意两个提交引用：`HEAD~5..HEAD~3`、`v1.0..v2.0`、`main...feature` 等。
+
+### 单词级 diff
+
+```bash
+git diff --word-diff
+git diff --word-diff=color
+```
+
+默认 diff 以行为单位，`--word-diff` 会高亮显示行内哪些词被改了。配合 `--word-diff=color` 效果更好，删除的词标红、新增的词标绿，比传统 diff 更容易读懂小改动。
+
+## 进阶：输出格式控制
+
+### 三种 diff 格式对比
+
+| 格式 | 命令 | 示例输出 |
+|------|------|----------|
+| 默认补丁 | `git diff` | 完整的 + / - 行，含上下文 |
+| 名字状态 | `git diff --name-status` | `M` `A` `D` `R` 加文件名 |
+| 仅名字 | `git diff --name-only` | 只列出变动文件名 |
+
+### 自定义 diff 驱动
+
+通过 `.gitattributes` 可以为特定文件类型配置 diff 行为：
+
+```
+# .gitattributes
+*.md diff=markdown
+*.png diff=exif
+*.pdf diff=pdf
+```
+
+然后配置对应的 diff 驱动：
+
+```bash
+git config diff.markdown.textconv "cat"
+git config diff.exif.textconv "exif"
+git config diff.pdf.textconv "pdftotext"
+```
+
+这样 `git diff` 会自动调用转换程序，对二进制文件也能看到有意义的差异。
+
+### 集成外部 diff 工具
+
+如果你更喜欢可视化的 diff 工具，可以配置 `diff.external`：
+
+```bash
+# 使用 delta（带语法高亮的分页器）
+git config --global core.pager "delta"
+
+# 使用 diff-so-fancy
+git config --global core.pager "diff-so-fancy | less --tabs=4 -RFX"
+
+# 使用 icdiff（并排彩色 diff）
+git config --global alias.d "difftool -y --tool=icdiff"
+git config --global diff.tool icdiff
+git config --global difftool.icdiff.cmd "icdiff $LOCAL $REMOTE"
+
+# 使用外部 GUI 工具
+git config --global diff.tool meld
+git difftool
+```
+
+这些工具都能显著提升阅读 diff 的体验，尤其是代码审查和排查问题时。
 
 例如：
 

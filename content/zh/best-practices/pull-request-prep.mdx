@@ -12,9 +12,20 @@ export const metadata = {
 
 # 提交评审前准备专题
 
-## 为什么“准备好再送审”会直接提升 review 质量
+## 为什么"准备好再送审"会直接提升 review 质量
 
-很多 review 并不是代码本身太难，而是分支还没整理好：提交很乱、主线不同步、噪声改动没清掉，reviewer 被迫先帮你做整理工作。  
+<CommandFlowFigure
+  title="PR 准备流程"
+  caption="发起 PR 前的检查清单：同步主线、整理提交、运行测试、检查 diff、编写描述。准备充分的 PR 评审更快、质量更高。"
+  inputsLabel="开发完成"
+  inputs="功能代码已编写|本地测试已通过|文档已更新"
+  commandLabel="PR 准备"
+  outputsLabel="高质量 PR"
+  outputs="✅ 已 rebase 最新主线|✅ 提交已整理|✅ 测试全部通过|✅ diff 干净|✅ 描述完整"
+  note="一个准备充分的 PR 是对评审者的尊重。减少来回修改，提高合并效率。"
+/>
+
+很多开发者写完代码就立刻
 评审前准备的目标不是“美化历史”，而是让 reviewer 一上来就能讨论真正重要的问题。
 
 ## 1. 先同步基线，再谈送审

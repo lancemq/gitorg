@@ -49,30 +49,32 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 
 ## What problem this command solves in a workflow
 
-`git rev-parse` lives closer to Git’s implementation model: objects, refs, and the index. It is best suited for scripting, automation, and advanced debugging rather than being your first manual tool.
+`git rev-parse` solves the problem of "parsing revision expressions (like branch names, tags, relative refs) into full commit hashes or obtaining repository path information". It is the core tool in scripts for converting human-readable references into machine-usable formats.
 
 ## Typical use cases
 
-- Use `git rev-parse` when you need precise control over objects, refs, or index state in a scriptable flow.
-- Reach for `git rev-parse` when learning internals or validating low-level repository state during debugging.
-- Use `git rev-parse` only when porcelain commands no longer express the exact operation you need.
+- Get the repository root path in a script by running `git rev-parse --show-toplevel` to get an absolute path, independent of the current working directory.
+- Resolve a branch name or tag to a full hash by using `git rev-parse main` or `git rev-parse v1.0.0` to get the corresponding commit hash.
+- Locate the `.git` directory with `git rev-parse --git-dir` to find the repository's metadata directory in scripts.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Objects, refs, and index path"
-  caption="Plumbing commands are powerful because they operate directly on Git internals, not because they are “more advanced” in the everyday workflow sense."
-  inputsLabel="Internal inputs"
-  inputs="Object database|Tree objects|Index|Refs"
+  title="Parse revision expressions and repository paths"
+  caption="rev-parse converts human-readable references (branch names, tags, relative expressions) into commit hashes, or outputs repository path information. It is a pure read-only operation."
+  inputsLabel="Revision expression / path query"
+  inputs="Branch name|Tag|Relative ref (HEAD~1)|Path query option"
   commandLabel="git rev-parse"
-  outputsLabel="Results"
-  outputs="Scriptable output|Updated low-level state|Fine-grained control"
-  note="If you are still thinking only in terms of branches and files, pause and separate objects, refs, and index state first."
+  outputsLabel="Outputs"
+  outputs="Full commit hash|Repository root|.git directory path|Validation result"
+  note="rev-parse only parses and queries, never modifying repository content. It is the Swiss Army knife for obtaining repository information in scripts."
 />
 
 ## Special cases and boundaries
 
-- The real risk in plumbing commands is not just that they can fail, but that they can successfully perform the wrong low-level action.
-- Before running `git rev-parse` in a real repo, test it in a tiny disposable repository and verify whether a safer porcelain command would do the job.
-- If arguments contain refs, trees, index paths, or raw object IDs, inspect those inputs independently before performing writes.
+- `git rev-parse` is a pure read-only command — it never modifies the repository, index, or working tree.
+- If an invalid revision expression is passed (e.g., a non-existent branch name), it outputs an error message and returns a non-zero exit code.
+- Different options produce different output formats: some output a single line (like `--show-toplevel`), others output multiple lines — scripts need to handle each case appropriately.
+- The `--verify` option can validate that a reference exists and is valid, useful as a pre-check in scripts.
+- Relative references like `HEAD~3` or `main^{tree}` are parsed correctly, but you must ensure the reference exists in the current repository.
 

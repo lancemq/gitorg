@@ -40,31 +40,250 @@ git push origin --tags
 
 ## 这条命令在流程里解决什么问题
 
-`git tag` 更接近工作区、暂存区和当前分支这三层状态。理解这类命令时，最重要的不是背参数，而是先判断它会不会改动文件内容、索引快照或当前引用。
+`git tag` 作用于引用层，它给特定提交绑定一个稳定的名字。与分支不同，标签一旦创建通常不再移动，所以它解决的是"给历史中的某个点起永久名字"的问题，而不是日常开发中的工作流管理。
 
 ## 典型用例
 
-- 把 `git tag` 放进“修改 -> 检查 -> 暂存 -> 提交”的日常循环中，控制当前状态。
-- 在切换上下文、整理提交或恢复文件时，用 `git tag` 精准处理工作区与索引。
-- 在团队协作前，先通过 `git tag` 把本地状态整理干净，减少后续冲突成本。
+- 给发布版本打标签（如 `v1.0.0`），让团队和 CI/CD 系统有一个明确的发布锚点。
+- 附注标签（`-a`）记录打标签的人和说明，适合正式发布流程。
+- 轻量标签适合本地临时标记，不需要推送给团队。
 
 ## 图例理解
 
 <CommandFlowFigure
-  title="工作区 / 暂存区 / 引用三层关系"
-  caption="状态类命令通常围绕工作区、索引和当前分支展开，关键是弄清它写到了哪一层。"
-  inputsLabel="输入状态"
-  inputs="工作区文件|暂存区索引|当前分支"
+  title="标签在引用系统中的位置"
+  caption="标签是指向提交的引用，创建后通常不再移动，与分支引用形成对比。"
+  inputsLabel="输入"
+  inputs="目标提交|标签名称|（附注时：作者/消息）"
   commandLabel="git tag"
-  outputsLabel="可能变化"
-  outputs="文件内容|暂存结果|当前引用"
-  note="执行前后各跑一次 git status，通常是判断这类命令是否按预期工作的最快办法。"
+  outputsLabel="产出"
+  outputs="refs/tags/ 下的新引用|（附注时：独立的 tag 对象）"
+  note="标签不会自动推送到远端，需要显式 `git push origin <tag>` 或 `git push origin --tags`。"
 />
+
+## 签名标签完整流程
+
+对于正式发布，推荐使用签名标签（signed tag），它提供了身份验证和完整性保证。
+
+### GPG 密钥准备
+
+```bash
+# 生成 GPG 密钥（如果没有的话）
+gpg --full-generate-key
+# 按提示选择：RSA and RSA, 4096 位
+
+# 查看密钥 ID
+gpg --list-secret-keys --keyid-format long
+# 输出类似：
+# sec   rsa4096/ABC123DEF4567890 2024-01-01 [SC]
+#       Your Name <you@example.com>
+```
+
+### 配置 Git 使用 GPG
+
+```bash
+# 告诉 Git 使用哪个 GPG 密钥
+git config --global user.signingkey ABC123DEF4567890
+
+# 或者让 Git 自动使用 user.email 对应的密钥
+git config --global commit.gpgsign true
+```
+
+### 创建签名标签
+
+```bash
+# -s 参数创建签名标签
+git tag -s v2.0.0 -m "Release v2.0.0"
+
+# 验证标签签名
+git tag -v v2.0.0
+# 输出：
+# object abc1234567890...
+# type commit
+# tag v2.0.0
+# tagger Your Name <you@example.com> ...
+#
+# Release v2.0.0
+# gpg: Signature made ... using RSA key ABC123DEF4567890
+# gpg: Good signature from "Your Name <you@example.com>"
+```
+
+### 推送签名标签
+
+```bash
+# 单个推送
+git push origin v2.0.0
+
+# 批量推送所有标签
+git push origin --tags
+```
+
+## tag 推送策略
+
+### 推送单个标签（推荐）
+
+```bash
+# 只推送新创建的标签，精确可控
+git push origin v1.0.0
+git push origin v1.1.0
+```
+
+**优点**：
+- 精确控制推送了哪些标签
+- 不会意外推送未准备好的标签
+- 适合 CI/CD 流程中的自动化发布
+
+### 推送所有标签
+
+```bash
+# 推送所有本地标签到远端
+git push origin --tags
+```
+
+**使用场景**：
+- 批量同步多个标签
+- 团队统一约定标签管理规范时
+- 新成员初始化环境时同步所有历史标签
+
+**风险**：
+- 可能推送测试/实验标签到生产远端
+- 如果本地有不该推送的标签，会一起推上去
+
+### 默认行为
+
+`git push` 默认**不会**推送标签：
+
+```bash
+git push origin main
+# 只会推送 main 分支，不包含任何标签
+```
+
+这是 Git 的安全设计，防止意外发布标签。
+
+### 自动推送标签（可选配置）
+
+```bash
+# 配置 push 时自动推送匹配的标签
+git config --global push.followTags true
+```
+
+开启后，`git push` 会自动推送与本次推送的 commit 关联的标签。
+
+## 轻量标签 vs 附注标签对比
+
+| 维度 | 轻量标签 (Lightweight) | 附注标签 (Annotated) |
+|------|----------------------|---------------------|
+| 创建命令 | `git tag v1.0.0` | `git tag -a v1.0.0 -m "msg"` |
+| Git 对象 | 只是一个引用指针 | 独立的 tag 对象 |
+| 元数据 | 无 | 包含 tagger、日期、消息 |
+| 签名支持 | ❌ 不支持 | ✅ 支持 (`-s`) |
+| 存储位置 | `refs/tags/v1.0.0` | `refs/tags/v1.0.0` + tag 对象 |
+| `git show` 输出 | 显示 commit 信息 | 显示 tag 信息 + commit 信息 |
+| 适用场景 | 本地临时标记、个人使用 | 正式发布、团队协作 |
+| 是否推荐用于发布 | ❌ 不推荐 | ✅ 强烈推荐 |
+
+### 直观对比
+
+```bash
+# 轻量标签
+git tag v1.0-beta
+git show v1.0-beta
+# 输出直接显示 commit 内容
+
+# 附注标签
+git tag -a v1.0.0 -m "Release v1.0.0"
+git show v1.0.0
+# 输出先显示 tag 元数据，再显示 commit 内容
+# tag v1.0.0
+# Tagger: Name <email>
+# Date:   ...
+#
+# Release v1.0.0
+```
+
+## tag 命名惯例
+
+### SemVer（语义化版本）
+
+最主流的命名方式，格式：`主版本.次版本.补丁版本`
+
+```
+v1.0.0     ← 正式版
+v1.0.1     ← 补丁修复
+v1.1.0     ← 新功能
+v2.0.0     ← 不兼容的大版本更新
+```
+
+### Pre-release（预发布）
+
+在正式发布前的测试版本：
+
+```
+v1.0.0-alpha.1     ← 内部测试版
+v1.0.0-alpha.2
+v1.0.0-beta.1      ← 公测版
+v1.0.0-beta.2
+v1.0.0-rc.1        ← 候选发布版
+v1.0.0-rc.2
+v1.0.0             ← 最终正式版
+```
+
+### 日期标签
+
+适合频繁发布的场景：
+
+```
+release-2024-01-15
+release-20240115
+2024.01.15
+```
+
+### 命名建议
+
+- **始终加 `v` 前缀**：`v1.0.0` 比 `1.0.0` 更清晰
+- **避免空格和特殊字符**：`/`、`:` 等可能在远端有问题
+- **保持一致性**：团队统一命名规范
+- **不要用标签名覆盖已有标签**：即使使用 `-f` 也不推荐
+
+## 删除标签
+
+### 删除本地标签
+
+```bash
+git tag -d v1.0.0
+# Deleted tag 'v1.0.0' (was abc1234)
+```
+
+### 删除远端标签
+
+```bash
+# 方法 1：使用 --delete
+git push origin --delete v1.0.0
+
+# 方法 2：推送空引用（传统方式）
+git push origin :refs/tags/v1.0.0
+```
+
+### 批量删除
+
+```bash
+# 删除所有本地预发布标签
+git tag -l | grep -E 'alpha|beta|rc' | xargs git tag -d
+
+# 同步删除远端对应标签
+git tag -l | grep -E 'alpha|beta|rc' | xargs -I {} git push origin --delete {}
+```
+
+### 删除后的注意事项
+
+- 删除远端标签后，其他协作者可能需要 `git fetch --prune --prune-tags` 来清理本地缓存
+- 已经下载的 tag 不会因为远端删除而自动消失
+- 建议在删除前确认标签没有被 CI/CD 系统引用
 
 ## 特殊情况与边界
 
-- 这类命令往往直接碰工作区或暂存区，所以真正的风险不在“命令长什么样”，而在你是否分清它会改哪一层。
-- 如果当前目录里还有未备份改动，执行 `git tag` 前先决定这些改动是要提交、stash 还是丢弃。
-- 和 `git status` 搭配读，会更容易判断 `git tag` 执行前后到底改变了什么。
-- 轻量标签和附注标签的语义不同，发布流程里通常更推荐附注标签。
+- 标签名和分支名在同一个命名空间里冲突时会有歧义，所以命名时要有区分度。
+- 标签默认只在本地创建，不会随 `git push` 自动同步到远端。
+- 轻量标签只是一个引用指针，附注标签则是包含元数据的完整对象——发布时应优先使用附注标签。
+- 给已经打标签的提交改名需要 `-f` 强制覆盖，但谨慎操作以免误导协作者。
 

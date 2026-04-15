@@ -26,6 +26,18 @@ export const metadata = {
 
 ## 为什么 worktree 特别适合 AI agent
 
+<CommandFlowFigure
+  title="AI Agent + Worktree 并行模式"
+  caption="每个 worktree 对应独立的分支和 Agent 任务，避免上下文污染。一个 worktree 处理 bug fix，另一个继续 feature 开发。"
+  inputsLabel="多任务场景"
+  inputs="Bug fix 任务|Feature A 开发|Code review 修改|Agent 实验"
+  commandLabel="git worktree 管理"
+  outputsLabel="独立工作环境"
+  outputs="wt-bugfix/ → fix/login-timeout|wt-feature/ → feature/ai-integration|wt-review/ → review/comments|每个 worktree 独立分支、独立上下文"
+  note="AI agent 在 worktree 中运行，不干扰你的主工作区。任务完成后删除 worktree 即可。"
+/>
+
+
 AI agent 和人类开发者的差异之一，是它会更频繁地：
 
 - 同时推进多个子任务

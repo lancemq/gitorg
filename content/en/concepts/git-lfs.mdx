@@ -1,0 +1,393 @@
+export const metadata = {
+  title: "Managing Large Files with Git LFS",
+  slug: "git-lfs",
+  locale: "en",
+  section: "concepts",
+  summary: "A complete guide to Git Large File Storage — installation, tracking large files, migration, and team workflow considerations.",
+  sourceUrls: [
+    "https://git-lfs.com/",
+    "https://github.com/git-lfs/git-lfs/wiki/Tutorial",
+  ],
+};
+
+# Managing Large Files with Git Large File Storage
+
+## The Problem with Large Files in Git
+
+Git was designed for source code — text files that are relatively small and change incrementally. When you store large binary files (images, videos, datasets, compiled binaries, game assets) in a Git repository, several problems arise:
+
+1. **Repository bloat**: Every change to a large binary file creates a full copy in `.git/`, causing the repository size to grow rapidly.
+2. **Slow cloning**: A `git clone` downloads the entire history, including every version of every large file.
+3. **Slow operations**: `git status`, `git log`, and other commands become sluggish.
+4. **Hosting limits**: GitHub has a 100 MB file size limit and recommends keeping repositories under 1 GB.
+5. **Merge conflicts**: Binary files cannot be meaningfully merged, leading to conflicts that are hard to resolve.
+
+A repository with 100 MB of images that changes 50 times would have roughly 5 GB of image history in `.git/`, even though only 100 MB is in the current working tree.
+
+## What is Git LFS?
+
+**Git Large File Storage (LFS)** is an open-source Git extension that replaces large files in your repository with **pointer files** while storing the actual file contents on a separate remote server.
+
+```
+Normal Git:
+  repo/
+  ├── image.png (50 MB)    ← stored in .git/objects (full copy)
+  └── .git/                ← grows with every version
+
+Git LFS:
+  repo/
+  ├── image.png (pointer)  ← tiny text file (~130 bytes)
+  └── .git/lfs/objects/    ← LFS objects stored separately
+                            ← actual content on LFS server
+```
+
+### How LFS Works
+
+1. When you `git add` a tracked file, Git LFS intercepts the operation.
+2. Instead of storing the file in Git's object database, LFS stores it in a **local LFS cache** (`.git/lfs/objects/`).
+3. A **pointer file** is committed to the repository:
+   ```
+   version https://git-lfs.github.com/spec/v1
+   oid sha256:4d7a214614ab2935c943f9e0ff69d22eadbb8f32b1258daaa5e2ca24d17e2393
+   size 52428800
+   ```
+4. When you `git push`, LFS uploads the actual file contents to the LFS server.
+5. When someone `git clone`s or checks out a commit, Git LFS downloads the large files from the LFS server.
+
+The pointer file is tiny (~130 bytes), so the Git repository stays small regardless of how many large files it references.
+
+<CommandFlowFigure
+  title="Git LFS Workflow"
+  caption="LFS-tracked files are replaced with pointer files in the repository during commit, while actual file content is uploaded to the LFS server. On clone or checkout, LFS automatically downloads the real files to replace pointers."
+  inputsLabel="Tracked Large Files"
+  inputs="model.pt (500MB)|dataset.csv (1GB)|video.mp4 (200MB)|image.psd (50MB)"
+  commandLabel="git lfs track + commit"
+  outputsLabel="Storage Result"
+  outputs="Repository → pointer files (~130 bytes each)|LFS server → actual files (original size)|On clone → download actual files on demand"
+  note="Repository size drops from 500MB × 10 = 5GB to ~130 bytes × 10 + on-demand downloads."
+/>
+
+## Installation
+
+### macOS
+
+```bash
+# Using Homebrew
+brew install git-lfs
+
+# Using MacPorts
+sudo port install git-lfs
+```
+
+### Linux (Debian/Ubuntu)
+
+```bash
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+sudo apt-get install git-lfs
+```
+
+### Linux (RHEL/CentOS/Fedora)
+
+```bash
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | sudo bash
+sudo yum install git-lfs
+```
+
+### Windows
+
+```bash
+# Using Chocolatey
+choco install git-lfs
+
+# Using Scoop
+scoop install git-lfs
+
+# Or download the installer from https://git-lfs.com
+```
+
+### After Installation
+
+```bash
+# Initialize Git LFS for your user
+git lfs install
+
+# This sets up the Git LFS hooks in ~/.gitconfig
+# Output: "Updated Git hooks." "Git LFS initialized."
+```
+
+## Tracking Large Files
+
+### Basic Tracking
+
+Use `git lfs track` to specify which file patterns should be handled by LFS:
+
+```bash
+# Track all PNG files
+git lfs track "*.png"
+
+# Track specific large files
+git lfs track "assets/videos/*.mp4"
+
+# Track model files
+git lfs track "*.pt"
+git lfs track "*.onnx"
+git lfs track "*.pb"
+
+# Track dataset files
+git lfs track "data/*.csv"
+git lfs track "data/*.parquet"
+
+# Track game assets
+git lfs track "*.fbx"
+git lfs track "*.tga"
+git lfs track "*.psd"
+```
+
+The `git lfs track` command adds entries to your `.gitattributes` file:
+
+```gitattributes
+*.png filter=lfs diff=lfs merge=lfs -text
+*.mp4 filter=lfs diff=lfs merge=lfs -text
+```
+
+**Important**: Commit the `.gitattributes` file so that all team members share the same LFS tracking rules:
+
+```bash
+git add .gitattributes
+git commit -m "Configure Git LFS tracking for large files"
+```
+
+### Viewing Tracked Files
+
+```bash
+# List all tracked patterns
+git lfs track
+
+# Output:
+# Listing tracked patterns
+#     *.png (.gitattributes)
+#     *.mp4 (.gitattributes)
+#     *.pt (.gitattributes)
+
+# List files currently tracked by LFS in this commit
+git lfs ls-files
+
+# Output:
+# 4d7a214614 * assets/images/logo.png
+# 8f3e91a02c * assets/videos/intro.mp4
+# b2c45d7e1a * models/model.pt
+
+# Show detailed information
+git lfs ls-files -l
+```
+
+### Untracking Files
+
+```bash
+# Stop tracking a pattern
+git lfs untrack "*.png"
+
+# This removes the pattern from .gitattributes
+# Note: files already in LFS remain in LFS
+```
+
+## Working with LFS Files
+
+### Adding and Committing
+
+```bash
+# Add a large file (LFS intercepts automatically)
+git add assets/images/logo.png
+
+# Verify it's tracked by LFS
+git lfs status
+
+# Output:
+# On branch main
+#
+# Git LFS objects to be committed:
+#
+#     assets/images/logo.png
+#
+# Git LFS objects not staged for commit:
+#
+#     (none)
+
+git commit -m "Add logo image"
+```
+
+### Pushing
+
+```bash
+# Push commits and LFS objects
+git push origin main
+
+# Git LFS automatically uploads the large files:
+# Uploading LFS objects: 100% (1/1), 52 MB | 0 B/s
+# Enumerating objects: 5, done.
+# ...
+```
+
+### Cloning and Fetching
+
+```bash
+# Clone a repository with LFS files
+git clone https://github.com/example/project.git
+
+# LFS files are automatically downloaded during checkout
+
+# Clone without downloading LFS files (faster initial clone)
+GIT_LFS_SKIP_SMUDGE=1 git clone https://github.com/example/project.git
+
+# Download LFS files later
+cd project
+git lfs fetch --all
+git lfs checkout
+```
+
+### Pulling
+
+```bash
+git pull origin main
+# LFS files are downloaded automatically
+```
+
+## Migration: Moving Existing Files to LFS
+
+If you have large files already committed to your repository (before setting up LFS), you need to migrate them:
+
+### Using `git lfs migrate`
+
+```bash
+# Preview migration (no changes made)
+git lfs migrate info --include="*.png,*.jpg"
+
+# Migrate specific file types
+git lfs migrate import --include="*.png,*.jpg,*.gif" --include-ref=main
+
+# Migrate all branches and tags
+git lfs migrate import --include="*.png,*.jpg" --everything
+
+# Migrate with a size threshold (files larger than 1 MB)
+git lfs migrate import --everything --above=1mb
+```
+
+### Manual Migration (Older Approach)
+
+```bash
+# Remove files from Git history
+git filter-branch --tree-filter '
+    rm -f path/to/large-file.bin
+' -- --all
+
+# Then add them back with LFS tracking
+git lfs track "*.bin"
+git add path/to/large-file.bin
+git commit -m "Migrate large files to LFS"
+```
+
+> **Warning**: Rewriting history changes commit hashes. All collaborators must re-clone the repository after migration. Coordinate with your team before rewriting shared history.
+
+## LFS Storage and Quotas
+
+### Understanding LFS Storage
+
+LFS files are stored on a separate server from your Git repository. Popular platforms provide LFS storage:
+
+| Platform | Free Storage | Bandwidth | Notes |
+|----------|-------------|-----------|-------|
+| GitHub | 1 GB free | 1 GB/month | Paid plans offer more |
+| GitLab | 10 GB free | Varies | Self-hosted can use external storage |
+| Bitbucket | 1 GB free | 2x storage | Part of repo quota |
+| Azure DevOps | 2 GB free | Varies | Additional storage available |
+
+### Checking LFS Usage
+
+```bash
+# Check LFS storage usage on GitHub
+# (via web interface: Settings → Storage)
+
+# List all LFS objects in your repository
+git lfs ls-files --all
+
+# Check local LFS cache size
+du -sh .git/lfs/objects/
+```
+
+### Pruning Local LFS Cache
+
+```bash
+# Remove LFS objects older than the retention period (default: 3 days)
+git lfs prune
+
+# Keep recent objects, remove older ones
+git lfs prune --verbose
+
+# Remove all cached objects (they will be re-downloaded on checkout)
+git lfs prune --force --work-tree
+```
+
+## Team Workflow
+
+### Setting Up LFS for a Team
+
+1. **Install Git LFS** on all team members' machines
+2. **Run `git lfs install`** on each machine (sets up hooks)
+3. **Commit `.gitattributes`** with all LFS tracking patterns
+4. **Push `.gitattributes`** so team members can pull it
+5. **Ensure LFS server** is configured (GitHub/GitLab handle this automatically)
+
+### Shared LFS Server Configuration
+
+```bash
+# Set a custom LFS URL (for self-hosted LFS servers)
+git config lfs.url https://lfs.example.com/repo.git/info/lfs
+
+# Verify LFS configuration
+git lfs env
+```
+
+### Pre-push Hook for LFS
+
+Git LFS automatically sets up a pre-push hook during `git lfs install`. This hook ensures that LFS objects are uploaded before commits are pushed. Verify it's in place:
+
+```bash
+ls -la .git/hooks/pre-push
+# Should show a script that calls git-lfs
+```
+
+## When NOT to Use Git LFS
+
+Git LFS is not appropriate for all large files:
+
+1. **Files under 1 MB**: The overhead of LFS management isn't worth it for small files.
+2. **Frequently changing large files**: Each change creates a new LFS object, which can quickly consume storage.
+3. **Secrets and credentials**: Never store secrets in Git, LFS or otherwise. Use a secrets manager.
+4. **Generated artifacts**: Build outputs should not be committed. Use a CI/CD artifact store instead.
+5. **Very large files (> 2 GB)**: Some Git hosting platforms have per-file size limits for LFS.
+
+## Best Practices
+
+1. **Track by extension, not by filename**: Use `*.png` instead of `specific-image.png`.
+2. **Commit `.gitattributes`**: This is the most critical LFS file — it defines what gets tracked.
+3. **Use `GIT_LFS_SKIP_SMUDGE=1`** for CI/CD when you don't need the actual files.
+4. **Set up LFS early**: It's much easier to configure LFS before large files accumulate.
+5. **Monitor storage usage**: LFS storage can grow quickly and incur costs.
+6. **Use `git lfs migrate`** carefully — it rewrites history.
+7. **Test LFS setup** with a small project before applying to production repositories.
+
+## Summary
+
+| Task | Command |
+|------|---------|
+| Initialize LFS | `git lfs install` |
+| Track files | `git lfs track "*.ext"` |
+| View tracked patterns | `git lfs track` |
+| List tracked files | `git lfs ls-files` |
+| Clone without LFS files | `GIT_LFS_SKIP_SMUDGE=1 git clone ...` |
+| Download LFS files | `git lfs fetch --all && git lfs checkout` |
+| Migrate existing files | `git lfs migrate import --include="*.ext"` |
+| Prune local cache | `git lfs prune` |
+| Check LFS environment | `git lfs env` |
+
+Git LFS is an essential tool for any project that deals with large binary files. By replacing large files with lightweight pointers and storing actual content separately, LFS keeps your Git repository fast, manageable, and within hosting limits. Proper planning and early adoption are key to a smooth LFS experience.

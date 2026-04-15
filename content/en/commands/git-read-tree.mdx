@@ -48,31 +48,32 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 
 ## What problem this command solves in a workflow
 
-`git read-tree` lives closer to Git’s implementation model: objects, refs, and the index. It is best suited for scripting, automation, and advanced debugging rather than being your first manual tool.
+`git read-tree` solves the problem of "loading a tree object's contents into the index for low-level operations". It loads the directory structure of a specified commit or tree object into the index, and is the low-level foundation for Git's internal merge, reset, and branch-switching operations.
 
 ## Typical use cases
 
-- Use `git read-tree` when you need precise control over objects, refs, or index state in a scriptable flow.
-- Reach for `git read-tree` when learning internals or validating low-level repository state during debugging.
-- Use `git read-tree` only when porcelain commands no longer express the exact operation you need.
+- Reset the index to a commit's state by running `git read-tree --reset -u HEAD` to synchronize the index and working tree to HEAD's tree.
+- Implement custom merge logic in a low-level script by using `git read-tree -m HEAD branch1 branch2` to merge multiple trees into the index.
+- Prepare a new index state and then use `git write-tree` to generate a new tree object, building a custom commit flow.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Objects, refs, and index path"
-  caption="Plumbing commands are powerful because they operate directly on Git internals, not because they are “more advanced” in the everyday workflow sense."
-  inputsLabel="Internal inputs"
-  inputs="Object database|Tree objects|Index|Refs"
+  title="Read tree objects into the index"
+  caption="read-tree loads tree object contents into the index, replacing or merging index entries. It directly affects index state and is a write operation."
+  inputsLabel="Tree object"
+  inputs="Target tree/commit|Merge mode (--reset / -m / -u)|Current index state"
   commandLabel="git read-tree"
   outputsLabel="Results"
-  outputs="Scriptable output|Updated low-level state|Fine-grained control"
-  note="If you are still thinking only in terms of branches and files, pause and separate objects, refs, and index state first."
+  outputs="Updated index|Merge conflict markers (if applicable)|Working tree changes (if -u used)"
+  note="read-tree directly modifies the index — it is a low-level write operation. When using -u, it also updates working tree files, requiring extra caution."
 />
 
 ## Special cases and boundaries
 
-- The real risk in plumbing commands is not just that they can fail, but that they can successfully perform the wrong low-level action.
-- Before running `git read-tree` in a real repo, test it in a tiny disposable repository and verify whether a safer porcelain command would do the job.
-- If arguments contain refs, trees, index paths, or raw object IDs, inspect those inputs independently before performing writes.
-- `git read-tree` directly affects index semantics, so prefer safer porcelain commands unless you are intentionally working at plumbing level.
+- `git read-tree` is a write operation that directly modifies index content. After execution, the index is replaced or merged, affecting subsequent commit behavior.
+- When the `-u` (update) flag is used, read-tree also updates working tree files to match the new index state, which can overwrite uncommitted local changes.
+- Multi-tree merge mode (`-m`) marks conflict entries in the index, requiring manual resolution before a new commit can be created.
+- `read-tree` operates on the index rather than directly on the working tree (unless `-u` is used) — understanding the relationship between tree, index, and working tree is important.
+- Unless you are writing low-level scripts or implementing custom Git operations, you should typically use higher-level commands like `git reset` or `git checkout` instead.
 

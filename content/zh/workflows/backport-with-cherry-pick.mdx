@@ -1,9 +1,9 @@
 export const metadata = {
-  title: "用 cherry-pick 回移修复教程",
+  title: "使用 Cherry-pick 回移修复",
   slug: "backport-with-cherry-pick",
   locale: "zh",
   section: "workflows",
-  summary: "在旧版本维护线中按提交精确回移修复，而不是整条分支整合。",
+  summary: "把主线上的精确修复回移到维护分支，而不是把整条功能分支或无关历史一起合进去。",
   sourceUrls: [
     "https://git-scm.com/docs/git-cherry-pick",
     "https://git-scm.com/docs/git-branch",
@@ -11,9 +11,18 @@ export const metadata = {
   ],
 };
 
-# 用 cherry-pick 回移修复教程
+# 使用 Cherry-pick 回移修复
 
 ## 这个工作流适合什么场景
+
+<CherryPickFigure
+  title="Cherry-Pick 回移修复"
+  caption="从 main 分支挑选特定的修复提交，应用到旧版本维护分支。每次 cherry-pick 生成内容相同但 ID 不同的新提交。"
+  sourceLabel="main (主线)"
+  targetLabel="release/2.x (维护线)"
+  transferLabel="git cherry-pick <commit-hash>"
+/>
+
 
 当某个修复已经进入主线，但旧版本维护线还没有这个修复时，最常见的问题就是：
 

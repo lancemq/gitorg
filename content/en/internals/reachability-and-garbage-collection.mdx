@@ -17,6 +17,15 @@ An object still existing in the repository is not the same as that object still 
 
 ## What reachability means
 
+<ReflogFigure
+  title="Object Reachability and Garbage Collection"
+  caption="As long as an object is traceable from branches, tags, or reflog entries, it is reachable. Objects that lose all references become unreachable and are eventually cleaned up by gc."
+  historyLabel="Historical reference chain"
+  rescueLabel="Recovery entry point"
+  nowLabel="Current HEAD"
+/>
+
+
 Git stores blobs, trees, commits, and tags as objects. Those objects matter because of how they are connected, not because they sit in a flat list.
 
 An object is usually considered reachable if Git can still get to it from some known starting point, such as:

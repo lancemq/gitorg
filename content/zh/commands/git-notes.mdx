@@ -34,6 +34,7 @@ git log --show-notes
 1. notes 用于什么场景（审计/复盘/合规）
 2. notes ref 是否统一（默认是 `refs/notes/commits`）
 3. notes 是否需要推送共享
+这是一个注解管理工具，不修改原提交本身。它通过独立的 notes 引用存储注解，原提交的 hash 和内容完全不变。
 
 ## 共享 notes 的关键点
 
@@ -44,6 +45,21 @@ git push origin refs/notes/*
 ```
 
 拉取也要显式配置或执行。
+- 处理复杂协作和历史分析问题
+- 把一次性操作收敛成可重复流程
+- 降低高风险操作的偶然性
+
+
+## 这条命令在流程里解决什么问题
+
+`git notes` 用于给已有提交附加额外注释信息，而不修改原提交本身。它通过在独立的 notes 引用下创建新对象来实现，原提交的 hash 和内容完全不变。它不会重塑历史，而是在不破坏原提交的前提下增加附加信息。
+
+## 典型用例
+
+- 给某个提交附加调查说明，比如"此提交由 release 团队调查后确认为 root cause"。
+- 用 `git notes add --ref=review <commit>` 在独立的 review 命名空间下添加评审意见，不影响主 notes。
+- 用 `git notes copy <from> <to>` 把注释复制到另一个提交（比如 cherry-pick 后）。
+- 配置 `notes.rewriteRef` 让 rebase 或 cherry-pick 时自动携带 notes。
 
 ## 图例理解
 
@@ -56,11 +72,25 @@ git push origin refs/notes/*
   outputsLabel="输出"
   outputs="附加注释|不变的 commit ID|可共享的 notes 引用"
   note="它改变的是注释引用，而不是提交对象。"
+  title="注解附加机制的作用面"
+  caption="git notes 在原提交之外创建一个独立的注解对象，通过 commit hash 关联，不修改原提交。"
+  inputsLabel="输入"
+  inputs="目标提交 hash|注解文本"
+  commandLabel="git notes"
+  outputsLabel="结果"
+  outputs="附加在原提交上的注解|notes 引用下的新对象"
+  note="notes 是独立的引用空间（refs/notes/），默认不会随 push/fetch 同步。原提交的 hash 和内容完全不受影响。"
 />
 
 ## 常见误区
 
 ### 误区 1：以为 notes 所有人都能自动看到
+- notes 默认存储在 `refs/notes/commits` 下，不会影响原提交的 hash 或内容。
+- `git log --show-notes` 可以在查看日志时同时显示 notes。
+- notes 默认不会被 push 或 fetch 同步，需要显式指定：`git push origin refs/notes/*`。
+- rebase 和 cherry-pick 默认不会携带 notes，需要配置 `notes.rewriteRef`。
+- `git notes append` 可以在已有 notes 上追加内容，而不是替换。
+- 如果目标提交已有 notes，`git notes add` 会报错，需要加 `-f` 强制覆盖或用 `git notes append`。
 
 如果没有共享 notes ref，别人看不到这些信息。
 
@@ -77,3 +107,4 @@ git push origin refs/notes/*
 1. `commit message conventions`
 2. `release checklist discipline`
 3. `git-show`
+搭配 `git log --show-notes`、`git show` 和 `git config notes.rewriteRef` 一起理解，可以更全面地掌握如何在团队间共享和管理提交注解。

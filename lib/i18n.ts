@@ -89,7 +89,10 @@ export type BestPracticeSlug =
   | "safe-force-push-protocol"
   | "commit-message-conventions"
   | "release-checklist-discipline"
-  | "code-review-handoff-quality";
+  | "code-review-handoff-quality"
+  | "git-aliases"
+  | "commit-message-advanced"
+  | "security-with-git";
 
 export type WorkflowSlug =
   | "fetch-vs-pull"
@@ -127,7 +130,10 @@ export type WorkflowSlug =
   | "canary-release-workflow"
   | "database-migration-safety-workflow"
   | "api-versioning-change-workflow"
-  | "incident-retro-to-guardrail-workflow";
+  | "incident-retro-to-guardrail-workflow"
+  | "pre-release-checklist"
+  | "ci-optimization-with-git"
+  | "trunk-based-development";
 
 export type GithubSlug =
   | "github-flow-basics"
@@ -181,7 +187,14 @@ export type RecoverySlug =
   | "recover-lost-stash"
   | "recover-after-wrong-cherry-pick"
   | "recover-after-accidental-merge"
-  | "recover-after-git-clean";
+  | "recover-after-git-clean"
+  | "recover-after-cherry-pick"
+  | "undo-merge-commit"
+  | "fix-broken-interactive-rebase"
+  | "recover-lost-commits"
+  | "recover-from-corrupted-repo"
+  | "fix-detached-head-accidentally-committed"
+  | "fix-wrong-author-or-commit-message";
 
 export type LearningPathSlug =
   | "quick-start"
@@ -193,6 +206,16 @@ export type LearningPathSlug =
   | "handle-review-feedback"
   | "merge-and-close-task"
   | "first-safe-hotfix";
+
+export type ConceptsSlug =
+  | "three-layers"
+  | "git-history"
+  | "git-ignore"
+  | "git-attributes"
+  | "git-hooks"
+  | "git-subtree"
+  | "git-lfs"
+  | "git-shallow";
 
 export function isValidLocale(value: string): value is Locale {
   return locales.includes(value as Locale);
@@ -706,6 +729,9 @@ export const bestPracticeSlugs = [
   "commit-message-conventions",
   "release-checklist-discipline",
   "code-review-handoff-quality",
+  "git-aliases",
+  "commit-message-advanced",
+  "security-with-git",
 ] as const satisfies readonly BestPracticeSlug[];
 
 export const workflowSlugs = [
@@ -745,6 +771,9 @@ export const workflowSlugs = [
   "database-migration-safety-workflow",
   "api-versioning-change-workflow",
   "incident-retro-to-guardrail-workflow",
+  "pre-release-checklist",
+  "ci-optimization-with-git",
+  "trunk-based-development",
 ] as const satisfies readonly WorkflowSlug[];
 
 export const recoverySlugs = [
@@ -759,7 +788,25 @@ export const recoverySlugs = [
   "recover-after-wrong-cherry-pick",
   "recover-after-accidental-merge",
   "recover-after-git-clean",
+  "recover-after-cherry-pick",
+  "undo-merge-commit",
+  "fix-broken-interactive-rebase",
+  "recover-lost-commits",
+  "recover-from-corrupted-repo",
+  "fix-detached-head-accidentally-committed",
+  "fix-wrong-author-or-commit-message",
 ] as const satisfies readonly RecoverySlug[];
+
+export const conceptSlugs = [
+  "three-layers",
+  "git-history",
+  "git-ignore",
+  "git-attributes",
+  "git-hooks",
+  "git-subtree",
+  "git-lfs",
+  "git-shallow",
+] as const satisfies readonly ConceptsSlug[];
 
 export const internalsSlugs = [
   "object-database",

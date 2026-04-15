@@ -44,32 +44,33 @@ git describe --tags --always
 
 ## 这条命令在流程里解决什么问题
 
-从流程位置看，`git describe` 更像“先观察、再决定”的命令。它通常不直接改写历史，而是帮助你确认工作区、暂存区、引用或提交对象当前到底处于什么状态。
+`git describe` 基于最近的标签生成人类可读的版本标识符，格式类似 `v1.2.3-5-gabc1234`。理解它时，要把它放在"如何给提交赋予有意义的版本号"这个场景中来看。
 
 ## 典型用例
 
-- 在真正修改历史或文件之前，先用 `git describe` 收集当前状态、差异或证据。
-- 把 `git describe` 放进代码评审、排障和复盘流程，帮助团队对齐上下文。
-- 当你需要解释“现在仓库为什么会这样”时，让 `git describe` 先输出可验证的信息。
+- 在构建流程中，用 `git describe` 自动生成包含版本号和提交信息的构建标识。
+- 给发布打标签后，用 describe 确认当前 HEAD 相对于最新标签的位置。
+- 用 `git describe --tags --always` 确保即使没有标签也能输出一个有意义的标识符。
 
 ## 图例理解
 
 <CommandFlowFigure
-  title="观察类命令的作用位置"
-  caption="这类命令主要读取仓库状态并输出信息，重点在于知道自己观察的是哪一层。"
-  inputsLabel="观察对象"
-  inputs="工作区|暂存区|提交历史|引用"
+  title="版本标识的生成"
+  caption="describe 命令沿着提交历史向上查找最近的标签，然后生成格式化的版本字符串。"
+  inputsLabel="输入"
+  inputs="目标提交（默认 HEAD）|仓库标签历史"
   commandLabel="git describe"
-  outputsLabel="产出"
-  outputs="控制台信息|差异上下文|决策依据"
-  note="如果输出看起来“不对”，优先排查的是观察范围，而不是命令本身有没有生效。"
+  outputsLabel="结果"
+  outputs="版本标识符（如 v1.2.3-5-gabc1234）"
+  note="describe 不修改任何内容，只输出一个基于标签的人类可读版本字符串。"
 />
 
 ## 特殊情况与边界
 
-- 大多数观察命令本身不改历史，但它看到的结果会受 HEAD、路径、提交范围或引用选择影响。
-- 如果 `git describe` 的输出和预期不一致，先确认你看的到底是工作区、索引、当前分支，还是某个历史提交。
-- 把 `git describe` 和 `git status`、`git log`、`git show` 组合使用，通常比单独看一个输出更稳。
+- 如果当前提交祖先中没有任何标签且不使用 `--always`，describe 会直接报错退出。
+- `--tags` 参数会让 describe 也考虑非注释标签（annotated tags 是默认搜索目标）。
+- 输出格式为 `最近标签名-距离标签的提交数-g简短哈希`，适合直接用作构建版本号。
+- 注释标签（annotated tag）和普通标签（lightweight tag）在 describe 中的处理方式不同，发布版本建议使用注释标签。
 
 
 ## 延伸阅读

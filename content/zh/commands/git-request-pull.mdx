@@ -53,18 +53,36 @@ git request-pull origin/main https://example.com/repo.git feature/my-change
 </WarningBox>
 
 ## 常见误区
+`git request-pull` 生成一段纯文本摘要，告诉维护者应该从哪个 URL 拉取哪些提交。理解它时，要明确它只生成描述文本，不发起任何平台的 pull request，也不修改本地仓库。
 
 ### 误区 1：把它当平台 PR 替代按钮
 
 它是文本摘要工具，不是平台 API。
+- 向维护者发送拉取请求时，用 `git request-pull` 生成一段包含拉取 URL、起始点和提交范围的说明文本。
+- 把生成的摘要直接粘贴到邮件或协作平台中，让维护者可以手动执行 `git pull` 来拉取你的改动。
+- 在邮件列表协作模式中，作为 format-patch / send-email 之外的另一种提交改动的方式。
 
 ### 误区 2：分支没推送就发 request-pull
 
 维护者无法拉取到你描述的对象。
+<CommandFlowFigure
+  title="拉取请求摘要的生成"
+  caption="request-pull 生成的是纯文本描述，不是自动发起的平台 PR，维护者需要根据摘要中的信息手动执行拉取操作。"
+  inputsLabel="输入"
+  inputs="起始提交|远端 URL|结束分支"
+  commandLabel="git request-pull"
+  outputsLabel="结果"
+  outputs="纯文本拉取请求摘要"
+  note="这条命令不修改本地仓库，只输出文本，维护者收到后需要自行执行 git pull。"
+/>
 
 ### 误区 3：摘要不校对直接发送
 
 base 或 URL 有误会增加维护者沟通成本。
+- 这条命令生成的是"请求摘要"文本，不是自动发起 GitHub/GitLab 的 PR，需要结合团队实际协作渠道使用。
+- 指定的起始提交必须在维护者可以访问的远端上可见，否则对方无法拉取。
+- 执行前最好确认你的远端仓库已经 push 了相关分支，且 URL 是维护者有权限访问的。
+- 输出的摘要可以直接粘贴到邮件正文中，维护者通常只需要复制其中的 git pull 命令即可执行。
 
 ## 接下来建议继续看什么
 

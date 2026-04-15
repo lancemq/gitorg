@@ -1,0 +1,372 @@
+export const metadata = {
+  title: "Git 别名与效率提升",
+  slug: "git-aliases",
+  locale: "zh",
+  section: "best-practices",
+  summary: "高效 Git 别名配置、常用别名清单、Shell 别名、团队共享别名配置与最佳实践。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases",
+    "https://git-scm.com/docs/git-config",
+  ],
+};
+
+# Git 别名与效率提升
+
+## 一句话理解
+
+<CommandFlowFigure
+  title="Git 别名体系"
+  caption="通过别名简化常用命令，统一团队操作习惯，减少输入错误。别名应该是自解释的，而不是更短的缩写。"
+  inputsLabel="常用命令"
+  inputs="git status|git log --oneline --graph|git branch --merged|git diff --staged"
+  commandLabel="别名简化"
+  outputsLabel="快捷命令"
+  outputs="git s → status|git lg → log --oneline --graph|git bm → branch --merged|git ds → diff --staged"
+  note="别名应该让常用操作更快，但不要牺牲可读性。团队可以共享一套别名配置。"
+/>
+
+Git 别名就是把你经常使用的完整命令，
+
+## 什么是 Git 别名
+
+Git 别名是 Git 内置的命令缩写机制。配置后，`git s` 可以等同于 `git status`。
+
+```bash
+# 基本配置语法
+git config --global alias.别名 '原命令'
+
+# 示例
+git config --global alias.s status
+```
+
+配置存储在 `~/.gitconfig` 中：
+
+```ini
+[alias]
+    s = status
+```
+
+## 常用基础别名
+
+### 状态与日志
+
+```ini
+[alias]
+    # 查看状态（简短格式）
+    s = status -s
+
+    # 查看分支
+    b = branch
+
+    # 查看提交日志（单行）
+    l = log --oneline
+
+    # 查看最近 10 条提交
+    last = log -1 HEAD --stat
+
+    # 查看图形化日志
+    lg = log --oneline --graph --decorate
+```
+
+### 分支操作
+
+```ini
+[alias]
+    # 列出所有分支（包括远端）
+    ba = branch -a
+
+    # 列出已合并的分支
+    bm = branch --merged
+
+    # 列出未合并的分支
+    bu = branch --no-merged
+
+    # 创建并切换分支
+    co = checkout -b
+```
+
+### 远程操作
+
+```ini
+[alias]
+    # 查看所有远端
+    r = remote -v
+
+    # 推送当前分支并设置上游
+    pushu = push -u origin HEAD
+
+    # 拉取并合并
+    pullr = pull --rebase
+```
+
+## 高级别名
+
+### 美化日志格式
+
+```ini
+[alias]
+    # 详细美化日志
+    lg1 = log --graph --format='%C(auto)%h %C(cyan)%ad %C(green)%s%C(reset) %C(yellow)%d' --date=short
+
+    # 带作者信息的日志
+    lg2 = log --graph --format='%C(auto)%h %C(bold blue)%an%C(reset) %C(cyan)%ad %C(green)%s%C(reset) %C(yellow)%d' --date=short
+
+    # 统计提交数
+    count = shortlog -sn
+
+    # 按日期查看谁改了什么
+    who = shortlog -sn --no-merges
+```
+
+### 文件变更历史
+
+```ini
+[alias]
+    # 查看文件修改历史
+    filelog = log --oneline --follow --
+
+    # 查看谁修改了文件的哪一行
+    blame-compact = blame --date=short -w
+
+    # 搜索提交信息
+    search = log --all --grep
+```
+
+### Diff 增强
+
+```ini
+[alias]
+    # 显示单词级别的 diff
+    wdiff = diff --word-diff=color
+
+    # 显示变更统计
+    stat = diff --stat
+
+    # 比较两个分支的差异
+    compare = diff --stat main..HEAD
+```
+
+## Shell 别名（! 前缀）
+
+以 `!` 开头的别名会在 Shell 中执行，可以做更复杂的操作：
+
+```ini
+[alias]
+    # 查看当前分支
+    current = !"git symbolic-ref --short HEAD"
+
+    # 删除已合并的分支
+    cleanup = !"git branch --merged | grep -v '\\*\\|main\\|master' | xargs -n 1 git branch -d"
+
+    # 查看未跟踪的文件
+    untracked = !"git status --porcelain | grep '^??' | cut -c4-"
+
+    # 快速提交
+    c = "!f() { git commit -m \"$*\"; }; f"
+
+    # 查看最常被修改的文件
+    topfiles = !"git log --pretty=format: --name-only | sort | uniq -c | sort -rg | head -20"
+
+    # 显示最近的 tag
+    latest-tag = !"git describe --tags --abbrev=0"
+
+    # 交互式添加
+    addp = add -p
+
+    # 压缩提交（squash 最近 N 个）
+    squash = !"f() { git reset --soft HEAD~${1} && git commit --edit -m\"$(git log --format=%B --reverse HEAD..HEAD@{1})\"; }; f"
+```
+
+## 团队共享别名配置
+
+### 方法 1：通过 include 共享配置
+
+```ini
+# ~/.gitconfig
+[include]
+    path = ~/.gitconfig-team
+
+# ~/.gitconfig-team
+[alias]
+    lg = log --oneline --graph --decorate
+    s = status -s
+    cleanup = !"git branch --merged | grep -v '\\*\\|main' | xargs -n 1 git branch -d"
+```
+
+### 方法 2：通过仓库级配置
+
+```bash
+# 在仓库根目录创建 .gitconfig
+cat > .gitconfig << EOF
+[alias]
+    lg = log --oneline --graph --decorate
+    s = status -s
+EOF
+
+# 让仓库包含这个配置
+git config include.path .gitconfig
+```
+
+### 方法 3：通过脚本分发
+
+```bash
+#!/bin/bash
+# setup-git-aliases.sh
+
+git config --global alias.s 'status -s'
+git config --global alias.lg 'log --oneline --graph --decorate'
+git config --global alias.cleanup "!git branch --merged | grep -v '\\*\\|main' | xargs -n 1 git branch -d"
+git config --global alias.lg1 "log --graph --format='%C(auto)%h %C(cyan)%ad %C(green)%s%C(reset) %C(yellow)%d' --date=short"
+
+echo "Git aliases configured."
+```
+
+团队新成员只需运行：
+
+```bash
+bash setup-git-aliases.sh
+```
+
+## 别名与自动补全的配合
+
+### Bash 补全
+
+确保安装了 git-completion.bash：
+
+```bash
+# Ubuntu/Debian
+sudo apt install git bash-completion
+
+# macOS (Homebrew)
+brew install git bash-completion@2
+```
+
+Git 别名自动补全需要在 `.bashrc` 中添加：
+
+```bash
+# 让补全脚本识别自定义别名
+__git_complete gc _git_checkout  # 如果你的别名是 gc
+```
+
+### Zsh 补全
+
+使用 oh-my-zsh 的 git 插件：
+
+```bash
+# ~/.zshrc
+plugins=(git zsh-autosuggestions)
+```
+
+oh-my-zsh 自带大量 Git 别名：
+
+| 别名 | 命令 |
+|------|------|
+| `g` | git |
+| `gst` | git status |
+| `gl` | git pull |
+| `gc` | git commit -v |
+| `gb` | git branch |
+| `gd` | git diff |
+| `gco` | git checkout |
+| `glog` | git log --oneline --graph --decorate |
+
+## 推荐的个人别名配置
+
+```ini
+[alias]
+    # 日常高频
+    s = status -sb
+    b = branch -vv
+    l = log --oneline -20
+    lg = log --oneline --graph --decorate --all
+
+    # 提交相关
+    c = commit
+    ca = commit --amend
+    cn = commit --no-verify
+
+    # 分支操作
+    co = checkout
+    nb = checkout -b
+    del = branch -d
+    force-del = branch -D
+
+    # 远端操作
+    p = push
+    pf = push --force-with-lease
+    pl = pull --rebase
+    f = fetch --all --prune
+
+    # 高级
+    stash-all = stash save --include-untracked
+    unstage = reset HEAD --
+    undo = reset --soft HEAD~1
+    who = shortlog -sn --no-merges
+
+    # Shell 别名
+    root = rev-parse --show-toplevel
+    current = !"git symbolic-ref --short HEAD"
+    cleanup = "!git branch --merged | grep -v '\\*\\|main\\|master' | xargs -n 1 git branch -d"
+```
+
+## 常见误区
+
+### 过度缩写导致可读性下降
+
+```ini
+# 不好的做法——缩写太短，难以记忆
+[alias]
+    q = status
+    w = log
+    e = commit
+
+# 好的做法——缩写有意义
+[alias]
+    s = status -s
+    l = log --oneline
+    c = commit
+```
+
+### 别名与子命令冲突
+
+```ini
+# 避免使用 Git 已有的子命令名作为别名
+# 不要用 checkout 作为别名（已有 checkout 命令）
+# 不要用 commit 作为别名（已有 commit 命令）
+```
+
+### 在脚本中使用别名
+
+```bash
+# 错误：Git 脚本中别名不展开
+#!/bin/bash
+git s  # 在非交互模式下可能不工作
+
+# 正确：使用完整命令
+#!/bin/bash
+git status -s
+```
+
+Git 别名主要在交互式命令行中展开，脚本中应使用完整命令。
+
+## 注意事项
+
+1. **alias 配置在全局还是本地**：`--global` 影响所有仓库，不加则只影响当前仓库
+2. **Shell 别名需要引号**：`!` 前缀的别名必须用引号包裹
+3. **别名可以链式调用**：`git s` 展开为 `git status -s`
+4. **查看已配置的别名**：`git config --get-regexp alias`
+5. **删除别名**：`git config --global --unset alias.xxx`
+6. **避免与 Shell 别名混淆**：Git 别名只在 `git` 后生效
+
+## 总结
+
+| 类别 | 推荐别名 | 效果 |
+|------|---------|------|
+| 状态 | `s = status -sb` | 简短+分支信息 |
+| 日志 | `lg = log --oneline --graph --decorate --all` | 图形化全分支日志 |
+| 提交 | `ca = commit --amend` | 修改上次提交 |
+| 分支 | `nb = checkout -b` | 创建并切换分支 |
+| 推送 | `pf = push --force-with-lease` | 安全强制推送 |
+| 清理 | `cleanup` (Shell) | 删除已合并分支 |
+
+好的别名配置可以节省大量打字时间，但要保持克制——只缩写你每天使用多次的命令。

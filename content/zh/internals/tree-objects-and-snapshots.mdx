@@ -27,6 +27,17 @@ export const metadata = {
 
 ## 2. tree 保存的到底是什么
 
+<CommandFlowFigure
+  title="Tree 如何组织目录快照"
+  caption="根 tree 指向多个子 tree 和 blob，形成完整的目录层级快照。commit 最终指向根 tree，表达整个项目的当前状态。"
+  inputsLabel="目录结构"
+  inputs="src/app.ts → blob:app_hash|src/utils.ts → blob:utils_hash|README.md → blob:readme_hash|tests/ → sub-tree"
+  commandLabel="根 tree 组织"
+  outputsLabel="快照表达"
+  outputs="tree: src/ (含 app, utils)|tree: tests/ (含 test files)|tree: 根目录 (含 README, src/, tests/)"
+  note="每次提交都指向一个完整的 tree 快照，不是差异。Git 通过对象复用保证存储效率。"
+/>
+
 tree 不直接保存文件内容，它保存的是目录条目。每个条目通常包括：
 
 - 名字

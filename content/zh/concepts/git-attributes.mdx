@@ -1,0 +1,349 @@
+export const metadata = {
+  title: "Git Attributes 详解",
+  slug: "git-attributes",
+  locale: "zh",
+  section: "concepts",
+  summary: "解释 .gitattributes 文件的用途、语法和常见应用场景，包括行尾符、合并策略、差异比较、语言识别和大文件处理。",
+  sourceUrls: [
+    "https://git-scm.com/docs/gitattributes",
+    "https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes",
+  ],
+};
+
+# Git Attributes 详解
+
+## 一句话理解
+
+`.gitattributes` 文件让你对仓库中的文件进行更细粒度的控制，包括行尾符处理、合并策略、差异比较方式、语言识别和大文件关联等。
+
+## .gitignore 与 .gitattributes 的区别
+
+很多初学者容易混淆这两个文件：
+
+| 特性 | `.gitignore` | `.gitattributes` |
+|------|-------------|-----------------|
+| 作用 | 决定哪些文件**不被跟踪** | 决定被跟踪的文件**如何处理** |
+| 关注点 | 文件的去留 | 文件的行为 |
+| 常见用途 | 忽略编译产物、依赖包 | 控制行尾符、合并策略、差异格式 |
+
+简单来说：`.gitignore` 说"别管这个文件"，`.gitattributes` 说"用特定方式处理这个文件"。
+
+<CommandFlowFigure
+  title=".gitattributes 的文件处理流程"
+  caption=".gitattributes 不决定文件是否被跟踪，而是决定被跟踪的文件在行尾符、合并策略、差异比较等方面如何被处理。"
+  inputsLabel="被跟踪的文件"
+  inputs="*.sh 脚本文件|*.bat 批处理文件|package-lock.json 锁文件|*.png 图片文件|*.docx 文档文件"
+  commandLabel=".gitattributes 规则"
+  outputsLabel="处理策略"
+  outputs="eol=lf 统一行尾符|eol=crlf Windows 行尾符|merge=ours 合并保留当前|diff=exif 图片元数据 diff|diff=docx 文档转文本 diff"
+  note="规则按 pattern 匹配，子目录的 .gitattributes 优先级高于父目录。"
+/>
+
+## .gitattributes 文件语法
+
+每一行的格式是：
+
+```
+<pattern> <attribute1> <attribute2> ...
+```
+
+- **pattern**：使用 glob 模式匹配文件路径（和 `.gitignore` 类似）
+- **attribute**：属性名，可选值或布尔属性
+
+### 属性值类型
+
+```gitattributes
+# 布尔属性：设置（+）或取消（-）
+*.txt text          # 标记为文本文件
+*.bin -text         # 标记为二进制文件
+
+# 带值的属性
+*.png diff=exif     # 使用 exif 方式进行差异比较
+
+# 多属性组合
+*.ps1 text eol=crlf # 标记为文本且使用 CRLF 行尾
+```
+
+### 文件位置
+
+- **仓库根目录**：`/.gitattributes`，对整个仓库生效
+- **子目录**：`subdir/.gitattributes`，仅对该目录生效
+- **全局**：`~/.config/git/attributes` 或 `~/.gitattributes`，通过 `git config core.attributesFile` 配置
+
+## 行尾符控制（text 和 eol）
+
+这是 `.gitattributes` 最常见的用途之一。不同操作系统的行尾符不同：
+
+- **Linux/macOS**：LF（`\n`）
+- **Windows**：CRLF（`\r\n`）
+
+Git 默认会根据 `core.autocrlf` 配置自动转换，但在团队协作中，通过 `.gitattributes` 明确指定更可靠：
+
+```gitattributes
+# 将所有文本文件统一为 LF（推荐用于跨平台项目）
+* text=auto
+
+# 特定文件强制使用 CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 特定文件强制使用 LF
+*.sh text eol=lf
+*.py text eol=lf
+
+# 标记为二进制文件（不进行行尾转换）
+*.png -text
+*.jpg -text
+*.exe -text
+```
+
+### text=auto 的作用
+
+`text=auto` 让 Git 自动检测文件是否为文本文件：
+- 如果是文本文件，检入时转换为 LF，检出时根据平台转换
+- 如果是二进制文件，不做任何转换
+
+**最佳实践**：在跨平台项目的根目录放一行 `* text=auto`，然后针对特殊文件覆盖设置。
+
+## 合并策略控制
+
+`.gitattributes` 可以指定特定文件的合并策略，避免合并冲突或采用特定的合并方式：
+
+```gitattributes
+# 使用 "ours" 策略：合并时始终保留当前分支的版本
+package-lock.json merge=ours
+yarn.lock merge=ours
+
+# 使用 "union" 策略：将两边的修改合并在一起
+*.md merge=union
+
+# 使用自定义合并驱动
+*.pbxproj merge=pbxprojMerge
+```
+
+### 配置自定义合并驱动
+
+```bash
+# 在 .git/config 中配置
+git config merge.pbxprojMerge.name "Xcode project merge"
+git config merge.pbxprojMerge.driver "git-merge-xcodeproj %O %A %B"
+```
+
+### 常见场景
+
+- **锁文件**：`package-lock.json`、`yarn.lock`、`Cargo.lock` 等通常设为 `merge=ours`，因为重新生成比手动合并更安全
+- **自动生成的文件**：代码生成器的输出可以设为 `merge=ours`
+- **文档文件**：可以设为 `merge=union` 来保留双方修改
+
+## 差异比较控制（diff）
+
+`.gitattributes` 可以改变 `git diff` 的输出方式：
+
+### 文本 diff 驱动
+
+```gitattributes
+# 为不同语言选择合适的关键字和函数名识别
+*.c diff=cpp
+*.h diff=cpp
+*.py diff=python
+*.rb diff=ruby
+*.java diff=java
+*.cs diff=csharp
+```
+
+Git 内置了多种语言的 diff 驱动，能够更准确地识别函数名和关键字。
+
+### 二进制文件的 diff
+
+```gitattributes
+# 图片文件：使用 exiftool 显示元数据差异
+*.png diff=exif
+*.jpg diff=exif
+
+# 文档文件：使用自定义脚本
+*.docx diff=docx
+*.xlsx diff=xlsx
+
+# 标记为不生成 diff（完全跳过）
+*.bin -diff
+```
+
+### 配置自定义 diff 驱动
+
+```bash
+# 配置 docx 文件的 diff 驱动
+git config diff.docx.textconv "pandoc --to=markdown"
+```
+
+这样 `git diff` 时会先将 `.docx` 转为 Markdown 再比较，而不是显示二进制差异。
+
+## 导出控制（export-ignore 和 export-subst）
+
+当你使用 `git archive` 打包发布时，可以控制哪些文件被包含：
+
+```gitattributes
+# 这些文件不会被包含在 git archive 输出中
+.gitattributes export-ignore
+.gitignore export-ignore
+tests/ export-ignore
+.github/ export-ignore
+.editorconfig export-ignore
+
+# 在导出时替换变量
+VERSION.txt export-subst
+```
+
+### export-subst 示例
+
+`VERSION.txt` 内容：
+
+```
+Version: $Format:%H$
+Date: $Format:%ci$
+```
+
+导出后会被替换为实际的提交哈希和日期。
+
+## 语言检测和统计（linguist-*）
+
+GitHub 使用 Linguist 库来识别仓库中的主要编程语言。`.gitattributes` 可以影响这个统计：
+
+```gitattributes
+# 将特定文件标记为某种语言
+*.gradle linguist-language=Groovy
+*.plist linguist-language=XML
+
+# 排除文件不纳入语言统计
+generated/ linguist-generated=true
+vendor/ linguist-vendored=true
+
+# 标记为文档而非代码
+docs/ linguist-documentation=true
+*.md linguist-documentation=true
+```
+
+**注意**：`linguist-*` 属性仅影响 GitHub 的显示，不影响 Git 核心功能。
+
+## 大文件属性（filter=lfs）
+
+与 Git LFS 配合使用，标记需要 LFS 管理的文件：
+
+```gitattributes
+# 将所有模型文件和大数据文件交由 LFS 管理
+*.pt filter=lfs diff=lfs merge=lfs -text
+*.bin filter=lfs diff=lfs merge=lfs -text
+data/*.csv filter=lfs diff=lfs merge=lfs -text
+```
+
+这通常在运行 `git lfs track` 时自动生成。
+
+## 固定宽度 diff 属性（ws）
+
+控制空白字符在 diff 中的显示方式：
+
+```gitattributes
+# 忽略行尾空白差异
+*.txt whitespace=trailing-space
+
+# 高亮所有空白问题
+*.py whitespace=tab-in-indent,space-before-tab
+```
+
+### 空白检查选项
+
+| 选项 | 含义 |
+|------|------|
+| `blank-at-eol` | 行尾有多余空格 |
+| `blank-at-eof` | 文件末尾缺少换行符 |
+| `space-before-tab` | tab 前面有空格 |
+| `tab-in-indent` | 缩进中混用空格和 tab |
+| `cr-at-eol` | 行尾有 CR（不视为错误） |
+
+## 完整示例
+
+一个典型的 Web 项目的 `.gitattributes`：
+
+```gitattributes
+# 自动检测文本/二进制
+* text=auto
+
+# Windows 脚本使用 CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Unix 脚本使用 LF
+*.sh text eol=lf
+*.bash text eol=lf
+
+# 锁文件合并策略
+package-lock.json merge=ours
+yarn.lock merge=ours
+
+# 语言 diff 驱动
+*.js diff=javascript
+*.ts diff=javascript
+*.css diff=css
+*.html diff=html
+
+# 导出时忽略的文件
+.gitattributes export-ignore
+.gitignore export-ignore
+.eslintrc export-ignore
+.editorconfig export-ignore
+tests/ export-ignore
+.github/ export-ignore
+
+# 图片元数据 diff
+*.png diff=exif
+*.jpg diff=exif
+
+# LFS 管理的文件
+*.psd filter=lfs diff=lfs merge=lfs -text
+*.ai filter=lfs diff=lfs merge=lfs -text
+```
+
+## 调试和验证
+
+### 检查属性应用
+
+```bash
+# 查看某个文件的属性
+git check-attr -a path/to/file.txt
+
+# 查看特定属性
+git check-attr text path/to/file.txt
+```
+
+### 查看当前生效的 .gitattributes
+
+```bash
+# 列出所有 .gitattributes 文件
+find . -name ".gitattributes" -not -path "./.git/*"
+```
+
+## 常见误区
+
+### 1. 已缓存的行尾符需要重置
+
+```bash
+# 修改 .gitattributes 后，需要重新规范化行尾符
+git add --renormalize .
+git commit -m "规范化行尾符"
+```
+
+### 2. 属性只对跟踪的文件生效
+
+和 `.gitignore` 不同，`.gitattributes` 对被跟踪的文件生效。未跟踪的文件不会受其影响（除非你 add 它们）。
+
+### 3. 多个 .gitattributes 的优先级
+
+- 子目录的 `.gitattributes` 优先级高于父目录
+- 同一目录中，后匹配的规则覆盖前面的
+- `.git/info/attributes` 优先级高于仓库内的 `.gitattributes`
+
+## 继续学习建议
+
+1. `git diff` 的各种选项
+2. Git LFS（大文件存储）
+3. `git archive` 和发布流程

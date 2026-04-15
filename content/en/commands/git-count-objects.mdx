@@ -48,30 +48,30 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 
 ## What problem this command solves in a workflow
 
-`git count-objects` focuses on object storage, pack files, reachability, and repository maintenance quality. It is usually a diagnostic or maintenance tool, not part of the normal commit loop.
+`git count-objects` focuses on object storage, pack files, reachability, and repository maintenance quality. It is not usually part of the normal commit loop — it is more of a diagnostic or maintenance tool.
 
 ## Typical use cases
 
-- Use `git count-objects` when the repository grows large, when object integrity is in question, or when you need to understand storage layout.
-- Put `git count-objects` into maintenance flow when you need visibility into packs, object counts, and reachability.
-- Use `git count-objects` during performance, size, or integrity investigations when porcelain commands do not expose enough storage detail.
+- Diagnose repository health when it grows large, when object corruption is suspected, or when you need to understand the storage layout.
+- Add `git count-objects` to your maintenance flow to monitor packs, object counts, and reachability state.
+- Use `git count-objects` during performance, size, or integrity investigations to expose storage details that porcelain commands do not show.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Storage and maintenance view"
+  title="Object storage and maintenance view"
   caption="Storage-oriented commands work against the object database, pack files, and reachability model to verify, analyze, or clean repository state."
-  inputsLabel="Storage inputs"
-  inputs="Object database|Pack files|Reachability data"
+  inputsLabel="Storage objects"
+  inputs="Object database|Pack files|Reachability information"
   commandLabel="git count-objects"
   outputsLabel="Results"
-  outputs="Diagnostics|Maintenance actions|Size / integrity signals"
-  note="If a command may prune, compress, or reorganize storage, confirm whether you are still in a phase where recovery clues matter."
+  outputs="Loose object count|Pack file count|Space usage statistics"
+  note="This command is read-only and safe to run at any time — it never changes any repository state."
 />
 
 ## Special cases and boundaries
 
-- Maintenance commands are usually better scheduled in a controlled window than improvised during a stressful release moment.
-- If you are actively doing recovery or incident analysis, verify that `git count-objects` will not remove useful evidence before continuing.
-- When something looks wrong, preserve diagnostics first and choose cleanup second.
+- This is a read-only command — running it at any time will never affect repository state.
+- The `size` and `size-pack` values in the output may differ — the former is the size of loose objects, the latter is the size of objects in pack files.
+- If the number of loose objects grows unusually large, it usually means `git gc` has not run automatically yet — you can run `git gc` manually to clean up.
 

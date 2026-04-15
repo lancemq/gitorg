@@ -1,0 +1,434 @@
+export const metadata = {
+  title: "Git 浅克隆与浅操作",
+  slug: "git-shallow",
+  locale: "zh",
+  section: "concepts",
+  summary: "解释 git clone --depth、浅 fetch、shallow exclude 等浅操作的概念、使用场景和局限性。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-clone",
+    "https://git-scm.com/docs/git-fetch",
+    "https://git-scm.com/book/en/v2/Git-Tools-Shallow-Cloning",
+  ],
+};
+
+# Git 浅克隆与浅操作
+
+## 一句话理解
+
+浅克隆（Shallow Clone）只下载最近的若干次提交而非完整历史，大幅减少 clone 时间和磁盘占用，适用于 CI/CD、大型仓库和只需要最新代码的场景。
+
+## 为什么需要浅克隆
+
+### 完整克隆的问题
+
+对于大型项目，完整 clone 可能非常耗时：
+
+```bash
+# Linux 内核仓库（完整历史超过 3GB）
+git clone https://github.com/torvalds/linux.git
+# 需要下载数 GB 数据，可能耗时几分钟到几十分钟
+```
+
+如果 CI/CD 流水线每次都要完整 clone，浪费大量时间在下载历史上。
+
+### 浅克隆的优势
+
+```bash
+# 只下载最近 1 次提交
+git clone --depth 1 https://github.com/torvalds/linux.git
+# 只需下载当前快照，体积小、速度快
+```
+
+| 指标 | 完整克隆 | 浅克隆 (--depth 1) |
+|------|---------|-------------------|
+| 下载量 | 完整历史（可能数 GB） | 仅当前快照（通常几 MB 到几百 MB） |
+| 速度 | 慢 | 快 |
+| 可用功能 | 全部 | 部分受限 |
+| 适用场景 | 日常开发 | CI/CD、代码审查、快速查看 |
+
+<CommitGraphFigure
+  title="完整历史 vs 浅克隆历史"
+  caption="完整克隆下载从 root commit 到最新提交的全部历史。浅克隆只下载最近 N 次提交，更早的提交被截断（shallow boundary），本地无法访问。"
+  linearLabel="完整历史（A→B→C→D→E→F→G→H）"
+  mergeLabel="浅克隆 --depth 3（仅 F→G→H）"
+  rewriteLabel="浅克隆 --depth 1（仅 H）"
+  pointerLabel="shallow boundary 截断点"
+/>
+
+## 基本操作
+
+### 浅克隆
+
+```bash
+# 只克隆最近 N 次提交
+git clone --depth <N> <repository-url>
+
+# 只克隆最近 1 次提交（最常用）
+git clone --depth 1 https://github.com/user/repo.git
+
+# 克隆特定分支的最近 N 次提交
+git clone --depth 1 --branch main https://github.com/user/repo.git
+```
+
+### 浅克隆后的状态
+
+```bash
+# 查看克隆深度
+git rev-parse --is-shallow-repository
+# true
+
+# 查看浅提交的边界
+git rev-parse --shallow-file
+# .git/shallow
+
+# 查看哪些提交是浅提交（历史记录在此截断）
+git log --oneline
+# 你只能看到最近的 N 次提交
+```
+
+### 将浅克隆转为完整克隆
+
+```bash
+# 方法一：获取完整历史
+git fetch --unshallow
+
+# 方法二：获取更多历史（但不一定是完整的）
+git fetch --depth=100
+
+# 方法三：指定获取到某个时间点之前
+git fetch --deepen=50
+```
+
+## 浅 Fetch
+
+不只是 clone 可以浅操作，`fetch` 也支持：
+
+### 增加深度
+
+```bash
+# 在当前浅仓库上获取更多历史
+git fetch --depth=50
+
+# 在现有基础上再增加 50 次提交
+git fetch --deepen=50
+```
+
+### 浅 fetch 特定分支
+
+```bash
+# 只 fetch 某个分支的最近 10 次提交
+git fetch origin main --depth=10
+```
+
+### 自动跟随 tags
+
+```bash
+# 浅克隆时也获取 tag
+git clone --depth 1 --no-tags https://github.com/user/repo.git
+
+# 或者获取所有 tag（即使它们指向浅边界之外的提交）
+git clone --depth 1 https://github.com/user/repo.git
+git fetch --tags
+```
+
+## Shallow Exclude
+
+`--shallow-exclude` 允许你排除某个分支或 tag 之前的历史：
+
+```bash
+# 克隆但不包含 v1.0 tag 之前的历史
+git clone --shallow-exclude=v1.0 https://github.com/user/repo.git
+
+# 不包含某个分支的合并之前的历史
+git clone --shallow-exclude=develop https://github.com/user/repo.git
+```
+
+这在需要保留某个版本之后的完整历史，但不想下载更早期的提交时很有用。
+
+## Shallow Since
+
+`--shallow-since` 允许你基于时间裁剪历史：
+
+```bash
+# 只克隆 2024 年 1 月 1 日之后的提交
+git clone --shallow-since="2024-01-01" https://github.com/user/repo.git
+
+# 只克隆最近 30 天的提交
+git clone --shallow-since="30 days ago" https://github.com/user/repo.git
+```
+
+## 分支和 Tag 的限制
+
+### 默认行为
+
+```bash
+# 默认情况下，浅克隆只获取默认分支
+git clone --depth 1 https://github.com/user/repo.git
+
+# 查看所有可用分支
+git branch -r
+```
+
+### 获取其他分支
+
+```bash
+# 方法一：克隆时指定分支
+git clone --depth 1 --branch develop https://github.com/user/repo.git
+
+# 方法二：克隆后 fetch 其他分支
+git fetch origin develop --depth=1
+git checkout -b develop origin/develop
+
+# 方法三：配置 fetch 规则获取更多分支
+git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+git fetch --depth=1
+```
+
+### Tag 的限制
+
+浅克隆默认不会获取指向浅边界之外的 tag。如果需要这些 tag：
+
+```bash
+# 克隆后单独 fetch tags
+git fetch --tags --depth=1
+
+# 或者在克隆时不限制 tag
+git clone --depth 1 https://github.com/user/repo.git
+```
+
+## CI/CD 中的浅克隆
+
+### GitHub Actions
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1  # 浅克隆
+
+      - name: Build
+        run: |
+          npm ci
+          npm run build
+```
+
+### GitLab CI
+
+```yaml
+variables:
+  GIT_DEPTH: 1  # 浅克隆
+
+build:
+  script:
+    - npm ci
+    - npm run build
+```
+
+### Jenkins Pipeline
+
+```groovy
+pipeline {
+    agent any
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    extensions: [[$class: 'CloneOption', depth: 1, shallow: true]],
+                    userRemoteConfigs: [[url: 'https://github.com/user/repo.git']]
+                ])
+            }
+        }
+    }
+}
+```
+
+## 浅克隆的限制和注意事项
+
+### 1. 无法 push 浅克隆
+
+```bash
+# 浅克隆默认不允许 push
+git push
+# fatal: shallow update not allowed
+
+# 如果远端允许，可以配置：
+git config remote.origin.promisor true
+git config remote.origin.partialclonefilter blob:none
+```
+
+### 2. 某些操作不可用
+
+以下操作在浅仓库中可能受限或不可用：
+
+```bash
+# git blame 需要完整历史才能准确追踪
+git blame file.py  # 在浅仓库中只能追溯到浅边界
+
+# git bisect 需要足够的历史范围
+git bisect start  # 如果好/坏提交都在浅边界之外则无法使用
+
+# git log 只能看到有限的历史
+git log --oneline  # 只显示最近的 N 次提交
+
+# 比较两个不在浅历史中的提交
+git diff commit1 commit2  # 如果任一提交不在浅历史中则失败
+```
+
+### 3. Merge 和 Rebase 的限制
+
+```bash
+# 浅克隆上 merge 可能找不到共同祖先
+git merge feature-branch
+# 可能需要先获取更多历史
+
+# 解决：先 fetch 更多历史
+git fetch --deepen=100
+git merge feature-branch
+```
+
+### 4. Submodule 的浅克隆
+
+```bash
+# 浅克隆时同时浅初始化 submodule
+git clone --depth 1 --recurse-submodules --shallow-submodules https://github.com/user/repo.git
+
+# 或者后续添加 submodule 时也浅克隆
+git submodule update --init --depth 1
+```
+
+## 部分克隆（Partial Clone）
+
+Git 2.19+ 引入了部分克隆，比浅克隆更灵活：
+
+```bash
+# 获取完整历史但不下载 blob（文件内容）
+git clone --filter=blob:none https://github.com/user/repo.git
+
+# 只下载小于 1MB 的 blob
+git clone --filter=blob:limit=1m https://github.com/user/repo.git
+
+# 只下载 tree（目录结构），不下载任何 blob
+git clone --filter=tree:0 https://github.com/user/repo.git
+```
+
+部分克隆与浅克隆的区别：
+
+| 特性 | 浅克隆 | 部分克隆 |
+|------|-------|---------|
+| 历史深度 | 有限次提交 | 完整历史 |
+| 文件内容 | 下载的文件完整 | 按需下载 |
+| Push | 受限 | 通常不受限 |
+| 适用场景 | CI/CD、临时查看 | 大型代码库、按需下载 |
+
+### 部分克隆的使用
+
+```bash
+# 克隆后按需获取文件内容
+git clone --filter=blob:none https://github.com/user/repo.git
+cd repo
+
+# 正常 checkout（Git 会自动按需下载需要的 blob）
+git checkout develop
+
+# 查看某个文件（自动下载该文件的 blob）
+cat src/main.py
+```
+
+## 实际工作流示例
+
+### 示例 1：CI/CD 快速构建
+
+```bash
+# 在 CI 中快速克隆最新代码
+git clone --depth 1 --branch main https://github.com/company/project.git
+cd project
+
+# 运行构建
+npm ci
+npm run build
+
+# 如果需要完整历史用于某些插件
+git fetch --unshallow 2>/dev/null || true
+```
+
+### 示例 2：大型仓库快速查看
+
+```bash
+# 快速查看大型仓库的最新代码
+git clone --depth 1 https://github.com/microsoft/vscode.git
+
+# 查看最近的变更
+git log --oneline
+
+# 如果需要更多历史
+git fetch --deepen=50
+```
+
+### 示例 3：代码审查
+
+```bash
+# 浅克隆用于快速代码审查
+git clone --depth 50 https://github.com/user/project.git
+cd project
+
+# 查看 PR 涉及的变更
+git log --oneline origin/main..origin/feature-branch
+
+# 如果历史不够
+git fetch --deepen=100
+```
+
+### 示例 4：转换为完整仓库
+
+```bash
+# 1. 先浅克隆开始工作
+git clone --depth 1 https://github.com/user/project.git
+cd project
+
+# 2. 开始开发后发现需要完整历史
+git fetch --unshallow
+
+# 3. 现在可以进行完整操作
+git log --oneline --all --graph
+git bisect start
+```
+
+## 常见问题
+
+### Q: 浅克隆后能看到所有分支吗？
+
+默认只能看到默认分支。需要额外配置或 fetch 才能获取其他分支。
+
+### Q: 浅克隆可以 push 吗？
+
+默认不行。浅克隆的设计目的是快速获取代码而非协作。需要转换为完整仓库或在远端启用浅推送。
+
+### Q: 什么时候不应该使用浅克隆？
+
+- 你需要完整历史来进行 `git blame`、`git bisect` 等
+- 你需要与旧版本进行比较
+- 你需要 push 到远端
+- 你需要查看所有 tag 和分支的完整历史
+
+### Q: 浅克隆会影响 git describe 吗？
+
+会。`git describe` 需要找到最近的 tag，如果 tag 在浅边界之外则无法使用。
+
+## 最佳实践
+
+1. **CI/CD 默认使用浅克隆**：`--depth 1` 能显著加速构建
+2. **需要时再转完整**：先用浅克隆开始，需要完整历史时再 `fetch --unshallow`
+3. **大型仓库考虑部分克隆**：`--filter=blob:none` 比浅克隆更灵活
+4. **Submodule 也使用浅克隆**：`--shallow-submodules` 减少嵌套仓库的下载量
+5. **监控仓库大小**：定期使用 `git count-objects -vH` 检查仓库状态
+
+## 继续学习建议
+
+1. `git sparse-checkout` —— 只检出部分目录
+2. `git filter-repo` —— 改写仓库历史
+3. `git bundle` —— 离线传输仓库

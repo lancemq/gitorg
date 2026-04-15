@@ -1,0 +1,286 @@
+export const metadata = {
+  title: "Git Subtree: Managing Nested Repositories",
+  slug: "git-subtree",
+  locale: "en",
+  section: "concepts",
+  summary: "A practical comparison of git subtree vs git submodule, and how to use subtree for embedding and synchronizing external projects.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Tools-Submodules",
+    "https://github.com/git/git/blob/master/contrib/subtree/git-subtree.txt",
+  ],
+};
+
+# Git Subtree: Managing Nested Repositories
+
+## What is Git Subtree?
+
+`git subtree` allows you to embed one repository (the **subproject**) inside another repository (the **main project**) as a subdirectory. Unlike submodules, which store only a reference to an external commit, subtree **merges the subproject's history directly into your repository**.
+
+The `git subtree` command was originally a contributed script in Git's source tree and has been included in official Git distributions since version 1.7.11.
+
+```
+main-project/
+├── src/
+├── docs/
+├── libs/
+│   └── my-library/        ← subtree: external repo embedded here
+│       ├── src/
+│       ├── tests/
+│       └── README.md
+└── README.md
+```
+
+## Subtree vs Submodule
+
+Before diving into subtree commands, it's important to understand when to use subtree versus submodule:
+
+| Feature | `git subtree` | `git submodule` |
+|---------|--------------|-----------------|
+| **History** | Merged into main repo | Separate repo with own history |
+| **`.gitmodules`** | Not needed | Required |
+| **Cloning** | Works with a simple `git clone` | Requires `git clone --recurse-submodules` |
+| **Contributor experience** | Transparent — files appear as part of the repo | Requires submodule awareness |
+| **Pushing changes back** | Requires `git subtree push` | Done in the submodule directory |
+| **Repository size** | Larger (includes subproject history) | Smaller (only stores commit reference) |
+| **Updating subproject** | Manual pull/push | `git submodule update` |
+| **Branch switching** | Seamless | Can cause detached HEAD issues |
+| **Best for** | Libraries you modify frequently | Dependencies you rarely modify |
+
+### When to Choose Subtree
+
+- You want contributors to interact with the subproject transparently
+- You need to modify the subproject and push changes back upstream
+- You don't want to manage `.gitmodules` and submodule initialization
+- The subproject is relatively small
+- You want a single-clone experience (no `--recurse-submodules`)
+
+<CommandFlowFigure
+  title="Subtree Workflow"
+  caption="Subtree embeds an external repository's history as a subdirectory in the main repository. Adding, updating, and pushing back to the subrepo all have dedicated commands."
+  inputsLabel="External Repository"
+  inputs="lodash.git (utility)|docs-site.git (documentation)|shared-lib.git (shared library)"
+  commandLabel="git subtree add/push/pull"
+  outputsLabel="Operation Result"
+  outputs="add → subrepo history embedded in main repo|pull → fetch subrepo updates into subdirectory|push → push subdirectory changes back to subrepo"
+  note="The --squash flag collapses the subrepo's multiple commits into one, keeping the main repo history clean."
+/>
+
+### When to Choose Submodule
+
+- The subproject is large and you don't want to bloat the main repo
+- You rarely need to modify the subproject
+- You want to pin to specific versions of external dependencies
+- The subproject is maintained by a different team
+
+## Basic Subtree Commands
+
+### Adding a Subtree
+
+To add an external repository as a subtree:
+
+```bash
+git subtree add --prefix=libs/my-library \
+    https://github.com/example/my-library.git \
+    main \
+    --squash
+```
+
+**Parameters:**
+- `--prefix=libs/my-library`: The directory where the subproject will be placed
+- The repository URL: The source repository to embed
+- `main`: The branch to pull from (can also be a commit hash or tag)
+- `--squash`: Combines the entire subproject history into a single commit (recommended)
+
+The `--squash` flag is important — without it, the entire history of the subproject is merged into your repository, which can significantly increase its size.
+
+### Pulling Updates
+
+To pull the latest changes from the upstream subproject:
+
+```bash
+git subtree pull --prefix=libs/my-library \
+    https://github.com/example/my-library.git \
+    main \
+    --squash
+```
+
+This fetches the latest changes from the remote repository and merges them into the subtree directory.
+
+### Pushing Changes Back
+
+If you've made changes to the subtree directory and want to push them back to the upstream repository:
+
+```bash
+git subtree push --prefix=libs/my-library \
+    https://github.com/example/my-library.git \
+    main
+```
+
+This extracts the commits that affect only the subtree directory and pushes them to the specified remote branch.
+
+> **Note**: `git subtree push` only pushes commits that are unique to the subtree. If the upstream has new commits, you may need to pull first and resolve conflicts before pushing back.
+
+## Working with Subtrees
+
+### Making Local Changes
+
+After adding a subtree, you can modify files within the subtree directory just like any other files in your repository:
+
+```bash
+# Edit files in the subtree
+vim libs/my-library/src/main.js
+
+# Commit changes
+git add libs/my-library/src/main.js
+git commit -m "fix: resolve compatibility issue in my-library"
+
+# Push changes back upstream
+git subtree push --prefix=libs/my-library \
+    https://github.com/example/my-library.git \
+    main
+```
+
+### Viewing Subtree History
+
+```bash
+# View commits that affected the subtree
+git log --oneline -- libs/my-library/
+
+# View the merge commit that added the subtree
+git log --oneline --grep="git-subtree-dir"
+```
+
+### Splitting a Subtree into a Separate Repository
+
+If you decide that a subtree should become its own repository:
+
+```bash
+# Create a new branch with only the subtree's history
+git subtree split --prefix=libs/my-library --branch=my-library-standalone
+
+# This creates a new branch with just the subtree's commits
+# You can then push it to a new remote
+cd /path/to/new-repo
+git remote add origin https://github.com/example/my-library.git
+git push origin my-library-standalone:main
+```
+
+### Removing a Subtree
+
+To remove a subtree, simply delete its directory and commit:
+
+```bash
+git rm -r libs/my-library
+git commit -m "Remove my-library subtree"
+```
+
+## Advanced Patterns
+
+### Using a Shared Remote
+
+Instead of specifying the full URL each time, add the subproject as a remote first:
+
+```bash
+# Add the subproject as a remote
+git remote add my-library https://github.com/example/my-library.git
+
+# Then use the remote name
+git subtree add --prefix=libs/my-library my-library main --squash
+git subtree pull --prefix=libs/my-library my-library main --squash
+git subtree push --prefix=libs/my-library my-library main
+```
+
+### Multiple Subtrees
+
+You can manage multiple subtrees in a single repository:
+
+```bash
+git subtree add --prefix=libs/utils https://github.com/example/utils.git main --squash
+git subtree add --prefix=libs/logger https://github.com/example/logger.git main --squash
+git subtree add --prefix=libs/config https://github.com/example/config.git main --squash
+
+# Update all subtrees
+git subtree pull --prefix=libs/utils utils main --squash
+git subtree pull --prefix=libs/logger logger main --squash
+git subtree pull --prefix=libs/config config main --squash
+```
+
+### Automating Subtree Updates
+
+Create a script to update all subtrees:
+
+```bash
+#!/bin/bash
+# scripts/update-subtrees.sh
+
+subtrees=(
+    "libs/utils:utils:main"
+    "libs/logger:logger:main"
+    "libs/config:config:main"
+)
+
+for entry in "${subtrees[@]}"; do
+    IFS=':' read -r prefix remote branch <<< "$entry"
+    echo "🔄 Updating $prefix from $remote/$branch..."
+    git subtree pull --prefix="$prefix" "$remote" "$branch" --squash
+done
+
+echo "✅ All subtrees updated."
+```
+
+## Understanding How Subtree Works
+
+Git subtree works by identifying commits that affect a specific directory path. When you run `git subtree add`, it:
+
+1. Fetches the remote repository
+2. Reads the specified branch
+3. Rewrites the commits so that all file paths are prefixed with the `--prefix` directory
+4. Merges these rewritten commits into your current branch
+
+The `--squash` flag collapses all these rewritten commits into a single commit, keeping your main repository's history clean.
+
+When you run `git subtree push`, it:
+
+1. Identifies all commits that affect the subtree directory
+2. Extracts only the changes within that directory
+3. Rewrites the paths (removing the prefix)
+4. Pushes these commits to the remote repository
+
+## Common Issues and Solutions
+
+### Merge Conflicts
+
+Subtree merge conflicts can occur when both the main project and the upstream subproject modify the same files. To resolve:
+
+```bash
+# Standard conflict resolution
+git status
+vim libs/my-library/src/conflicted-file.js
+git add libs/my-library/src/conflicted-file.js
+git commit -m "Resolve subtree merge conflict"
+```
+
+### Accidentally Pushing Unrelated Changes
+
+When using `git subtree push`, Git may try to push commits from the main project that also touch the subtree directory. This usually indicates that changes were made directly in the subtree directory without following the proper subtree workflow.
+
+**Solution**: Make changes to the subproject in its own repository, then pull them into the main project with `git subtree pull`.
+
+### Performance with Large Subtrees
+
+If the subproject is large, consider:
+- Using `--squash` to reduce history size
+- Using submodules instead for very large dependencies
+- Splitting the subproject into smaller, focused libraries
+
+## Summary
+
+| Operation | Command |
+|-----------|---------|
+| Add subtree | `git subtree add --prefix=DIR URL BRANCH --squash` |
+| Pull updates | `git subtree pull --prefix=DIR URL BRANCH --squash` |
+| Push changes | `git subtree push --prefix=DIR URL BRANCH` |
+| Split subtree | `git subtree split --prefix=DIR --branch=NEW-BRANCH` |
+| Remove subtree | `git rm -r DIR` |
+
+`git subtree` is a powerful tool for embedding external projects while maintaining a clean contributor experience. It shines when you need to modify the subproject and push changes back upstream, and when you want to avoid the complexity of submodule management. For large, rarely-modified dependencies, submodules may still be the better choice.

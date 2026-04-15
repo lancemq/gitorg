@@ -15,6 +15,18 @@ export const metadata = {
 
 ## 这个工作流解决什么问题
 
+<CommandFlowFigure
+  title="Worktree 并行工作模式"
+  caption="同一个仓库的多个 worktree 共享 .git 目录，但可以检出不同的分支。适合同时处理 bug fix、feature 和 review 的场景。"
+  inputsLabel="单工作区痛点"
+  inputs="正在开发 feature 被打断|需要紧急修复 bug|评审要求立即修改"
+  commandLabel="git worktree add"
+  outputsLabel="多工作区并行"
+  outputs="../fix/ → 检出 hotfix 分支|../review/ → 检出 review 分支|主目录继续 feature 开发"
+  note="所有 worktree 共享同一个 .git 目录，提交和对象是共享的。删除 worktree 不影响提交历史。"
+/>
+
+
 很多团队协作里的卡点，并不是不会切分支，而是你已经在一个工作目录里做了很多事，突然又需要：
 
 - 临时修一个 hotfix

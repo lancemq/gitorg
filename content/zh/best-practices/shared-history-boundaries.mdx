@@ -13,9 +13,18 @@ export const metadata = {
 
 # 共享历史的改写边界
 
-## 这件事为什么比“会不会 rebase”更重要
+## 这件事为什么比"会不会 rebase"更重要
 
-真正危险的从来不是某一条命令，而是你在错误的历史边界上使用了它。`commit --amend`、`rebase -i`、`reset --soft` 本身都很有用，但一旦这段历史已经被别人拉走并继续开发，风险就完全变了。
+<CommitGraphFigure
+  title="共享历史边界"
+  caption="一旦提交被推送到共享远端，它就成为团队共同的历史。不应该 rewrite 这部分历史。本地整理可以在推送前进行。"
+  linearLabel="本地历史 (可安全 rewrite)"
+  mergeLabel="已推送历史 (不应 rewrite)"
+  rewriteLabel="团队共享历史 (禁止 force push)"
+  pointerLabel="推送边界"
+/>
+
+很多人学 Git 时最关心的是
 
 ## 1. 一个最实用的判断规则
 

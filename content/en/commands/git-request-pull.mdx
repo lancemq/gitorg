@@ -57,18 +57,36 @@ It only produces a shareable pull-summary text.
 ### Mistake 1: treating it as a hosted PR replacement
 
 It is a summary generator, not a platform PR action.
+`git request-pull` generates a pull request summary message for maintainers. It does not create a hosted-platform PR — instead, it produces a text summary describing what changes exist between two points in your repository, which you can send to a maintainer via email or other communication channels.
 
 ### Mistake 2: sending summary before branch is available remotely
 
 Maintainers cannot fetch what you referenced.
+- Generate a summary for a maintainer showing what commits exist between their branch and yours: `git request-pull origin/main <url> <branch>`.
+- Include the summary in an email to request that a maintainer pull your changes from a public repository.
+- Document the exact range of changes being proposed, including the commit log, for review before a merge.
 
 ### Mistake 3: sending without verifying URL/base details
 
 Small metadata mistakes create large review friction.
+<CommandFlowFigure
+  title="Pull request summary generation"
+  caption="request-pull reads commit history between two refs and generates a text summary describing the proposed changes, suitable for communication with maintainers."
+  inputsLabel="Input"
+  inputs="Base ref (e.g., origin/main)|Your branch|Repository URL"
+  commandLabel="git request-pull"
+  outputsLabel="Output"
+  outputs="Text summary with commit log|Change description for maintainers"
+  note="This command generates a summary message, not a hosted-platform PR. It must still fit your team's communication flow."
+/>
 
 ## Good follow-up reads
 
 1. `git-send-email`
 2. `git-format-patch`
 3. `fork upstream sync`
+- This command creates a pull request summary message, not a hosted-platform PR — it must still be delivered through your team's communication channel.
+- The URL you provide should point to a repository the maintainer can actually fetch from; otherwise the summary is not actionable.
+- If the base ref does not exist in the target repository, the summary may describe changes the maintainer cannot apply cleanly.
+- `request-pull` verifies that the specified commits are reachable from your repository before generating the summary, catching mismatches early.
 

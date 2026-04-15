@@ -15,6 +15,16 @@ export const metadata = {
 
 ## 先判断你到底丢了什么
 
+<ResetFigure
+  title="Reset 的三层影响与恢复入口"
+  caption="git reset 同时影响 HEAD、暂存区和工作区。soft 只移动 HEAD，mixed 还重置暂存区，hard 还会覆盖工作区文件。通过 reflog 可以找到 reset 前的位置。"
+  layersLabel="影响层"
+  softLabel="--soft"
+  mixedLabel="--mixed"
+  hardLabel="--hard"
+/>
+
+
 `git reset` 最容易让人慌，是因为它可能同时影响三层状态：
 
 - 分支和 `HEAD` 指向哪里

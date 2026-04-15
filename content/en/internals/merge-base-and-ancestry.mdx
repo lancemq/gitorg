@@ -16,6 +16,15 @@ Many branch operations feel confusing because we see two branch names, but Git s
 
 ## Start with the core idea
 
+<MergeFigure
+  title="Merge Base and Branch Divergence"
+  caption="When two branches diverge from a common base, Git finds the most recent common ancestor (merge base) to perform a three-way comparison, identifying each branch's independent changes."
+  beforeLabel="Before divergence (common ancestor)"
+  afterLabel="After divergence (independent histories)"
+  modeLabel="find merge base"
+/>
+
+
 When Git compares branches, performs a merge, decides whether a fast-forward is possible, or figures out which commits a rebase should replay, it usually starts by finding a **common ancestor**.
 
 That common ancestor is the `merge base`.

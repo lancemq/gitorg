@@ -60,15 +60,38 @@ Context divergence still requires human conflict resolution.
 
 ### Mistake 2: aborting immediately and losing useful progress
 
+`git am` applies mailbox-format patches onto the current branch and creates new commits, preserving the original author information and commit metadata. Think of it as the step where "patches formally enter local history from an external source."
+
 Evaluate already-applied commits before discarding series state.
 
 ### Mistake 3: skipping patches without traceability
 
+- Apply a series of patches received from external contributors or mailing lists directly onto your local branch.
+- In a patch-based workflow, use `git am` to convert received .patch files into proper commit records.
+- When you need to preserve the committer identity and full commit message, use `git am` rather than manually copying changes.
+
 Later it becomes hard to explain sequence gaps.
+
+<CommandFlowFigure
+  title="Patch application surface"
+  caption="Patch application commands formally incorporate external patches into local branches. The key distinction is whether they create commits and whether they preserve email headers."
+  inputsLabel="Input"
+  inputs="Mailbox-format patch files|Current branch"
+  commandLabel="git am"
+  outputsLabel="Output"
+  outputs="New commits (preserving author info)|Advanced branch pointer"
+  note="am and apply have clear division: am creates commits, apply only changes the working tree."
+/>
+
+## Special cases and boundaries
+
+- When patch application fails, `git am --abort` rolls back to the pre-application state without leaving half-finished commits.
+- Before running `git am`, confirm a clean working tree with `git status` and preview the current patch with `--show-current-patch`.
+- If a patch's context does not match the current codebase, application will fail — first verify which version the patch was generated against.
+- Email encoding, signature lines, and whitespace formatting can all affect patch parsing; use `--ignore-whitespace` or `--3way` for more tolerance when needed.
 
 ## Good follow-up reads
 
 1. `git-format-patch`
 2. `git-send-email`
 3. `recover after wrong cherry-pick`
-

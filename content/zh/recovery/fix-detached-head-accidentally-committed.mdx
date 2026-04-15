@@ -1,0 +1,303 @@
+export const metadata = {
+  title: "detached HEAD 上提交了怎么接回分支",
+  slug: "fix-detached-head-accidentally-committed",
+  locale: "zh",
+  section: "recovery",
+  summary: "在 detached HEAD 状态下做了提交后，如何正确接回分支。包括创建新分支、合并到已有分支、预防措施。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-switch",
+    "https://git-scm.com/docs/git-checkout",
+    "https://git-scm.com/book/en/v2/Git-Branching-Advanced-Branching",
+  ],
+};
+
+# detached HEAD 上提交了怎么接回分支
+
+## 一句话理解
+
+<RefsHeadFigure
+  title="Detached HEAD 上提交后的状态"
+  caption="在 detached HEAD 状态下创建提交后，新提交没有分支名接住。通过创建新分支或合并到已有分支，可以安全地接住这些提交。"
+  headLabel="正常分支状态"
+  branchLabel="HEAD → main → 持续提交"
+  tagLabel="tag: v1.0 → 固定提交"
+  remoteLabel="origin/main → 远端快照"
+  detachedLabel="Detached HEAD + 新提交"
+/>
+
+
+detached HEAD 意味着 HEAD 直接指向一个提交（commit），而不是指向一个分支名。在这种状态下做的提交不会自动关联到任何分支，但提交本身不会丢失——你只需要创建一个分支来"接住"它们。
+
+## 什么是 detached HEAD
+
+正常情况下，HEAD 指向当前分支，分支指向最新提交：
+
+```
+HEAD -> refs/heads/main -> commit abc123
+```
+
+detached HEAD 时，HEAD 直接指向提交：
+
+```
+HEAD -> commit abc123（没有分支名）
+```
+
+### 常见触发场景
+
+```bash
+# 场景 1：checkout 一个具体的提交 hash
+git checkout abc1234
+
+# 场景 2：checkout 一个 tag（tag 不可变）
+git checkout v1.0.0
+
+# 场景 3：使用 bisect 时
+git bisect start
+git bisect bad
+git bisect good abc1234
+
+# 场景 4：直接 checkout 远端分支（没有本地跟踪）
+git checkout origin/main
+```
+
+Git 会给出警告：
+
+```
+Note: switching to 'abc1234'.
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+```
+
+## 已经提交了怎么办
+
+### 方法 1：创建新分支接住提交（推荐）
+
+这是最简单安全的方法：
+
+```bash
+# 你已经在 detached HEAD 上做了提交
+git log --oneline
+# abc1234 (HEAD) 修复了 bug
+# def5678 之前的提交
+
+# 创建新分支接住这些提交
+git switch -c my-fix-branch
+
+# 或者用旧语法
+git checkout -b my-fix-branch
+```
+
+现在提交有了归属：
+
+```
+HEAD -> refs/heads/my-fix-branch -> commit abc1234
+```
+
+### 方法 2：合并到已有分支
+
+如果你想把这些提交合并回主分支：
+
+```bash
+# 先在 detached HEAD 状态创建分支保存提交
+git switch -c temp-fix
+
+# 切换回目标分支
+git switch main
+
+# 合并或 cherry-pick
+git merge temp-fix
+# 或者只选择部分提交
+git cherry-pick temp-fix~2..temp-fix
+
+# 清理临时分支
+git branch -d temp-fix
+```
+
+### 方法 3：只 cherry-pick 特定提交
+
+如果你只需要 detached HEAD 上的部分提交：
+
+```bash
+# 记下提交 hash（在 detached HEAD 状态下）
+git log --oneline
+# a1b2c3d 需要这个
+# d4e5f6g 不需要这个
+
+# 切回目标分支
+git switch main
+
+# cherry-pick 需要的提交
+git cherry-pick a1b2c3d
+```
+
+### 方法 4：使用 reflog 找回
+
+如果你已经切走了但忘记了分支名：
+
+```bash
+# 查看所有 HEAD 移动记录
+git reflog
+
+# 找到 detached HEAD 时的提交
+# abc1234 HEAD@{2}: checkout: moving from abc1234 to main
+
+# 基于该提交创建分支
+git switch -c recovered-branch abc1234
+```
+
+### 方法 5：还没有提交时的处理
+
+如果你还在 detached HEAD 状态，但还没提交：
+
+```bash
+# 保存工作区（包括已跟踪和未跟踪文件）
+git stash --include-untracked
+
+# 切回目标分支
+git switch main
+
+# 恢复工作
+git stash pop
+```
+
+## 完整工作流示例
+
+```bash
+# 1. 你不小 checkout 了一个旧提交
+git checkout v1.0.0
+# (detached HEAD)
+
+# 2. 你修了一个 bug 并提交
+git add fix.txt
+git commit -m "修复了 v1.0.0 中的 bug"
+
+# 3. 你意识到应该在分支上工作
+# 立刻创建分支接住提交
+git switch -c hotfix-v1
+
+# 4. 验证提交在分支上
+git log --oneline -3
+# abc1234 (HEAD -> hotfix-v1) 修复了 v1.0.0 中的 bug
+# def5678 (tag: v1.0.0) Release v1.0.0
+
+# 5. 切回 main 并合并
+git switch main
+git merge hotfix-v1
+
+# 6. 清理
+git branch -d hotfix-v1
+```
+
+## 可视化理解
+
+### detached HEAD 上的提交
+
+```
+          main
+           │
+           ▼
+A --- B --- C
+ \
+  D --- E (HEAD，没有分支名)
+```
+
+### 创建分支后
+
+```
+          main
+           │
+           ▼
+A --- B --- C
+ \
+  D --- E (HEAD -> hotfix-branch)
+```
+
+### 合并回 main 后
+
+```
+                    main (HEAD)
+                     │
+                     ▼
+A --- B --- C --- F (merge commit)
+ \               /
+  D --- E ------
+  (hotfix-branch)
+```
+
+## 预防措施
+
+### 使用 switch -c 替代 checkout hash
+
+```bash
+# 不要这样
+git checkout abc1234
+
+# 应该这样——直接创建分支
+git switch -c experiment abc1234
+```
+
+### 配置警告
+
+Git 默认会在进入 detached HEAD 时显示警告。确保你的 Git 版本足够新（2.23+）以获得更好的提示。
+
+### 使用别名提醒自己
+
+```bash
+# 在 .gitconfig 中添加
+[alias]
+    # 安全的 checkout 替代：总是创建分支
+    cob = "!f() { git switch -c \"$1\" 2>/dev/null || git switch \"$1\"; }; f"
+```
+
+### Tag checkout 的特别处理
+
+```bash
+# checkout tag 会进入 detached HEAD
+git checkout v1.0.0
+
+# 如果想基于 tag 工作，立即创建分支
+git switch -c release-fix v1.0.0
+```
+
+## 常见问题
+
+### Q: detached HEAD 上的提交会被 gc 删除吗？
+
+会，但需要时间。默认情况下，Git 的 gc 会在 90 天后清理 unreachable 的对象。但只要你记得创建分支，提交就永远不会丢失。
+
+### Q: 我可以继续使用 detached HEAD 工作吗？
+
+可以，但不推荐。detached HEAD 适合临时查看和实验，不适合正式开发，因为：
+- 没有分支名，容易忘记提交位置
+- 切换分支时可能"丢失"提交（虽然 reflog 能找回）
+- 团队协作时无法推送 detached HEAD 状态
+
+### Q: push 时 detached HEAD 会怎样？
+
+```bash
+# 在 detached HEAD 状态下推送
+git push origin HEAD:refs/heads/new-branch
+
+# 这会创建一个新分支并推送当前提交
+```
+
+## 注意事项
+
+1. **不要恐慌**：detached HEAD 上的提交不会立即丢失
+2. **第一时间创建分支**：`git switch -c branch-name` 是最简单的保险措施
+3. **善用 reflog**：即使忘记创建分支，reflog 也能帮你找回提交
+4. **tag checkout 必然 detached**：这是正常行为，不是错误
+5. **避免在 CI/CD 中在 detached HEAD 上提交**：CI 环境通常处于 detached HEAD 状态
+
+## 总结
+
+| 场景 | 解决方法 |
+|------|---------|
+| 已提交，想保留 | `git switch -c new-branch` |
+| 已提交，想合并到已有分支 | 创建分支 → 切换 → merge/cherry-pick |
+| 未提交，想保留修改 | `git stash` → 切换 → `git stash pop` |
+| 已切换走，忘记分支名 | `git reflog` → 找到 hash → `git switch -c` |
+| 想推送到远端 | `git push origin HEAD:branch-name` |
+
+detached HEAD 不可怕——它是 Git 的一个正常状态。关键是在做提交之前或之后立即创建分支来"接住"它们。

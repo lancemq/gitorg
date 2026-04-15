@@ -1,0 +1,373 @@
+export const metadata = {
+  title: "Git aliases and productivity tips",
+  slug: "git-aliases",
+  locale: "en",
+  section: "best-practices",
+  summary: "Efficient Git alias configuration, common alias catalog, shell aliases, team-shared alias configuration, and best practices.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases",
+    "https://git-scm.com/docs/git-config",
+  ],
+};
+
+# Git aliases and productivity tips
+
+## The short version
+
+<CommandFlowFigure
+  title="Git Alias System"
+  caption="Simplify common commands with aliases, unify team habits, reduce typos. Aliases should be self-explanatory, not just shorter abbreviations."
+  inputsLabel="Common Commands"
+  inputs="git status|git log --oneline --graph|git branch --merged|git diff --staged"
+  commandLabel="Alias Simplification"
+  outputsLabel="Quick Commands"
+  outputs="git s → status|git lg → log --oneline --graph|git bm → branch --merged|git ds → diff --staged"
+  note="Aliases should make common ops faster, but not sacrifice readability. Teams can share alias configs."
+/>
+
+
+Git aliases let you replace verbose native commands with short ones, dramatically boosting daily productivity. Configured via `git config alias.xxx`, they support simple argument substitution and complex shell script execution.
+
+## What are Git aliases
+
+Git aliases are a built-in command abbreviation mechanism. Once configured, `git s` can equal `git status`.
+
+```bash
+# Basic configuration syntax
+git config --global alias.alias-name 'original command'
+
+# Example
+git config --global alias.s status
+```
+
+Configuration is stored in `~/.gitconfig`:
+
+```ini
+[alias]
+    s = status
+```
+
+## Common basic aliases
+
+### Status and log
+
+```ini
+[alias]
+    # Status in short format
+    s = status -s
+
+    # List branches
+    b = branch
+
+    # View commit log (single line)
+    l = log --oneline
+
+    # View last 10 commits
+    last = log -1 HEAD --stat
+
+    # Graph log
+    lg = log --oneline --graph --decorate
+```
+
+### Branch operations
+
+```ini
+[alias]
+    # List all branches (including remote)
+    ba = branch -a
+
+    # List merged branches
+    bm = branch --merged
+
+    # List unmerged branches
+    bu = branch --no-merged
+
+    # Create and switch to new branch
+    co = checkout -b
+```
+
+### Remote operations
+
+```ini
+[alias]
+    # View all remotes
+    r = remote -v
+
+    # Push current branch and set upstream
+    pushu = push -u origin HEAD
+
+    # Pull with rebase
+    pullr = pull --rebase
+```
+
+## Advanced aliases
+
+### Pretty log formats
+
+```ini
+[alias]
+    # Detailed pretty log
+    lg1 = log --graph --format='%C(auto)%h %C(cyan)%ad %C(green)%s%C(reset) %C(yellow)%d' --date=short
+
+    # Log with author info
+    lg2 = log --graph --format='%C(auto)%h %C(bold blue)%an%C(reset) %C(cyan)%ad %C(green)%s%C(reset) %C(yellow)%d' --date=short
+
+    # Count commits by author
+    count = shortlog -sn
+
+    # Who changed what
+    who = shortlog -sn --no-merges
+```
+
+### File change history
+
+```ini
+[alias]
+    # View file modification history
+    filelog = log --oneline --follow --
+
+    # View who changed which line
+    blame-compact = blame --date=short -w
+
+    # Search commit messages
+    search = log --all --grep
+```
+
+### Diff enhancements
+
+```ini
+[alias]
+    # Word-level diff
+    wdiff = diff --word-diff=color
+
+    # Change statistics
+    stat = diff --stat
+
+    # Compare two branches
+    compare = diff --stat main..HEAD
+```
+
+## Shell aliases (! prefix)
+
+Aliases starting with `!` execute in a shell, enabling more complex operations:
+
+```ini
+[alias]
+    # View current branch
+    current = !"git symbolic-ref --short HEAD"
+
+    # Delete merged branches
+    cleanup = !"git branch --merged | grep -v '\\*\\|main\\|master' | xargs -n 1 git branch -d"
+
+    # View untracked files
+    untracked = !"git status --porcelain | grep '^??' | cut -c4-"
+
+    # Quick commit
+    c = "!f() { git commit -m \"$*\"; }; f"
+
+    # Most frequently modified files
+    topfiles = !"git log --pretty=format: --name-only | sort | uniq -c | sort -rg | head -20"
+
+    # Show latest tag
+    latest-tag = !"git describe --tags --abbrev=0"
+
+    # Interactive add
+    addp = add -p
+
+    # Squash recent N commits
+    squash = !"f() { git reset --soft HEAD~${1} && git commit --edit -m\"$(git log --format=%B --reverse HEAD..HEAD@{1})\"; }; f"
+```
+
+## Team-shared alias configuration
+
+### Method 1: Shared config via include
+
+```ini
+# ~/.gitconfig
+[include]
+    path = ~/.gitconfig-team
+
+# ~/.gitconfig-team
+[alias]
+    lg = log --oneline --graph --decorate
+    s = status -s
+    cleanup = "!git branch --merged | grep -v '\\*\\|main' | xargs -n 1 git branch -d"
+```
+
+### Method 2: Repo-level configuration
+
+```bash
+# Create .gitconfig in repo root
+cat > .gitconfig << EOF
+[alias]
+    lg = log --oneline --graph --decorate
+    s = status -s
+EOF
+
+# Include it for the repo
+git config include.path .gitconfig
+```
+
+### Method 3: Distribution via script
+
+```bash
+#!/bin/bash
+# setup-git-aliases.sh
+
+git config --global alias.s 'status -s'
+git config --global alias.lg 'log --oneline --graph --decorate'
+git config --global alias.cleanup "!git branch --merged | grep -v '\\*\\|main' | xargs -n 1 git branch -d"
+git config --global alias.lg1 "log --graph --format='%C(auto)%h %C(cyan)%ad %C(green)%s%C(reset) %C(yellow)%d' --date=short"
+
+echo "Git aliases configured."
+```
+
+New team members just run:
+
+```bash
+bash setup-git-aliases.sh
+```
+
+## Aliases and auto-completion
+
+### Bash completion
+
+Ensure git-completion.bash is installed:
+
+```bash
+# Ubuntu/Debian
+sudo apt install git bash-completion
+
+# macOS (Homebrew)
+brew install git bash-completion@2
+```
+
+Git alias auto-completion requires adding to `.bashrc`:
+
+```bash
+# Make completion script recognize custom aliases
+__git_complete gc _git_checkout  # if your alias is gc
+```
+
+### Zsh completion
+
+Using oh-my-zsh git plugin:
+
+```bash
+# ~/.zshrc
+plugins=(git zsh-autosuggestions)
+```
+
+oh-my-zsh ships with many Git aliases:
+
+| Alias | Command |
+|-------|---------|
+| `g` | git |
+| `gst` | git status |
+| `gl` | git pull |
+| `gc` | git commit -v |
+| `gb` | git branch |
+| `gd` | git diff |
+| `gco` | git checkout |
+| `glog` | git log --oneline --graph --decorate |
+
+## Recommended personal alias configuration
+
+```ini
+[alias]
+    # Daily high-frequency
+    s = status -sb
+    b = branch -vv
+    l = log --oneline -20
+    lg = log --oneline --graph --decorate --all
+
+    # Commit-related
+    c = commit
+    ca = commit --amend
+    cn = commit --no-verify
+
+    # Branch operations
+    co = checkout
+    nb = checkout -b
+    del = branch -d
+    force-del = branch -D
+
+    # Remote operations
+    p = push
+    pf = push --force-with-lease
+    pl = pull --rebase
+    f = fetch --all --prune
+
+    # Advanced
+    stash-all = stash save --include-untracked
+    unstage = reset HEAD --
+    undo = reset --soft HEAD~1
+    who = shortlog -sn --no-merges
+
+    # Shell aliases
+    root = rev-parse --show-toplevel
+    current = !"git symbolic-ref --short HEAD"
+    cleanup = "!git branch --merged | grep -v '\\*\\|main\\|master' | xargs -n 1 git branch -d"
+```
+
+## Common pitfalls
+
+### Over-abbreviation reduces readability
+
+```ini
+# Bad — too short, hard to remember
+[alias]
+    q = status
+    w = log
+    e = commit
+
+# Good — abbreviations are meaningful
+[alias]
+    s = status -s
+    l = log --oneline
+    c = commit
+```
+
+### Alias and subcommand conflicts
+
+```ini
+# Avoid using existing Git subcommand names as aliases
+# Don't use checkout as an alias (checkout already exists)
+# Don't use commit as an alias (commit already exists)
+```
+
+### Using aliases in scripts
+
+```bash
+# Wrong: Aliases may not expand in scripts
+#!/bin/bash
+git s  # may not work in non-interactive mode
+
+# Correct: Use full commands
+#!/bin/bash
+git status -s
+```
+
+Git aliases are primarily expanded in interactive command-line sessions; scripts should use full commands.
+
+## Key takeaways
+
+1. **Global vs local alias config**: `--global` affects all repos, without it only affects the current repo
+2. **Shell aliases need quotes**: `!` prefixed aliases must be quoted
+3. **Aliases can chain**: `git s` expands to `git status -s`
+4. **View configured aliases**: `git config --get-regexp alias`
+5. **Delete an alias**: `git config --global --unset alias.xxx`
+6. **Don't confuse with shell aliases**: Git aliases only work after `git`
+
+## Summary
+
+| Category | Recommended alias | Effect |
+|----------|------------------|--------|
+| Status | `s = status -sb` | Short + branch info |
+| Log | `lg = log --oneline --graph --decorate --all` | Graph full-branch log |
+| Commit | `ca = commit --amend` | Amend last commit |
+| Branch | `nb = checkout -b` | Create and switch branch |
+| Push | `pf = push --force-with-lease` | Safe force push |
+| Cleanup | `cleanup` (shell) | Delete merged branches |
+
+Good alias configuration saves a lot of typing, but stay disciplined — only abbreviate commands you use multiple times daily.

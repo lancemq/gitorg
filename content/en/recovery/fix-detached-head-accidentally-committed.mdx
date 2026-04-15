@@ -1,0 +1,303 @@
+export const metadata = {
+  title: "Recovering commits made in detached HEAD",
+  slug: "fix-detached-head-accidentally-committed",
+  locale: "en",
+  section: "recovery",
+  summary: "How to properly recover commits made in detached HEAD state back to a branch. Covers creating new branches, merging into existing branches, and prevention strategies.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-switch",
+    "https://git-scm.com/docs/git-checkout",
+    "https://git-scm.com/book/en/v2/Git-Branching-Advanced-Branching",
+  ],
+};
+
+# Recovering commits made in detached HEAD
+
+## The short version
+
+<RefsHeadFigure
+  title="Commits Made in Detached HEAD"
+  caption="After creating commits in detached HEAD, new commits have no branch name catching them. Create a new branch or merge into an existing branch to safely preserve these commits."
+  headLabel="Normal branch state"
+  branchLabel="HEAD → main → ongoing commits"
+  tagLabel="tag: v1.0 → fixed commit"
+  remoteLabel="origin/main → remote snapshot"
+  detachedLabel="Detached HEAD + new commits"
+/>
+
+
+Detached HEAD means HEAD points directly to a commit rather than to a branch name. Commits made in this state don't automatically belong to any branch, but the commits themselves aren't lost — you just need to create a branch to "catch" them.
+
+## What is detached HEAD
+
+Normally, HEAD points to the current branch, which points to the latest commit:
+
+```
+HEAD -> refs/heads/main -> commit abc123
+```
+
+In detached HEAD, HEAD points directly to a commit:
+
+```
+HEAD -> commit abc123 (no branch name)
+```
+
+### Common trigger scenarios
+
+```bash
+# Scenario 1: Checking out a specific commit hash
+git checkout abc1234
+
+# Scenario 2: Checking out a tag (tags are immutable)
+git checkout v1.0.0
+
+# Scenario 3: During bisect
+git bisect start
+git bisect bad
+git bisect good abc1234
+
+# Scenario 4: Checking out a remote branch (no local tracking)
+git checkout origin/main
+```
+
+Git will display a warning:
+
+```
+Note: switching to 'abc1234'.
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+```
+
+## What to do if you already committed
+
+### Method 1: Create a new branch (recommended)
+
+The simplest and safest approach:
+
+```bash
+# You've already committed in detached HEAD
+git log --oneline
+# abc1234 (HEAD) fixed the bug
+# def5678 previous commit
+
+# Create a new branch to catch these commits
+git switch -c my-fix-branch
+
+# Or with old syntax
+git checkout -b my-fix-branch
+```
+
+Now your commits have a home:
+
+```
+HEAD -> refs/heads/my-fix-branch -> commit abc1234
+```
+
+### Method 2: Merge into an existing branch
+
+If you want to merge these commits back into your main branch:
+
+```bash
+# First, create a branch in detached HEAD state to save commits
+git switch -c temp-fix
+
+# Switch back to target branch
+git switch main
+
+# Merge or cherry-pick
+git merge temp-fix
+# Or cherry-pick only specific commits
+git cherry-pick temp-fix~2..temp-fix
+
+# Clean up temporary branch
+git branch -d temp-fix
+```
+
+### Method 3: Cherry-pick specific commits only
+
+If you only need some of the detached HEAD commits:
+
+```bash
+# Note the commit hashes (while in detached HEAD)
+git log --oneline
+# a1b2c3d need this one
+# d4e5f6g don't need this one
+
+# Switch back to target branch
+git switch main
+
+# Cherry-pick the commits you need
+git cherry-pick a1b2c3d
+```
+
+### Method 4: Use reflog to recover
+
+If you already switched away and forgot the branch name:
+
+```bash
+# View all HEAD movement records
+git reflog
+
+# Find the detached HEAD commit
+# abc1234 HEAD@{2}: checkout: moving from abc1234 to main
+
+# Create a branch from that commit
+git switch -c recovered-branch abc1234
+```
+
+### Method 5: If you haven't committed yet
+
+If you're still in detached HEAD but haven't committed:
+
+```bash
+# Save working state (tracked and untracked files)
+git stash --include-untracked
+
+# Switch back to target branch
+git switch main
+
+# Restore work
+git stash pop
+```
+
+## Complete workflow example
+
+```bash
+# 1. You accidentally checkout an old commit
+git checkout v1.0.0
+# (detached HEAD)
+
+# 2. You fix a bug and commit
+git add fix.txt
+git commit -m "fixed bug in v1.0.0"
+
+# 3. You realize you should be on a branch
+# Immediately create a branch to catch commits
+git switch -c hotfix-v1
+
+# 4. Verify commits are on the branch
+git log --oneline -3
+# abc1234 (HEAD -> hotfix-v1) fixed bug in v1.0.0
+# def5678 (tag: v1.0.0) Release v1.0.0
+
+# 5. Switch back to main and merge
+git switch main
+git merge hotfix-v1
+
+# 6. Clean up
+git branch -d hotfix-v1
+```
+
+## Visual understanding
+
+### Commits on detached HEAD
+
+```
+          main
+           │
+           ▼
+A --- B --- C
+ \
+  D --- E (HEAD, no branch name)
+```
+
+### After creating a branch
+
+```
+          main
+           │
+           ▼
+A --- B --- C
+ \
+  D --- E (HEAD -> hotfix-branch)
+```
+
+### After merging back to main
+
+```
+                    main (HEAD)
+                     │
+                     ▼
+A --- B --- C --- F (merge commit)
+ \               /
+  D --- E ------
+  (hotfix-branch)
+```
+
+## Prevention strategies
+
+### Use switch -c instead of checkout hash
+
+```bash
+# Don't do this
+git checkout abc1234
+
+# Do this instead — create a branch immediately
+git switch -c experiment abc1234
+```
+
+### Configure warnings
+
+Git shows a warning when entering detached HEAD by default. Ensure your Git version is recent enough (2.23+) for better messages.
+
+### Use aliases as reminders
+
+```bash
+# Add to .gitconfig
+[alias]
+    # Safe checkout alternative: always create a branch
+    cob = "!f() { git switch -c \"$1\" 2>/dev/null || git switch \"$1\"; }; f"
+```
+
+### Special handling for tag checkout
+
+```bash
+# Checking out a tag will put you in detached HEAD
+git checkout v1.0.0
+
+# If you want to work based on a tag, create a branch immediately
+git switch -c release-fix v1.0.0
+```
+
+## FAQ
+
+### Q: Will commits on detached HEAD be gc'd?
+
+Yes, but it takes time. By default, Git's gc cleans up unreachable objects after 90 days. But as long as you remember to create a branch, commits will never be lost.
+
+### Q: Can I keep working in detached HEAD?
+
+You can, but it's not recommended. Detached HEAD is fine for temporary inspection and experiments, but not for active development because:
+- No branch name, easy to forget where commits are
+- Switching branches may "lose" commits (though reflog can recover them)
+- You can't push detached HEAD state in team collaboration
+
+### Q: What happens when pushing in detached HEAD?
+
+```bash
+# Push while in detached HEAD
+git push origin HEAD:refs/heads/new-branch
+
+# This creates a new branch and pushes the current commit
+```
+
+## Key takeaways
+
+1. **Don't panic**: Commits in detached HEAD aren't immediately lost
+2. **Create a branch immediately**: `git switch -c branch-name` is the simplest safety net
+3. **Use reflog**: Even if you forget to create a branch, reflog can help you find commits
+4. **Tag checkout is always detached**: This is normal behavior, not an error
+5. **Avoid committing on detached HEAD in CI/CD**: CI environments are usually in detached HEAD state
+
+## Summary
+
+| Scenario | Solution |
+|----------|----------|
+| Already committed, want to keep | `git switch -c new-branch` |
+| Already committed, merge into existing branch | Create branch → switch → merge/cherry-pick |
+| Not committed, want to keep changes | `git stash` → switch → `git stash pop` |
+| Already switched away, forgot branch | `git reflog` → find hash → `git switch -c` |
+| Want to push to remote | `git push origin HEAD:branch-name` |
+
+Detached HEAD isn't scary — it's a normal Git state. The key is creating a branch before or right after making commits to "catch" them.

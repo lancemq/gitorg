@@ -8,17 +8,18 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "check": "npm run lint && npm run typecheck && npm run build"
+    "validate:content": "node scripts/validate-content.mjs",
+    "check": "npm run validate:content && npm run lint && npm run typecheck && npm run build"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
-    "@next/mdx": "^16.2.1",
+    "@next/mdx": "16.2.3",
     "@swc/helpers": "^0.5.15",
     "@types/mdx": "^2.0.13",
     "@vercel/analytics": "^2.0.1",
     "debug": "^4.4.3",
-    "next": "16.2.1",
+    "next": "16.2.3",
     "postcss": "^8.5.6",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -29,7 +30,7 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "eslint": "^9.0.0",
-    "eslint-config-next": "16.2.1",
+    "eslint-config-next": "16.2.3",
     "typescript": "^5.9.0"
   }
 }

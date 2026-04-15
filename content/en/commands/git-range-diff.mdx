@@ -46,6 +46,21 @@ They answer different questions and are often complementary.
 git fetch origin
 git range-diff origin/main...feature-v1 origin/main...feature-v2
 ```
+## Related reading
+
+Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.
+
+
+## What problem this command solves in a workflow
+
+`git range-diff` is a read-only comparison tool that shows the differences between two versions of a commit series (e.g., v1 and v2 of a patch series submitted for review). Unlike `git diff` which compares two commits, range-diff compares two ranges of commits, mapping corresponding patches and showing how each one changed between versions. It is essential for code review workflows where patch series get revised.
+
+## Typical use cases
+
+- Code review: when a contributor submits a revised patch series (v2, v3), range-diff shows exactly what changed in each patch compared to the previous version.
+- Rebasing patch series: after rebasing a feature branch, use range-diff to verify that the rebased series is equivalent to the original, or to document what shifted.
+- Comparing branch states: understanding how the content and ordering of commits evolved between two iterations of the same work.
+- Maintainer workflows: reviewing incremental changes to a submitted series without re-reading the entire diff.
 
 ## Diagram view
 
@@ -58,11 +73,24 @@ git range-diff origin/main...feature-v1 origin/main...feature-v2
   outputsLabel="Output"
   outputs="Patch mapping|Added/dropped patches|Patch-level changes"
   note="This command is mainly for explainability and verification after history edits."
+  title="Range-diff comparison"
+  caption="Range-diff compares two commit ranges side by side, pairing corresponding commits and showing how each patch's content changed between the two versions."
+  inputsLabel="Inputs"
+  inputs="Original commit range|Revised commit range|Patch content"
+  commandLabel="git range-diff"
+  outputsLabel="Results"
+  outputs="Per-patch diff of changes|Commit correspondence mapping|No refs modified"
+  note="Range-diff is read-only. It compares two ranges — it never creates, moves, or modifies any commits or refs."
 />
 
 ## Common mistakes
 
 ### Mistake 1: using it as a plain file diff replacement
+- Range-diff uses heuristics to match commits between the two ranges. If you reorder, split, or merge commits significantly, the correspondence mapping may be imprecise.
+- The output can be verbose for large series. Focus on patches marked as changed — unchanged patches are listed but show no diff.
+- Three-dot notation (`A...B`) is commonly used to define ranges, comparing commits reachable from one side but not the other, starting from the merge base.
+- Range-diff is purely diagnostic. It does not rebase, cherry-pick, or modify anything — it only reports differences between two ranges.
+- For simpler "what's different" questions between two commits, `git diff` is more appropriate. Range-diff is specifically for comparing two series of commits.
 
 You lose the patch-sequence semantics that make range-diff valuable.
 

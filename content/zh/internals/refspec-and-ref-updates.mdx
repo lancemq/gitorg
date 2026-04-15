@@ -19,6 +19,17 @@ Git 真正还要回答另一个问题：**这些更新应该写到哪个引用�
 
 ## 先理解引用更新的核心问题
 
+<RefsHeadFigure
+  title="Refspec 如何映射远端到本地引用"
+  caption="Fetch refspec 将远端的 refs/heads/* 映射到本地的 refs/remotes/origin/*，push refspec 将本地的 refs/heads/* 映射到远端的 refs/heads/*。"
+  headLabel="Fetch 映射"
+  branchLabel="refs/heads/main → refs/remotes/origin/main"
+  tagLabel="refs/tags/* → refs/tags/*"
+  remoteLabel="远端引用"
+  detachedLabel="Push 映射"
+/>
+
+
 无论是 `fetch` 还是 `push`，都不只是传对象。
 
 Git 还要决定：

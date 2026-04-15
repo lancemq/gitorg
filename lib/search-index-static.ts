@@ -90,7 +90,7 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "tier": "core",
       "slug": "git-add",
       "title": "git add 教程",
-      "summary": "说明 git add 如何把工作区改动加入暂存区，以及为什么理解暂存区是学会提交质量的关键。",
+      "summary": "说明 git add 如何把工作区改动加入暂存区、如何用 patch 精细暂存，以及怎样避免把不相关改动混进同一次提交。",
       "suggestions": []
     },
     {
@@ -100,7 +100,7 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "tier": "core",
       "slug": "git-commit",
       "title": "git commit 教程",
-      "summary": "解释 git commit 如何生成新历史节点、写好提交信息，以及 amend 与普通提交的边界。",
+      "summary": "解释 git commit 如何生成新的历史节点、怎样写出更有价值的提交信息，以及 amend 适合和不适合的边界。",
       "suggestions": []
     },
     {
@@ -110,7 +110,7 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "tier": "recommended",
       "slug": "git-diff",
       "title": "git diff 教程",
-      "summary": "讲清 git diff 如何比较工作区、暂存区和提交之间的差异，以及最常见的几种比较方式。",
+      "summary": "讲清 git diff 如何比较工作区、暂存区和提交状态，如何正确选择比较范围，以及怎样避免看错层级。",
       "suggestions": []
     },
     {
@@ -130,7 +130,7 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "tier": "core",
       "slug": "git-log",
       "title": "git log 教程",
-      "summary": "说明 git log 如何查看提交历史、图结构和作者信息，以及哪些参数最适合日常排查和阅读历史。",
+      "summary": "说明 git log 如何查看提交历史、分支图结构、作者和范围过滤，并把它真正用到评审、同步和恢复判断中。",
       "suggestions": []
     },
     {
@@ -170,7 +170,7 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "tier": "core",
       "slug": "git-pull",
       "title": "git pull 教程",
-      "summary": "解释 git pull 是 fetch 加整合的组合命令，以及为何很多团队更推荐 fetch-first 或 ff-only 的保守策略。",
+      "summary": "解释 git pull 是 fetch 加整合的组合动作，什么时候 pull 很方便，什么时候 fetch-first 更稳，以及 rebase / ff-only 会怎样改变结果。",
       "suggestions": []
     },
     {
@@ -180,7 +180,7 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "tier": "core",
       "slug": "git-push",
       "title": "git push 教程",
-      "summary": "说明 git push 如何发布本地分支、设置上游分支，以及 force-with-lease 为什么比裸 force 更安全。",
+      "summary": "说明 git push 如何发布本地分支、建立上游跟踪关系，以及怎样判断一次 push 是安全发布还是高风险改写。",
       "suggestions": []
     },
     {
@@ -714,6 +714,16 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "suggestions": []
     },
     {
+      "href": "/zh/best-practices/branch-workflow-and-lifecycle",
+      "path": "best-practices/branch-workflow-and-lifecycle",
+      "section": "best-practices",
+      "tier": "extended",
+      "slug": "branch-workflow-and-lifecycle",
+      "title": "分支策略与分支生命周期",
+      "summary": "把主线、发布线、修复线和主题分支的职责拆开，团队才更容易同时兼顾开发速度、评审质量和发布稳定性。",
+      "suggestions": []
+    },
+    {
       "href": "/zh/best-practices/fetch-first-sync",
       "path": "best-practices/fetch-first-sync",
       "section": "best-practices",
@@ -754,6 +764,16 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "suggestions": []
     },
     {
+      "href": "/zh/best-practices/focused-commits-and-topic-branch-hygiene",
+      "path": "best-practices/focused-commits-and-topic-branch-hygiene",
+      "section": "best-practices",
+      "tier": "extended",
+      "slug": "focused-commits-and-topic-branch-hygiene",
+      "title": "小步提交与主题分支整洁度",
+      "summary": "把提交粒度和主题分支边界同时管住，review 会更快，rebase 更稳，回滚也会轻松很多。",
+      "suggestions": []
+    },
+    {
       "href": "/zh/best-practices/branch-naming",
       "path": "best-practices/branch-naming",
       "section": "best-practices",
@@ -771,6 +791,16 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "slug": "pull-request-prep",
       "title": "提交评审前准备专题",
       "summary": "在发起评审前收敛提交、同步基线并清理噪音改动。",
+      "suggestions": []
+    },
+    {
+      "href": "/zh/best-practices/pull-request-review-readiness",
+      "path": "best-practices/pull-request-review-readiness",
+      "section": "best-practices",
+      "tier": "extended",
+      "slug": "pull-request-review-readiness",
+      "title": "Pull Request 评审准备与协作规范",
+      "summary": "评审质量很大程度上取决于送审前有没有把变更范围、提交叙事、上下文说明和后续响应机制准备清楚。",
       "suggestions": []
     },
     {
@@ -1110,7 +1140,7 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "tier": "recommended",
       "slug": "gitlab-flow-and-merge-requests",
       "title": "GitLab Flow 与 Merge Request 教程",
-      "summary": "理解 GitLab Flow、分支环境和 Merge Request 在团队协作里的关系，而不只是学会在哪点合并。",
+      "summary": "理解 GitLab Flow、环境感知的分支协作，以及 Merge Request 为什么会成为 GitLab 交付模型的中心。",
       "suggestions": []
     },
     {
@@ -1120,7 +1150,7 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "tier": "extended",
       "slug": "gitlab-forks-and-contributions",
       "title": "GitLab Fork 与贡献流程",
-      "summary": "把 GitLab 上的 fork、贡献分支、合并请求和上游同步串成一条更真实的外部协作路径。",
+      "summary": "把 GitLab 上的 fork、贡献分支、Merge Request 和上游同步串成一条更真实的外部协作路径，并说明权限与 CI 边界。",
       "suggestions": []
     },
     {
@@ -1130,7 +1160,7 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "tier": "extended",
       "slug": "gitlab-issues-boards-and-milestones",
       "title": "GitLab Issues、Boards 与 Milestones",
-      "summary": "理解 GitLab 如何把 issue、board、milestone 和交付节奏组织在一起，而不是把所有协作都丢进 Merge Request。",
+      "summary": "理解 GitLab 如何用 issue、board 和 milestone 把计划、流转和交付组织起来，而不是把所有上下文都塞进 Merge Request。",
       "suggestions": []
     },
     {
@@ -1150,7 +1180,7 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "tier": "recommended",
       "slug": "gitlab-ci-and-runners",
       "title": "GitLab CI/CD 与 Runners 入门",
-      "summary": "建立 GitLab CI/CD、pipeline、job、runner 的最小心智模型，理解它们怎样和 Merge Request 协作。",
+      "summary": "建立更扎实的 GitLab CI/CD、pipeline、job、runner 心智模型，并理解它们怎样参与 Merge Request 准入。",
       "suggestions": []
     },
     {
@@ -1394,6 +1424,136 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "suggestions": []
     },
     {
+      "href": "/zh/recovery/recover-after-cherry-pick",
+      "path": "recovery/recover-after-cherry-pick",
+      "section": "recovery",
+      "tier": "extended",
+      "slug": "recover-after-cherry-pick",
+      "title": "cherry-pick 冲突或出错后怎么恢复",
+      "summary": "cherry-pick 遇到冲突、中止或结果不对时的完整恢复流程，包括 --abort、--continue、--skip 以及 cherry-pick 完成后的补救方法。",
+      "suggestions": []
+    },
+    {
+      "href": "/zh/recovery/undo-merge-commit",
+      "path": "recovery/undo-merge-commit",
+      "section": "recovery",
+      "tier": "extended",
+      "slug": "undo-merge-commit",
+      "title": "合并提交后怎么撤销",
+      "summary": "merge commit 创建后发现有问题时的正确撤销方法。重点讲解 git revert -m 的 parent 编号原理和常见误区。",
+      "suggestions": []
+    },
+    {
+      "href": "/zh/recovery/fix-broken-interactive-rebase",
+      "path": "recovery/fix-broken-interactive-rebase",
+      "section": "recovery",
+      "tier": "extended",
+      "slug": "fix-broken-interactive-rebase",
+      "title": "交互式 rebase 中途出问题怎么救",
+      "summary": "交互式 rebase 过程中常见的错误（选错动作、冲突、编辑器问题）及恢复办法，包括 --abort、--edit-todo 和 reflog 找回。",
+      "suggestions": []
+    },
+    {
+      "href": "/zh/recovery/recover-lost-commits",
+      "path": "recovery/recover-lost-commits",
+      "section": "recovery",
+      "tier": "extended",
+      "slug": "recover-lost-commits",
+      "title": "提交丢失后怎么找回",
+      "summary": "各种场景下提交“丢失”后的恢复策略：detached HEAD 提交、filter-branch 后、误删分支、reset 过头。核心工具是 reflog 和 fsck。",
+      "suggestions": []
+    },
+    {
+      "href": "/zh/recovery/recover-from-corrupted-repo",
+      "path": "recovery/recover-from-corrupted-repo",
+      "section": "recovery",
+      "tier": "extended",
+      "slug": "recover-from-corrupted-repo",
+      "title": "仓库损坏后怎么恢复",
+      "summary": "仓库损坏（pack 损坏、对象丢失、磁盘故障）后的诊断和恢复策略。包括 git fsck 诊断、从远端重新 clone、恢复 pack 文件、备份恢复和预防措施。",
+      "suggestions": []
+    },
+    {
+      "href": "/zh/recovery/fix-detached-head-accidentally-committed",
+      "path": "recovery/fix-detached-head-accidentally-committed",
+      "section": "recovery",
+      "tier": "extended",
+      "slug": "fix-detached-head-accidentally-committed",
+      "title": "detached HEAD 上提交了怎么接回分支",
+      "summary": "在 detached HEAD 状态下做了提交后，如何正确接回分支。包括创建新分支、合并到已有分支、预防措施。",
+      "suggestions": []
+    },
+    {
+      "href": "/zh/recovery/fix-wrong-author-or-commit-message",
+      "path": "recovery/fix-wrong-author-or-commit-message",
+      "section": "recovery",
+      "tier": "extended",
+      "slug": "fix-wrong-author-or-commit-message",
+      "title": "提交后发现作者或信息写错怎么修正",
+      "summary": "提交后发现作者信息、提交信息写错，或者漏了文件的修正方法。包括 amend、rebase -i、filter-repo 批量修改等。",
+      "suggestions": []
+    },
+    {
+      "href": "/zh/best-practices/git-aliases",
+      "path": "best-practices/git-aliases",
+      "section": "best-practices",
+      "tier": "extended",
+      "slug": "git-aliases",
+      "title": "Git 别名与效率提升",
+      "summary": "高效 Git 别名配置、常用别名清单、Shell 别名、团队共享别名配置与最佳实践。",
+      "suggestions": []
+    },
+    {
+      "href": "/zh/best-practices/commit-message-advanced",
+      "path": "best-practices/commit-message-advanced",
+      "section": "best-practices",
+      "tier": "extended",
+      "slug": "commit-message-advanced",
+      "title": "高级提交信息规范",
+      "summary": "Conventional Commits、语义化提交、Co-authored-by、Breaking Changes 等高级提交信息规范与工具支持。",
+      "suggestions": []
+    },
+    {
+      "href": "/zh/best-practices/security-with-git",
+      "path": "best-practices/security-with-git",
+      "section": "best-practices",
+      "tier": "extended",
+      "slug": "security-with-git",
+      "title": "Git 安全实践",
+      "summary": "敏感信息泄露处理、密钥管理、.env 安全、git-secrets、GPG 签名提交、SSH 密钥管理等安全实践。",
+      "suggestions": []
+    },
+    {
+      "href": "/zh/workflows/pre-release-checklist",
+      "path": "workflows/pre-release-checklist",
+      "section": "workflows",
+      "tier": "extended",
+      "slug": "pre-release-checklist",
+      "title": "发布前的 Git 检查清单",
+      "summary": "发布前的完整 Git 检查清单：分支状态、tag 创建、changelog 生成、版本号、CI 验证。",
+      "suggestions": []
+    },
+    {
+      "href": "/zh/workflows/ci-optimization-with-git",
+      "path": "workflows/ci-optimization-with-git",
+      "section": "workflows",
+      "tier": "extended",
+      "slug": "ci-optimization-with-git",
+      "title": "CI/CD 中的 Git 优化",
+      "summary": "CI/CD 中的 Git 优化策略：浅克隆、缓存、partial clone、只拉变更，以及 GitHub Actions / GitLab CI 中的具体配置。",
+      "suggestions": []
+    },
+    {
+      "href": "/zh/workflows/trunk-based-development",
+      "path": "workflows/trunk-based-development",
+      "section": "workflows",
+      "tier": "extended",
+      "slug": "trunk-based-development",
+      "title": "主干开发工作流",
+      "summary": "主干开发 vs 分支开发对比、feature flag 配合、短分支策略、小步提交实践。",
+      "suggestions": []
+    },
+    {
       "href": "/zh/history",
       "path": "concepts/git-history",
       "section": "internals",
@@ -1401,6 +1561,66 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "slug": "git-history",
       "title": "Git 历史说明",
       "summary": "系统解释 Git 如何记录历史、为什么提交历史是一个有向图，以及这对协作、恢复和变更审查意味着什么。",
+      "suggestions": []
+    },
+    {
+      "href": "/zh/docs/concepts/git-ignore",
+      "path": "concepts/git-ignore",
+      "section": "concepts",
+      "tier": "extended",
+      "slug": "git-ignore",
+      "title": ".gitignore 完整指南",
+      "summary": "系统解释 .gitignore 规则语法、优先级、通配符、全局配置，以及如何排除不该提交的文件。",
+      "suggestions": []
+    },
+    {
+      "href": "/zh/docs/concepts/git-attributes",
+      "path": "concepts/git-attributes",
+      "section": "concepts",
+      "tier": "extended",
+      "slug": "git-attributes",
+      "title": "Git Attributes 详解",
+      "summary": "解释 .gitattributes 文件的用途、语法和常见应用场景，包括行尾符、合并策略、差异比较、语言识别和大文件处理。",
+      "suggestions": []
+    },
+    {
+      "href": "/zh/docs/concepts/git-hooks",
+      "path": "concepts/git-hooks",
+      "section": "concepts",
+      "tier": "extended",
+      "slug": "git-hooks",
+      "title": "Git Hooks 完全指南",
+      "summary": "详细解释 Git Hooks 的工作机制、客户端与服务端钩子、常见应用场景，以及如何使用 Husky 等工具管理 Hooks。",
+      "suggestions": []
+    },
+    {
+      "href": "/zh/docs/concepts/git-subtree",
+      "path": "concepts/git-subtree",
+      "section": "concepts",
+      "tier": "extended",
+      "slug": "git-subtree",
+      "title": "Git Subtree 使用指南",
+      "summary": "解释 git subtree 的概念、与 submodule 的对比、添加和更新子树的操作，以及子树合并和拆分的高级用法。",
+      "suggestions": []
+    },
+    {
+      "href": "/zh/docs/concepts/git-lfs",
+      "path": "concepts/git-lfs",
+      "section": "concepts",
+      "tier": "extended",
+      "slug": "git-lfs",
+      "title": "Git LFS 大文件存储",
+      "summary": "解释 Git LFS 的工作原理、安装配置、追踪文件类型、迁移已有大文件，以及 LFS 的常见问题和最佳实践。",
+      "suggestions": []
+    },
+    {
+      "href": "/zh/docs/concepts/git-shallow",
+      "path": "concepts/git-shallow",
+      "section": "concepts",
+      "tier": "extended",
+      "slug": "git-shallow",
+      "title": "Git 浅克隆与浅操作",
+      "summary": "解释 git clone --depth、浅 fetch、shallow exclude 等浅操作的概念、使用场景和局限性。",
       "suggestions": []
     }
   ],
@@ -1492,7 +1712,7 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "tier": "core",
       "slug": "git-add",
       "title": "git add Tutorial",
-      "summary": "Explains how git add stages changes for the next commit, and why the index is central to creating cleaner history.",
+      "summary": "Explains how git add stages changes for the next commit, how patch staging works, and how to avoid mixing unrelated edits into one commit.",
       "suggestions": []
     },
     {
@@ -1502,7 +1722,7 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "tier": "core",
       "slug": "git-commit",
       "title": "git commit Tutorial",
-      "summary": "Explains how git commit creates new history nodes, how to write useful messages, and when amend is appropriate.",
+      "summary": "Explains how git commit creates new history nodes, how to write stronger messages, and when amend is safe versus risky.",
       "suggestions": []
     },
     {
@@ -1512,7 +1732,7 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "tier": "recommended",
       "slug": "git-diff",
       "title": "git diff Tutorial",
-      "summary": "Explains how git diff compares working tree, index, and commit states, and which forms are most useful day to day.",
+      "summary": "Explains how git diff compares working tree, index, and commit states, how to read the most useful forms, and how to avoid checking the wrong layer.",
       "suggestions": []
     },
     {
@@ -1532,7 +1752,7 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "tier": "core",
       "slug": "git-log",
       "title": "git log Tutorial",
-      "summary": "Shows how git log inspects commit history, graph structure, authorship, and filtered history for debugging and review.",
+      "summary": "Shows how git log inspects commit history, graph structure, authorship, and filtered history for debugging, review, and recovery.",
       "suggestions": []
     },
     {
@@ -1572,7 +1792,7 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "tier": "core",
       "slug": "git-pull",
       "title": "git pull Tutorial",
-      "summary": "Explains git pull as fetch plus integration, and why many teams prefer fetch-first or ff-only synchronization habits.",
+      "summary": "Explains git pull as fetch plus integration, when pull is convenient, when fetch-first is safer, and how rebase or ff-only change the outcome.",
       "suggestions": []
     },
     {
@@ -1582,7 +1802,7 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "tier": "core",
       "slug": "git-push",
       "title": "git push Tutorial",
-      "summary": "Explains how git push publishes local branches, how upstream tracking works, and why force-with-lease is safer than raw force push.",
+      "summary": "Explains how git push publishes local branches, how upstream tracking works, and how to reason about safe versus risky publication.",
       "suggestions": []
     },
     {
@@ -2116,6 +2336,16 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "suggestions": []
     },
     {
+      "href": "/en/best-practices/branch-workflow-and-lifecycle",
+      "path": "best-practices/branch-workflow-and-lifecycle",
+      "section": "best-practices",
+      "tier": "extended",
+      "slug": "branch-workflow-and-lifecycle",
+      "title": "Branch Workflows and Branch Lifecycle",
+      "summary": "Teams move faster when mainline, release lines, hotfix lines, and topic branches each have a clear job and a clear exit condition.",
+      "suggestions": []
+    },
+    {
       "href": "/en/best-practices/fetch-first-sync",
       "path": "best-practices/fetch-first-sync",
       "section": "best-practices",
@@ -2156,6 +2386,16 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "suggestions": []
     },
     {
+      "href": "/en/best-practices/focused-commits-and-topic-branch-hygiene",
+      "path": "best-practices/focused-commits-and-topic-branch-hygiene",
+      "section": "best-practices",
+      "tier": "extended",
+      "slug": "focused-commits-and-topic-branch-hygiene",
+      "title": "Focused Commits and Topic Branch Hygiene",
+      "summary": "When commit scope and branch scope stay clean, reviews move faster, rebases stay safer, and rollback boundaries become much easier to reason about.",
+      "suggestions": []
+    },
+    {
       "href": "/en/best-practices/branch-naming",
       "path": "best-practices/branch-naming",
       "section": "best-practices",
@@ -2173,6 +2413,16 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "slug": "pull-request-prep",
       "title": "Preparing a Branch for Review",
       "summary": "Clean up commits, sync with the latest base, and remove noise before asking for review.",
+      "suggestions": []
+    },
+    {
+      "href": "/en/best-practices/pull-request-review-readiness",
+      "path": "best-practices/pull-request-review-readiness",
+      "section": "best-practices",
+      "tier": "extended",
+      "slug": "pull-request-review-readiness",
+      "title": "Pull Request Review Readiness",
+      "summary": "Review quality depends heavily on whether the author prepared branch scope, change narrative, validation notes, and follow-up behavior before requesting feedback.",
       "suggestions": []
     },
     {
@@ -2512,7 +2762,7 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "tier": "recommended",
       "slug": "gitlab-flow-and-merge-requests",
       "title": "GitLab Flow and Merge Requests",
-      "summary": "Understand GitLab Flow, environment-aware branching, and merge requests as one collaboration model instead of a collection of UI features.",
+      "summary": "Understand GitLab Flow, environment-aware branching, and merge requests as one delivery model instead of a collection of UI features.",
       "suggestions": []
     },
     {
@@ -2522,7 +2772,7 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "tier": "extended",
       "slug": "gitlab-forks-and-contributions",
       "title": "GitLab Forks and Contribution Flow",
-      "summary": "Connect GitLab forks, contribution branches, merge requests, and upstream sync into a more realistic external collaboration flow.",
+      "summary": "Connect GitLab forks, contribution branches, merge requests, and upstream sync into a realistic external contribution workflow with permission and CI boundaries.",
       "suggestions": []
     },
     {
@@ -2532,7 +2782,7 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "tier": "extended",
       "slug": "gitlab-issues-boards-and-milestones",
       "title": "GitLab Issues, Boards, and Milestones",
-      "summary": "Learn how GitLab organizes issues, boards, and milestones so planning and delivery do not collapse into merge requests alone.",
+      "summary": "Learn how GitLab issues, boards, and milestones turn project planning into a visible delivery system instead of forcing all context into merge requests.",
       "suggestions": []
     },
     {
@@ -2552,7 +2802,7 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "tier": "recommended",
       "slug": "gitlab-ci-and-runners",
       "title": "GitLab CI/CD and Runners",
-      "summary": "Build the smallest useful mental model for GitLab CI/CD, pipelines, jobs, and runners, and understand how they work with merge requests.",
+      "summary": "Build a stronger mental model for GitLab CI/CD, pipelines, jobs, and runners, and understand how they shape merge request readiness.",
       "suggestions": []
     },
     {
@@ -2796,6 +3046,136 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "suggestions": []
     },
     {
+      "href": "/en/recovery/recover-after-cherry-pick",
+      "path": "recovery/recover-after-cherry-pick",
+      "section": "recovery",
+      "tier": "extended",
+      "slug": "recover-after-cherry-pick",
+      "title": "How to recover from a failed cherry-pick",
+      "summary": "Complete recovery workflow when cherry-pick encounters conflicts, gets aborted, or produces unexpected results. Covers --abort, --continue, --skip, and post-cherry-pick remediation.",
+      "suggestions": []
+    },
+    {
+      "href": "/en/recovery/undo-merge-commit",
+      "path": "recovery/undo-merge-commit",
+      "section": "recovery",
+      "tier": "extended",
+      "slug": "undo-merge-commit",
+      "title": "How to undo a merge commit",
+      "summary": "Correct methods for undoing a merge commit when things go wrong. Deep dive into git revert -m and the parent numbering system, plus common pitfalls.",
+      "suggestions": []
+    },
+    {
+      "href": "/en/recovery/fix-broken-interactive-rebase",
+      "path": "recovery/fix-broken-interactive-rebase",
+      "section": "recovery",
+      "tier": "extended",
+      "slug": "fix-broken-interactive-rebase",
+      "title": "Recovering from a broken interactive rebase",
+      "summary": "Common errors during interactive rebase (wrong actions, conflicts, editor issues) and how to recover, including --abort, --edit-todo, and reflog-based recovery.",
+      "suggestions": []
+    },
+    {
+      "href": "/en/recovery/recover-lost-commits",
+      "path": "recovery/recover-lost-commits",
+      "section": "recovery",
+      "tier": "extended",
+      "slug": "recover-lost-commits",
+      "title": "Recovering lost commits",
+      "summary": "Recovery strategies for 'lost' commits across scenarios: detached HEAD commits, post-filter-branch, deleted branches, and over-reset. Core tools are reflog and fsck.",
+      "suggestions": []
+    },
+    {
+      "href": "/en/recovery/recover-from-corrupted-repo",
+      "path": "recovery/recover-from-corrupted-repo",
+      "section": "recovery",
+      "tier": "extended",
+      "slug": "recover-from-corrupted-repo",
+      "title": "Recovering from a corrupted repository",
+      "summary": "Diagnosis and recovery strategies for repository corruption: damaged pack files, missing objects, and disk failures. Covers git fsck, remote re-clone, pack recovery, backup restoration, and prevention.",
+      "suggestions": []
+    },
+    {
+      "href": "/en/recovery/fix-detached-head-accidentally-committed",
+      "path": "recovery/fix-detached-head-accidentally-committed",
+      "section": "recovery",
+      "tier": "extended",
+      "slug": "fix-detached-head-accidentally-committed",
+      "title": "Recovering commits made in detached HEAD",
+      "summary": "How to properly recover commits made in detached HEAD state back to a branch. Covers creating new branches, merging into existing branches, and prevention strategies.",
+      "suggestions": []
+    },
+    {
+      "href": "/en/recovery/fix-wrong-author-or-commit-message",
+      "path": "recovery/fix-wrong-author-or-commit-message",
+      "section": "recovery",
+      "tier": "extended",
+      "slug": "fix-wrong-author-or-commit-message",
+      "title": "Fixing wrong author or commit message after commit",
+      "summary": "How to fix wrong author info, commit messages, or forgotten files after committing. Covers amend, interactive rebase, and batch author modification with filter-repo.",
+      "suggestions": []
+    },
+    {
+      "href": "/en/best-practices/git-aliases",
+      "path": "best-practices/git-aliases",
+      "section": "best-practices",
+      "tier": "extended",
+      "slug": "git-aliases",
+      "title": "Git aliases and productivity tips",
+      "summary": "Efficient Git alias configuration, common alias catalog, shell aliases, team-shared alias configuration, and best practices.",
+      "suggestions": []
+    },
+    {
+      "href": "/en/best-practices/commit-message-advanced",
+      "path": "best-practices/commit-message-advanced",
+      "section": "best-practices",
+      "tier": "extended",
+      "slug": "commit-message-advanced",
+      "title": "Advanced commit message conventions",
+      "summary": "Conventional Commits, semantic commits, Co-authored-by, Breaking Changes, and tooling support including commitlint, husky, and commitizen.",
+      "suggestions": []
+    },
+    {
+      "href": "/en/best-practices/security-with-git",
+      "path": "best-practices/security-with-git",
+      "section": "best-practices",
+      "tier": "extended",
+      "slug": "security-with-git",
+      "title": "Security best practices with Git",
+      "summary": "Handling sensitive info leaks, key management, .env security, git-secrets, GPG-signed commits, and SSH key management.",
+      "suggestions": []
+    },
+    {
+      "href": "/en/workflows/pre-release-checklist",
+      "path": "workflows/pre-release-checklist",
+      "section": "workflows",
+      "tier": "extended",
+      "slug": "pre-release-checklist",
+      "title": "Pre-release Git checklist",
+      "summary": "Complete pre-release Git checklist: branch status, tag creation, changelog generation, version numbers, and CI verification.",
+      "suggestions": []
+    },
+    {
+      "href": "/en/workflows/ci-optimization-with-git",
+      "path": "workflows/ci-optimization-with-git",
+      "section": "workflows",
+      "tier": "extended",
+      "slug": "ci-optimization-with-git",
+      "title": "CI/CD Git optimization",
+      "summary": "CI/CD Git optimization strategies: shallow clone, caching, partial clone, fetching only changes, and specific configurations for GitHub Actions and GitLab CI.",
+      "suggestions": []
+    },
+    {
+      "href": "/en/workflows/trunk-based-development",
+      "path": "workflows/trunk-based-development",
+      "section": "workflows",
+      "tier": "extended",
+      "slug": "trunk-based-development",
+      "title": "Trunk-based development workflow",
+      "summary": "Trunk-based development vs branch-based development comparison, feature flag integration, short branch lifecycle, and small-step commit practices.",
+      "suggestions": []
+    },
+    {
       "href": "/en/history",
       "path": "concepts/git-history",
       "section": "internals",
@@ -2803,6 +3183,66 @@ export const staticSearchIndex: Record<Locale, SearchDoc[]> = {
       "slug": "git-history",
       "title": "Git History Explained",
       "summary": "Explains how Git records history, why commit history is a graph, and what that means for collaboration, recovery, and code review.",
+      "suggestions": []
+    },
+    {
+      "href": "/en/docs/concepts/git-ignore",
+      "path": "concepts/git-ignore",
+      "section": "concepts",
+      "tier": "extended",
+      "slug": "git-ignore",
+      "title": "The Complete Guide to .gitignore",
+      "summary": "A comprehensive explanation of .gitignore rule syntax, precedence, glob patterns, global configuration, and how to exclude files that should not be committed.",
+      "suggestions": []
+    },
+    {
+      "href": "/en/docs/concepts/git-attributes",
+      "path": "concepts/git-attributes",
+      "section": "concepts",
+      "tier": "extended",
+      "slug": "git-attributes",
+      "title": "Understanding .gitattributes",
+      "summary": "A deep dive into .gitattributes for controlling line endings, merge strategies, diff drivers, and binary file handling in Git.",
+      "suggestions": []
+    },
+    {
+      "href": "/en/docs/concepts/git-hooks",
+      "path": "concepts/git-hooks",
+      "section": "concepts",
+      "tier": "extended",
+      "slug": "git-hooks",
+      "title": "Git Hooks: Automating Git Workflows",
+      "summary": "A practical guide to Git hooks, covering client-side and server-side hooks, common use cases, and best practices for hook management.",
+      "suggestions": []
+    },
+    {
+      "href": "/en/docs/concepts/git-subtree",
+      "path": "concepts/git-subtree",
+      "section": "concepts",
+      "tier": "extended",
+      "slug": "git-subtree",
+      "title": "Git Subtree: Managing Nested Repositories",
+      "summary": "A practical comparison of git subtree vs git submodule, and how to use subtree for embedding and synchronizing external projects.",
+      "suggestions": []
+    },
+    {
+      "href": "/en/docs/concepts/git-lfs",
+      "path": "concepts/git-lfs",
+      "section": "concepts",
+      "tier": "extended",
+      "slug": "git-lfs",
+      "title": "Managing Large Files with Git LFS",
+      "summary": "A complete guide to Git Large File Storage — installation, tracking large files, migration, and team workflow considerations.",
+      "suggestions": []
+    },
+    {
+      "href": "/en/docs/concepts/git-shallow",
+      "path": "concepts/git-shallow",
+      "section": "concepts",
+      "tier": "extended",
+      "slug": "git-shallow",
+      "title": "Shallow Clones and CI Optimization",
+      "summary": "Understanding shallow clones, single-branch clones, and how to optimize Git operations for CI/CD and large repositories.",
       "suggestions": []
     }
   ]

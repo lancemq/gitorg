@@ -14,6 +14,18 @@ export const metadata = {
 
 ## Why branch names affect collaboration more than people expect
 
+<CommandFlowFigure
+  title="Branch Naming Convention"
+  caption="Unified branch naming patterns let team members instantly understand branch purpose, owner and related task. Also helps automation tools identify and process."
+  inputsLabel="Branch Types"
+  inputs="New feature|Bug fix|Hotfix|Experimental|Release prep"
+  commandLabel="Naming Rules"
+  outputsLabel="Branch Names"
+  outputs="feature/user-auth|bugfix/login-timeout|hotfix/security-patch|experiment/ai-suggestions|release/2.1.0"
+  note="Recommended pattern: <type>/<scope> or <type>/JIRA-<id>-<description>. Keep it concise but meaningful."
+/>
+
+
 Branch names look small, but they keep showing up in PRs, CI logs, release conversations, and rollback decisions.  
 When names are vague, people repeatedly pay the cost of asking what the branch is for. When names are stable, that context becomes almost free.
 

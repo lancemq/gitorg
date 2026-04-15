@@ -15,6 +15,16 @@ export const metadata = {
 
 ## Where this workflow fits
 
+<GitflowReleaseFigure
+  title="Release Branch Workflow"
+  caption="Cut release branch from develop for feature freeze and bug fix. After fixes, merge to main for release and backmerge to develop."
+  startLabel="Start release cycle"
+  releasePrepLabel="Feature freeze + Bug fixes"
+  releaseBackmergeLabel="Merge to main + develop"
+  hotfixBackmergeLabel="Hotfix bidirectional merge"
+/>
+
+
 Release branches are useful when the team needs a stable lane for test, packaging, and release-only fixes while main keeps moving.
 
 ## Suggested sequence

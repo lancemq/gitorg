@@ -54,6 +54,7 @@ You lose isolation and switch-cost benefits.
 Metadata can become stale and list output confusing.
 
 ### Mistake 3: sharing temporary build outputs across worktrees
+`git worktree` creates additional working directories linked to the same repository, allowing you to work on multiple branches simultaneously without stashing or switching. Think of it as "how do I parallelize local work across branches without cloning the repository multiple times?"
 
 This can hide branch-specific state differences.
 
@@ -62,4 +63,119 @@ This can hide branch-specific state differences.
 1. `parallel work with worktree`
 2. `ai agent worktree mode`
 3. `git-switch`
+- Create a separate working directory for a hotfix branch while keeping your main work intact: `git worktree add ../repo-hotfix hotfix`.
+- Run long builds or tests on one branch in a worktree while continuing to develop on another branch in the main directory.
+- Review a pull request branch in an isolated worktree without disrupting your current working state.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="Parallel working directories"
+  caption="worktree creates additional checkouts of the same repository, each on a different branch, sharing the same object database."
+  inputsLabel="Input"
+  inputs="Repository|Target branch|New directory path"
+  commandLabel="git worktree"
+  outputsLabel="Output"
+  outputs="Additional working directory|Independent branch checkout|Shared object store"
+  note="All worktrees share the same repository data — only the working directory and HEAD differ."
+/>
+
+## Branch locking in worktrees
+
+Git prevents the same branch from being checked out as a writable branch in multiple worktrees simultaneously. If you try:
+
+```bash
+# worktree1: already has feature-x checked out
+git worktree add ../worktree2 feature-x
+# Error: 'feature-x' is already checked out in '...'
+```
+
+This is a safety feature — it prevents conflicting edits to the same branch. To work around it:
+- Use a **detached HEAD** in the second worktree: `git worktree add --detach ../worktree2`
+- Check out a different branch
+
+You can see which worktree owns a branch with:
+
+```bash
+git worktree list
+```
+
+## Cleaning up orphaned worktrees
+
+When a worktree directory is manually deleted (without `git worktree remove`), Git may still reference it:
+
+```bash
+git worktree list
+# Shows a worktree that no longer exists on disk
+```
+
+Clean these up with:
+
+```bash
+git worktree prune
+```
+
+This removes stale worktree metadata from `.git/worktrees/`. Run it periodically if you frequently delete worktree directories manually.
+
+For regular cleanup, always use the proper command:
+
+```bash
+git worktree remove <path>
+```
+
+## CI/CD worktree scenarios
+
+Worktrees are powerful in CI/CD pipelines where you need to:
+- **Test a PR branch alongside main:** Create a worktree for the PR branch while keeping main available for baseline comparisons
+- **Build multiple targets in parallel:** Different worktrees for different branches, each running its own build
+- **Cherry-pick testing:** Create a temporary worktree to test cherry-picks before applying them to the real branch
+
+Example CI pattern:
+
+```bash
+# Start with main checked out
+git worktree add --detach ../ci-test HEAD
+cd ../ci-test
+git checkout -b test-branch
+# Run tests in isolation
+cd ../main
+git worktree remove ../ci-test
+```
+
+## Comparison: worktree vs stash vs branch
+
+| Aspect | Worktree | Stash | Separate Branch |
+|--------|----------|-------|-----------------|
+| Parallel work | ✅ Full parallel directories | ❌ Single working tree | ❌ Must switch branches |
+| Disk usage | Low (shares object store) | Minimal | Low (same repo) |
+| Uncommitted work | Preserved per worktree | Saved temporarily | Must commit first |
+| Build/test isolation | ✅ Independent | ❌ Mixed with current state | ❌ Must switch |
+| Setup overhead | Moderate | Minimal | Minimal |
+| Best for | Long-running parallel tasks | Quick context switches | Sequential work |
+
+## Experiment branch scenarios
+
+Worktrees excel for experimentation. Instead of stashing your current work to test an idea:
+
+```bash
+# Keep main work untouched
+git worktree add ../experiment-1 -b experiment/idea-1
+cd ../experiment-1
+# Try something risky — your main work is safe
+```
+
+If the experiment works, merge it back. If it doesn't, simply remove the worktree:
+
+```bash
+git worktree remove ../experiment-1
+```
+
+You can create multiple experiment worktrees simultaneously to compare different approaches side by side.
+
+## Special cases and boundaries
+
+- A branch usually cannot be checked out as a writable target in multiple worktrees at the same time, so confirm branch occupancy first.
+- Worktrees share the same `.git` directory and object database, so disk usage is efficient compared to multiple clones.
+- Use `git worktree list` to see all active worktrees and `git worktree remove <path>` to clean up when done.
+- Worktree metadata is stored in `.git/worktrees/`, so moving or renaming the main repository directory may require updating worktree paths.
 

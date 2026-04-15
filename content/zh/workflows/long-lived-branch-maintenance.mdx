@@ -13,7 +13,30 @@ export const metadata = {
 
 # 长期分支维护教程
 
+分支存活时间越长，漂移、重复冲突和混乱的历史就越容易堆积。
+我们的目标不是"永远不冲突"，而是让漂移可见、同步批量小、分支债务可控。
+
+<CommandFlowFigure
+  title="更健康的长期分支节奏"
+  caption="设置定期同步节奏，小批量集成主线变更，在冲突热区积累成最终合并事件之前先检查并解决。"
+  inputsLabel="持续监控"
+  inputs="分支存活时间|主线漂移|冲突热区"
+  commandLabel="定期同步 → 验证 → 偿还债务"
+  outputsLabel="目标"
+  outputs="更小的冲突|更清晰的历史|更低的合并冲击"
+  note="当团队直到最后才检查漂移时，长期分支就会变得危险。"
+/>
+
 ## 为什么长期分支容易出问题
+
+<RebaseFigure
+  title="长期分支同步主线"
+  caption="长期分支需要定期 rebase 或 merge 主线变更。rebase 保持历史线性但改写提交 ID，merge 保留完整历史但产生合并提交。"
+  beforeLabel="长期分支落后主线"
+  afterLabel="同步主线后"
+  modeLabel="git rebase origin/main"
+/>
+
 
 短生命周期分支最大的优点，是漂移时间短、冲突面小。
 

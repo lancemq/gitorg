@@ -1,0 +1,410 @@
+export const metadata = {
+  title: "The Complete Guide to .gitignore",
+  slug: "git-ignore",
+  locale: "en",
+  section: "concepts",
+  summary: "A comprehensive explanation of .gitignore rule syntax, precedence, glob patterns, global configuration, and how to exclude files that should not be committed.",
+  sourceUrls: ["https://git-scm.com/docs/gitignore"],
+};
+
+# The Complete Guide to .gitignore
+
+## What is .gitignore?
+
+At its core, `.gitignore` is a plain text file that tells Git which files or directories to **ignore** — meaning Git will not track them, will not stage them, and will not include them in commits. This is essential for keeping repositories clean, avoiding the accidental commit of sensitive data, and reducing repository size.
+
+A `.gitignore` file should live in the root of your repository, but you can also place additional `.gitignore` files in subdirectories to apply rules scoped to those directories.
+
+```
+my-project/
+├── .gitignore          ← applies to the entire repo
+├── src/
+│   └── .gitignore      ← applies only to files under src/
+├── build/
+└── tests/
+```
+
+<CommandFlowFigure
+  title=".gitignore Matching Flow"
+  caption="Git checks every untracked file in the working tree against .gitignore rules line by line. The last matching rule determines whether the file is ignored."
+  inputsLabel="Working Tree Files"
+  inputs="src/index.js|node_modules/|.env|build/output.js|.DS_Store"
+  commandLabel=".gitignore Match"
+  outputsLabel="Result"
+  outputs="✅ src/index.js → tracked|❌ node_modules/ → ignored|❌ .env → ignored|❌ build/ → ignored|❌ .DS_Store → ignored"
+  note="The last matching rule takes effect. Negation rules ! only work on files that were previously ignored."
+/>
+
+## Rule Syntax and Glob Patterns
+
+Git's ignore patterns use a simplified form of **glob patterns** (similar to shell wildcards). Here are the key symbols and their meanings:
+
+### Basic Patterns
+
+| Pattern | Meaning | Example |
+|---------|---------|---------|
+| `*` | Matches zero or more characters within a single path component | `*.log` matches `error.log`, `debug.log` |
+| `**` | Matches zero or more directories (path separators) | `logs/**` matches `logs/a/b/c.log` |
+| `?` | Matches exactly one character | `file?.txt` matches `file1.txt` but not `file10.txt` |
+| `[abc]` | Matches any one character in the brackets | `file[ab].txt` matches `filea.txt`, `fileb.txt` |
+| `[0-9]` | Matches a range of characters | `file[0-3].txt` matches `file0.txt` through `file3.txt` |
+| `/` | Denotes directory boundaries | `/build/` matches only the top-level `build/` directory |
+
+### Special Modifiers
+
+| Modifier | Meaning |
+|----------|---------|
+| Leading `/` | Anchors the pattern to the directory containing the `.gitignore` file |
+| Trailing `/` | Specifies that the pattern matches a directory (and everything inside it) |
+| `!` (negation) | Re-includes a previously excluded pattern |
+| `\` (escape) | Escapes special characters in filenames |
+
+### Practical Examples
+
+```gitignore
+# Ignore all .log files anywhere in the repository
+*.log
+
+# Ignore only the top-level build directory (not src/build/)
+/build/
+
+# Ignore node_modules in any directory
+node_modules/
+
+# Ignore all .env files but keep .env.example
+.env
+!.env.example
+
+# Ignore everything in dist/ except dist/main.js
+dist/*
+!dist/main.js
+
+# Ignore all .tmp files in the tmp directory and its subdirectories
+tmp/**/*.tmp
+
+# Ignore specific file types in docs/
+docs/*.pdf
+docs/*.docx
+```
+
+## Rule Precedence and Matching Order
+
+Understanding how Git resolves conflicting `.gitignore` rules is critical:
+
+1. **Top-to-bottom evaluation**: Git reads `.gitignore` from top to bottom.
+2. **First match wins**: The first rule that matches a file path determines the outcome — **unless** a later rule negates it with `!`.
+3. **Negation rules**: A `!` prefix re-includes a file that was previously ignored. Negation rules can only override patterns that appeared **earlier** in the file.
+4. **Directory-scoped `.gitignore`**: A `.gitignore` file in a subdirectory applies to that directory and its descendants, but it cannot affect rules from parent directories.
+
+```gitignore
+# Rule precedence example
+*.txt           # Ignore all .txt files
+!important.txt  # Except important.txt (this works because ! comes after *.txt)
+!important2.txt # Also re-include important2.txt
+```
+
+### Order Matters
+
+```gitignore
+# WRONG: this won't work
+!important.txt  # This has no effect — nothing has been ignored yet
+*.txt           # Now all .txt files (including important.txt) are ignored
+
+# CORRECT: ignore first, then re-include
+*.txt
+!important.txt
+```
+
+## Common Patterns by Ecosystem
+
+### Node.js / JavaScript
+
+```gitignore
+# Dependencies
+node_modules/
+bower_components/
+
+# Build output
+dist/
+build/
+.next/
+.nuxt/
+.output/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+```
+
+### Python
+
+```gitignore
+# Byte-compiled / optimized
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# IPython / Jupyter
+.ipynb_checkpoints/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.mypy_cache/
+.ruff_cache/
+```
+
+### Java / Kotlin
+
+```gitignore
+# Build output
+target/
+build/
+out/
+bin/
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Gradle
+.gradle/
+build/
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+
+# OS
+.DS_Store
+*.class
+```
+
+### Go
+
+```gitignore
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# IDE
+.idea/
+.vscode/
+```
+
+## Global .gitignore
+
+Some files should be ignored across **all** your repositories — typically IDE settings, OS-generated files, and editor swap files. Instead of adding these to every project's `.gitignore`, configure a **global** ignore file:
+
+```bash
+# Create a global gitignore file
+echo ".DS_Store" > ~/.gitignore_global
+echo ".idea/" >> ~/.gitignore_global
+echo "*.swp" >> ~/.gitignore_global
+echo "Thumbs.db" >> ~/.gitignore_global
+
+# Tell Git to use it globally
+git config --global core.excludesFile ~/.gitignore_global
+```
+
+You can also configure this in your `~/.gitconfig`:
+
+```ini
+[core]
+    excludesFile = ~/.gitignore_global
+```
+
+Global rules are overridden by local `.gitignore` files. If a local rule explicitly tracks a file, the global ignore won't block it.
+
+## Ignoring Already-Tracked Files
+
+This is the **most common pitfall** with `.gitignore`: **`.gitignore` only affects untracked files**. If a file is already being tracked by Git (it has been `git add`ed and committed), adding it to `.gitignore` will have **no effect**.
+
+To stop tracking an already-committed file while keeping it locally:
+
+```bash
+# Remove from the index but keep the file on disk
+git rm --cached path/to/file
+
+# Remove a directory from the index
+git rm --cached -r path/to/directory/
+
+# Then commit the change
+git add .gitignore
+git commit -m "Stop tracking files that should be ignored"
+```
+
+### Bulk Remove Tracked Files Matching .gitignore
+
+If you've added many patterns to `.gitignore` but the files are already tracked:
+
+```bash
+# Remove all currently ignored files from the index
+git rm -r --cached .
+
+# Re-add everything (now respecting .gitignore)
+git add .
+
+# Commit
+git commit -m "Apply .gitignore to already-tracked files"
+```
+
+> **Warning**: This removes all files from the index and re-adds them. Make sure your working tree is clean before doing this, and verify the changes with `git status` before committing.
+
+## Debugging .gitignore Rules
+
+Git provides built-in tools to debug why files are (or aren't) being ignored:
+
+### git check-ignore
+
+```bash
+# Check if a specific file is ignored
+git check-ignore -v path/to/file.log
+
+# Output example:
+# .gitignore:3:*.log    path/to/file.log
+# ^file       ^line#    ^matched file
+# ^pattern
+
+# Check multiple files
+git check-ignore -v file1.log file2.txt debug.log
+```
+
+The `-v` flag shows which `.gitignore` file, which line, and which pattern caused the file to be ignored. If nothing is output, the file is **not** ignored.
+
+### git status --ignored
+
+```bash
+# Show ignored files in the status output
+git status --ignored
+
+# This shows files that Git knows about but is ignoring
+```
+
+### Test Patterns Without Creating Files
+
+```bash
+# Use git check-ignore with stdin to test patterns
+echo "build/output.js" | git check-ignore --stdin -v
+echo "src/build/output.js" | git check-ignore --stdin -v
+```
+
+## Common Pitfalls and Gotchas
+
+### 1. Whitespace in Patterns
+
+Trailing spaces in `.gitignore` can cause unexpected behavior. A pattern `*.log ` (with a trailing space) will **not** match `error.log`.
+
+```gitignore
+# BAD: trailing space
+*.log 
+
+# GOOD: no trailing space
+*.log
+
+# Escape spaces in filenames
+file\ name.txt
+```
+
+### 2. Case Sensitivity
+
+On macOS (which typically uses a case-insensitive filesystem), `*.LOG` and `*.log` may behave differently than on Linux.
+
+### 3. Ignored Directories Can't Have Exceptions for Specific Files
+
+If you ignore an entire directory, you cannot selectively include a file inside it unless you un-ignore the directory path first:
+
+```gitignore
+# This won't work as expected
+logs/
+!logs/important.log
+
+# Fix: un-ignore the directory first, then ignore specific contents
+logs/
+!logs/
+logs/*.tmp
+```
+
+### 4. .gitignore Itself Should Be Committed
+
+Unlike global `.gitignore`, your project's `.gitignore` **should** be committed to the repository so that all team members benefit from the same ignore rules.
+
+### 5. Pattern Scope with Leading /
+
+```gitignore
+# Without leading /: matches build/ in ANY directory
+build/
+
+# With leading /: matches ONLY the top-level build/
+/build/
+```
+
+### 6. Empty Directories
+
+Git does not track empty directories. If you need a directory to exist in the repo, add a `.gitkeep` file inside it:
+
+```bash
+mkdir -p logs
+touch logs/.gitkeep
+git add logs/.gitkeep
+```
+
+## Summary
+
+| Concept | Key Takeaway |
+|---------|-------------|
+| `*` | Matches characters within one path component |
+| `**` | Matches across multiple directories |
+| `!` | Negates a previous pattern |
+| `/` | Anchors pattern to the `.gitignore` directory |
+| Precedence | First matching rule wins; `!` can override earlier rules |
+| Tracked files | `.gitignore` does not affect already-tracked files |
+| Global ignore | Use `core.excludesFile` for cross-project patterns |
+| Debugging | `git check-ignore -v` is your best friend |
+
+A well-maintained `.gitignore` keeps your repository clean, prevents sensitive data leaks, and reduces noise in `git status` output. Make it a habit to update your `.gitignore` whenever new build tools, IDEs, or dependency managers are introduced to your project.

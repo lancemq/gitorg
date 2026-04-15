@@ -18,6 +18,16 @@ commit 对象不是“写一句提交说明”那么简单，它真正做的是�
 
 ## 1. 提交对象里至少有什么
 
+<CommitGraphFigure
+  title="提交如何通过父提交链接成历史"
+  caption="每个 commit 对象包含指向 tree 的引用、一个或多个父提交、作者和提交者信息，以及提交说明。父提交是历史图的关键链接。"
+  linearLabel="普通提交（一个父节点）"
+  mergeLabel="Merge 提交（两个父节点）"
+  rewriteLabel="Rebase 后提交（新 ID 的提交链）"
+  pointerLabel="HEAD 指向"
+/>
+
+
 一个 commit 对象通常会包含：
 
 - 指向当前快照根 tree 的信息

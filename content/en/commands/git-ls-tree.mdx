@@ -48,30 +48,32 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 
 ## What problem this command solves in a workflow
 
-`git ls-tree` lives closer to Git’s implementation model: objects, refs, and the index. It is best suited for scripting, automation, and advanced debugging rather than being your first manual tool.
+`git ls-tree` solves the problem of "what files and directories does a given tree object contain?". It lists the directory and file entries inside a specified tree object, showing each entry's type, mode, and blob hash.
 
 ## Typical use cases
 
-- Use `git ls-tree` when you need precise control over objects, refs, or index state in a scriptable flow.
-- Reach for `git ls-tree` when learning internals or validating low-level repository state during debugging.
-- Use `git ls-tree` only when porcelain commands no longer express the exact operation you need.
+- View the complete directory structure of a commit by running `git ls-tree -r HEAD` to recursively list all files and subdirectories.
+- Parse the contents of a specific directory in a script by using `git ls-tree HEAD:src/` to see file entries under a given path.
+- Verify the blob hash of a file in a specific commit with `git ls-tree HEAD path/to/file` to retrieve its object ID.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Objects, refs, and index path"
-  caption="Plumbing commands are powerful because they operate directly on Git internals, not because they are “more advanced” in the everyday workflow sense."
-  inputsLabel="Internal inputs"
-  inputs="Object database|Tree objects|Index|Refs"
+  title="List tree object contents"
+  caption="ls-tree reads tree objects from the object database and outputs their directory and file entries. It is a pure read-only operation."
+  inputsLabel="Tree object"
+  inputs="Tree object reference|Recursive option|Target path"
   commandLabel="git ls-tree"
-  outputsLabel="Results"
-  outputs="Scriptable output|Updated low-level state|Fine-grained control"
-  note="If you are still thinking only in terms of branches and files, pause and separate objects, refs, and index state first."
+  outputsLabel="Outputs"
+  outputs="File mode|Object type (blob/tree)|Object hash|File path"
+  note="ls-tree only reads tree object contents without changing anything. It shows the directory structure at a specific snapshot moment."
 />
 
 ## Special cases and boundaries
 
-- The real risk in plumbing commands is not just that they can fail, but that they can successfully perform the wrong low-level action.
-- Before running `git ls-tree` in a real repo, test it in a tiny disposable repository and verify whether a safer porcelain command would do the job.
-- If arguments contain refs, trees, index paths, or raw object IDs, inspect those inputs independently before performing writes.
+- `git ls-tree` is a pure read-only command — it never modifies the object database, index, or working tree.
+- By default it only shows the specified level of content; use `-r` (recursive) to list all files in subdirectories.
+- You can use the `TREE:PATH` syntax to see contents under a specific path, such as `git ls-tree HEAD:src/`.
+- Output includes file modes (e.g., 100644 for regular files, 100755 for executables, 040000 for directories).
+- It shows the tree structure from the object database, independent of the working tree state — even if the working tree has uncommitted changes, ls-tree still shows the tree object's contents.
 

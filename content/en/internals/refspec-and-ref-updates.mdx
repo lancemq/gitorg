@@ -18,6 +18,17 @@ That is what a refspec describes.
 
 ## Start with the real problem
 
+<RefsHeadFigure
+  title="How Refspecs Map Remote to Local Refs"
+  caption="Fetch refspecs map remote refs/heads/* to local refs/remotes/origin/*. Push refspecs map local refs/heads/* to remote refs/heads/*."
+  headLabel="Fetch mapping"
+  branchLabel="refs/heads/main → refs/remotes/origin/main"
+  tagLabel="refs/tags/* → refs/tags/*"
+  remoteLabel="Remote refs"
+  detachedLabel="Push mapping"
+/>
+
+
 During both `fetch` and `push`, Git is not only transferring objects. It also has to decide:
 
 - which source ref to read from

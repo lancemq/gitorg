@@ -19,6 +19,15 @@ This is the most common collaboration path: branch from main, develop in isolati
 
 ## A safer baseline flow
 
+<MergeFigure
+  title="Feature Branch Collaboration Pattern"
+  caption="Feature branch is cut from main, developed independently, then merged back. During development, regularly sync main changes to avoid large conflicts at merge time."
+  beforeLabel="Feature branch cut from main"
+  afterLabel="Merged back to main"
+  modeLabel="Regularly sync origin/main"
+/>
+
+
 ```bash
 git switch main
 git pull --ff-only

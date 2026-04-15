@@ -1,0 +1,402 @@
+export const metadata = {
+  title: "提交丢失后怎么找回",
+  slug: "recover-lost-commits",
+  locale: "zh",
+  section: "recovery",
+  summary: "各种场景下提交“丢失”后的恢复策略：detached HEAD 提交、filter-branch 后、误删分支、reset 过头。核心工具是 reflog 和 fsck。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-reflog",
+    "https://git-scm.com/docs/git-fsck",
+    "https://git-scm.com/book/en/v2/Git-Internals-Maintenance-and-Data-Recovery",
+  ],
+};
+
+# 提交丢失后怎么找回
+
+## 一句话理解
+
+<ReflogFigure
+  title="提交丢失后的找回路径"
+  caption="Git 中的提交很少真正被删除。大多数情况下提交对象仍然存在，只是失去了引用路径。通过 reflog 和 git fsck --lost-found 可以找到这些悬挂对象。"
+  historyLabel="reflog 历史（提交操作记录）"
+  rescueLabel="新建分支接住提交"
+  nowLabel="当前分支位置"
+/>
+
+
+Git 中的提交很少真正被删除。大多数情况下，提交对象仍然存在于 `.git/objects/` 中，只是失去了引用路径（分支指针移走了）。通过 reflog 和 fsck，你可以找回几乎所有"丢失"的提交。
+
+## 提交为什么会"丢失"
+
+提交本身不会自动消失，但访问它的路径可能丢失。常见场景：
+
+### 场景 1：在 detached HEAD 上提交后切换了分支
+
+```bash
+# 你 checkout 了一个旧提交（detached HEAD）
+git checkout abc1234
+
+# 做了些修改并提交
+git add .
+git commit -m "紧急修复"
+# 此时: HEAD -> (abc1234的新提交 def5678)
+
+# 然后切换回主分支
+git checkout main
+# 此时: HEAD -> main
+# 提交 def5678 仍然存在，但没有任何分支指向它！
+```
+
+```
+    main
+     │
+     ▼
+A --- B --- C
+     \
+      D --- E (detached HEAD 上的提交，没有名字)
+```
+
+### 场景 2：reset --hard 过头
+
+```bash
+# 想回退 2 个提交，不小心回了 20 个
+git reset --hard HEAD~20
+
+# 中间的 18 个提交"丢失"了
+```
+
+### 场景 3：误删分支
+
+```bash
+# 删除了一个包含重要提交的分支
+git branch -D feature-important
+
+# 该分支上未合并的提交"丢失"
+```
+
+### 场景 4：rebase 后旧提交被替代
+
+```bash
+git rebase main
+# 旧提交被新的（内容相同但 SHA 不同）提交替代
+# 旧提交变成了 unreachable
+```
+
+### 场景 5：filter-branch / filter-repo 改写历史后
+
+```bash
+git filter-branch --force --tree-filter 'rm -f passwords.txt' HEAD
+# 旧的历史被改写，原始提交变成 unreachable
+```
+
+## 关键认知：提交对象通常还在
+
+```
+分支指针 (refs/heads/*)
+       │
+       ▼
+    提交 A ──→ 提交 B ──→ 提交 C (当前)
+                 │
+           ┌─────┘
+           ▼
+       提交 X ──→ 提交 Y  (孤立提交，但对象仍在 .git/objects/ 中)
+```
+
+只要你没有运行 `git gc` 并且 reflog 还没有过期，提交对象就安全地躺在 `.git/objects/` 目录里。
+
+## 恢复工具一：git reflog（最常用）
+
+reflog 记录了 HEAD 和每个分支的每一次移动。它是找回丢失提交的首选工具。
+
+### 查看 reflog
+
+```bash
+# 查看 HEAD 的移动历史
+$ git reflog
+d4e5f6a (HEAD -> main) HEAD@{0}: reset: moving to HEAD~20
+a1b2c3d HEAD@{1}: commit: 第 20 个提交
+b2c3d4e HEAD@{2}: commit: 第 19 个提交
+c3d4e5f HEAD@{3}: commit: 第 18 个提交
+...
+e5f6a7b HEAD@{20}: commit: 第 1 个提交
+f6a7b8c HEAD@{21}: checkout: moving from feature to main
+```
+
+```bash
+# 查看特定分支的 reflog
+git reflog show feature
+
+# 查看所有 reflog
+git reflog show --all
+```
+
+### 用 reflog 恢复
+
+```bash
+# 方法一：reset 到 reflog 中的某个位置
+git reset --hard HEAD@{3}  # 回到第 3 步之前的状态
+
+# 方法二：直接用 SHA
+git reset --hard c3d4e5f
+
+# 方法三：创建一个新分支接住它（更安全）
+git branch recovered/c3d4e5f c3d4e5f
+```
+
+### reflog 的时间窗口
+
+reflog 条目不会永久保留：
+
+| 状态 | 保留时间 |
+|------|---------|
+| 当前分支的 reflog | 默认 90 天 |
+| 其他分支的 reflog | 默认 30 天 |
+| 过期后 | 下次 `git gc` 时可能被清理 |
+
+```bash
+# 查看 reflog 过期配置
+git config gc.reflogExpire        # 当前分支：90天
+git config gc.reflogExpireUnreachable  # 其他分支：30天
+
+# 手动清理过期 reflog
+git reflog expire --expire=now --all
+```
+
+**重要**：reflog 是本地的，不会 push 到远端。如果你克隆了一个新仓库，就没有旧的 reflog 记录。
+
+## 恢复工具二：git fsck --lost-found
+
+当 reflog 帮不上忙时（reflog 已过期或被清理），可以用 `fsck` 找到 dangling（悬空）的提交对象。
+
+### 查找 dangling commits
+
+```bash
+# 查找所有悬空的提交对象
+$ git fsck --lost-found
+Checking object directories: 100% (256/256), done.
+dangling commit a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0
+dangling commit b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1
+dangling blob c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2
+```
+
+```bash
+# 查看这些 dangling commit 的内容
+git show a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0
+
+# 只看一行摘要
+git log --oneline -1 a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0
+```
+
+```bash
+# 更友好的输出方式
+git fsck --no-reflog --unreachable | grep commit
+```
+
+### 批量检查所有 dangling commits
+
+```bash
+# 列出所有 dangling commit 及其信息
+for sha in $(git fsck --lost-found 2>&1 | grep "dangling commit" | awk '{print $3}'); do
+  echo "--- $sha ---"
+  git log --oneline -1 $sha
+done
+```
+
+### 恢复 dangling commit
+
+```bash
+# 找到你需要的提交后，创建一个分支接住它
+git branch recovered/lost-work a1b2c3d4
+
+# 或者直接 cherry-pick 到当前分支
+git cherry-pick a1b2c3d4
+```
+
+## 恢复工具三：在 reflog 和 fsck 之间
+
+### 查找包含特定文件的提交
+
+```bash
+# 你知道丢失的提交中包含某个文件
+git log --all --full-history -- src/important-file.js
+
+# 或者用 rev-list 搜索
+git rev-list --all -- src/important-file.js
+```
+
+### 查找特定时间范围内的提交
+
+```bash
+# 查找某个时间段内的所有提交
+git reflog --since="2026-04-10" --until="2026-04-14"
+
+# 或者
+git log --all --since="2026-04-10" --until="2026-04-14"
+```
+
+## 各场景的具体恢复步骤
+
+### 场景 1 恢复：detached HEAD 上提交后切换分支
+
+```bash
+# 1. 在 reflog 中找到那个提交
+$ git reflog
+a1b2c3d HEAD@{2}: checkout: moving from <sha> to main
+b2c3d4e HEAD@{3}: commit: 紧急修复  ← 这就是丢失的提交！
+
+# 2. 创建一个分支接住它
+git branch recovered/emergency-fix b2c3d4e
+
+# 3. 查看恢复的提交
+git log --oneline recovered/emergency-fix -3
+
+# 4. 合并或 cherry-pick 到主分支
+git checkout main
+git merge recovered/emergency-fix
+# 或
+git cherry-pick b2c3d4e
+```
+
+### 场景 2 恢复：reset --hard 过头
+
+```bash
+# 1. 查看 reflog 找到 reset 前的位置
+$ git reflog
+d4e5f6a HEAD@{0}: reset: moving to HEAD~20  ← 过头的 reset
+a1b2c3d HEAD@{1}: commit: 第 20 个提交  ← 回到这里
+...
+
+# 2. 恢复到 reset 前
+git reset --hard HEAD@{1}
+# 或
+git reset --hard a1b2c3d
+```
+
+### 场景 3 恢复：误删分支
+
+```bash
+# 1. 用 fsck 找到 dangling commit
+git fsck --lost-found
+
+# 2. 检查哪个是你删除的分支的 tip
+git show <dangling-commit-sha>
+
+# 3. 重新创建分支
+git branch feature-important <dangling-commit-sha>
+
+# 或者用 reflog
+git reflog show feature-important
+git branch feature-important feature-important@{1}
+```
+
+### 场景 4 恢复：filter-branch 后找回原始提交
+
+```bash
+# filter-branch 会在 refs/original/ 中保存原始引用
+git log refs/original/refs/heads/main
+
+# 如果需要恢复整个分支
+git checkout -b original-main refs/original/refs/heads/main
+```
+
+## 找回提交后的操作
+
+找到丢失的提交后，你有几种方式把它"接回"正常历史：
+
+```bash
+# 方式一：创建分支（最安全）
+git branch recovered/work <sha>
+
+# 方式二：cherry-pick 到当前分支
+git cherry-pick <sha>
+
+# 方式三：reset 到该提交（丢弃之后的所有提交）
+git reset --hard <sha>
+
+# 方式四：merge 回来
+git merge <sha>
+```
+
+## 时间窗口和不可恢复的情况
+
+提交对象在以下情况下可能被永久删除：
+
+1. **reflog 过期**（默认 30-90 天）
+2. **执行了 `git gc`** 且 reflog 已过期
+3. **执行了 `git gc --prune=now`** 立即清理
+4. **克隆的新仓库**（没有旧的 reflog）
+5. **远端仓库**（远端通常没有 reflog）
+
+```bash
+# 如果你想永久清除所有 unreachable 对象
+git reflog expire --expire=now --all
+git gc --prune=now --aggressive
+```
+
+## 预防措施
+
+### 1. 重要操作前创建备份分支
+
+```bash
+# 在 reset、rebase、filter-branch 之前
+git branch backup/before-reset
+git branch backup/before-rebase
+```
+
+### 2. 定期 push 到远端
+
+push 到远端相当于创建了一个额外的备份。即使本地 reflog 丢失，远端的提交记录还在。
+
+```bash
+git push origin feature
+```
+
+### 3. 使用 stash 代替不确定的临时提交
+
+如果你不确定是否要保留某个改动：
+
+```bash
+git stash push -m "临时改动，可能需要"
+# 比 commit 更安全，不会污染历史
+```
+
+### 4. 调整 reflog 保留时间
+
+```bash
+# 延长 reflog 保留时间
+git config gc.reflogExpire 180.days
+git config gc.reflogExpireUnreachable 90.days
+```
+
+### 5. 使用 git bundle 做离线备份
+
+```bash
+# 打包整个仓库（包括所有 refs 和 objects）
+git bundle create backup-$(date +%Y%m%d).bundle --all
+
+# 从 bundle 恢复
+git clone backup-20260414.bundle recovered-repo
+```
+
+## 快速决策流程图
+
+```
+提交"丢失"了？
+      │
+  ┌───┴───┐
+  还记得    不记得
+  大致情况？  SHA？
+  │        │
+  ↓        ↓
+ git reflog  git fsck --lost-found
+  │        │
+  ↓        ↓
+ 找到后：   找到后：
+ git branch  git show 检查
+ recovered/xxx git branch recovered/xxx <sha>
+  <sha>      │
+  │         确认后 cherry-pick
+  ↓          或 merge
+ cherry-pick
+ 或 merge
+```

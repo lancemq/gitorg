@@ -1,0 +1,464 @@
+export const metadata = {
+  title: "Git LFS 大文件存储",
+  slug: "git-lfs",
+  locale: "zh",
+  section: "concepts",
+  summary: "解释 Git LFS 的工作原理、安装配置、追踪文件类型、迁移已有大文件，以及 LFS 的常见问题和最佳实践。",
+  sourceUrls: [
+    "https://git-lfs.com/",
+    "https://github.com/git-lfs/git-lfs/wiki/Tutorial",
+    "https://git-scm.com/book/en/v2/Git-Tools-Git-LFS",
+  ],
+};
+
+# Git LFS 大文件存储
+
+## 一句话理解
+
+Git LFS（Large File Storage）用文本指针替换仓库中的大文件，实际文件内容存储在远程服务器上，从而避免仓库体积膨胀。
+
+## 为什么需要 Git LFS
+
+Git 在设计上会记录每个文件的完整历史。每次修改文件，Git 都会存储该文件的新完整副本。这对代码文件（通常很小）没有问题，但对于大文件（二进制文件、媒体文件、数据集等）会导致仓库体积迅速膨胀。
+
+### 没有 LFS 的问题
+
+假设你在仓库中放了一个 100MB 的模型文件，并修改了 10 次：
+
+```
+仓库体积 ≈ 100MB × 10 次 = 1GB
+```
+
+即使你后来删除了这个文件，它的历史仍然存在于 `.git/objects/` 中。
+
+### LFS 的解决方案
+
+LFS 在仓库中只存储一个轻量的指针文件（通常几十字节），实际的大文件内容存储在 LFS 服务器上：
+
+```
+仓库体积 ≈ 几十字节 × 10 次 + 按需下载的实际文件 ≈ 极小
+```
+
+## LFS 工作原理
+
+### 文件替换机制
+
+当使用 LFS 追踪一个文件时，Git 会在提交时做以下操作：
+
+1. 将实际文件上传到 LFS 服务器
+2. 在仓库中存储一个指针文件，内容类似：
+
+```
+version https://git-lfs.github.com/spec/v1
+oid sha256:4d7a214614ab2935c943f9e0ff69d22eadbb8f32b1258daaa5e2ca24d17e2393
+size 123456789
+```
+
+3. 当你 checkout 或 clone 时，Git LFS 会下载指针指向的实际文件，替换指针文件
+
+<CommandFlowFigure
+  title="Git LFS 的工作流程"
+  caption="LFS 追踪的文件在提交时被替换为指针文件上传到仓库，实际文件内容上传到 LFS 服务器。clone 或 checkout 时，LFS 自动下载实际文件替换指针。"
+  inputsLabel="被追踪的大文件"
+  inputs="model.pt (500MB)|dataset.csv (1GB)|video.mp4 (200MB)|image.psd (50MB)"
+  commandLabel="git lfs track + commit"
+  outputsLabel="存储结果"
+  outputs="仓库中 → 指针文件 (几十字节)|LFS 服务器 → 实际文件 (原大小)|clone 时 → 按需下载实际文件"
+  note="仓库体积从 500MB×10 次 = 5GB 缩小到 几十字节×10 次 + 按需下载。"
+/>
+
+### 架构概览
+
+```
+本地仓库 (.git/)          LFS 服务器
+┌─────────────┐          ┌──────────────┐
+│ 指针文件     │ ──push─→ │ 实际大文件    │
+│ (几十字节)   │          │ (100MB+)     │
+└─────────────┘          └──────────────┘
+       │                        │
+       └────clone/pull────────→ │
+              按需下载实际文件
+```
+
+## 安装 Git LFS
+
+### macOS
+
+```bash
+# 使用 Homebrew
+brew install git-lfs
+
+# 安装 Git LFS 钩子（每个仓库只需执行一次）
+git lfs install
+```
+
+### Linux (Debian/Ubuntu)
+
+```bash
+sudo apt install git-lfs
+git lfs install
+```
+
+### Linux (Red Hat/CentOS/Fedora)
+
+```bash
+sudo dnf install git-lfs   # 或 yum install git-lfs
+git lfs install
+```
+
+### Windows
+
+```bash
+# 使用 Chocolatey
+choco install git-lfs
+
+# 或使用 Scoop
+scoop install git-lfs
+
+# 安装钩子
+git lfs install
+```
+
+### 验证安装
+
+```bash
+git lfs version
+# git-lfs/3.x.x (GitHub; linux amd64; go 1.xx.x)
+```
+
+## 基本使用
+
+### 追踪文件类型
+
+```bash
+# 追踪所有 .psd 文件
+git lfs track "*.psd"
+
+# 追踪所有 .mp4 文件
+git lfs track "*.mp4"
+
+# 追踪特定目录下的所有文件
+git lfs track "assets/images/*"
+
+# 追踪特定文件
+git lfs track "models/neural-network-v1.bin"
+```
+
+`git lfs track` 会自动在 `.gitattributes` 中添加对应规则：
+
+```bash
+cat .gitattributes
+# *.psd filter=lfs diff=lfs merge=lfs -text
+```
+
+### 提交追踪的文件
+
+```bash
+# 添加 .gitattributes（必须提交，让其他人也能使用 LFS）
+git add .gitattributes
+
+# 添加被追踪的大文件
+git add model.bin
+git commit -m "添加模型文件（通过 LFS）"
+git push
+```
+
+### 查看追踪的文件类型
+
+```bash
+# 列出当前追踪的所有模式
+git lfs track
+
+# 输出示例：
+# Listing tracked patterns
+#     *.psd (.gitattributes)
+#     *.mp4 (.gitattributes)
+#     assets/images/* (.gitattributes)
+```
+
+### 查看 LFS 管理的文件
+
+```bash
+# 列出仓库中所有 LFS 文件
+git lfs ls-files
+
+# 输出示例：
+# 4d7a214614 * model.bin
+# 8f3e9a12bc * dataset/train.csv
+```
+
+### 查看 LFS 文件详情
+
+```bash
+# 查看某个 LFS 文件的指针内容
+git lfs pointer --file=model.bin
+
+# 查看 LFS 文件状态
+git lfs status
+```
+
+## Clone 和 Fetch
+
+### Clone 含 LFS 文件的仓库
+
+```bash
+# 默认行为：clone 时下载所有 LFS 文件
+git clone https://github.com/user/repo.git
+
+# 跳过 LFS 文件下载（只获取指针）
+git clone https://github.com/user/repo.git --no-checkout
+cd repo
+git lfs install
+# 之后按需拉取
+
+# 或者先 clone 指针，再手动拉取 LFS 文件
+GIT_LFS_SKIP_SMUDGE=1 git clone https://github.com/user/repo.git
+cd repo
+git lfs pull
+```
+
+### 拉取 LFS 文件
+
+```bash
+# 拉取当前分支的所有 LFS 文件
+git lfs pull
+
+# 拉取特定分支的 LFS 文件
+git lfs pull --include="*" --remote=origin
+
+# 只拉取特定路径的 LFS 文件
+git lfs pull --include="models/*"
+```
+
+### Fetch LFS 对象
+
+```bash
+# 获取 LFS 对象但不检出到工作区
+git lfs fetch
+
+# 获取所有 LFS 对象（包括其他分支的）
+git lfs fetch --all
+```
+
+## 迁移已有大文件到 LFS
+
+如果你仓库中已经有大文件，想迁移到 LFS 管理：
+
+### 使用 git lfs migrate
+
+```bash
+# 迁移指定文件类型（会改写历史）
+git lfs migrate import --include="*.psd,*.mp4"
+
+# 迁移整个目录
+git lfs migrate import --include="assets/*" --include-ref=main
+
+# 迁移前可以先检查哪些文件占空间
+git lfs migrate info --top=10
+```
+
+**警告**：`git lfs migrate import` 会改写 Git 历史，改变所有相关提交的 SHA-1 值。如果仓库已经与他人共享，需要协调所有协作者。
+
+### 迁移后的推送
+
+```bash
+# 强制推送改写后的历史
+git push --force-with-lease
+
+# 其他协作者需要重新 clone 或 reset
+git fetch origin
+git reset --hard origin/main
+```
+
+### 迁移前检查
+
+```bash
+# 查看哪些文件占用最多空间
+git lfs migrate info
+
+# 查看特定引用范围的文件大小
+git lfs migrate info --include-ref=main --include-ref=develop
+```
+
+## LFS 配置
+
+### 查看 LFS 配置
+
+```bash
+git lfs env
+```
+
+### 设置 LFS 存储端点
+
+```bash
+# 设置 LFS 服务器 URL
+git lfs install --local
+git config lfs.url https://your-lfs-server.com/repo.git/info/lfs
+
+# 或使用 .lfsconfig 文件（提交到仓库中）
+echo "[lfs]
+    url = https://your-lfs-server.com/repo.git/info/lfs" > .lfsconfig
+```
+
+### 跳过 LFS 文件下载
+
+```bash
+# 临时跳过
+GIT_LFS_SKIP_SMUDGE=1 git checkout some-branch
+
+# 永久配置（当前仓库）
+git config lfs.skipdownload true
+```
+
+### 并发下载
+
+```bash
+# 设置并发下载数量（默认 3）
+git config lfs.concurrenttransfers 8
+```
+
+## 常见场景
+
+### 场景一：游戏开发中的资源文件
+
+```bash
+# 追踪所有资源文件
+git lfs track "*.png" "*.jpg" "*.wav" "*.mp3" "*.fbx" "*.unity"
+git lfs track "Assets/Sprites/*"
+git lfs track "Assets/Audio/*"
+git lfs track "Assets/Models/*"
+
+# 提交
+git add .gitattributes
+git add Assets/
+git commit -m "添加游戏资源（LFS 管理）"
+```
+
+### 场景二：机器学习数据集
+
+```bash
+# 追踪数据集和模型
+git lfs track "data/*.csv" "data/*.parquet"
+git lfs track "models/*.pt" "models/*.bin"
+git lfs track "models/*.onnx"
+
+# 排除不需要 LFS 的小配置文件
+# 在 .gitattributes 中手动调整
+# *.json -lfs
+```
+
+### 场景三：设计团队的 PSD 文件
+
+```bash
+# 追踪设计文件
+git lfs track "*.psd" "*.ai" "*.sketch" "*.fig"
+
+# 同时追踪导出的资源
+git lfs track "exports/*"
+```
+
+## 注意事项
+
+### 1. LFS 文件大小限制
+
+不同的 Git 托管平台对 LFS 文件大小有限制：
+
+| 平台 | LFS 文件大小限制 |
+|------|-----------------|
+| GitHub | 单文件 2GB（免费），更大需联系支持 |
+| GitLab | 默认与仓库大小限制相同 |
+| Bitbucket | 单文件 2GB |
+
+### 2. LFS 存储配额
+
+- GitHub 免费版包含 1GB LFS 存储和 1GB 带宽
+- 超出后需要购买额外数据包
+
+### 3. .gitattributes 必须提交
+
+`.gitattributes` 中的 LFS 规则必须提交到仓库中，否则其他协作者的 Git 不会知道哪些文件应该使用 LFS。
+
+### 4. 不要将 LFS 指针文件手动编辑
+
+LFS 指针文件由 Git LFS 自动管理，手动编辑会导致文件校验失败。
+
+### 5. LFS 与 .gitignore 配合
+
+```gitignore
+# .gitignore 忽略临时/缓存文件
+*.cache
+tmp/
+
+# .gitattributes 用 LFS 管理大文件
+*.psd filter=lfs diff=lfs merge=lfs -text
+```
+
+两者不冲突：`.gitignore` 忽略文件，`.gitattributes` 定义如何跟踪文件。
+
+## 故障排查
+
+### LFS 文件显示为指针而非实际内容
+
+```bash
+# 检查 LFS 是否正确安装
+git lfs install
+
+# 手动拉取 LFS 文件
+git lfs pull
+
+# 检查网络连通性
+git lfs env
+```
+
+### 推送时 LFS 认证失败
+
+```bash
+# 更新 Git 凭证
+git credential-manager-core configure  # Windows
+# 或重新登录 Git 托管平台
+```
+
+### 误将大文件提交（未使用 LFS）
+
+```bash
+# 1. 先设置 LFS 追踪
+git lfs track "*.bin"
+
+# 2. 迁移历史
+git lfs migrate import --include="*.bin"
+
+# 3. 强制推送
+git push --force-with-lease
+```
+
+### LFS 对象丢失
+
+```bash
+# 从远端重新获取
+git lfs fetch --all
+
+# 检查本地 LFS 对象完整性
+git lfs fsck
+```
+
+## 最佳实践
+
+1. **尽早引入 LFS**：在项目开始时就配置 LFS，避免后期迁移的麻烦
+2. **提交 .gitattributes**：确保团队所有人都使用相同的 LFS 规则
+3. **选择性追踪**：不要追踪所有文件，只追踪真正的大文件
+4. **定期清理**：使用 `git lfs prune` 清理本地不再需要的 LFS 缓存
+5. **监控配额**：定期检查 LFS 存储和带宽使用情况
+
+```bash
+# 清理不再引用的 LFS 对象
+git lfs prune
+
+# 查看 LFS 缓存大小
+du -sh .git/lfs/objects/
+```
+
+## 继续学习建议
+
+1. `git sparse-checkout` —— 大仓库部分检出
+2. `git filter-repo` —— 仓库历史改写
+3. `git attributes` —— 更细粒度的文件属性控制

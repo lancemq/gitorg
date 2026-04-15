@@ -13,9 +13,20 @@ export const metadata = {
 
 # 长期分支冲突治理
 
-## 为什么“冲突治理”值得单独成篇
+## 为什么"冲突治理"值得单独成篇
 
-很多团队对长期分支的认知停留在“有冲突就解决”，但真正痛苦的地方在于：
+<CommandFlowFigure
+  title="冲突治理流程"
+  caption="将冲突处理从临时救火升级为可治理的流程：定期同步减少冲突量，识别冲突热区优先解决，用 rerere 复用已解决的冲突方案。"
+  inputsLabel="冲突场景"
+  inputs="长期分支同步主线|频繁 rebase 产生相同冲突|多个开发者修改同一区域"
+  commandLabel="冲突治理"
+  outputsLabel="治理结果"
+  outputs="定期同步 → 减少冲突量|识别热区 → 优先治理架构问题|rerere → 自动复用解决方案"
+  note="rerere (reuse recorded resolution) 记录冲突解决方案，下次遇到相同冲突自动应用。"
+/>
+
+很多团队处理冲突的方式是"等冲突来了再说"。
 
 - 冲突反复出现
 - 同一批文件总是高风险区

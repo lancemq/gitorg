@@ -1,0 +1,478 @@
+export const metadata = {
+  title: ".gitignore 完整指南",
+  slug: "git-ignore",
+  locale: "zh",
+  section: "concepts",
+  summary: "系统解释 .gitignore 规则语法、优先级、通配符、全局配置，以及如何排除不该提交的文件。",
+  sourceUrls: [
+    "https://git-scm.com/docs/gitignore",
+    "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+  ],
+};
+
+# .gitignore 完整指南
+
+## 一句话理解
+
+`.gitignore` 文件告诉 Git 哪些文件不该被跟踪，避免把编译产物、依赖包、敏感配置等提交到仓库中。
+
+## 为什么需要 .gitignore
+
+一个健康的仓库应该只包含源代码和必要的构建配置，而不是所有生成的文件。`.gitignore` 帮你自动忽略这些文件，带来以下好处：
+
+- **减小仓库体积**：不跟踪 `node_modules/`、`target/` 等巨型目录
+- **避免冲突**：IDE 配置文件（如 `.idea/`）在不同开发者的机器上路径不同，提交后容易产生冲突
+- **保护敏感信息**：`.env`、密钥文件等不应出现在版本历史中
+- **加速操作**：Git 不需要扫描大量无关文件，`status`、`diff` 等命令更快
+
+<CommandFlowFigure
+  title=".gitignore 的匹配流程"
+  caption="Git 对工作区的每个未跟踪文件按 .gitignore 规则逐行匹配，最后一条匹配的规则决定是否忽略该文件。"
+  inputsLabel="工作区文件"
+  inputs="src/index.js|node_modules/|.env|build/output.js|.DS_Store"
+  commandLabel=".gitignore 匹配"
+  outputsLabel="匹配结果"
+  outputs="✅ src/index.js → 被跟踪|❌ node_modules/ → 被忽略|❌ .env → 被忽略|❌ build/ → 被忽略|❌ .DS_Store → 被忽略"
+  note="最后一条匹配的规则生效。取反规则 ! 只对被忽略过的文件有效。"
+/>
+
+## .gitignore 规则语法
+
+`.gitignore` 使用 glob 模式匹配文件路径。以下是核心语法规则：
+
+### 空行和注释
+
+空行被忽略。以 `#` 开头的行是注释：
+
+```gitignore
+# 忽略所有 .log 文件
+*.log
+```
+
+### 基本通配符 `*`
+
+`*` 匹配零个或多个字符，**不跨越目录分隔符**：
+
+```gitignore
+# 忽略所有 .o 文件（仅在当前目录及子目录的直接文件）
+*.o
+```
+
+### 双星号 `**`
+
+`**` 匹配任意层级的目录，包括零层：
+
+```gitignore
+# 忽略任意层级下的 build 目录
+**/build/
+
+# 等同于（从根目录开始）
+build/
+```
+
+### 问号 `?`
+
+`?` 匹配单个字符：
+
+```gitignore
+# 忽略 file1.txt、file2.txt，但不忽略 file10.txt
+file?.txt
+```
+
+### 方括号 `[]`
+
+`[]` 匹配括号内指定的字符范围：
+
+```gitignore
+# 忽略 file0.txt 到 file9.txt
+file[0-9].txt
+
+# 忽略 fileA.txt 和 fileB.txt
+file[AB].txt
+```
+
+### 感叹号 `!` —— 取消忽略
+
+`!` 取反规则，让之前被忽略的文件重新被跟踪：
+
+```gitignore
+# 先忽略所有 .log 文件
+*.log
+
+# 但保留 important.log
+!important.log
+```
+
+**重要**：取反规则只对之前已被忽略的文件有效。如果父目录已被忽略，需要先取消父目录的忽略。
+
+### 斜杠 `/` —— 目录限定
+
+- 模式以 `/` 开头：相对于 `.gitignore` 所在目录
+- 模式以 `/` 结尾：只匹配目录，不匹配同名文件
+- 模式中间有 `/`：匹配路径中包含该分隔符的情况
+
+```gitignore
+# 仅忽略根目录下的 build/ 目录
+/build/
+
+# 忽略所有名为 build 的目录（任意层级）
+build/
+
+# 忽略 doc/ 目录下所有的 .txt 文件
+doc/*.txt
+
+# 忽略 doc 目录及其子目录下所有层级的 .pdf 文件
+doc/**/*.pdf
+```
+
+## 规则匹配顺序
+
+`.gitignore` 规则**从上到下逐行匹配**，但有一个关键细节：
+
+1. Git 会检查所有规则，而不仅仅是第一个匹配的规则
+2. **最后一条匹配的规则生效**（后匹配覆盖前匹配）
+3. 取反规则 `!` 同样遵循这个顺序
+
+这意味着你可以这样写：
+
+```gitignore
+# 第一步：忽略所有 .log 文件
+*.log
+
+# 第二步：保留 important.log
+!important.log
+
+# 第三步：但仍然忽略 secret.log
+secret.log
+```
+
+最终结果：`important.log` 不被忽略，`secret.log` 和其他 `.log` 文件都被忽略。
+
+## 常见忽略模式示例
+
+### Node.js 项目
+
+```gitignore
+# 依赖目录
+node_modules/
+
+# 构建产物
+dist/
+build/
+.next/
+.nuxt/
+
+# 环境变量
+.env
+.env.local
+.env.*.local
+
+# 日志
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+```
+
+### Python 项目
+
+```gitignore
+# 字节码
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 虚拟环境
+venv/
+.venv/
+env/
+
+# 分发/打包
+dist/
+build/
+*.egg-info/
+*.egg
+
+# 测试覆盖
+.coverage
+htmlcov/
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+```
+
+### Java / Maven 项目
+
+```gitignore
+# 编译产物
+target/
+*.class
+*.jar
+*.war
+
+# IDE
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+
+# 日志
+*.log
+```
+
+### Go 项目
+
+```gitignore
+# 编译产物
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# 测试二进制
+*.test
+
+# 输出目录
+vendor/
+```
+
+### 通用补充
+
+```gitignore
+# Git 本身
+.gitignore.bak
+
+# 临时文件
+*.tmp
+*.bak
+*.swp
+*~
+
+# 调试日志
+*.log
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+```
+
+## 全局 .gitignore
+
+除了项目级别的 `.gitignore`，你还可以配置全局忽略文件，适用于所有仓库（如 IDE 配置、OS 文件等）：
+
+```bash
+# 创建全局忽略文件
+touch ~/.gitignore_global
+
+# 配置 Git 使用它
+git config --global core.excludesFile ~/.gitignore_global
+```
+
+全局 `.gitignore_global` 的典型内容：
+
+```gitignore
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 编辑器临时文件
+*~
+```
+
+**注意**：全局忽略不会出现在仓库中，团队其他成员看不到。适合放个人习惯的文件，不要放项目特有的规则。
+
+## .gitignore 文件可以放在哪里
+
+- **项目根目录**：`/.gitignore`，对整个仓库生效（最常见）
+- **子目录中**：`subdir/.gitignore`，仅对该目录及其子目录生效
+- **多个 `.gitignore`**：Git 会合并所有层级的规则
+
+子目录 `.gitignore` 中的路径是相对于该文件所在目录的：
+
+```
+project/
+├── .gitignore        # 忽略根目录的 build/
+├── src/
+│   └── .gitignore    # 这里的 *.log 仅忽略 src/ 下的 .log 文件
+└── docs/
+    └── .gitignore    # 这里的规则仅对 docs/ 生效
+```
+
+## 已跟踪文件不受 .gitignore 影响
+
+这是最常见的困惑之一：**`.gitignore` 只对未跟踪的文件生效**。如果一个文件已经被 `git add` 并提交过，即使后来加入 `.gitignore`，Git 仍会继续跟踪它。
+
+解决方法：
+
+```bash
+# 从索引中移除文件（保留工作区中的文件）
+git rm --cached <file>
+
+# 递归移除整个目录
+git rm -r --cached <directory>
+
+# 然后再提交
+git commit -m "停止跟踪已被 .gitignore 忽略的文件"
+```
+
+如果不确定哪些文件已经被跟踪，可以用：
+
+```bash
+# 列出所有已跟踪的文件
+git ls-files
+
+# 查看 .gitignore 中规则实际忽略了哪些未跟踪文件
+git status --ignored
+```
+
+## 调试 .gitignore 规则
+
+### git check-ignore
+
+用来测试某个文件是否被忽略，以及被哪条规则忽略：
+
+```bash
+# 检查单个文件
+git check-ignore -v path/to/file.txt
+
+# 检查多个文件
+git check-ignore -v file1.txt file2.log
+
+# 详细输出：显示匹配的规则来源、行号、规则内容
+# 输出示例：.gitignore:3:*.log    debug.log
+```
+
+`-v` 选项输出的格式是：`来源:行号:规则    匹配的文件路径`
+
+### git status --ignored
+
+显示当前被忽略的文件列表：
+
+```bash
+git status --ignored
+```
+
+输出会在 "Ignored files" 部分列出所有被忽略的文件，帮助你确认 `.gitignore` 是否按预期工作。
+
+## 常见误区和坑
+
+### 1. 忘了处理已跟踪的文件
+
+```bash
+# 错误做法：以为改了 .gitignore 就自动生效
+echo "config.ini" >> .gitignore
+# 但 config.ini 之前已被提交，所以仍被跟踪
+
+# 正确做法
+echo "config.ini" >> .gitignore
+git rm --cached config.ini
+git commit -m "停止跟踪 config.ini"
+```
+
+### 2. 取反规则没有处理父目录
+
+```gitignore
+# 错误：这样 !build/important.txt 不会生效，因为 build/ 目录已被忽略
+build/
+!build/important.txt
+
+# 正确：需要先取消目录的忽略
+build/*
+!build/important.txt
+```
+
+### 3. 通配符范围理解错误
+
+```gitignore
+# 这只匹配当前目录下的 .log 文件，不匹配子目录
+*.log
+
+# 这才是匹配所有层级的 .log 文件
+**/*.log
+```
+
+### 4. 末尾斜杠的意义
+
+```gitignore
+# 匹配名为 logs 的目录，但不匹配名为 logs 的文件
+logs/
+
+# 匹配名为 logs 的文件或目录
+logs
+```
+
+### 5. 规则顺序搞反
+
+```gitignore
+# 错误顺序：取反在忽略之前，取反无效
+!important.log
+*.log
+
+# 正确顺序：先忽略，再取反
+*.log
+!important.log
+```
+
+### 6. 中文或特殊字符文件名
+
+如果文件名包含特殊字符，可以用引号包裹：
+
+```gitignore
+"特殊文件名.txt"
+```
+
+## 在线工具推荐
+
+- [gitignore.io](https://www.toptal.com/developers/gitignore)：根据技术栈自动生成 `.gitignore` 模板
+- [GitHub gitignore 仓库](https://github.com/github/gitignore)：大量语言/框架的官方模板
+
+## 快速检查清单
+
+- [ ] 是否忽略了依赖目录（`node_modules/`、`vendor/` 等）
+- [ ] 是否忽略了编译产物（`dist/`、`target/`、`build/` 等）
+- [ ] 是否忽略了环境变量和密钥文件（`.env`、`*.key` 等）
+- [ ] 是否忽略了 IDE 配置文件（`.idea/`、`.vscode/` 等）
+- [ ] 是否忽略了 OS 生成文件（`.DS_Store`、`Thumbs.db`）
+- [ ] 已跟踪的文件是否已从索引中移除（`git rm --cached`）
+- [ ] 是否用 `git check-ignore -v` 验证过关键规则
+- [ ] 是否考虑了全局 `.gitignore` 配置
+
+## 继续学习建议
+
+如果你已理解 `.gitignore`，下一步建议了解：
+
+1. `git clean` —— 清理未跟踪文件
+2. `git attributes` —— 更细粒度的文件属性控制
+3. `git sparse-checkout` —— 只检出部分目录

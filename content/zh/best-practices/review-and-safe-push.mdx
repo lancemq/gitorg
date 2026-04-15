@@ -13,9 +13,20 @@ export const metadata = {
 
 # 评审前整理与安全推送
 
-## 为什么“push 前自检”能显著减少事故
+## 为什么"push 前自检"能显著减少事故
 
-很多 Git 问题都不是不会命令，而是在真正把历史发出去之前，没有留出最后一分钟做检查。评审前整理和安全推送，本质上是在给历史增加一道低成本的质量门。
+<CommandFlowFigure
+  title="安全推送流程"
+  caption="推送前确认：提交信息准确、diff 无意外变更、测试通过、没有敏感信息泄露。推送后检查远端状态。"
+  inputsLabel="本地提交"
+  inputs="git log 确认提交|git diff --staged 检查内容|git status 确认干净"
+  commandLabel="安全推送"
+  outputsLabel="推送到远端"
+  outputs="git push --dry-run → 预检|git push → 正式推送|git log origin/main → 确认远端状态"
+  note="推送是不可逆操作（除非 force push）。推送前的最后检查是你最后的机会。"
+/>
+
+推送本身不是最危险的，
 
 ## 1. 发起评审前先整理提交栈
 

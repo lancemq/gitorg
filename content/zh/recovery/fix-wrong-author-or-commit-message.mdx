@@ -1,0 +1,324 @@
+export const metadata = {
+  title: "提交后发现作者或信息写错怎么修正",
+  slug: "fix-wrong-author-or-commit-message",
+  locale: "zh",
+  section: "recovery",
+  summary: "提交后发现作者信息、提交信息写错，或者漏了文件的修正方法。包括 amend、rebase -i、filter-repo 批量修改等。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-commit",
+    "https://git-scm.com/docs/git-rebase",
+    "https://github.com/newren/git-filter-repo",
+  ],
+};
+
+# 提交后发现作者或信息写错怎么修正
+
+## 一句话理解
+
+<CommitGraphFigure
+  title="替换错误提交的原理"
+  caption="Git 的提交是不可变的。你不能编辑已有提交，但可以创建新提交来替代它。amend 替换最新提交，rebase -i 可以修改历史中间的提交。"
+  linearLabel="原始提交链（含错误）"
+  mergeLabel="amend 后（替换最新提交）"
+  rewriteLabel="rebase -i 后（新提交链替代旧链）"
+  pointerLabel="分支指向"
+/>
+
+
+Git 的提交是不可变的——你不能"编辑"一个已有提交，但可以创建一个新提交来替代它。根据错误发生的位置（最新提交 vs 历史中间），有不同的修正方法。
+
+## 修正最后一个提交
+
+### 修改提交信息
+
+```bash
+# 修改最近一次提交的信息
+git commit --amend -m "新的提交信息"
+
+# 会打开编辑器让你编辑（默认编辑器）
+git commit --amend
+```
+
+### 修改作者信息
+
+```bash
+# 修改最近一次提交的作者
+git commit --amend --author="张三 <zhangsan@example.com>"
+
+# 同时修改提交信息和作者
+git commit --amend -m "修复了登录 bug" --author="张三 <zhangsan@example.com>"
+```
+
+### 添加漏掉的文件
+
+```bash
+# 你提交后发现有文件忘记 add
+git add forgotten-file.js
+
+# 将文件加入上一次提交（不会创建新提交）
+git commit --amend --no-edit
+
+# --no-edit 保持原有提交信息不变
+```
+
+### 注意事项：--amend 的本质
+
+`git commit --amend` 实际上创建了一个**新的提交**，它的：
+- 内容 = 当前暂存区的内容
+- 父提交 = 原提交的父提交（跳过原提交）
+- 新的 SHA
+
+```
+A --- B (旧提交，将被替代)
+     \
+      B' (新提交，amend 后)
+```
+
+原提交 B 仍然存在（在 reflog 中），但不再被任何分支引用。
+
+## 修正历史中间的提交
+
+### 方法 1：交互式 rebase（推荐）
+
+```bash
+# 假设要修改倒数第 3 个提交
+git rebase -i HEAD~3
+```
+
+这会打开编辑器，显示：
+
+```
+pick abc1234 添加用户认证
+pick def5678 修复登录 bug
+pick ghi9012 更新依赖
+```
+
+#### 修改提交信息（reword）
+
+将 `pick` 改为 `reword`（或简写 `r`）：
+
+```
+reword abc1234 添加用户认证
+pick def5678 修复登录 bug
+pick ghi9012 更新依赖
+```
+
+保存后，Git 会逐个打开编辑器让你修改标记为 reword 的提交信息。
+
+#### 修改提交内容（edit）
+
+```
+pick abc1234 添加用户认证
+edit def5678 修复登录 bug
+pick ghi9012 更新依赖
+```
+
+保存后，Git 会在标记为 edit 的提交处暂停：
+
+```bash
+# 此时 HEAD 指向你要修改的提交
+# 修改文件
+vim bug-fix.js
+git add bug-fix.js
+
+# 修改提交（可以改信息、作者、内容）
+git commit --amend
+
+# 继续 rebase
+git rebase --continue
+```
+
+### 方法 2：修改作者信息
+
+在交互式 rebase 的 edit 暂停点：
+
+```bash
+git rebase -i HEAD~3
+# 将目标提交标记为 edit
+
+# 暂停后修改作者
+git commit --amend --author="新作者 <new@email.com>" --no-edit
+
+git rebase --continue
+```
+
+## 批量修改历史中的作者
+
+### 方法 1：使用 git filter-repo（推荐）
+
+```bash
+# 安装 git-filter-repo
+pip install git-filter-repo
+
+# 创建 mailmap 文件
+cat > mailmap << EOF
+张三 <zhangsan@example.com> <old-wrong@email.com>
+李四 <lisi@example.com> <another-old@email.com>
+EOF
+
+# 应用 mailmap 修改所有提交
+git filter-repo --mailmap mailmap --force
+```
+
+mailmap 格式：`新名字 <新邮箱> <旧邮箱>` 或 `新名字 <新邮箱> 旧名字 <旧邮箱>`
+
+### 方法 2：使用 .mailmap 文件（只影响显示）
+
+```bash
+# 在项目根目录创建 .mailmap
+cat > .mailmap << EOF
+张三 <zhangsan@example.com> <old-wrong@email.com>
+EOF
+
+# 这不会修改历史，只影响 git log 的显示
+git log --use-mailmap
+```
+
+### 方法 3：使用环境变量（影响后续提交）
+
+```bash
+# 永久修改全局配置
+git config --global user.name "张三"
+git config --global user.email "zhangsan@example.com"
+
+# 或仅对当前仓库
+git config user.name "张三"
+git config user.email "zhangsan@example.com"
+
+# 临时覆盖（仅下一次提交）
+git commit -m "提交" --author="临时作者 <temp@email.com>"
+```
+
+## 添加 Co-authored-by
+
+### 手动添加
+
+在提交信息的末尾添加：
+
+```bash
+git commit -m "实现了搜索功能
+
+与 @同事 一起完成的搜索功能实现。
+
+Co-authored-by: 同事 <colleague@example.com>
+Co-authored-by: 另一位同事 <another@example.com>"
+```
+
+注意：`Co-authored-by:` 必须在提交信息正文的**最后**，前面有一个空行。
+
+### GitHub 的自动识别
+
+GitHub 会识别 `Co-authored-by: Name <email>` 格式并显示为多个作者。在 PR 合并时也可以自动添加。
+
+## 已推送的提交修正
+
+### 问题
+
+改写已推送的历史会导致本地和远端分叉：
+
+```
+远端: A --- B --- C
+本地: A --- B' --- C'  (B 和 C 被 amend/rebase 改写)
+```
+
+### 解决方案：Force push
+
+```bash
+# 强制推送（会覆盖远端历史）
+git push --force-with-lease origin main
+
+# --force-with-lease 比 --force 更安全：
+# 如果远端有新提交（你没拉取），会拒绝推送
+```
+
+### 团队协作注意事项
+
+- **提前通知团队**：改写历史前通知所有协作者
+- **不要在共享分支上改写**：main/master 等分支应尽量避免 force push
+- **使用 --force-with-lease**：永远不要用裸 `--force`
+- **考虑 fixup 提交**：对于已推送的提交，创建 fixup 提交比重写历史更安全
+
+## Fixup 提交技巧
+
+```bash
+# 创建一个 fixup 提交（自动标记为修复某个提交）
+git commit --fixup abc1234
+
+# 查看提交历史
+git log --oneline
+# def5678 (HEAD) fixup! 添加用户认证
+# abc1234 添加用户认证
+
+# 自动 squash 所有 fixup 提交
+git rebase -i --autosquash HEAD~5
+
+# 或更简洁的别名
+git rebase -i --autosquash HEAD~5
+```
+
+设置别名简化操作：
+
+```bash
+git config --global alias.fixup 'commit --fixup'
+git config --global alias.squash-fix 'rebase -i --autosquash'
+
+# 使用
+git fixup abc1234
+git squash-fix HEAD~5
+```
+
+## 常见问题
+
+### Q: amend 后 SHA 变了怎么办？
+
+这是正常的。Git 的提交 SHA 包含内容、作者、时间、父提交等信息，任何改变都会产生新的 SHA。
+
+### Q: 可以用 reset 再重新提交吗？
+
+```bash
+# 回退一个提交但保留修改
+git reset --soft HEAD~1
+
+# 现在所有修改在暂存区，可以重新提交
+git commit -m "新的提交信息"
+```
+
+这和 `commit --amend` 效果类似，但更灵活（可以调整文件）。
+
+### Q: 修改了很多历史提交后推不上去？
+
+```bash
+# 查看本地和远端的差异
+git log origin/main..HEAD
+git log HEAD..origin/main
+
+# 如果远端有你需要的提交，先拉取
+git fetch origin
+git rebase origin/main
+
+# 然后再 force push
+git push --force-with-lease
+```
+
+## 注意事项
+
+1. **已推送的提交谨慎改写**：会迫使所有协作者重新同步
+2. **--force-with-lease 是底线**：永远比裸 --force 安全
+3. **小错误用 fixup 提交**：比重写历史更友好
+4. **团队约定历史改写规则**：明确哪些分支允许 force push
+5. **修改作者信息后检查**：用 `git log --format="%h %an <%ae>"` 验证
+
+## 总结
+
+| 场景 | 方法 | 是否改写历史 |
+|------|------|-------------|
+| 最后一个提交信息错误 | `git commit --amend` | 是 |
+| 最后一个提交作者错误 | `git commit --amend --author=...` | 是 |
+| 最后一个提交漏了文件 | `git add` + `git commit --amend` | 是 |
+| 历史中间提交信息错误 | `git rebase -i` + reword | 是 |
+| 历史中间提交内容错误 | `git rebase -i` + edit | 是 |
+| 批量修改作者 | `git filter-repo --mailmap` | 是 |
+| 已推送的小错误 | fixup 提交 + rebase | 是 |
+| 只影响显示 | `.mailmap` 文件 | 否 |
+
+核心原则：Git 提交是不可变的，"修改"实际上是创建替代提交。

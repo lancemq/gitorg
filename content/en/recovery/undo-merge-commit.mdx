@@ -1,0 +1,298 @@
+export const metadata = {
+  title: "How to undo a merge commit",
+  slug: "undo-merge-commit",
+  locale: "en",
+  section: "recovery",
+  summary: "Correct methods for undoing a merge commit when things go wrong. Deep dive into git revert -m and the parent numbering system, plus common pitfalls.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-revert",
+    "https://git-scm.com/docs/git-merge",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+  ],
+};
+
+# How to undo a merge commit
+
+## The short version
+
+<MergeFigure
+  title="Undoing a Merge Commit"
+  caption="Merge commits have multiple parents. To undo, use git revert -m to specify which parent to restore to. Choosing the wrong parent causes future merge difficulties. You can also reset back to the pre-merge position."
+  beforeLabel="Before merge (two independent branches)"
+  afterLabel="After merge (converged into one node)"
+  modeLabel="Undo: git revert -m <parent-num>"
+/>
+
+
+A merge commit has multiple parents. To undo it, you must use `git revert -m` to specify which parent to revert back to. Choosing the wrong parent leads to unexpected results.
+
+## Understanding merge commit structure
+
+A normal commit has one parent (the previous commit). A merge commit has two or more:
+
+```
+Parent 1 (current branch)         Parent 2 (merged branch)
+      │                                │
+      ▼                                ▼
+    A --- B --- C --- M ---          D --- E --- F
+                                (feature)   │
+                                            Merge commit M:
+                                            parent 1 = C (main)
+                                            parent 2 = F (feature)
+```
+
+```bash
+$ git cat-file -p <merge-commit-sha>
+tree abc123...
+parent ccc111...    ← parent 1: main branch before merge
+parent fff222...    ← parent 2: feature branch tip
+author Alice <alice@example.com>
+committer Alice <alice@example.com>
+
+Merge branch 'feature' into main
+```
+
+**Key insight**: The merge commit's tree (file snapshot) is the combined result of parent 1 and parent 2. When reverting a merge, Git needs to know which parent to treat as the "baseline" for the reversal.
+
+## Scenario 1: Local merge, haven't pushed yet
+
+This is the simplest case. The merge only exists locally — the remote knows nothing about it.
+
+```bash
+# Current state
+$ git log --oneline -3
+m1a2b3c (HEAD -> main) Merge branch 'feature' into main
+abc1234 feat: implement new feature
+def5678 fix: resolve bug
+
+# Simply reset to before the merge
+git reset --hard HEAD~1
+
+# Verify
+$ git log --oneline -3
+def5678 (HEAD -> main) fix: resolve bug
+...
+```
+
+`reset --hard HEAD~1` moves the main branch pointer back to the commit before the merge. The merge commit and all its merge effects disappear.
+
+## Scenario 2: Already pushed, need a safe undo
+
+Once the merge commit is on the remote, you cannot use `reset` (it rewrites shared history). You must use `revert`.
+
+```bash
+# Revert the most recent merge commit
+git revert -m 1 HEAD
+```
+
+### The `-m` flag explained
+
+`-m` takes a parent number, starting from 1:
+
+```bash
+# Parent numbering:
+# -m 1 → first parent = the branch you were on during merge (usually main)
+# -m 2 → second parent = the branch being merged in (usually feature)
+
+# Revert the merge, returning to parent 1 (main) state
+git revert -m 1 HEAD
+
+# Revert the merge, returning to parent 2 (feature) state (rarely useful)
+git revert -m 2 HEAD
+```
+
+**In 99% of cases, you want `-m 1`** because you want to "go back to what main looked like before the merge."
+
+### What happens after reverting a merge
+
+```
+... C --- M --- R
+         │      │
+    (merge) (revert of merge)
+```
+
+R is a new commit whose changes exactly cancel out M's effects. The file contents return to the pre-merge state.
+
+## Scenario 3: After reverting a merge, you want to re-merge the same branch
+
+This is the most common trap! After reverting a merge, you cannot directly merge the same branch again.
+
+### Why this happens
+
+Git checks the common ancestor and each branch's changes during a merge. After you revert the merge:
+
+```
+main:    A --- M --- R
+                   │
+feature:            B --- C --- D
+```
+
+Git sees that R contains the "inverse" of all feature branch changes. So when you run `git merge feature` again, Git believes the feature changes have already been "handled" and won't re-apply them.
+
+### Correct ways to re-merge
+
+**Method 1: Revert the revert**
+
+```bash
+# Undo the revert, restoring the merge's effect
+git revert HEAD  # HEAD points to the revert commit
+
+# Or explicitly revert the revert commit
+git revert <revert-commit-sha>
+```
+
+**Method 2: Rebase the feature branch, then merge**
+
+```bash
+# Rebase feature to create new commits
+git checkout feature
+git rebase main
+
+# Go back to main and merge
+git checkout main
+git merge feature
+```
+
+Rebase creates new commits (new SHAs), so Git no longer considers these changes as "already handled."
+
+**Method 3: Reset main to before the merge, then re-merge**
+
+```bash
+# Only do this if you're sure nobody based work on the merge!
+git checkout main
+git reset --hard <commit-before-merge>
+git push --force-with-lease  # Dangerous: rewrites shared history
+git merge feature
+```
+
+## Common pitfalls
+
+### Pitfall 1: Running `git revert HEAD` without `-m`
+
+```bash
+$ git revert HEAD
+error: commit abc123 is a merge but no -m option was given.
+fatal: revert failed
+```
+
+Git refuses to revert a merge commit unless you explicitly specify `-m`. This is because Git doesn't know which parent to revert against.
+
+### Pitfall 2: Choosing the wrong parent number
+
+```bash
+# Wrong: -m 2 makes main become the feature branch's state
+git revert -m 2 HEAD
+
+# Consequence: main now contains feature branch's content
+# while main's own changes are discarded
+```
+
+Using `-m 2` is almost always a mistake. It makes the current branch adopt the merged-in branch's state.
+
+### Pitfall 3: Using `git reset` to undo a pushed merge
+
+```bash
+# This rewrites shared history
+git reset --hard HEAD~1
+git push --force
+
+# Consequences:
+# 1. Other collaborators' local repos will conflict with remote
+# 2. Anyone who based work on your merge commit will have "dangling" commits
+# 3. Team collaboration breaks down
+```
+
+**Rule**: Once pushed to a shared branch, always use `revert`, never `reset`.
+
+## Worked example: Undoing a problematic merge
+
+```bash
+# 1. Check current state
+$ git log --oneline --graph -5
+*   m1a2b3c (HEAD -> main) Merge branch 'bugfix-hot' into main
+|\
+| * f4e5d6c (bugfix-hot) fix: urgent bug fix (but introduced new issues)
+* | a1b2c3d feat: add new feature
+|/
+* 9876543 prev: earlier commit
+
+# 2. Confirm the merge commit's parents
+$ git cat-file -p m1a2b3c
+tree ...
+parent a1b2c3d...   ← parent 1 (main)
+parent f4e5d6c...   ← parent 2 (bugfix-hot)
+
+# 3. Safely undo (use -m 1 to return to main's state)
+$ git revert -m 1 HEAD
+[main d7c8b9a] Revert "Merge branch 'bugfix-hot' into main"
+ 1 file changed, 3 insertions(+), 15 deletions(-)
+
+# 4. Push to remote
+$ git push origin main
+
+# 5. Verify
+$ git log --oneline -3
+d7c8b9a (HEAD -> main) Revert "Merge branch 'bugfix-hot' into main"
+m1a2b3c Merge branch 'bugfix-hot' into main
+a1b2c3d feat: add new feature
+```
+
+### Re-merging after the fix
+
+```bash
+# bugfix-hot is now fixed, ready to re-merge
+
+# Method 1: revert the revert
+$ git revert HEAD  # HEAD = d7c8b9a (the revert commit)
+$ git push origin main
+
+# Method 2: rebase then merge
+$ git checkout bugfix-hot
+$ git rebase main
+$ git checkout main
+$ git merge bugfix-hot
+```
+
+## Quick decision guide
+
+```
+Regret the merge?
+        │
+   ┌────┴────┐
+   Not pushed?     Already pushed?
+       │            │
+       ↓            ↓
+  git reset     git revert -m 1 HEAD
+  --hard HEAD~1      │
+       │             ↓
+       │        Want to re-merge same branch?
+       ↓             │
+   Done ✓       ┌────┴────┐
+              Yes         No
+              │           │
+              ↓           ↓
+        revert the    Done ✓
+        revert
+        or rebase branch
+```
+
+## Preventive measures
+
+1. **Create a backup branch before merging**
+   ```bash
+   git branch backup/before-merge
+   ```
+
+2. **Preview merge results with `--no-commit`**
+   ```bash
+   git merge --no-commit --no-ff feature
+   # Inspect changes
+   git diff --cached
+   # Satisfied → git commit, not satisfied → git merge --abort
+   ```
+
+3. **Prefer `--no-ff` for explicit merge commits**
+   ```bash
+   git merge --no-ff feature
+   ```
+   This ensures a clear merge commit exists that you can revert later if needed.

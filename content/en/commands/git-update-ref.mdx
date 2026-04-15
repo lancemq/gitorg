@@ -48,31 +48,32 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 
 ## What problem this command solves in a workflow
 
-`git update-ref` lives closer to Git’s implementation model: objects, refs, and the index. It is best suited for scripting, automation, and advanced debugging rather than being your first manual tool.
+`git update-ref` solves the problem of "updating references at a low level (creating, moving, or deleting branches and tags)". It bypasses high-level commands like `git branch` and `git tag`, directly manipulating reference files, and supports atomic old-value validation.
 
 ## Typical use cases
 
-- Use `git update-ref` when you need precise control over objects, refs, or index state in a scriptable flow.
-- Reach for `git update-ref` when learning internals or validating low-level repository state during debugging.
-- Use `git update-ref` only when porcelain commands no longer express the exact operation you need.
+- Create or move a branch in a script by running `git update-ref refs/heads/feature HEAD` to point the feature branch at the current commit.
+- Atomically update a reference and prevent concurrent conflicts by using `git update-ref refs/heads/branch NEW_HASH OLD_HASH` — the update only proceeds if the old value matches.
+- Delete a reference with `git update-ref -d refs/heads/old-branch` to directly remove a branch reference.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Objects, refs, and index path"
-  caption="Plumbing commands are powerful because they operate directly on Git internals, not because they are “more advanced” in the everyday workflow sense."
-  inputsLabel="Internal inputs"
-  inputs="Object database|Tree objects|Index|Refs"
+  title="Update references at a low level"
+  caption="update-ref writes directly to reference files (.git/refs or packed-refs), creating, modifying, or deleting references. It is a write operation with support for atomic old-value validation."
+  inputsLabel="Reference operation"
+  inputs="Reference path (e.g. refs/heads/main)|Target commit hash|Old-value check (optional)"
   commandLabel="git update-ref"
   outputsLabel="Results"
-  outputs="Scriptable output|Updated low-level state|Fine-grained control"
-  note="If you are still thinking only in terms of branches and files, pause and separate objects, refs, and index state first."
+  outputs="Updated reference|Newly created branch/tag|Deleted reference"
+  note="update-ref is a low-level command that writes directly to references. It bypasses safety checks of high-level commands — confirm the reference name and target hash before using."
 />
 
 ## Special cases and boundaries
 
-- The real risk in plumbing commands is not just that they can fail, but that they can successfully perform the wrong low-level action.
-- Before running `git update-ref` in a real repo, test it in a tiny disposable repository and verify whether a safer porcelain command would do the job.
-- If arguments contain refs, trees, index paths, or raw object IDs, inspect those inputs independently before performing writes.
-- When you update refs directly, include an old-value check when possible so concurrent writes do not silently clobber newer history.
+- `git update-ref` is a write operation that directly modifies where a reference points. Creating or moving branches, tags, and other references changes repository state.
+- Using old-value validation (the third parameter) enables atomic conditional updates: the reference is only updated if its current value matches the expected old value, preventing silent overwrites in concurrent scenarios.
+- Writing references directly bypasses the validation and protection of high-level commands like `git branch` and `git tag` — a typo in the reference name could accidentally create an unwanted branch.
+- `update-ref` does not check whether the target hash points to a valid commit object — even if the hash does not exist, the reference will be created.
+- When using `-d` to delete a reference, an error is thrown if the reference does not exist; adding `-no-deref` deletes the symbolic reference itself rather than the target it points to.
 

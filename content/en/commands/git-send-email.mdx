@@ -61,4 +61,31 @@ git send-email --dry-run *.patch
 1. `git-format-patch`
 2. `git-request-pull`
 3. `open source fork pr contribution`
+`git send-email` transmits patch files as emails to a mailing list or reviewer. It handles threading, encoding, and SMTP configuration — making it the delivery step after `git format-patch` has prepared the patches.
+
+## Typical use cases
+
+- Send a series of generated patch files to a project's mailing list: `git send-email *.patch`.
+- Use `--to` and `--cc` to direct patches to maintainers and interested reviewers.
+- Configure SMTP settings in `.gitconfig` so that sending patches becomes a repeatable, one-command step.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="Patch email delivery"
+  caption="send-email reads .patch files and transmits them as properly formatted emails with threading, encoding, and SMTP handling."
+  inputsLabel="Input"
+  inputs="Patch files (.patch)|SMTP configuration|Recipient addresses"
+  commandLabel="git send-email"
+  outputsLabel="Output"
+  outputs="Emails sent to recipients|Threaded patch series"
+  note="Always do a dry run or test with a small scope first to verify recipients, threading, and encoding before the real send."
+/>
+
+## Special cases and boundaries
+
+- Do a dry run or small-scope test first so recipients, threading, and encoding are all correct before the real send.
+- SMTP credentials and server settings must be configured in `.gitconfig` or via command-line flags before sending.
+- `send-email` preserves the threading structure from `format-patch`, so patches arrive as a coherent email thread.
+- Some projects have specific patch submission guidelines (subject prefixes, sign-off requirements) — check the project's contribution guide before sending.
 

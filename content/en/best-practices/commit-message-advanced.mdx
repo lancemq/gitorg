@@ -1,0 +1,344 @@
+export const metadata = {
+  title: "Advanced commit message conventions",
+  slug: "commit-message-advanced",
+  locale: "en",
+  section: "best-practices",
+  summary: "Conventional Commits, semantic commits, Co-authored-by, Breaking Changes, and tooling support including commitlint, husky, and commitizen.",
+  sourceUrls: [
+    "https://www.conventionalcommits.org/",
+    "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project",
+    "https://github.com/commitizen/cz-cli",
+  ],
+};
+
+# Advanced commit message conventions
+
+## The short version
+
+<CommitGraphFigure
+  title="Advanced Commit Message Standards"
+  caption="Conventional Commits add type prefix, scope description and Breaking Changes markers, making commit messages machine-readable structured format."
+  linearLabel="feat: new feature|fix: bug fix"
+  mergeLabel="BREAKING CHANGE: incompatible change"
+  rewriteLabel="Co-authored-by: multi-dev collab"
+  pointerLabel="Commit type"
+/>
+
+
+Good commit messages make code history the best documentation. With a unified convention, teams can auto-generate changelogs, trace why changes were made, and understand design decisions from the commit log alone.
+
+## Basic commit message structure
+
+A well-formed commit message has three parts:
+
+```
+<title line> (within 50 chars)
+
+<body> (wrap at 72 chars)
+
+<footer> (metadata, issue references, etc.)
+```
+
+### Title line rules
+
+- **Under 50 characters** (ideal), max 72
+- **Start with imperative mood**: "fix" not "fixed", "add" not "added"
+- **No period at the end**
+- **Capitalize first letter** (English)
+
+```
+✅ Fix null pointer on login page
+✅ Add user avatar upload feature
+✅ Refactor database connection pool config
+
+❌ Fixed null pointer on login page.
+❌ Changed some stuff
+❌ Update
+```
+
+### Body rules
+
+- **Blank line** between title and body
+- Explain **why** the change was made, not what (the code shows what)
+- Wrap at 72 characters per line
+- Multiple paragraphs are fine
+
+```
+Fix null pointer on login page
+
+When users click login without entering a password,
+the backend doesn't validate for null, causing a
+NullPointerException.
+
+The fix adds a non-null check for the password field
+in the auth service and returns a clear error message.
+```
+
+### Footer rules
+
+- **Blank line** between body and footer
+- Contains issue references, breaking changes, co-authors, etc.
+
+```
+Fix null pointer on login page
+
+Added non-null check for password field.
+
+Closes #123
+Co-authored-by: Jane Smith <jane@example.com>
+```
+
+## Conventional Commits specification
+
+Conventional Commits is one of the most popular commit message conventions:
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+### Type categories
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `feat` | New feature | `feat(auth): add OAuth2 login` |
+| `fix` | Bug fix | `fix(login): fix password validation` |
+| `docs` | Documentation changes | `docs(readme): update installation guide` |
+| `style` | Code formatting (no logic change) | `style: standardize 2-space indentation` |
+| `refactor` | Refactoring (not feat/fix) | `refactor(db): refactor connection pool` |
+| `perf` | Performance optimization | `perf(query): optimize SQL query` |
+| `test` | Test-related changes | `test(auth): add login unit tests` |
+| `chore` | Build/tool changes | `chore: upgrade dependency versions` |
+| `ci` | CI/CD changes | `ci(github): add lint check` |
+| `revert` | Reverting a commit | `revert: revert feat(auth)` |
+
+### Scope usage
+
+Scope identifies the module or area affected:
+
+```
+feat(user): add user profile page
+fix(api): fix pagination bug on /users endpoint
+docs(readme): update quick start guide
+refactor(core): refactor event bus
+```
+
+Scope is optional but helpful for larger projects.
+
+### Breaking Changes annotation
+
+Two ways to mark breaking changes:
+
+#### Method 1: Footer annotation
+
+```
+feat(api): change user query endpoint
+
+Switch /users endpoint pagination from offset/limit
+to cursor-based pagination.
+
+BREAKING CHANGE: The /users endpoint no longer supports
+offset and limit parameters. Use cursor and page_size instead.
+
+Closes #456
+```
+
+#### Method 2: Title line annotation
+
+```
+feat(api)!: switch user query to cursor pagination
+```
+
+Or:
+
+```
+feat!: remove legacy auth middleware
+```
+
+Note the `!` goes after the type, before the colon.
+
+## Co-authored-by multi-author annotation
+
+When multiple people collaborate on a feature:
+
+```
+feat(search): implement full-text search
+
+Full-text search using Elasticsearch with Chinese
+tokenization support.
+
+Co-authored-by: Wang Wu <wangwu@example.com>
+Co-authored-by: Zhao Liu <zhaoliu@example.com>
+```
+
+GitHub automatically recognizes and displays multiple authors.
+
+### GitHub PR auto-addition
+
+When merging PRs on GitHub, "Squash and merge" automatically collects Co-authored-by from all contributors.
+
+## Issue/PR references
+
+### Keywords for auto-closing
+
+Use specific keywords in commit messages to auto-close related issues:
+
+```
+fix(auth): fix login timeout issue
+
+Closes #123
+Closes #456
+Fixes #789
+Resolves #100
+```
+
+Supported keywords: `close`, `closes`, `closed`, `fix`, `fixes`, `fixed`, `resolve`, `resolves`, `resolved`
+
+### Reference without closing
+
+```
+feat(user): add user export functionality
+
+Related discussion in #123
+See #456 for API design
+```
+
+## Tooling support
+
+### commitlint
+
+commitlint checks if commit messages follow the convention:
+
+```bash
+# Install
+npm install --save-dev @commitlint/cli @commitlint/config-conventional
+
+# Configure commitlint.config.js
+module.exports = {
+  extends: ['@commitlint/config-conventional'],
+  rules: {
+    'header-max-length': [2, 'always', 72],
+    'body-max-line-length': [2, 'always', 100],
+  },
+};
+
+# Test a commit message
+echo "feat: add login" | npx commitlint
+```
+
+### Husky integration
+
+Automatic checks on commit:
+
+```bash
+# Install husky
+npm install --save-dev husky
+
+# Enable husky
+npx husky init
+
+# Add commit-msg hook
+echo 'npx --no-install commitlint --edit "$1"' > .husky/commit-msg
+chmod +x .husky/commit-msg
+```
+
+### Commitizen
+
+Interactive commit message generation:
+
+```bash
+# Install
+npm install --save-dev commitizen @commitlint/cz-commitlint
+
+# Initialize
+npx commitizen init cz-conventional-changelog --save-dev --save-exact
+
+# Use cz instead of git commit
+npx cz
+# Interactive prompts for type, scope, description, etc.
+```
+
+Interactive process:
+
+```
+? Select the type of change you are committing:
+❯ feat:     A new feature
+  fix:      A bug fix
+  docs:     Documentation only changes
+  ...
+
+? What is the scope of this change? (e.g. component or file name)
+auth
+
+? Write a short, imperative tense description of the change:
+add OAuth2 login support
+```
+
+### conventional-changelog
+
+Auto-generate changelog:
+
+```bash
+# Install
+npm install -g conventional-changelog-cli
+
+# Generate changelog
+conventional-changelog -p angular -i CHANGELOG.md -s -r 0
+
+# Generate from all commits since first tag
+conventional-changelog -p angular -i CHANGELOG.md -s
+```
+
+## Team convention recommendations
+
+### Minimum viable convention
+
+For small teams, you don't need the full specification. Start with:
+
+1. **Clear title describing the change** (who, what)
+2. **Body explaining the why** (reason for the change)
+3. **Issue reference** (use `#123`)
+
+```
+Fix login timeout issue
+
+Users reported being logged out after 5 minutes instead of 30.
+Session TTL was misconfigured.
+
+Closes #123
+```
+
+### Mid-to-large team convention
+
+1. Use Conventional Commits
+2. Configure commitlint + husky for auto-checking
+3. Use conventional-changelog for auto changelog generation
+4. Remind about commit message convention in PR templates
+
+### Mandatory vs suggested
+
+- **Mandatory**: Run commitlint in CI, block merge on failure
+- **Suggested**: Remind in PR template, let reviewers judge
+
+## Key takeaways
+
+1. **Consistency > perfection**: Team using the same convention matters more than the convention itself
+2. **Automate checking**: Use tools instead of manual format reviews
+3. **English for international projects**: Use English commit messages for internationalized projects
+4. **Title line is critical**: Many people only read titles, make sure they're informative
+5. **Don't make scopes too granular**: Scopes are for quick filtering; too fine-grained reduces usefulness
+
+## Summary
+
+| Scenario | Recommended approach |
+|----------|---------------------|
+| Personal project | Clear title + body when needed |
+| Small team | Conventional Commits + manual review |
+| Mid-to-large team | Conventional Commits + commitlint + husky + auto changelog |
+| Open source | Strict Conventional Commits + CI check |
+| Enterprise | Custom convention + mandatory check + PR template |
+
+Good commit messages are the foundation of long-term team maintainability. Spend 1 minute writing a good commit message and you may save 1 hour of debugging time later.

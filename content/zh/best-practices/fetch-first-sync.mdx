@@ -15,7 +15,18 @@ export const metadata = {
 
 ## 为什么这是一个值得固定下来的习惯
 
-很多团队并不是不会 `git pull`，而是默认让 `pull` 同时完成“观察远端”和“改写本地”这两件事。这样做虽然快，但可控性差。
+<CommandFlowFigure
+  title="Fetch-First 同步流程"
+  caption="先 fetch 查看远端变更，再决定 merge 或 rebase。避免 pull 的自动合并带来的意外。让判断前置，操作更安全。"
+  inputsLabel="本地状态"
+  inputs="本地有未提交修改|本地有未推送提交|本地分支落后远端"
+  commandLabel="fetch → 检查 → 决定"
+  outputsLabel="同步策略"
+  outputs="git fetch origin → 查看变更|git log HEAD..origin/main → 确认差异|决定 merge 或 rebase"
+  note="pull = fetch + merge。分开执行让你有选择权：可以先看再决定，而不是盲目合并。"
+/>
+
+很多团队默认用 pull 同步远端，这是最简单的方式，
 
 更保守也更清楚的习惯是：
 

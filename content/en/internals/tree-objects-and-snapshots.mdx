@@ -13,7 +13,21 @@ export const metadata = {
 
 Tree objects are the part of Git that makes the repository look like a directory structure instead of a pile of unrelated blobs.
 
+## How trees organize snapshots
+
+<CommandFlowFigure
+  title="Tree Directory Snapshot Organization"
+  caption="Root trees point to sub-trees and blobs, forming a complete directory hierarchy snapshot. Commits ultimately point to root trees to express the project's current state."
+  inputsLabel="Directory Structure"
+  inputs="src/app.ts → blob:app_hash|src/utils.ts → blob:utils_hash|README.md → blob:readme_hash|tests/ → sub-tree"
+  commandLabel="root tree organizes"
+  outputsLabel="Snapshot Expression"
+  outputs="tree: src/ (with app, utils)|tree: tests/ (with test files)|tree: root dir (with README, src/, tests/)"
+  note="Each commit points to a complete tree snapshot, not a diff. Git ensures storage efficiency through object reuse."
+/>
+
 ## What a tree stores
+
 
 A tree records entries such as:
 

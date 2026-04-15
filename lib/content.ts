@@ -221,7 +221,27 @@ export const docPathRegistry = [
   "recovery/recover-after-wrong-cherry-pick",
   "recovery/recover-after-accidental-merge",
   "recovery/recover-after-git-clean",
+  "recovery/recover-after-cherry-pick",
+  "recovery/undo-merge-commit",
+  "recovery/fix-broken-interactive-rebase",
+  "recovery/recover-lost-commits",
+  "recovery/recover-from-corrupted-repo",
+  "recovery/fix-detached-head-accidentally-committed",
+  "recovery/fix-wrong-author-or-commit-message",
+  "best-practices/git-aliases",
+  "best-practices/commit-message-advanced",
+  "best-practices/security-with-git",
+  "workflows/pre-release-checklist",
+  "workflows/ci-optimization-with-git",
+  "workflows/trunk-based-development",
+  "concepts/three-layers",
   "concepts/git-history",
+  "concepts/git-ignore",
+  "concepts/git-attributes",
+  "concepts/git-hooks",
+  "concepts/git-subtree",
+  "concepts/git-lfs",
+  "concepts/git-shallow",
 ] as const;
 
 export type DocPath = (typeof docPathRegistry)[number];
@@ -435,7 +455,27 @@ const contentModules = {
     "recovery/recover-after-accidental-merge": () =>
       import("@/content/zh/recovery/recover-after-accidental-merge.mdx"),
     "recovery/recover-after-git-clean": () => import("@/content/zh/recovery/recover-after-git-clean.mdx"),
+    "recovery/recover-after-cherry-pick": () => import("@/content/zh/recovery/recover-after-cherry-pick.mdx"),
+    "recovery/undo-merge-commit": () => import("@/content/zh/recovery/undo-merge-commit.mdx"),
+    "recovery/fix-broken-interactive-rebase": () => import("@/content/zh/recovery/fix-broken-interactive-rebase.mdx"),
+    "recovery/recover-lost-commits": () => import("@/content/zh/recovery/recover-lost-commits.mdx"),
+    "concepts/three-layers": () => import("@/content/zh/concepts/three-layers.mdx"),
     "concepts/git-history": () => import("@/content/zh/concepts/git-history.mdx"),
+    "concepts/git-ignore": () => import("@/content/zh/concepts/git-ignore.mdx"),
+    "concepts/git-attributes": () => import("@/content/zh/concepts/git-attributes.mdx"),
+    "concepts/git-hooks": () => import("@/content/zh/concepts/git-hooks.mdx"),
+    "concepts/git-subtree": () => import("@/content/zh/concepts/git-subtree.mdx"),
+    "concepts/git-lfs": () => import("@/content/zh/concepts/git-lfs.mdx"),
+    "concepts/git-shallow": () => import("@/content/zh/concepts/git-shallow.mdx"),
+    "recovery/recover-from-corrupted-repo": () => import("@/content/zh/recovery/recover-from-corrupted-repo.mdx"),
+    "recovery/fix-detached-head-accidentally-committed": () => import("@/content/zh/recovery/fix-detached-head-accidentally-committed.mdx"),
+    "recovery/fix-wrong-author-or-commit-message": () => import("@/content/zh/recovery/fix-wrong-author-or-commit-message.mdx"),
+    "best-practices/git-aliases": () => import("@/content/zh/best-practices/git-aliases.mdx"),
+    "best-practices/commit-message-advanced": () => import("@/content/zh/best-practices/commit-message-advanced.mdx"),
+    "best-practices/security-with-git": () => import("@/content/zh/best-practices/security-with-git.mdx"),
+    "workflows/pre-release-checklist": () => import("@/content/zh/workflows/pre-release-checklist.mdx"),
+    "workflows/ci-optimization-with-git": () => import("@/content/zh/workflows/ci-optimization-with-git.mdx"),
+    "workflows/trunk-based-development": () => import("@/content/zh/workflows/trunk-based-development.mdx"),
   },
   en: {
     "learning-path/quick-start": () => import("@/content/en/learning-path/quick-start.mdx"),
@@ -646,7 +686,27 @@ const contentModules = {
     "recovery/recover-after-accidental-merge": () =>
       import("@/content/en/recovery/recover-after-accidental-merge.mdx"),
     "recovery/recover-after-git-clean": () => import("@/content/en/recovery/recover-after-git-clean.mdx"),
+    "recovery/recover-after-cherry-pick": () => import("@/content/en/recovery/recover-after-cherry-pick.mdx"),
+    "recovery/undo-merge-commit": () => import("@/content/en/recovery/undo-merge-commit.mdx"),
+    "recovery/fix-broken-interactive-rebase": () => import("@/content/en/recovery/fix-broken-interactive-rebase.mdx"),
+    "recovery/recover-lost-commits": () => import("@/content/en/recovery/recover-lost-commits.mdx"),
+    "concepts/three-layers": () => import("@/content/en/concepts/three-layers.mdx"),
     "concepts/git-history": () => import("@/content/en/concepts/git-history.mdx"),
+    "concepts/git-ignore": () => import("@/content/en/concepts/git-ignore.mdx"),
+    "concepts/git-attributes": () => import("@/content/en/concepts/git-attributes.mdx"),
+    "concepts/git-hooks": () => import("@/content/en/concepts/git-hooks.mdx"),
+    "concepts/git-subtree": () => import("@/content/en/concepts/git-subtree.mdx"),
+    "concepts/git-lfs": () => import("@/content/en/concepts/git-lfs.mdx"),
+    "concepts/git-shallow": () => import("@/content/en/concepts/git-shallow.mdx"),
+    "recovery/recover-from-corrupted-repo": () => import("@/content/en/recovery/recover-from-corrupted-repo.mdx"),
+    "recovery/fix-detached-head-accidentally-committed": () => import("@/content/en/recovery/fix-detached-head-accidentally-committed.mdx"),
+    "recovery/fix-wrong-author-or-commit-message": () => import("@/content/en/recovery/fix-wrong-author-or-commit-message.mdx"),
+    "best-practices/git-aliases": () => import("@/content/en/best-practices/git-aliases.mdx"),
+    "best-practices/commit-message-advanced": () => import("@/content/en/best-practices/commit-message-advanced.mdx"),
+    "best-practices/security-with-git": () => import("@/content/en/best-practices/security-with-git.mdx"),
+    "workflows/pre-release-checklist": () => import("@/content/en/workflows/pre-release-checklist.mdx"),
+    "workflows/ci-optimization-with-git": () => import("@/content/en/workflows/ci-optimization-with-git.mdx"),
+    "workflows/trunk-based-development": () => import("@/content/en/workflows/trunk-based-development.mdx"),
   },
 } satisfies Record<Locale, Record<DocPath, ContentLoader>>;
 
@@ -1067,6 +1127,11 @@ function extractMetadataField(source: string, key: keyof Omit<DocMetadata, "sour
   return match?.[1];
 }
 
+function extractMetadataSourceUrls(source: string) {
+  const sourceUrlsBlock = source.match(/sourceUrls:\s*\[([\s\S]*?)\]/)?.[1] ?? "";
+  return Array.from(sourceUrlsBlock.matchAll(/"([^"]+)"/g), (match) => match[1]);
+}
+
 async function readDocMetadata(locale: Locale, docPath: DocPath): Promise<DocMetadata> {
   const absolutePath = getDocAbsolutePath(locale, docPath);
   const source = await readFile(absolutePath, "utf8");
@@ -1086,7 +1151,7 @@ async function readDocMetadata(locale: Locale, docPath: DocPath): Promise<DocMet
     locale,
     summary,
     section,
-    sourceUrls: [],
+    sourceUrls: extractMetadataSourceUrls(metadataBlock),
   };
 }
 
@@ -1124,6 +1189,10 @@ export async function getAllDocs(locale: Locale) {
   const docs = await Promise.all(indexedDocs.map(async ({ path: docPath }) => getDocByPath(locale, docPath)));
 
   return docs;
+}
+
+export async function getAllDocMetadata(locale: Locale) {
+  return getIndexedDocs(locale);
 }
 
 function toDocCard(locale: Locale, doc: Awaited<ReturnType<typeof getDocByPath>>): DocCard {
@@ -1200,10 +1269,12 @@ function sortBySeriesOrder<T extends { path: DocPath }>(docs: T[]) {
 
 function sortByTierAndSeriesOrder<T extends { path: DocPath }>(docs: T[]) {
   const ordered = sortBySeriesOrder(docs);
+  const order = new Map(ordered.map((doc, index) => [doc.path, index]));
+
   return [...ordered].sort(
     (a, b) =>
       tierRank[getDocTier(a.path)] - tierRank[getDocTier(b.path)] ||
-      ordered.findIndex((doc) => doc.path === a.path) - ordered.findIndex((doc) => doc.path === b.path),
+      (order.get(a.path) ?? Number.MAX_SAFE_INTEGER) - (order.get(b.path) ?? Number.MAX_SAFE_INTEGER),
   );
 }
 

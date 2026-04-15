@@ -22,6 +22,17 @@ export const metadata = {
 
 ## 先理解为什么 Git 要把它们分开
 
+<RefsHeadFigure
+  title="本地分支与远端跟踪引用的关系"
+  caption="main 是你的本地分支，可以自由提交和切换。origin/main 是 Git 记录的远端状态快照，只在 fetch 时更新。它们之间可能产生分歧。"
+  headLabel="正常状态（main = origin/main）"
+  branchLabel="main → 本地提交 F"
+  tagLabel="origin/main → 远端提交 D"
+  remoteLabel="远端快照"
+  detachedLabel="分歧状态"
+/>
+
+
 如果 Git 每次一看到远端更新，就直接改写你的本地工作分支，会有很多问题：
 
 - 你还没检查远端变化
@@ -195,11 +206,3 @@ pull = fetch + integrate。
 - `git branch -vv`
 - `git remote`
 - `git status`
-
-## 为什么 fetch 很重要
-
-`git fetch` 更新的是远端跟踪引用，而不是直接改写你的本地分支。这让 Git 能把“先知道远端现在在哪里”和“要不要改自己的分支”分成两步。
-
-## 为什么这会影响 pull
-
-`git pull` 本质上是 fetch 再整合。你越理解远端跟踪引用，就越能理解 pull 为什么有时会产生 merge、有时会 rebase，有时还会被拦住。

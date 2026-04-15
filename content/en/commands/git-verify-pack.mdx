@@ -48,31 +48,31 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 
 ## What problem this command solves in a workflow
 
-`git verify-pack` focuses on object storage, pack files, reachability, and repository maintenance quality. It is usually a diagnostic or maintenance tool, not part of the normal commit loop.
+`git verify-pack` focuses on object storage, pack files, reachability, and repository maintenance quality. It is not usually part of the normal commit loop — it is more of a diagnostic or maintenance tool.
 
 ## Typical use cases
 
-- Use `git verify-pack` when the repository grows large, when object integrity is in question, or when you need to understand storage layout.
-- Put `git verify-pack` into maintenance flow when you need visibility into packs, object counts, and reachability.
-- Use `git verify-pack` during performance, size, or integrity investigations when porcelain commands do not expose enough storage detail.
+- After receiving a pack file from a remote, use `git verify-pack` to verify its integrity.
+- Analyze the largest objects in the repository to locate the root cause of size inflation (combine `-v` with a sort command).
+- Check the delta chain depth in pack files to assess whether storage efficiency needs optimization.
 
 ## Diagram view
 
 <CommandFlowFigure
-  title="Storage and maintenance view"
+  title="Object storage and maintenance view"
   caption="Storage-oriented commands work against the object database, pack files, and reachability model to verify, analyze, or clean repository state."
-  inputsLabel="Storage inputs"
-  inputs="Object database|Pack files|Reachability data"
+  inputsLabel="Storage objects"
+  inputs="Object database|Pack files|Reachability information"
   commandLabel="git verify-pack"
   outputsLabel="Results"
-  outputs="Diagnostics|Maintenance actions|Size / integrity signals"
-  note="If a command may prune, compress, or reorganize storage, confirm whether you are still in a phase where recovery clues matter."
+  outputs="Integrity verification result|Object list (SHA / type / size / offset)|Delta chain info"
+  note="This command is read-only — you can safely inspect pack file contents and integrity status."
 />
 
 ## Special cases and boundaries
 
-- Maintenance commands are usually better scheduled in a controlled window than improvised during a stressful release moment.
-- If you are actively doing recovery or incident analysis, verify that `git verify-pack` will not remove useful evidence before continuing.
-- When something looks wrong, preserve diagnostics first and choose cleanup second.
-- This command is more diagnostic than operational; object size, delta chains, and pack offsets are usually the high-value parts of the output.
+- This is a read-only command — it will never affect repository state.
+- The input is an `.idx` file path, not a `.pack` file; `git verify-pack` automatically finds the corresponding `.pack` file.
+- Entries with `chain depth` in the output are delta objects — depth 0 means a base object, and larger values indicate deeper delta chains.
+- This command is more diagnostic than operational and is not part of the everyday collaboration workflow; the most valuable parts of the output are object sizes, delta chains, and offset relationships.
 

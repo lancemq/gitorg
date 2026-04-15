@@ -1,0 +1,437 @@
+export const metadata = {
+  title: "Shallow Clones and CI Optimization",
+  slug: "git-shallow",
+  locale: "en",
+  section: "concepts",
+  summary: "Understanding shallow clones, single-branch clones, and how to optimize Git operations for CI/CD and large repositories.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-clone",
+    "https://github.blog/2020-12-21-get-up-to-speed-with-partial-clone-and-shallow-clone/",
+  ],
+};
+
+# Shallow Clones and CI Optimization
+
+## What is a Shallow Clone?
+
+A **shallow clone** is a Git clone that downloads only a limited number of commits from the repository history, rather than the complete history. This is controlled by the `--depth` flag:
+
+```bash
+# Clone only the most recent commit
+git clone --depth 1 https://github.com/example/large-repo.git
+
+# Clone the last 5 commits
+git clone --depth 5 https://github.com/example/large-repo.git
+```
+
+In a shallow clone, the `.git/shallow` file records the boundary commits — the oldest commits that were downloaded. Anything older than these commits is not present in the local repository.
+
+```
+Full clone:
+  A - B - C - D - E - F - G - H (HEAD)
+  ←───────────────────────────────→
+  All commits downloaded
+
+Shallow clone (--depth 3):
+  A - B - C - D - E - F - G - H (HEAD)
+                          ←───→
+  Only G, H downloaded (plus E-F as boundary)
+```
+
+<CommitGraphFigure
+  title="Full History vs Shallow Clone History"
+  caption="A full clone downloads all commits from root to HEAD. A shallow clone only downloads the most recent N commits — earlier commits are cut off at the shallow boundary and are inaccessible locally."
+  linearLabel="Full history (A→B→C→D→E→F→G→H)"
+  mergeLabel="Shallow --depth 3 (F→G→H only)"
+  rewriteLabel="Shallow --depth 1 (H only)"
+  pointerLabel="shallow boundary cutoff"
+/>
+
+## When Shallow Clones Are Useful
+
+### CI/CD Pipelines
+
+This is the most common use case. In CI/CD, you typically only need the current commit to run tests, build artifacts, or deploy code. Downloading the full history of a large repository can add minutes to pipeline execution time.
+
+```yaml
+# GitHub Actions - shallow clone (default since 2023)
+- uses: actions/checkout@v4
+  with:
+    fetch-depth: 1  # Shallow clone
+
+# For full history (when needed)
+- uses: actions/checkout@v4
+  with:
+    fetch-depth: 0  # Full clone
+```
+
+### Large Repositories
+
+For repositories with extensive histories (e.g., the Linux kernel with over 1 million commits), a shallow clone can reduce clone time from minutes to seconds:
+
+| Repository | Full Clone Time | Shallow Clone (--depth 1) |
+|------------|----------------|---------------------------|
+| Linux kernel | ~3-5 minutes | ~30 seconds |
+| Chromium | ~10+ minutes | ~1 minute |
+| Android | ~30+ minutes | ~2 minutes |
+| VS Code | ~1 minute | ~10 seconds |
+
+### Quick Inspections
+
+When you just need to look at the current state of a repository:
+
+```bash
+# Quickly check out a project to read the code
+git clone --depth 1 https://github.com/example/project.git
+cd project
+# Read the code without waiting for full history
+```
+
+## Single-Branch Clones
+
+By default, `git clone` downloads all branches from the remote. The `--single-branch` flag limits the clone to only the branch you're checking out:
+
+```bash
+# Clone only the main branch
+git clone --single-branch https://github.com/example/project.git
+
+# Clone a specific branch
+git clone --single-branch --branch develop https://github.com/example/project.git
+```
+
+Combined with shallow cloning:
+
+```bash
+# Clone only the latest commit of a specific branch
+git clone --depth 1 --single-branch --branch main https://github.com/example/project.git
+```
+
+## Limitations of Shallow Clones
+
+Shallow clones come with several restrictions:
+
+### 1. No Full History
+
+```bash
+# This will fail or give incomplete results
+git log --oneline
+# Only shows the shallow commits
+
+git blame file.py
+# May show "boundary" commits without details
+
+git bisect
+# Cannot bisect beyond the shallow boundary
+```
+
+### 2. Cannot Push from Shallow Clones (Historically)
+
+Older versions of Git could not push from shallow clones. Modern Git (2.20+) allows this in many cases, but it's still limited:
+
+```bash
+# May fail with older Git versions
+git push origin main
+
+# Error: "shallow updates are not allowed"
+```
+
+### 3. No Tag Fetching by Default
+
+Tags are not fetched in shallow clones unless explicitly requested:
+
+```bash
+# Fetch tags in a shallow clone
+git fetch --tags --depth=1
+```
+
+### 4. Limited Merge and Rebase Operations
+
+Operations that require full history may fail:
+
+```bash
+# May fail if the merge base is beyond the shallow boundary
+git merge feature-branch
+
+# May fail if rebase needs commits beyond the boundary
+git rebase main
+```
+
+### 5. Cannot Create Patches Beyond Boundary
+
+```bash
+# May fail if the diff extends beyond shallow history
+git format-patch HEAD~10
+```
+
+## Unshallowing a Clone
+
+If you started with a shallow clone and later need the full history:
+
+```bash
+# Fetch the complete history
+git fetch --unshallow
+
+# Fetch more history (increase depth)
+git fetch --deepen=100    # Get 100 more commits
+git fetch --deepen=50     # Get 50 more
+
+# Fetch full history for a specific branch
+git fetch --unshallow --depth=2147483647
+```
+
+## Partial Clones
+
+Introduced in Git 2.19, **partial clones** go beyond shallow clones by selectively fetching objects rather than commits. Instead of limiting the depth of history, you can exclude specific types of objects.
+
+### Blobless Clone
+
+Downloads commit and tree objects but not blob objects (file contents). Blobs are fetched on-demand when you access a specific file:
+
+```bash
+# Clone without downloading file contents
+git clone --filter=blob:none https://github.com/example/project.git
+
+# File contents are downloaded when you access them
+cat file.py          # Triggers on-demand download
+git log -p file.py   # Downloads the blob for this commit
+```
+
+### Treeless Clone
+
+Downloads commit objects but not tree objects (directory structures):
+
+```bash
+# Clone without downloading directory structures
+git clone --filter=tree:0 https://github.com/example/project.git
+```
+
+### Combined Filters
+
+```bash
+# Combine filters (Git 2.32+)
+git clone --filter=blob:none --filter=tree:0 https://github.com/example/project.git
+```
+
+### Partial Clone vs Shallow Clone
+
+| Feature | Shallow Clone | Partial Clone |
+|---------|--------------|---------------|
+| **What's excluded** | Old commits | Specific object types |
+| **History** | Truncated | Complete (but objects missing) |
+| **Push support** | Limited | Full |
+| **Merge/rebase** | Limited | Generally works |
+| **On-demand fetch** | No (for missing history) | Yes (for missing blobs/trees) |
+| **Best for** | CI/CD, quick inspections | Large repos where you need full history but not all files |
+
+## Sparse Checkout + Shallow Clone
+
+**Sparse checkout** allows you to check out only specific directories from a repository. Combined with shallow cloning, this is extremely efficient for monorepos:
+
+### Modern Sparse Checkout (Git 2.37+)
+
+```bash
+# Clone with sparse checkout enabled
+git clone --depth 1 --filter=blob:none --sparse https://github.com/example/monorepo.git
+
+cd monorepo
+
+# Initially, only the root is checked out
+ls
+# README.md  (just root files)
+
+# Add specific directories
+git sparse-checkout add packages/frontend
+git sparse-checkout add packages/backend
+
+# List current sparse checkout configuration
+git sparse-checkout list
+
+# Set to specific directories
+git sparse-checkout set packages/frontend docs
+
+# Disable sparse checkout
+git sparse-checkout disable
+```
+
+### Combined Optimization
+
+For maximum efficiency in CI/CD with a monorepo:
+
+```bash
+# Shallow + sparse + blobless
+git clone --depth 1 --filter=blob:none --sparse \
+    --branch main \
+    https://github.com/example/monorepo.git
+
+cd monorepo
+
+# Only check out the directory needed for this job
+git sparse-checkout set packages/frontend
+
+# Now only frontend files are present
+npm install
+npm test
+```
+
+This combination can reduce clone size from gigabytes to megabytes for large monorepos.
+
+## CI/CD Optimization Best Practices
+
+### GitHub Actions
+
+```yaml
+# Fast checkout for most jobs
+- uses: actions/checkout@v4
+  with:
+    fetch-depth: 1
+
+# Full history for jobs that need it (e.g., changelog generation)
+- uses: actions/checkout@v4
+  with:
+    fetch-depth: 0
+
+# Shallow checkout with LFS
+- uses: actions/checkout@v4
+  with:
+    fetch-depth: 1
+    lfs: true
+```
+
+### GitLab CI
+
+```yaml
+variables:
+  GIT_DEPTH: 1  # Shallow clone depth for all jobs
+
+test:
+  script:
+    - npm test
+
+# Override for specific jobs
+changelog:
+  variables:
+    GIT_DEPTH: 0
+  script:
+    - ./generate-changelog.sh
+```
+
+### Jenkins Pipeline
+
+```groovy
+pipeline {
+    agent any
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    extensions: [[$class: 'CloneOption', depth: 1, shallow: true]],
+                    userRemoteConfigs: [[url: 'https://github.com/example/project.git']]
+                ])
+            }
+        }
+    }
+}
+```
+
+### CircleCI
+
+```yaml
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: cimg/node:20.0
+    steps:
+      - checkout:
+          # CircleCI does shallow clones by default
+          # Use --no-depth for full history
+```
+
+### Bitbucket Pipelines
+
+```yaml
+definitions:
+  steps:
+    - step:
+        clone:
+          depth: 1
+        script:
+          - npm test
+```
+
+## Performance Comparison
+
+Typical performance for a repository with 10,000 commits and 2 GB of history:
+
+| Method | Clone Time | Disk Usage | Network Transfer |
+|--------|-----------|------------|------------------|
+| Full clone | ~45 seconds | 2.1 GB | 2.1 GB |
+| `--depth 1` | ~5 seconds | 50 MB | 50 MB |
+| `--depth 5` | ~8 seconds | 120 MB | 120 MB |
+| `--filter=blob:none` | ~10 seconds | 200 MB | 200 MB (plus on-demand) |
+| `--depth 1 --sparse` | ~3 seconds | 20 MB | 20 MB |
+
+> Note: These numbers are approximate and depend on network speed, repository structure, and server performance.
+
+## Common Pitfalls
+
+### 1. Missing Tags
+
+```bash
+# Shallow clones don't fetch tags by default
+git clone --depth 1 https://github.com/example/project.git
+git tag
+# (empty)
+
+# Fix: fetch tags explicitly
+git fetch --tags
+```
+
+### 2. Version Determination
+
+Tools that determine version from git history (like `git describe`) may fail:
+
+```bash
+git describe --tags
+# fatal: No tags can describe <commit-hash>
+
+# Fix: fetch more history
+git fetch --unshallow
+```
+
+### 3. Code Coverage and Diff Tools
+
+Tools that compare against a base branch need full history:
+
+```bash
+# May fail with shallow clone
+git diff origin/main...HEAD
+
+# Fix: fetch the full branch history
+git fetch origin main --unshallow
+```
+
+### 4. Submodule Interaction
+
+Shallow clones with submodules require additional flags:
+
+```bash
+git clone --depth 1 --recurse-submodules --shallow-submodules \
+    https://github.com/example/project.git
+```
+
+## Summary
+
+| Flag | Purpose |
+|------|---------|
+| `--depth N` | Clone only the last N commits |
+| `--single-branch` | Clone only the current branch |
+| `--filter=blob:none` | Clone without file contents (on-demand) |
+| `--filter=tree:0` | Clone without directory trees |
+| `--sparse` | Enable sparse checkout mode |
+| `--unshallow` | Convert shallow clone to full clone |
+| `--deepen N` | Fetch N more commits in a shallow clone |
+
+Shallow clones and partial clones are essential tools for optimizing Git operations in CI/CD pipelines and when working with large repositories. Choose the right combination of depth, filtering, and sparse checkout based on what your workflow actually needs. For most CI/CD jobs, `--depth 1` provides the best balance of speed and functionality.

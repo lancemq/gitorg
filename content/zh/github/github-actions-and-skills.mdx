@@ -14,7 +14,18 @@ export const metadata = {
 
 ## 为什么学 GitHub 不能只停留在文档阅读
 
-GitHub 平台里最容易让人“看懂但不会用”的部分，就是自动化。  
+<CommandFlowFigure
+  title="GitHub Actions CI/CD 流程"
+  caption="GitHub Actions 通过 YAML 工作流文件定义 CI/CD 流程。每个 workflow 由 jobs 组成，jobs 由 steps 组成，在 runner 上执行。"
+  inputsLabel="触发事件"
+  inputs="push 到分支|pull request 创建|定时触发|手动触发"
+  commandLabel="GitHub Actions"
+  outputsLabel="工作流执行"
+  outputs="checkout 代码|安装依赖|运行测试|构建产物|部署发布"
+  note="Actions 市场有数千个可复用的 action。也可以编写自定义 action 满足特定需求。"
+/>
+
+很多教程把 Actions 当成纯配置问题，
 如果你只是看别人仓库里有个 workflow 文件，却没自己跑过，很难真正建立直觉。
 
 而 GitHub Skills 的价值，则在于它让你可以用更低成本做练习，而不是只在真实仓库里硬试。

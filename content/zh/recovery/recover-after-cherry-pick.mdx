@@ -1,0 +1,301 @@
+export const metadata = {
+  title: "cherry-pick 冲突或出错后怎么恢复",
+  slug: "recover-after-cherry-pick",
+  locale: "zh",
+  section: "recovery",
+  summary: "cherry-pick 遇到冲突、中止或结果不对时的完整恢复流程，包括 --abort、--continue、--skip 以及 cherry-pick 完成后的补救方法。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-cherry-pick",
+    "https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History",
+  ],
+};
+
+# cherry-pick 冲突或出错后怎么恢复
+
+## 一句话理解
+
+`cherry-pick` 把其他分支上的某个提交"摘"到当前分支。遇到冲突或结果不对时，Git 提供了明确的中止、继续和跳过机制，完成后也能安全回退。
+
+## cherry-pick 的基本模型
+
+<CherryPickFigure
+  title="Cherry-Pick 操作示意"
+  caption="cherry-pick 把其他分支上的某个提交复制到当前分支，生成内容相近但 ID 不同的新提交。遇到冲突时可以 --abort 中止，或 --continue 继续。"
+  sourceLabel="源分支"
+  targetLabel="目标分支"
+  transferLabel="git cherry-pick <commit>"
+/>
+-pick 做了什么
+
+```
+原分支:  A --- B --- C --- D
+                            \
+当前分支:  X --- Y           Z (cherry-pick C)
+```
+
+`git cherry-pick C` 会读取提交 C 的差异（diff），把同样的改动应用到当前分支，但会创建一个新的提交 Z，拥有不同的 SHA-1。
+
+**关键认知**：cherry-pick 不是"移动"提交，而是"复制"提交。原始提交 C 仍然在原分支上不动。
+
+## 场景一：cherry-pick 进行中遇到冲突
+
+当你执行 `git cherry-pick <commit>` 时，Git 尝试把目标提交的改动应用到当前分支。如果目标提交修改的文件在当前分支上也发生了不同的修改，就会产生冲突。
+
+### 此时 Git 的状态
+
+```bash
+$ git cherry-pick abc1234
+error: could not apply abc1234... feat: 添加用户认证
+hint: After resolving the conflicts, mark them with
+hint: "git add/rm <pathspec>", then run
+hint: "git cherry-pick --continue".
+hint: You can instead skip this commit with "git cherry-pick --skip".
+hint: To abort and get back to the state before "git cherry-pick",
+hint: run "git cherry-pick --abort".
+
+$ git status
+On branch main
+You are currently cherry-picking commit abc1234.
+  (fix conflicts and run "git cherry-pick --continue")
+  (use "git cherry-pick --abort" to cancel the cherry-pick operation)
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+        both modified:   src/auth/login.js
+```
+
+此时 Git 进入了 **CHERRY-PICKING** 中间状态，你有三个选择：
+
+### 选择 A：解决冲突后继续
+
+```bash
+# 1. 打开冲突文件，编辑解决冲突标记
+#    <<<<<<< HEAD
+#    ...当前分支的内容...
+#    =======
+#    ...cherry-pick 的内容...
+#    >>>>>>> abc1234
+
+# 2. 标记冲突已解决
+git add src/auth/login.js
+
+# 3. 继续 cherry-pick（会自动打开编辑器确认提交信息）
+git cherry-pick --continue
+
+# 如果想用默认提交信息，跳过编辑器：
+git cherry-pick --continue --no-edit
+```
+
+### 选择 B：中止整个 cherry-pick
+
+```bash
+# 完全取消，回到 cherry-pick 之前的状态
+git cherry-pick --abort
+
+# 验证：HEAD 应该回到 cherry-pick 前的位置
+git log --oneline -1
+```
+
+`--abort` 会把工作区、暂存区和 HEAD 都恢复到执行 `git cherry-pick` 之前的状态，相当于什么都没发生。
+
+### 选择 C：跳过当前提交
+
+```bash
+# 不应用这个提交，继续处理后续（如果有）
+git cherry-pick --skip
+```
+
+`--skip` 在你 cherry-pick 一系列提交时有用。如果其中某个提交在当前分支上已经不需要了，可以跳过它。
+
+## 场景二：cherry-pick 完成后才发现不对
+
+如果 cherry-pick 已经顺利完成（提交已创建），但你发现摘错了提交或结果有问题：
+
+### 方法一：重置回退（适用于尚未 push）
+
+```bash
+# 撤回最近一次 cherry-pick 创建的提交
+git reset --hard HEAD~1
+
+# 确认回退成功
+git log --oneline -3
+```
+
+如果你 cherry-pick 了多个提交：
+
+```bash
+# 回退最近 3 个 cherry-pick 的提交
+git reset --hard HEAD~3
+```
+
+### 方法二：revert 撤销（适用于已 push 到远端）
+
+```bash
+# 创建一个反向提交来抵消 cherry-pick 的效果
+git revert HEAD
+
+# 如果 cherry-pick 了多个提交，逐个 revert
+git revert HEAD~2..HEAD
+```
+
+`revert` 比 `reset` 更安全，因为它会创建一个新的提交来撤销改动，而不是改写历史。
+
+## 场景三：cherry-pick 了一系列提交，中间某个有问题
+
+```bash
+# cherry-pick 一段提交范围
+git cherry-pick A..D
+
+# 如果中间某个提交（比如 C）冲突了：
+# 解决冲突 → git add → git cherry-pick --continue
+# 或者跳过它 → git cherry-pick --skip
+```
+
+## 最佳实践
+
+### 1. 使用 -x 保留来源信息
+
+```bash
+git cherry-pick -x <commit>
+```
+
+`-x` 会在提交信息中追加 `(cherry picked from commit <sha>)`，方便日后追溯这个提交的来源。
+
+```
+commit z9y8x7w
+Author: Alice <alice@example.com>
+Date:   Mon Apr 14 10:00:00 2026
+
+    feat: 添加用户认证
+
+    (cherry picked from commit abc1234ef567890)
+```
+
+### 2. 先检查再摘取
+
+在 cherry-pick 之前，先看看目标提交到底改了什么：
+
+```bash
+# 查看提交的改动
+git show <commit>
+
+# 查看提交与当前分支的潜在差异
+git diff HEAD <commit>
+
+# 模拟 cherry-pick（不真正应用）
+git cherry-pick --no-commit <commit>
+# 检查改动是否符合预期后：
+#   - 满意：git commit
+#   - 不满意：git reset --hard
+```
+
+### 3. cherry-pick 改变提交 ID
+
+```
+原始提交:  abc1234  (branch-a)
+cherry-pick 后:  z9y8x7w  (main)
+
+虽然内容相同，但 SHA-1 不同！
+因为提交信息中的 parent、时间戳、作者可能都变了。
+```
+
+这意味着 `git cherry` 和 `git log --cherry-mark` 等工具可以帮你识别内容相同但 SHA 不同的提交。
+
+### 4. 避免重复 cherry-pick
+
+如果不小心 cherry-pick 了已经在当前分支上的内容，Git 通常会检测到空提交并报错：
+
+```bash
+$ git cherry-pick abc1234
+The previous cherry-pick is now empty, possibly due to conflict resolution.
+If you wish to commit it anyway, use:
+
+    git commit --allow-empty
+
+Otherwise, please use 'git cherry-pick --skip'
+```
+
+遇到这种情况，使用 `git cherry-pick --skip` 跳过即可。
+
+## 快速决策流程图
+
+```
+执行 git cherry-pick <commit>
+         │
+    ┌────┴────┐
+    │  有冲突  │ ──→ 解决冲突 → git add → git cherry-pick --continue
+    └────┬────┘          │                    │
+         │               ↓                    ↓
+         │           不想解决？          想放弃？
+         │           git cherry-pick    git cherry-pick
+         │             --skip            --abort
+         ↓
+    没有冲突，自动完成
+         │
+    ┌────┴────┐
+    │ 结果不对 │ ──→ 未 push？git reset --hard HEAD~1
+    └────┬────┘          已 push？git revert HEAD
+         │
+         ↓
+      一切正常 ✓
+```
+
+## 常见错误和解决
+
+### 错误 1：cherry-pick 到 detached HEAD
+
+```bash
+# 如果你在 detached HEAD 状态下 cherry-pick
+git checkout abc1234  # detached HEAD
+git cherry-pick def5678  # 可以成功，但提交"无处可去"
+
+# 补救：创建一个分支接住这个提交
+git branch recovery/what-i-just-picked
+git checkout -b feature/xxx
+```
+
+### 错误 2：cherry-pick 了一个 merge commit
+
+```bash
+# 直接 cherry-pick merge commit 会报错
+$ git cherry-pick merge123
+error: commit merge123 is a merge but no -m option was given.
+
+# 需要指定 parent（通常是 1）
+git cherry-pick -m 1 merge123
+```
+
+### 错误 3：cherry-pick 范围写反了
+
+```bash
+# 错误：A 比 B 旧，范围无效
+git cherry-pick newer_commit..older_commit
+
+# 正确：从旧到新
+git cherry-pick older_commit..newer_commit
+
+# 注意：A..B 不包含 A，包含 B
+# 如果要包含两端，用 A^..B
+git cherry-pick A^..B
+```
+
+## 预防措施
+
+1. **创建备份分支**：在大规模 cherry-pick 之前
+   ```bash
+   git branch backup/before-cherry-pick
+   ```
+
+2. **先在一个临时分支上试验**：
+   ```bash
+   git checkout -b test/cherry-pick
+   git cherry-pick <commit>
+   # 确认没问题后再 merge 回主分支
+   ```
+
+3. **使用 --no-commit 先检查**：
+   ```bash
+   git cherry-pick --no-commit <commit>
+   git diff --cached  # 检查暂存区的改动
+   # 满意就 commit，不满意就 reset
+   ```

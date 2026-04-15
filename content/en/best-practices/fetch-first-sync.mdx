@@ -15,6 +15,18 @@ export const metadata = {
 
 ## Why this habit is worth standardizing
 
+<CommandFlowFigure
+  title="Fetch-First Sync Flow"
+  caption="Fetch first to see remote changes, then decide merge or rebase. Avoids surprise from pull's automatic merge. Puts judgment before action."
+  inputsLabel="Local State"
+  inputs="Local uncommitted changes|Local unpushed commits|Local branch behind remote"
+  commandLabel="fetch → inspect → decide"
+  outputsLabel="Sync Strategy"
+  outputs="git fetch origin → view changes|git log HEAD..origin/main → confirm diff|Decide merge or rebase"
+  note="pull = fetch + merge. Separating them gives you choice: inspect first, then decide, not blind merge."
+/>
+
+
 Many teams are not confused by `git pull` itself. They are confused because pull combines “observe the remote” and “mutate the current branch” in one step. That is fast, but it reduces control.
 
 A safer default is:

@@ -1,0 +1,355 @@
+export const metadata = {
+  title: "交互式 rebase 中途出问题怎么救",
+  slug: "fix-broken-interactive-rebase",
+  locale: "zh",
+  section: "recovery",
+  summary: "交互式 rebase 过程中常见的错误（选错动作、冲突、编辑器问题）及恢复办法，包括 --abort、--edit-todo 和 reflog 找回。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rebase",
+    "https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History",
+  ],
+};
+
+# 交互式 rebase 中途出问题怎么救
+
+## 一句话理解
+
+<RebaseFigure
+  title="交互式 Rebase 的提交重排"
+  caption="交互式 rebase 让你在 replay 提交的过程中重新编排、修改、合并或丢弃提交。出问题时，Git 提供了 --abort、--edit-todo 和 reflog 等恢复手段。"
+  beforeLabel="rebase 前（原始提交链）"
+  afterLabel="rebase 后（重排后的新提交链）"
+  modeLabel="git rebase -i"
+/>
+
+
+交互式 rebase（`git rebase -i`）让你在 replay 提交的过程中重新编排、修改、合并或丢弃提交。出问题时，Git 提供了 `--abort`、`--edit-todo` 和 reflog 等多层恢复机制。
+
+## 交互式 rebase 在做什么
+
+```
+rebase 前:
+A --- B --- C --- D --- E (feature)
+       \
+        X --- Y (main)
+
+rebase 后:
+A --- B --- C --- D --- E (feature, 旧，即将被废弃)
+       \
+        X --- Y --- B' --- C' --- D' --- E' (feature, 新)
+```
+
+交互式 rebase 会打开一个编辑器，列出要 replay 的提交，每个提交前面有一个动作指令：
+
+```
+pick B    应用提交 B
+pick C    应用提交 C
+pick D    应用提交 D
+pick E    应用提交 E
+
+# Commands:
+# p, pick <commit> = 使用提交
+# r, reword <commit> = 使用提交，但修改提交信息
+# e, edit <commit> = 使用提交，但停下来修改
+# s, squash <commit> = 使用提交，但合并到前一个提交
+# f, fixup <commit> = 类似 squash，但丢弃此提交的日志信息
+# d, drop <commit> = 删除提交
+```
+
+## 场景一：rebase 进行中遇到冲突
+
+和普通的 rebase 或 cherry-pick 类似，如果 replay 某个提交时产生了冲突，rebase 会暂停。
+
+```bash
+$ git rebase -i HEAD~4
+# 编辑器保存后...
+
+$ git rebase main
+Auto-merging src/auth.js
+CONFLICT (content): Merge conflict in src/auth.js
+error: could not apply abc1234... feat: 更新认证逻辑
+hint: Resolve all conflicts manually, mark them as resolved with
+hint: "git add/rm <conflicted_files>", then run "git rebase --continue".
+hint: You can instead skip this commit with "git rebase --skip".
+hint: To abort and get back to the original branch before "git rebase",
+hint: run "git rebase --abort".
+
+$ git status
+interactive rebase in progress; onto def5678
+Last command done (1 command done):
+   pick abc1234 feat: 更新认证逻辑
+Next commands to do (3 remaining commands):
+   pick bcd2345 fix: 修正边界条件
+   squash cde3456 feat: 添加错误处理
+  (use "git rebase --edit-todo" to view and edit)
+You are currently rebasing branch 'feature' on 'def5678'.
+  (fix conflicts and then run "git rebase --continue")
+  (use "git rebase --skip" to skip this patch)
+  (use "git rebase --abort" to check out the original branch)
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+        both modified:   src/auth.js
+```
+
+### 此时你有四个选择：
+
+**选择 A：解决冲突，继续 rebase**
+
+```bash
+# 1. 编辑冲突文件
+vim src/auth.js
+
+# 2. 标记已解决
+git add src/auth.js
+
+# 3. 继续
+git rebase --continue
+# Git 可能会让你编辑提交信息（如果是 edit/reword 动作）
+```
+
+**选择 B：跳过当前提交**
+
+```bash
+# 不应用当前这个有冲突的提交，继续处理后续的
+git rebase --skip
+```
+
+**选择 C：完全放弃 rebase**
+
+```bash
+# 回到 rebase 之前的状态
+git rebase --abort
+```
+
+**选择 D：修改 rebase 计划**
+
+```bash
+# 打开编辑器，修改剩余提交的 rebase 计划
+git rebase --edit-todo
+# 比如把某个 pick 改成 drop 或 squash
+# 保存后继续
+git rebase --continue
+```
+
+## 场景二：在 rebase -i 编辑器中选错动作
+
+### 误把 pick 写成了 drop
+
+```
+# 你本来想 pick 这个提交，不小心写成了 drop
+drop abc1234 feat: 重要的新功能  ← 这个提交会被丢弃！
+```
+
+**恢复方法**：
+
+```bash
+# 方法一：如果 rebase 还没完成
+git rebase --abort
+
+# 方法二：如果 rebase 已经完成，用 reflog 找回
+git reflog
+# 找到 rebase 前的状态
+# git reset --hard feature@{1}  或
+# git reset --hard <rebase前的SHA>
+```
+
+### squash 后丢失了提交信息
+
+```
+# squash 会合并提交信息，但你可能不小心删掉了重要的描述
+pick abc1234 feat: 基础框架
+squash bcd2345 fix: 修正问题
+```
+
+squash 后，编辑器会打开让你编辑合并后的提交信息。如果你不小心保存了一个不完整的提交信息：
+
+```bash
+# 修改最近一次提交的信息
+git commit --amend
+
+# 如果 rebase 已经全部完成
+git rebase -i HEAD~1  # 用 reword 修改
+```
+
+### 在 edit 动作时不知道怎么继续
+
+```
+# 你给某个提交选了 edit 动作，rebase 停下来后：
+$ git status
+interactive rebase in progress; onto def5678
+Last command done (1 command done):
+   edit abc1234 feat: 更新认证逻辑
+  (use "git commit --amend" to amend the commit)
+  (use "git rebase --continue" to continue)
+```
+
+```bash
+# 1. 修改文件
+vim src/auth.js
+git add src/auth.js
+
+# 2. 修改提交信息（可选）
+git commit --amend
+
+# 3. 继续 rebase
+git rebase --continue
+```
+
+## 场景三：编辑器问题
+
+### 编辑器打开后不会操作
+
+交互式 rebase 使用你的默认编辑器。如果不熟悉 Vim：
+
+```bash
+# 临时改用其他编辑器
+GIT_SEQUENCE_EDITOR="code --wait" git rebase -i HEAD~4
+
+# 或者设置全局默认编辑器
+git config --global core.editor "code --wait"  # VS Code
+git config --global core.editor "nano"          # nano
+git config --global core.editor "vim"           # vim
+```
+
+### 编辑器保存后 rebase 报错
+
+```bash
+$ git rebase -i HEAD~4
+error: invalid line 3: blahblah blahblah
+Could not execute editor
+```
+
+这通常是因为 rebase 计划文件中有语法错误。Git 会告诉你哪一行有问题。
+
+```bash
+# 修复方法
+git rebase --edit-todo
+# 修正错误行（确保动作是 pick/reword/edit/squash/fixup/drop）
+git rebase --continue
+```
+
+## 场景四：rebase 完成后结果不对
+
+rebase 顺利完成，但你发现结果不是你想要的。
+
+### 用 reflog 找回 rebase 前的状态
+
+```bash
+# 查看 reflog
+$ git reflog
+a1b2c3d (HEAD -> feature) HEAD@{0}: rebase (finish): returning to refs/heads/feature
+a1b2c3d HEAD@{1}: rebase (pick): feat: 添加错误处理
+b2c3d4e HEAD@{2}: rebase (pick): fix: 修正边界条件
+c3d4e5f HEAD@{3}: rebase (pick): feat: 更新认证逻辑
+d4e5f6a HEAD@{4}: rebase (start): checkout main
+e5f6a7b HEAD@{5}: checkout: moving from main to feature  ← rebase 前的位置！
+e5f6a7b (feature@{1}) feat: 最后一个提交（rebase 前）
+
+# 回到 rebase 前的状态
+git reset --hard e5f6a7b
+# 或
+git reset --hard feature@{1}
+```
+
+### 部分恢复
+
+如果只是某个特定的提交出了问题，可以从 reflog 中找到它的新 SHA，然后 cherry-pick 回正确的版本：
+
+```bash
+# 从 reflog 中找到旧提交的 SHA
+git reflog --all | grep "重要的提交信息"
+
+# cherry-pick 旧版本的提交
+git cherry-pick <old-sha>
+```
+
+## 场景五：rebase 到错误的分支上
+
+```bash
+# 不小心执行了
+git rebase -i main   # 本来想 rebase 到 develop
+
+# 恢复
+git rebase --abort   # 如果还在进行中
+
+# 如果已经完成了
+git reset --hard feature@{1}  # 回到 rebase 前
+git rebase -i develop          # 重新 rebase 到正确的分支
+```
+
+## 交互式 rebase 命令速查
+
+| 命令 | 作用 |
+|------|------|
+| `git rebase --continue` | 解决冲突/编辑后继续 |
+| `git rebase --abort` | 完全放弃，回到 rebase 前 |
+| `git rebase --skip` | 跳过当前提交 |
+| `git rebase --edit-todo` | 修改剩余的 rebase 计划 |
+| `git rebase --quit` | 停止 rebase 但保留当前进度（不回到 rebase 前） |
+
+`--quit` 和 `--abort` 的区别：
+- `--abort`：完全回到 rebase 之前的状态
+- `--quit`：停止 rebase，但保留已经 replay 的提交在当前分支上
+
+## 预防措施
+
+### 1. rebase 前创建备份分支
+
+```bash
+# 这是最重要的预防措施！
+git branch backup/feature-before-rebase
+```
+
+如果 rebase 搞砸了，随时可以：
+```bash
+git reset --hard backup/feature-before-rebase
+```
+
+### 2. 先用 `--no-commit` 式思维检查
+
+```bash
+# 先不交互，看看 rebase 会产生什么
+git log --oneline main..feature
+# 确认要 rebase 的提交列表
+```
+
+### 3. 在副本上试验
+
+```bash
+# 创建副本分支
+git checkout -b feature/rebase-trial
+# 在副本上试验 rebase
+git rebase -i HEAD~4
+# 确认结果满意后，删除原分支，重命名副本
+git branch -D feature
+git branch -m feature
+```
+
+### 4. 使用 `GIT_SEQUENCE_EDITOR` 自动化
+
+如果你知道要做什么操作，可以用脚本代替手动编辑：
+
+```bash
+# 把第 3 个提交改成 squash
+GIT_SEQUENCE_EDITOR="sed -i '3s/pick/squash/'" git rebase -i HEAD~4
+
+# 删除所有包含 "WIP" 的提交
+GIT_SEQUENCE_EDITOR="sed -i '/WIP/s/pick/drop/'" git rebase -i HEAD~10
+```
+
+## 快速决策流程图
+
+```
+rebase 出问题？
+      │
+  ┌───┴───┐
+ 还在进行中？   已经完成了？
+  │            │
+  ↓            ↓
+ 冲突？      reflog 找回
+  │            │
+  ├─ 解决 → --continue   git reflog
+  ├─ 不要 → --skip       git reset --hard <old-sha>
+  └─ 放弃 → --abort
+```

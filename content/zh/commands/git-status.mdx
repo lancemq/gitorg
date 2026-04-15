@@ -64,7 +64,7 @@ git status --short
 
 ## 典型用例
 
-- 在真正修改历史或文件之前，先用 `git status` 收集当前状态、差异或证据。
+- 在执行任何操作之前，先用 `git status` 确认工作区和暂存区的当前状态。
 - 把 `git status` 放进代码评审、排障和复盘流程，帮助团队对齐上下文。
 - 当你需要解释“现在仓库为什么会这样”时，让 `git status` 先输出可验证的信息。
 
@@ -85,5 +85,5 @@ git status --short
 
 - 大多数观察命令本身不改历史，但它看到的结果会受 HEAD、路径、提交范围或引用选择影响。
 - 如果 `git status` 的输出和预期不一致，先确认你看的到底是工作区、索引、当前分支，还是某个历史提交。
-- 把 `git status` 和 `git status`、`git log`、`git show` 组合使用，通常比单独看一个输出更稳。
+- 把 `git status` 和 `git diff`、`git log`、`git show` 组合使用，通常比单独看一个输出更稳。
 
