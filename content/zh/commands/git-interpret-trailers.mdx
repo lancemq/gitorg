@@ -1,0 +1,95 @@
+export const metadata = {
+  title: "git-interpret-trailers 教程",
+  slug: "git-interpret-trailers",
+  locale: "zh",
+  section: "commands",
+  summary: "解析、添加或规范化提交信息中的尾部字段（trailers），如 Co-authored-by、Signed-off-by。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-interpret-trailers",
+  ],
+};
+
+# git-interpret-trailers 教程
+
+## 一句话理解
+
+git-interpret-trailers 用于**解析、添加或规范化**提交信息中的尾部字段（trailers），比如 `Co-authored-by:`、`Signed-off-by:`、`Reviewed-by:` 等，让提交信息的元数据结构化且一致。
+
+## 什么时候适合用
+
+- 当你需要在提交信息末尾添加标准化的协作元数据（共同作者、审核人等）
+- 当你想自动化生成或校验提交信息中的 trailer 字段
+- 当你编写 Git hook 或 CI 脚本，需要解析提交信息中的结构化尾部
+
+## 基本示例
+
+```bash
+# 从标准输入解析 trailers
+echo "Fix login bug
+
+Signed-off-by: Alice <alice@example.com>
+Co-authored-by: Bob <bob@example.com>" | git interpret-trailers
+
+# 添加一个新的 trailer
+echo "Fix login bug" | git interpret-trailers --trailer "Reviewed-by: Carol <carol@example.com>"
+
+# 添加 Signed-off-by（自动使用 Git 配置中的用户名和邮箱）
+echo "Fix login bug" | git interpret-trailers --trailer "Signed-off-by=$(git config user.name) <$(git config user.email)>"
+
+# 解析某个提交的所有 trailers
+git show --no-patch --format=%B HEAD | git interpret-trailers --parse
+
+# 只提取特定类型的 trailer
+git log --format=%B -1 | git interpret-trailers --if-exists add --trailer "Acked-by:"
+```
+
+## 读这条命令时最该注意什么
+
+trailers 必须放在提交信息的**最后**，格式是 `Key: Value`，且前面通常有一个空行与其他正文分隔。interpret-trailers 会智能处理 trailers 的分组、去重和排序，但前提是它们符合标准的 trailer 格式。
+
+## 一个更稳的实践建议
+
+在团队协作中，建议统一 trailer 的命名规范（如统一用 `Co-authored-by` 而不是 `Co-Authored-By`），并在项目文档中说明。interpret-trailers 可以通过 `trailer.*` 配置项来定制行为，比如自动添加 `Signed-off-by` 或设置别名。
+
+## 补充理解角度
+
+- 常用 trailers：`Signed-off-by`、`Co-authored-by`、`Reviewed-by`、`Acked-by`、`Tested-by`
+- GitHub/GitLab 会自动识别 `Co-authored-by` 并在提交上显示共同作者
+- `git config trailer.sign.key "Signed-off-by"` 可以配置快捷别名
+- `git interpret-trailers --in-place` 可以直接修改文件中的 trailers
+
+## 这条命令在流程里解决什么问题
+
+提交信息不仅是"描述做了什么"，也是"记录协作关系"的载体。trailers 让提交信息具备了结构化元数据的能力：谁审核过、谁共同编写、谁测试过。interpret-trailers 把这些操作的复杂细节封装起来，让脚本和工具能以标准化的方式读写这些信息。
+
+## 典型用例
+
+- 在 PR merge 时自动添加 `Reviewed-by` 或 `Merged-by` trailer
+- 在 pair programming 后添加 `Co-authored-by` 记录共同作者
+- 在开源项目要求 DCO（Developer Certificate of Origin）时添加 `Signed-off-by`
+- 编写 pre-commit hook 校验提交信息是否包含必需的 trailers
+
+## 图例理解
+
+<CommandFlowFigure
+  title="interpret-trailers 的元数据视角"
+  caption="interpret-trailers 把提交信息的尾部转化为结构化数据，支持自动添加、解析和规范化。"
+  inputsLabel="提交信息"
+  inputs="提交标题|正文描述|尾部字段"
+  commandLabel="git interpret-trailers"
+  outputsLabel="结构化输出"
+  outputs="解析 trailers|添加新字段|规范化格式"
+  note="trailers 必须放在提交信息末尾，格式为 Key: Value，前面通常有空行。"
+/>
+
+## 特殊情况与边界
+
+- 如果提交信息中的 trailer 格式不规范（如缺少空行分隔），interpret-trailers 可能无法正确识别
+- 不同项目对 trailer 的命名有不同偏好，建议团队统一约定
+- `git commit --trailer` 是更高层的快捷方式，底层也依赖 interpret-trailers
+- 过于复杂的 trailer 操作可能需要配合 `git config trailer.*` 系列配置
+- 某些 Git 平台（如 GitHub）只识别特定的 trailer 名称（如 `Co-authored-by`），自定义 trailer 不会显示在 UI 上
+
+## 延伸阅读
+
+继续搭配 `git commit`、`git log --format`、`.gitconfig` 中的 `trailer.*` 配置一起看，理解如何把 trailers 融入日常提交工作流。

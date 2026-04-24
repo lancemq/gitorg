@@ -1,0 +1,193 @@
+export const metadata = {
+  title: "Signing Commits Workflow",
+  slug: "signing-commits-workflow",
+  locale: "en",
+  section: "workflows",
+  summary: "Use GPG or SSH to sign commits, establishing verifiable commit identity and a trusted collaboration chain.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work",
+    "https://docs.github.com/en/authentication/managing-commit-signature-verification",
+  ],
+};
+
+# Signing Commits Workflow
+
+## The short version
+
+Signed commits cryptographically sign each commit using a **GPG or SSH key**, letting collaborators verify that the commit truly came from the claimed author and preventing identity forgery and supply-chain attacks.
+
+## Why signed commits are needed
+
+In open-source projects and large teams, anyone can set arbitrary `user.name` and `user.email`. A malicious attacker can forge an identity to commit harmful code. Signed commits make **identity verifiable** and **history trustworthy**.
+
+```
+Unsigned commit:
+commit abc123
+Author: Alice <alice@example.com>
+  ← No proof this was actually Alice
+
+Signed commit:
+commit def456
+Author: Alice <alice@example.com>
+gpgsig: -----BEGIN PGP SIGNATURE-----
+  ← Can be verified with Alice's public key
+```
+
+## GPG signing workflow
+
+### 1. Generate a GPG key
+
+```bash
+# Generate a GPG key (RSA 4096 or Ed25519 recommended)
+gpg --full-generate-key
+
+# Select key type and size
+# Enter name and email (must match Git configuration)
+```
+
+### 2. Configure Git to use GPG
+
+```bash
+# List keys to get the Key ID
+gpg --list-secret-keys --keyid-format=long
+
+# Configure Git to use that key
+git config --global user.signingkey YOUR_KEY_ID
+
+# Sign all commits by default
+git config --global commit.gpgsign true
+
+# Sign tags
+git config --global tag.gpgsign true
+```
+
+### 3. Commit and push
+
+```bash
+# If commit.gpgsign is not enabled, manually sign a commit
+git commit -S -m "feat: add authentication"
+
+# Create a signed tag
+git tag -s v1.0.0 -m "Release version 1.0.0"
+
+# Verify commit signatures
+git log --show-signature
+
+# Verify tag signatures
+git tag -v v1.0.0
+```
+
+## SSH signing workflow (Git 2.34+)
+
+Compared to GPG, SSH signing is lighter and can reuse your existing SSH keys.
+
+```bash
+# Generate an SSH signing key (if you don't have one)
+ssh-keygen -t ed25519 -C "signing@example.com" -f ~/.ssh/git_signing_key
+
+# Configure Git to use SSH signing
+git config --global user.signingkey ~/.ssh/git_signing_key.pub
+git config --global gpg.format ssh
+
+# Tell Git which public keys are trusted
+git config --global gpg.ssh.allowedSignersFile ~/.ssh/allowed_signers
+
+# Add a trusted signer
+echo "$(git config user.email) $(cat ~/.ssh/git_signing_key.pub)" >> ~/.ssh/allowed_signers
+
+# Sign a commit
+git commit -S -m "feat: use ssh signing"
+```
+
+## Platform verification setup
+
+### GitHub
+
+```bash
+# Export GPG public key
+gpg --armor --export YOUR_KEY_ID
+# Or export SSH public key
+cat ~/.ssh/git_signing_key.pub
+
+# Copy to GitHub Settings -> SSH and GPG keys -> New GPG key / Signing Key
+```
+
+### GitLab
+
+```bash
+# Similarly export the public key and add it to GitLab Profile -> GPG Keys / SSH Keys
+# Signed commits will display a "Verified" badge in GitLab
+```
+
+## Team-enforced signing policy
+
+### Through GitHub branch protection
+
+```
+Settings -> Branches -> Branch protection rules
+  -> Require signed commits
+```
+
+### Through Git hook validation
+
+```bash
+# .git/hooks/commit-msg
+#!/bin/sh
+# Require all commits to be signed
+git verify-commit HEAD 2>/dev/null || {
+  echo "Error: Commit must be signed"
+  exit 1
+}
+```
+
+## Handling mixed scenarios
+
+### Some commits not signed
+
+```bash
+# Temporarily skip signing for a quick fix
+git commit --no-gpg-sign -m "chore: quick fix"
+
+# Only sign important commits
+git commit -S -m "feat: security-critical change"
+```
+
+### Multi-device usage
+
+```bash
+# Use the same GPG key on different devices
+# Export the key pair
+gpg --export-secret-keys --armor YOUR_KEY_ID > private.key
+
+# Import on another device
+gpg --import private.key
+
+# Securely delete the export file
+shred -u private.key
+```
+
+## Troubleshooting verification failures
+
+| Issue | Cause | Fix |
+|-------|-------|-----|
+| gpg failed to sign | GPG agent not running | `gpgconf --launch gpg-agent` |
+| key not found | Git-configured key ID is wrong | Check `user.signingkey` |
+| bad signature | Public key not uploaded to platform | Export the public key to GitHub/GitLab |
+| unable to verify | Public key not in allowed_signers | Check the allowedSignersFile for SSH signing |
+
+## Best practices summary
+
+1. **Enable signing by default**: Set `commit.gpgsign true` so signing becomes the default behavior
+2. **Protect private keys**: GPG/SSH private keys are identity credentials; protect them with strong passphrases
+3. **Set key expiration**: Even if the primary key does not expire, subkeys should have reasonable expiration dates
+4. **Back up keys**: Export and securely back up key pairs to avoid losing the ability to verify historical commits
+5. **Platform cross-recognition**: Ensure the public key is uploaded to all Git hosting platforms you use
+6. **Team-wide policy**: Consider requiring signed commits on core branches
+
+## Key takeaways
+
+1. Signed commits add a small amount of metadata, slightly increasing repository size
+2. The initial verification workflow may be tedious, but it is a one-time investment
+3. When enabling signing on an existing project, old unsigned commits do not automatically become verified
+4. If a key is compromised, revoke it immediately and generate a new one
+5. CI/CD automated commits typically do not need signing, but critical release tags should be signed

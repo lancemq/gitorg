@@ -1,0 +1,96 @@
+export const metadata = {
+  title: "git-difftool Tutorial",
+  slug: "git-difftool",
+  locale: "en",
+  section: "commands",
+  summary: "Use an external graphical tool to view diffs, improving code review and conflict comprehension efficiency.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-difftool",
+  ],
+};
+
+# git-difftool Tutorial
+
+## The short version
+
+git-difftool invokes your configured **external graphical diff tool** to view differences between the working tree, the index, or commits — more intuitive than command-line `git diff`.
+
+## When it is a good fit
+
+- When you need to visualize diffs across many files
+- When you want to leverage your IDE's diff view for more intuitive code review
+- When command-line diff output is too long to quickly locate key changes
+
+## Basic example
+
+```bash
+# Use the default configured diff tool to view working tree vs index
+git difftool
+
+# View index vs latest commit
+git difftool --staged
+
+# View diff between two commits
+git difftool HEAD~3 HEAD
+
+# Use difftool on a specific file
+git difftool src/app.js
+
+# Use a specific tool (even if it's not the default)
+git difftool --tool=vimdiff
+
+# List all available diff tools
+git difftool --tool-help
+```
+
+## What to watch most closely
+
+difftool's behavior **depends entirely on your configured external tool**. Different tools (VS Code, Beyond Compare, Kaleidoscope) have very different launch behaviors and interaction experiences. Make sure your team members understand which tool your project uses.
+
+## A safer working habit
+
+Standardize the team's default difftool configuration and document it in the project README or onboarding docs. This ensures everyone has a consistent experience when reviewing diffs, and makes it easier to reference specific changes during code review discussions.
+
+## Useful angles for understanding it
+
+- Configure the default tool: `git config --global diff.tool vscode`
+- Configure a tool's path: `git config --global difftool.vscode.cmd 'code --wait --diff $LOCAL $REMOTE'`
+- `--no-prompt` skips the confirmation prompt and opens the tool directly
+- `--dir-diff` mode can compare entire directory trees (supported by some tools)
+- `git difftool` and `git mergetool` usually share the same tool ecosystem
+
+## What problem this command solves in a workflow
+
+Command-line diff is efficient for simple changes, but when dealing with multiple files, complex refactors, or the need to pinpoint changes line-by-line, graphical diff tools with syntax highlighting, side-by-side comparison, and expand/collapse features significantly improve comprehension speed. difftool connects Git's diff computation with professional visualization tools.
+
+## Typical use cases
+
+- Quickly browsing all file changes before reviewing a large PR
+- Viewing the diff between both sides before resolving a merge conflict
+- Comparing the full change set between two historical versions to understand code evolution
+- Viewing differences for a specific file across branches
+
+## Diagram view
+
+<CommandFlowFigure
+  title="difftool external-tool view"
+  caption="difftool passes Git's diff data to an external graphical tool for a more intuitive review experience."
+  inputsLabel="Diff request"
+  inputs="working tree vs index|index vs HEAD|commit A vs commit B"
+  commandLabel="git difftool"
+  outputsLabel="External tool display"
+  outputs="Side-by-side comparison|Syntax highlighting|Line-level navigation|Expand/collapse"
+  note="difftool does not produce diffs itself; it only invokes an external tool to display diffs computed by Git."
+/>
+
+## Special cases and boundaries
+
+- If no default tool is configured, `git difftool` will prompt you to select one
+- Some tools (e.g., `vimdiff`) run in the terminal; others (e.g., `vscode`) require a GUI environment
+- `--trust-exit-code` makes difftool's exit code reflect the tool's own exit status
+- In CI/CD environments difftool is usually not suitable because there is no graphical interface
+- `difftool` does not modify any files; it is a read-only viewing tool
+
+## Related reading
+
+Read it alongside `git diff`, `git mergetool`, and `git log -p` to understand the boundaries between command-line and graphical diff viewing.

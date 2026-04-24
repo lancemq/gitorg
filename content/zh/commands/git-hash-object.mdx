@@ -1,0 +1,96 @@
+export const metadata = {
+  title: "git-hash-object 教程",
+  slug: "git-hash-object",
+  locale: "zh",
+  section: "commands",
+  summary: "计算文件或标准输入的 Git 对象 ID（SHA-1），帮助理解 Git 的内容寻址模型。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-hash-object",
+  ],
+};
+
+# git-hash-object 教程
+
+## 一句话理解
+
+git-hash-object 计算给定内容的 **Git 对象 ID（SHA-1）**，让你可以直接观察 Git 的**内容寻址**模型：相同内容始终产生相同的哈希，不同内容（即使只差一个字节）也会产生完全不同的哈希。
+
+## 什么时候适合用
+
+- 当你想理解 Git 的底层对象模型和内容寻址机制
+- 当你需要手动构造对象并计算其 SHA-1（如编写 Git 工具或脚本）
+- 当你想验证两个文件在 Git 眼中是否被认为是"相同内容"
+- 当你需要把文件直接写入对象数据库而不经过工作区和暂存区
+
+## 基本示例
+
+```bash
+# 计算一个文件的对象 ID（blob）
+git hash-object README.md
+# e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+
+# 从标准输入计算对象 ID
+echo "hello world" | git hash-object --stdin
+# 3b18e512dba79e4c8300dd08aeb37f8e728b8dad
+
+# 把文件直接写入对象数据库
+git hash-object -w README.md
+# -w（write）会把对象写入 .git/objects/
+
+# 计算树对象（tree）的 ID
+git hash-object -t tree --stdin-format
+
+# 计算带类型的对象 ID
+echo "hello" | git hash-object --stdin -t blob
+```
+
+## 读这条命令时最该注意什么
+
+hash-object 计算的是 **Git 对象的 ID**，不是普通文件的 SHA-1。Git 在计算 blob 对象的哈希时，会在文件内容前加上 `blob <size>\0` 的头信息。因此，`git hash-object file.txt` 的结果和 `sha1sum file.txt` 的结果**不同**。
+
+## 一个更稳的实践建议
+
+用 hash-object 做实验时，先用 `--stdin` 模式测试不同输入的哈希变化，观察 Git 内容寻址的特性。这能帮你建立对 Git 对象模型的直觉，但日常开发中几乎不需要手动使用这个命令。
+
+## 补充理解角度
+
+- Git 对象 ID = SHA-1("类型 大小\0 内容")
+- blob 类型用于文件内容，tree 类型用于目录结构，commit 类型用于提交
+- `git cat-file -t <hash>` 查看对象类型，`git cat-file -p <hash>` 查看对象内容
+- `git hash-object -w` 写入对象后，可以用 `git cat-file` 读取
+
+## 这条命令在流程里解决什么问题
+
+hash-object 是 Git **plumbing 命令**的核心之一，它揭示了 Git 最底层的设计原则：**内容寻址存储**。理解这个命令等于理解了为什么 Git 中"相同内容只存储一次"、为什么重命名文件不改变对象 ID、为什么分支只是指向提交的引用。
+
+## 典型用例
+
+- 教学演示：展示相同内容产生相同哈希，证明 Git 的内容寻址特性
+- 脚本开发：在自动化工具中手动构造并写入 Git 对象
+- 调试对象数据库：验证某个对象是否存在、内容是否正确
+- 理解 `git add` 的底层：当你 `git add` 时，Git 本质上就是在调用 `hash-object -w`
+
+## 图例理解
+
+<CommandFlowFigure
+  title="hash-object 的内容寻址视角"
+  caption="hash-object 展示 Git 的核心设计：内容本身决定其唯一标识（SHA-1），而不是文件名或路径。"
+  inputsLabel="输入内容"
+  inputs="文件内容|标准输入|对象头信息"
+  commandLabel="git hash-object"
+  outputsLabel="输出"
+  outputs="SHA-1 对象 ID|内容寻址唯一标识|可写入对象数据库"
+  note="Git 对象哈希包含类型和大小头信息，与普通 sha1sum 结果不同。"
+/>
+
+## 特殊情况与边界
+
+- hash-object 默认计算 blob 类型的对象 ID，可以用 `-t` 指定其他类型
+- 写入对象（`-w`）不会更新任何引用（分支、HEAD），对象写入后处于"悬空"状态
+- 悬空对象最终会被 `git gc` 清理，除非你创建了引用指向它们
+- 计算 commit 对象 ID 需要遵循严格的 commit 对象格式（包含 tree、parent、author、committer 等字段）
+- 大文件的 hash-object 计算可能较慢，因为需要读取完整内容
+
+## 延伸阅读
+
+继续搭配 `git cat-file`、`git mktree`、`git commit-tree` 一起看，这些是 Git plumbing 命令的核心组合，能帮你完整理解 Git 的对象模型。

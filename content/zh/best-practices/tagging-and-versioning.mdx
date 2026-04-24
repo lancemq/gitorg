@@ -1,0 +1,274 @@
+export const metadata = {
+  title: "标签与版本管理",
+  slug: "tagging-and-versioning",
+  locale: "zh",
+  section: "best-practices",
+  summary: "使用语义化版本（SemVer）和带注释标签建立清晰、可追踪的版本发布规范。",
+  sourceUrls: [
+    "https://semver.org/lang/zh-CN/",
+    "https://git-scm.com/book/en/v2/Git-Basics-Tagging",
+  ],
+};
+
+# 标签与版本管理
+
+## 一句话理解
+
+标签是 Git 中指向特定提交的**不可变引用**，最适合标记发布节点。配合**语义化版本规范（SemVer）**，能让版本号本身传达变更的性质和影响范围。
+
+## 语义化版本（SemVer）
+
+```
+版本格式：主版本号.次版本号.修订号（MAJOR.MINOR.PATCH）
+
+1.2.3
+│ │ │
+│ │ └── 修订号：向下兼容的问题修正
+│ └──── 次版本号：向下兼容的功能新增
+└────── 主版本号：不兼容的 API 修改
+
+示例：
+v1.0.0   → 首个正式版本
+v1.1.0   → 新增功能，向下兼容
+v1.1.1   → 修复 bug，向下兼容
+v2.0.0   → 破坏性变更，不兼容 v1.x
+```
+
+### 预发布版本
+
+```
+v1.0.0-alpha.1   → 内测版
+v1.0.0-beta.2    → 公测版
+v1.0.0-rc.1      → 候选发布版
+```
+
+## 标签类型选择
+
+### 轻量标签（Lightweight）
+
+```bash
+# 只是提交的别名，没有元数据
+git tag v1.0.0
+
+# 适用场景：临时标记、个人本地使用
+```
+
+### 带注释标签（Annotated）—— 推荐
+
+```bash
+# 包含标签名、标签信息、日期、签名者
+git tag -a v1.0.0 -m "Release version 1.0.0"
+
+# 查看标签信息
+git show v1.0.0
+
+# 适用场景：正式发布、所有团队协作场景
+```
+
+### 签名标签（Signed）
+
+```bash
+# 用 GPG 签名标签，可验证标签者身份
+git tag -s v1.0.0 -m "Release version 1.0.0"
+
+# 验证签名
+git tag -v v1.0.0
+```
+
+## 发布标签工作流
+
+### 发布前
+
+```bash
+# 1. 确认当前版本
+git describe --tags --abbrev=0
+# v1.1.2
+
+# 2. 查看自上次发布以来的变更
+git log v1.1.2..HEAD --oneline
+
+# 3. 根据变更类型决定版本号
+# 只有 bugfix → v1.1.3
+# 有新增功能 → v1.2.0
+# 有破坏性变更 → v2.0.0
+```
+
+### 发布时
+
+```bash
+# 1. 确保在正确的分支
+git checkout main
+git pull origin main
+
+# 2. 运行完整测试
+npm test
+npm run build
+
+# 3. 更新版本号（package.json 等）
+npm version patch   # 或 minor / major
+# 这会创建提交和标签
+
+# 4. 手动创建标签（如果不使用 npm version）
+git tag -a v1.2.0 -m "Release v1.2.0
+
+Features:
+- Add dark mode support
+- Improve search performance
+
+Fixes:
+- Fix login redirect issue
+- Fix memory leak in dashboard"
+
+# 5. 推送代码和标签
+git push origin main
+git push origin v1.2.0
+```
+
+### 发布后
+
+```bash
+# 1. 验证标签已推送
+git ls-remote --tags origin | grep v1.2.0
+
+# 2. 在 GitHub/GitLab 上创建 Release Notes
+# 建议包含：变更摘要、破坏性变更说明、迁移指南
+
+# 3. 如果发现问题，准备热修复分支
+git checkout -b hotfix/v1.2.1 v1.2.0
+```
+
+## 标签命名规范
+
+### 推荐格式
+
+```bash
+# 生产发布
+v1.0.0
+v1.2.3
+
+# 预发布
+v1.0.0-alpha.1
+v1.0.0-beta.2
+v1.0.0-rc.1
+
+# 部署标记（可选）
+deployed-v1.2.3-prod
+deployed-v1.2.3-staging
+```
+
+### 不推荐的做法
+
+```bash
+# 不要用日期作为版本号
+git tag 20240115   ❌
+
+# 不要混合格式
+git tag version-1.0   ❌
+git tag rel_1_0   ❌
+
+# 不要在同一提交上打多个相同含义的标签
+```
+
+## 标签管理与维护
+
+### 查看标签
+
+```bash
+# 列出所有标签
+git tag
+
+# 列出匹配模式的标签
+git tag -l "v1.2.*"
+
+# 按版本排序
+git tag -l "v*" --sort=-version:refname
+
+# 查看标签详情
+git show v1.2.0
+```
+
+### 删除标签
+
+```bash
+# 删除本地标签
+git tag -d v1.2.0
+
+# 删除远端标签
+git push origin --delete v1.2.0
+```
+
+### 同步标签
+
+```bash
+# 拉取所有远端标签
+git fetch --tags
+
+# 推送所有本地标签
+git push origin --tags
+
+# 只推送特定标签
+git push origin v1.2.0
+```
+
+## 与 CI/CD 集成
+
+```yaml
+# .github/workflows/release.yml
+name: Release
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Build and test
+        run: |
+          npm ci
+          npm test
+          npm run build
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+```
+
+## 版本变更决策树
+
+```
+自上次发布以来有什么变更？
+├── 只有 bugfix，无行为变更
+│   └── PATCH +1  → v1.1.2 → v1.1.3
+├── 有新增功能，但向下兼容
+│   └── MINOR +1  → v1.1.2 → v1.2.0
+├── 有 API 删除或行为不兼容变更
+│   └── MAJOR +1  → v1.1.2 → v2.0.0
+└── 什么都没有（空发布）
+    └── 不打标签
+```
+
+## 最佳实践总结
+
+1. **始终使用带注释标签**：轻量标签没有元数据，不适合正式发布
+2. **严格遵循 SemVer**：版本号不只是数字，它传达了兼容性承诺
+3. **每个发布一个标签**：不要遗漏标签，也不要给同一发布打多个标签
+4. **标签信息要详细**：说明变更内容，不要只写 "Release v1.0.0"
+5. **推送时包含标签**：`git push origin --tags` 不要忘
+6. **保护标签**：在 GitHub/GitLab 中设置标签保护规则
+7. **定期清理预发布标签**：alpha/beta 标签过多会造成混乱
+
+## 注意事项
+
+1. 标签一旦推送，**不要修改**。如果发现标签打错了，删除后重建，不要 force push 标签
+2. 移动标签（force push tag）会导致协作者本地标签与远端不一致
+3. 标签不是分支，不能直接在上面提交。要在标签指向的提交上新建分支才能继续开发
+4. 某些自动化工具依赖标签触发，标签命名必须和工具配置匹配
+5. 在 monorepo 中，考虑使用带前缀的标签（如 `@app/v1.0.0`）区分不同包

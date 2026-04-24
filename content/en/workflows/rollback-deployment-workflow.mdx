@@ -1,0 +1,222 @@
+export const metadata = {
+  title: "Rollback Deployment Workflow",
+  slug: "rollback-deployment-workflow",
+  locale: "en",
+  section: "workflows",
+  summary: "Combine Git tags, revert, and fast branch switching to build a safe and controllable deployment rollback process.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-revert",
+    "https://git-scm.com/docs/git-tag",
+  ],
+};
+
+# Rollback Deployment Workflow
+
+## The short version
+
+The rollback deployment workflow uses **tagged release points**, **rollback branches**, and **revert strategies** to let you return to the last stable version within minutes when a production issue is discovered, instead of scrambling in an emergency.
+
+## Rollback strategy selection
+
+```
+Scenario 1: Just deployed, issue found
+  → Roll back the deployment directly (e.g., k8s rollout undo)
+  → No Git-side changes needed
+
+Scenario 2: Deployment has been running for a while, code rollback needed
+  → Revert the problematic commits
+  → Or switch to the previous release tag
+
+Scenario 3: Serious incident, need to immediately restore the last complete version
+  → Quickly revert using the release tag
+  → Fix on a separate branch, then redeploy
+```
+
+## Tag-based rollback
+
+### Tag on every release
+
+```bash
+# Create an annotated tag for every release
+git tag -a v1.2.3 -m "Release v1.2.3 - feature X and bug fixes"
+git push origin v1.2.3
+
+# Also record deployment time
+git tag -a deployed-v1.2.3 -m "Deployed to production at 2024-01-15 14:30 UTC"
+```
+
+### Fast rollback to the previous version
+
+```bash
+# View recent release tags
+git tag -l "v*" --sort=-version:refname | head -5
+# v1.2.3
+# v1.2.2
+# v1.2.1
+
+# Emergency rollback: point the production branch to the previous version
+git checkout production
+git reset --hard v1.2.2
+git push --force-with-lease origin production
+
+# Safer approach: create a rollback branch
+git checkout -b rollback/v1.2.3 v1.2.2
+git push origin rollback/v1.2.3
+# Then configure the deployment system to point to rollback/v1.2.3
+```
+
+## Revert-based rollback
+
+### Single commit caused the issue
+
+```bash
+# Identify the problematic commit
+git log --oneline --graph -20
+
+# Revert that commit (creates a new undo commit without rewriting history)
+git revert abc1234
+
+# If there are conflicts, resolve and continue
+git add .
+git revert --continue
+
+# Push to the production branch
+git push origin main
+```
+
+### Multiple commits caused the issue
+
+```bash
+# Batch revert a range of commits
+git revert abc1234..def5678
+
+# Or revert individually
+git revert abc1234
+git revert def5678
+git revert ghi9012
+```
+
+### Revert of a revert (restore original functionality)
+
+```bash
+# Previously reverted a commit
+git revert abc1234  # Created commit xyz7890
+
+# Later the issue was fixed and you want to restore the original functionality
+git revert xyz7890  # Revert again, restoring the original abc1234 changes
+```
+
+## Hotfix branch workflow
+
+```bash
+# 1. Create a hotfix branch from the last stable tag
+git checkout -b hotfix/critical-fix v1.2.2
+
+# 2. Fix the issue and commit
+git add src/fix.js
+git commit -m "fix: resolve critical issue in payment flow"
+
+# 3. Tag a new patch version
+git tag -a v1.2.4 -m "Hotfix v1.2.4 - critical payment fix"
+
+# 4. Deploy
+git push origin hotfix/critical-fix
+git push origin v1.2.4
+
+# 5. Also merge back to the main branch
+git checkout main
+git merge hotfix/critical-fix
+git push origin main
+```
+
+## Deployment system coordination
+
+### Kubernetes rollback
+
+```bash
+# View rollout history
+kubectl rollout history deployment/myapp
+
+# Roll back to the previous version
+kubectl rollout undo deployment/myapp
+
+# Roll back to a specific revision
+kubectl rollout undo deployment/myapp --to-revision=3
+```
+
+### Docker image rollback
+
+```bash
+# Use an image with a specific tag
+kubectl set image deployment/myapp myapp=myrepo/app:v1.2.2
+
+# Or update Helm values
+helm upgrade myapp ./chart --set image.tag=v1.2.2
+```
+
+## Relationship between Git and the deployment system
+
+```
+Git layer:                        Deployment layer:
+main ──●──●──●──●──●──●──●      v1.2.3 is running
+       ↑        ↑    ↑          ↓ Issue found
+       │        │    │          Roll back to v1.2.2
+       │        │    └── v1.2.3
+       │        └── v1.2.2 ←──── Fast switch
+       └── v1.2.1
+
+# Git provides recoverable historical nodes
+# The deployment system handles fast switching of running versions
+```
+
+## Pre-rollback checklist
+
+```bash
+# 1. Confirm the currently running version
+git describe --tags --abbrev=0
+
+# 2. Confirm the previous stable version
+git tag -l "v*" --sort=-version:refname | head -2
+
+# 3. View the diff between the two versions
+git log --oneline v1.2.2..v1.2.3
+
+# 4. Confirm database migration compatibility
+# If v1.2.3 has database migrations, rolling back to v1.2.2 may require rolling back migrations too!
+
+# 5. Check configuration changes
+git diff v1.2.2..v1.2.3 -- config/
+```
+
+## Database migrations and rollback
+
+```bash
+# Save migration state before deployment
+# Write the migration version number into the tag annotation
+git tag -a v1.2.3 -m "Release v1.2.3
+Migration: add_user_preferences_table (timestamp: 20240115120000)
+Config: new feature flag enabled"
+
+# When rolling back, also roll back the database
+git checkout v1.2.2
+# Run database rollback script
+npm run db:migrate:down 20240115120000
+```
+
+## Best practices summary
+
+1. **Tag every release strictly**: Tags are the anchor points for rollback; do not skip them
+2. **Consistent tag naming**: Use Semantic Versioning
+3. **Prefer revert over reset**: Revert does not destroy shared history; it is safer
+4. **Keep rollback branches**: Do not force push the production branch directly; create a rollback branch first
+5. **Database migrations must be reversible**: Every migration should have a corresponding rollback script
+6. **Practice the rollback flow**: Regularly exercise rollback in a staging environment to ensure the process works
+7. **Record rollback reasons**: Note the reason for rollback in the rollback commit or tag for post-mortem analysis
+
+## Key takeaways
+
+1. Rollback is not the only way to undo a deployment; sometimes a forward fix is faster
+2. Force pushing the production branch is extremely risky; always use `--force-with-lease`
+3. If the problematic commit has already been built upon by others, revert will create new conflicts
+4. Roll back versions that include database schema changes with special caution
+5. Combine the deployment system's rollback capability (e.g., k8s rollback) with Git rollback for best results

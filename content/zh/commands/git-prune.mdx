@@ -1,0 +1,92 @@
+export const metadata = {
+  title: "git-prune 教程",
+  slug: "git-prune",
+  locale: "zh",
+  section: "commands",
+  summary: "清理不可达的 Git 对象，配合 gc 和 reflog 管理仓库对象生命周期。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-prune",
+  ],
+};
+
+# git-prune 教程
+
+## 一句话理解
+
+git-prune 删除对象数据库中所有**不再被任何引用指向**的对象（不可达对象），是 Git 垃圾回收的核心组成部分。
+
+## 什么时候适合用
+
+- 当你明确知道某些对象已不可达且不再需要，想立即释放空间
+- 当你在执行 `git gc` 前想单独执行清理步骤
+- 当你在恢复操作后确认已不需要旧的临时对象
+
+## 基本示例
+
+```bash
+# 删除所有不可达对象（默认只删除超过 2 周的）
+git prune
+
+# 立即删除所有不可达对象（不等待过期时间）
+git prune --expire=now
+
+# 模拟运行，查看会被删除哪些对象但不真正删除
+git prune --dry-run
+
+# 只保留被 HEAD 和分支指向的对象，删除其余一切
+git prune --expire=now
+
+# 查看当前有多少松散对象
+git count-objects -v
+```
+
+## 读这条命令时最该注意什么
+
+prune 是一个**破坏性命令**。一旦对象被删除，如果它们不被任何引用（分支、tag、reflog、stash）保留，就真的消失了。运行前务必确认你没有遗漏需要保留的内容。
+
+## 一个更稳的实践建议
+
+**不要直接运行 `git prune`**。日常使用中，让 `git gc` 自动处理对象清理即可，它会智能地判断哪些对象可以安全删除。如果你确实需要手动清理，先用 `git fsck` 检查对象状态，再用 `git prune --dry-run` 预览删除范围。
+
+## 补充理解角度
+
+- `git gc` 内部会调用 `git prune` 来完成对象清理
+- `--expire` 参数控制对象保留时间，默认 `2.weeks.ago`
+- `git prune-packed` 清理已经被 pack 文件包含的松散对象
+- `git reflog expire` 清理过期的 reflog 条目后，更多对象会变得不可达
+
+## 这条命令在流程里解决什么问题
+
+Git 的对象数据库只增不减（在正常操作下）。rebase、reset、amend 等操作会产生大量旧版本的提交对象，虽然它们不再被分支引用，但仍占用磁盘空间。prune 负责识别并删除这些真正的"垃圾"对象，是仓库维护的关键环节。
+
+## 典型用例
+
+- 清理因大量 rebase 操作产生的临时提交对象
+- 删除已合并分支后残留的旧提交树
+- 在仓库归档或备份前清理无用对象，减小体积
+- 配合 `git filter-repo` 清除大文件历史后，删除残留的大文件对象
+
+## 图例理解
+
+<CommandFlowFigure
+  title="prune 的对象清理视角"
+  caption="prune 遍历对象数据库，删除没有任何引用指向的不可达对象，释放存储空间。"
+  inputsLabel="对象数据库"
+  inputs="可达对象（有引用）|不可达对象（无引用）|松散对象"
+  commandLabel="git prune"
+  outputsLabel="结果"
+  outputs="保留可达对象|删除过期不可达对象|释放磁盘空间"
+  note="prune 是破坏性操作，删除的对象不可恢复。"
+/>
+
+## 特殊情况与边界
+
+- `git prune` 默认不删除最近 2 周内的不可达对象，这是为了防止你正在恢复中的对象被意外清理
+- reflog 会保留对象的可达性，所以即使分支引用移走了，reflog 仍然能保护对象一段时间
+- `git gc --prune=now` 是更常用的方式，它会先做 pack、再清理，比单独 `git prune` 更安全高效
+- 在团队协作中，prune 只影响本地仓库，不会删除远端的对象
+- 如果磁盘空间极度紧张，可以考虑 `git gc --aggressive`，它会做更深度的压缩
+
+## 延伸阅读
+
+继续搭配 `git gc`、`git fsck`、`git count-objects`、`git reflog` 一起看，理解对象生命周期、可达性和垃圾回收的完整机制。

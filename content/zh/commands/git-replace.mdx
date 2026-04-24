@@ -1,0 +1,92 @@
+export const metadata = {
+  title: "git-replace 教程",
+  slug: "git-replace",
+  locale: "zh",
+  section: "commands",
+  summary: "在不改写历史的情况下替换提交对象，用于拆分仓库或修正历史中的特定节点。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-replace",
+  ],
+};
+
+# git-replace 教程
+
+## 一句话理解
+
+git-replace 让你用一个新的提交对象**替换**历史中的某个提交，**不需要改写历史或 force push**。替换关系存储在 `refs/replace/` 命名空间中，其他操作透明地跟随替换后的对象。
+
+## 什么时候适合用
+
+- 当你需要修正历史中的某个提交，但无法 force push（如公共仓库）
+- 当你要把子目录拆分成独立仓库，同时保留历史关联
+- 当你需要把某个大文件从早期历史中替换为 Git LFS 指针
+
+## 基本示例
+
+```bash
+# 用一个新的提交替换旧提交
+git replace <old-commit> <new-commit>
+
+# 查看所有替换关系
+git replace -l
+
+# 删除某个替换
+git replace -d <old-commit>
+
+# 创建交互式替换（编辑提交内容）
+git replace --edit <commit>
+
+# 把替换关系转换为真正的历史改写（谨慎使用）
+# 先用 filter-branch 或 filter-repo 固化替换
+```
+
+## 读这条命令时最该注意什么
+
+replace 是一种**引用层面的映射**，不是真正的历史改写。它不会改变原有提交对象的 SHA-1，只是让 Git 在查找对象时自动跳转到替换对象。这意味着如果你把仓库 clone 到没有这些替换引用的环境，替换关系就会消失。
+
+## 一个更稳的实践建议
+
+replace 创建的替换关系默认**不会随 push 传播**。如果你需要让协作者也看到这些替换，需要额外推送替换引用：`git push origin refs/replace/*`。更稳妥的做法是在合适的时机用 `git filter-repo` 把替换固化为真正的历史改写。
+
+## 补充理解角度
+
+- `git replace` 利用的是 Git 的 **replace refs** 机制，位于 `refs/replace/` 命名空间
+- `git --no-replace-objects log` 可以查看**未替换**的原始历史
+- 替换可以是任意对象类型（tree 替换 tree、blob 替换 blob）
+- 与 grafts（嫁接）不同，replace 是更现代的机制，推荐优先使用
+
+## 这条命令在流程里解决什么问题
+
+replace 解决了一个核心矛盾：你需要"修改"历史中的某个节点，但又不能 force push（因为仓库是公共的、协作者众多，或需要保持历史签名完整性）。replace 在不移动任何分支引用的情况下，实现了对象级别的"透明替换"。
+
+## 典型用例
+
+- 把某个旧提交中的大文件替换为 LFS 指针，避免新 clone 时下载大文件
+- 修复一个历史提交中的错误信息或文件内容，同时保持后续所有提交的 SHA-1 不变
+- 在仓库拆分时，用 replace 把子目录的历史连接到新仓库
+- 把 grafts 迁移为更现代的 replace 机制
+
+## 图例理解
+
+<CommandFlowFigure
+  title="replace 的透明替换视角"
+  caption="replace 在 refs/replace/ 中建立映射，让 Git 操作透明地看到新对象，而原有对象保持不变。"
+  inputsLabel="原始对象"
+  inputs="旧提交|旧 tree|旧 blob"
+  commandLabel="git replace"
+  outputsLabel="透明映射"
+  outputs="refs/replace/ 映射|新提交透明可见|原有对象不受影响"
+  note="replace 是引用级别的映射，不是真正的历史改写。"
+/>
+
+## 特殊情况与边界
+
+- replace 关系默认只在本地生效，push 时不会自动包含
+- 大量 replace 引用可能会影响性能，因为每次对象查找都要检查替换表
+- 某些底层操作（如 `git cat-file`）默认遵循替换，但可以用 `--no-replace-objects` 查看原始对象
+- 如果你想让替换永久化，最终仍需要使用 `git filter-repo` 等工具真正改写历史
+- 签名的提交被替换后，签名验证通常会失败，因为替换后的内容变了
+
+## 延伸阅读
+
+继续搭配 `git filter-repo`、`git commit-tree`、`git hash-object` 一起看，理解对象替换与历史改写的本质区别和迁移路径。

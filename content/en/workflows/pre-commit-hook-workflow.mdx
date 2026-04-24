@@ -1,0 +1,272 @@
+export const metadata = {
+  title: "Pre-commit Hook Workflow",
+  slug: "pre-commit-hook-workflow",
+  locale: "en",
+  section: "workflows",
+  summary: "Use pre-commit hooks to automatically run checks before code enters the repository, guarding the first gate of code quality.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks",
+    "https://pre-commit.com/",
+  ],
+};
+
+# Pre-commit Hook Workflow
+
+## The short version
+
+A pre-commit hook triggers before `git commit` executes, letting you automatically run lint, tests, formatting checks, and more **before code officially enters Git history**, catching quality issues at the first gate.
+
+## Why pre-commit hooks are needed
+
+```bash
+# Without hooks
+git commit -m "feat: add feature"
+git push
+# CI fails! Code formatting is wrong, lint errors...
+# Back to local fixes, creating fix-up commits
+
+# With hooks
+git commit -m "feat: add feature"
+# pre-commit hook runs automatically
+# ❌ ESLint errors, commit blocked
+# Fix locally, then commit again
+# ✅ Checks pass, commit succeeds
+```
+
+## Basic hook configuration
+
+### Manual setup
+
+```bash
+# Enter the repository hooks directory
+cd .git/hooks
+
+# Create a pre-commit script
+cat > pre-commit << 'EOF'
+#!/bin/sh
+# Run linter
+echo "Running linter..."
+npm run lint
+if [ $? -ne 0 ]; then
+  echo "Lint failed. Commit aborted."
+  exit 1
+fi
+
+# Run formatting check
+echo "Checking formatting..."
+npm run format:check
+if [ $? -ne 0 ]; then
+  echo "Formatting check failed. Run 'npm run format' first."
+  exit 1
+fi
+
+# Run unit tests
+echo "Running tests..."
+npm test
+if [ $? -ne 0 ]; then
+  echo "Tests failed. Commit aborted."
+  exit 1
+fi
+EOF
+
+chmod +x pre-commit
+```
+
+### Using the pre-commit framework (recommended)
+
+```bash
+# Install pre-commit
+pip install pre-commit
+# or brew install pre-commit
+
+# Create a configuration file in the project root
+cat > .pre-commit-config.yaml << 'EOF'
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+
+  - repo: https://github.com/eslint/eslint
+    rev: v8.56.0
+    hooks:
+      - id: eslint
+        additional_dependencies: ['eslint@8.56.0']
+
+  - repo: local
+    hooks:
+      - id: custom-check
+        name: Custom Project Check
+        entry: ./scripts/check.sh
+        language: script
+        files: \\.py$
+EOF
+
+# Install hooks
+cd /path/to/your/repo
+pre-commit install
+
+# Run all hooks manually
+cd /path/to/your/repo
+pre-commit run --all-files
+```
+
+## Gradual adoption strategy
+
+### Stage 1: Non-blocking checks (warning mode)
+
+```bash
+# At first, let the hook only output warnings without blocking commits
+cat > .git/hooks/pre-commit << 'EOF'
+#!/bin/sh
+if ! npm run lint; then
+  echo "⚠️  Warning: Lint errors found. Please fix before pushing."
+  # Do not exit non-zero; allow the commit
+fi
+EOF
+```
+
+### Stage 2: Selective blocking
+
+```bash
+# Only check files staged for this commit
+staged_files=$(git diff --cached --name-only --diff-filter=ACM | grep '\.js$')
+
+if [ -n "$staged_files" ]; then
+  echo "$staged_files" | xargs npx eslint
+  if [ $? -ne 0 ]; then
+    exit 1
+  fi
+fi
+```
+
+### Stage 3: Full enforcement
+
+```bash
+# Full checks, blocking commits
+npm run lint
+npm run test:unit
+```
+
+## Checking only changed files
+
+```bash
+# Get the list of files staged for this commit
+staged_files=$(git diff --cached --name-only --diff-filter=ACM)
+
+# Only check relevant files
+if echo "$staged_files" | grep -q '\.py$'; then
+  echo "$staged_files" | grep '\.py$' | xargs python -m flake8
+fi
+```
+
+## Bypassing hooks in emergencies
+
+```bash
+# Temporarily skip the hook for an urgent fix
+git commit -m "hotfix: critical bug" --no-verify
+
+# Teams should have auditing and constraints around --no-verify usage
+```
+
+## Synchronizing hooks across a team
+
+### Problem: hooks live in .git/hooks and are not committed to the repository
+
+### Solution 1: Use the pre-commit framework
+
+`.pre-commit-config.yaml` can be committed to the repository; team members only need to run `pre-commit install`.
+
+### Solution 2: Custom initialization script
+
+```bash
+# scripts/setup-hooks.sh
+#!/bin/sh
+cp scripts/git-hooks/pre-commit .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+echo "Hooks installed."
+
+# package.json
+# "postinstall": "./scripts/setup-hooks.sh"
+```
+
+### Solution 3: core.hooksPath
+
+```bash
+# Place hooks in a repository-committable directory
+mkdir -p scripts/git-hooks
+cp .git/hooks/pre-commit scripts/git-hooks/
+
+# Configure Git to use that directory
+git config core.hooksPath scripts/git-hooks
+
+# Commit scripts/git-hooks/ to the repository
+```
+
+## Performance optimization
+
+### Fast checks first
+
+```bash
+#!/bin/sh
+# Run the fastest checks first, exit immediately on failure
+
+# 1. Check large files (fastest)
+if ! check-large-files; then exit 1; fi
+
+# 2. Check trailing whitespace
+if ! check-trailing-whitespace; then exit 1; fi
+
+# 3. Run lint (medium)
+if ! run-lint-on-staged; then exit 1; fi
+
+# 4. Run tests (slowest)
+if ! run-tests-related-to-staged; then exit 1; fi
+```
+
+### Parallel execution
+
+```bash
+#!/bin/sh
+# Run independent checks in parallel
+npm run lint &
+lint_pid=$!
+npm run typecheck &
+type_pid=$!
+
+wait $lint_pid
+lint_result=$?
+wait $type_pid
+type_result=$?
+
+if [ $lint_result -ne 0 ] || [ $type_result -ne 0 ]; then
+  exit 1
+fi
+```
+
+## Best practices summary
+
+1. **Fast checks first**: Put the fastest checks at the beginning and exit immediately on failure
+2. **Only check changes**: Do not run full checks; only check staged files
+3. **Gradual enablement**: Start with warnings and no blocking, then enforce after the team adapts
+4. **Provide a bypass**: Keep `--no-verify` as an emergency path, but with auditing
+5. **Unified configuration**: Use `.pre-commit-config.yaml` or `core.hooksPath` to ensure team consistency
+6. **Local and CI complement each other**: hooks guard the first gate; CI guards the last gate
+
+## Key takeaways
+
+1. Hook checks should not be too slow, or they will seriously degrade the development experience
+2. Hook scripts must be compatible across operating systems (macOS/Linux/Windows)
+3. Using the pre-commit framework works cross-platform and is the more recommended approach
+4. Hooks only take effect locally and cannot replace checks in CI/CD
+5. Team members need training on what to do when a hook fails

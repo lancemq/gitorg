@@ -1,0 +1,213 @@
+export const metadata = {
+  title: "改写历史前备份",
+  slug: "backup-before-rewrite",
+  locale: "zh",
+  section: "best-practices",
+  summary: "在执行 rebase、filter-repo 等改写历史操作前建立安全网，确保误操作后可恢复。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rebase",
+    "https://github.com/newren/git-filter-repo",
+  ],
+};
+
+# 改写历史前备份
+
+## 一句话理解
+
+改写历史（rebase、amend、filter-repo、reset 等）是**高风险操作**。在执行前建立一个**命名分支或标签**作为安全网，相当于给当前状态拍一张快照，失误时随时能回到原点。
+
+## 为什么必须备份
+
+```bash
+# 没有备份的 rebase
+git rebase -i HEAD~10
+# 操作过程中出错、冲突解决错误、误删提交...
+# 后悔莫及，原来的提交位置已经找不到了
+
+# 有备份的 rebase
+git branch backup-before-rebase  # 先备份
+git rebase -i HEAD~10
+# 出错了？没关系，随时回到备份点
+git reset --hard backup-before-rebase
+```
+
+## 备份策略
+
+### 策略 1：备份分支（最常用）
+
+```bash
+# 在开始改写前创建备份分支
+git branch backup/main-$(date +%Y%m%d-%H%M%S)
+
+# 或者更语义化的命名
+git branch backup/before-rebase-sprint-2024
+git branch backup/before-filter-repo-cleanup
+
+# 完成后如果一切顺利，可以删除备份
+git branch -d backup/main-20240115-143022
+```
+
+### 策略 2：备份标签（更持久）
+
+```bash
+# 标签不会被常规分支清理影响，更持久
+git tag backup/before-rebase-$(date +%Y%m%d)
+
+# 完成后删除
+git tag -d backup/before-rebase-20240115
+```
+
+### 策略 3：远端备份（最高安全性）
+
+```bash
+# 把当前状态推送到远端
+git push origin main:backup/main-$(date +%Y%m%d)
+
+# 这样即使本地仓库损坏，远端仍有备份
+```
+
+## 常见改写场景的备份清单
+
+### 交互式 Rebase
+
+```bash
+# 1. 备份
+git branch backup/before-rebase
+
+# 2. 执行 rebase
+git rebase -i HEAD~5
+
+# 3. 如果满意，删除备份
+git branch -d backup/before-rebase
+
+# 4. 如果不满意，恢复
+git reset --hard backup/before-rebase
+```
+
+### Amend 提交
+
+```bash
+# 即使是简单的 amend，也建议先标记位置
+git tag backup/before-amend
+git commit --amend
+
+# 后悔了就回来
+git reset --hard backup/before-amend
+```
+
+### Filter-repo（清理历史）
+
+```bash
+# filter-repo 是破坏性极强的操作，必须多重备份
+
+# 1. 本地备份分支
+git branch backup/before-filter-repo
+
+# 2. 远端备份
+git push origin main:backup/main-before-cleanup
+
+# 3. 文件系统备份（clone --mirror）
+git clone --mirror . ../repo-backup.git
+
+# 4. 执行 filter-repo
+git filter-repo --path src/old-module/ --invert-paths
+
+# 5. 验证结果正确后再清理备份
+```
+
+### 批量 Cherry-pick
+
+```bash
+# cherry-pick 多个提交时容易出错
+git branch backup/before-cherry-pick
+git cherry-pick abc1234 def5678 ghi9012
+
+# 如果冲突太多，直接放弃
+git cherry-pick --abort
+git reset --hard backup/before-cherry-pick
+```
+
+## 自动化备份脚本
+
+```bash
+# scripts/git-backup.sh
+#!/bin/sh
+action="$1"
+branch=$(git branch --show-current)
+timestamp=$(date +%Y%m%d-%H%M%S)
+backup_name="backup/${branch}-${action}-${timestamp}"
+
+git branch "$backup_name"
+echo "Created backup branch: $backup_name"
+echo "If something goes wrong, run:"
+echo "  git reset --hard $backup_name"
+```
+
+## 备份命名规范
+
+```bash
+# 推荐格式
+backup/<branch>-<action>-<YYYYMMDD-HHMMSS>
+
+# 示例
+backup/main-rebase-20240115-143022
+backup/feature-auth-filter-repo-20240115-160000
+backup/main-before-amend-20240115-102030
+
+# 避免
+backup1      # 不知道备份了什么
+old-main     # 不知道是什么时间点的
+tmp          # 容易被清理
+```
+
+## 清理备份
+
+```bash
+# 查看所有备份分支
+git branch | grep backup/
+
+# 删除确认安全的备份
+git branch -d backup/main-rebase-20240115-143022
+
+# 批量清理一周前的备份（谨慎使用）
+git branch | grep "backup/" | while read branch; do
+  # 检查备份分支的日期，旧的删除
+  # ...
+done
+```
+
+## 团队规范建议
+
+```bash
+# 在团队文档中明确规定：
+#
+# 以下操作必须创建备份：
+# - 任何交互式 rebase（git rebase -i）
+# - 修改已推送的提交（git commit --amend + force push）
+# - 历史清理（git filter-repo, BFG）
+# - 批量 cherry-pick（超过 3 个提交）
+# - 任何首次尝试的不熟悉操作
+#
+# 以下操作建议创建备份：
+# - 普通 rebase
+# - reset --hard
+# - 复杂的 merge 冲突解决
+```
+
+## 最佳实践总结
+
+1. **操作前必备份**：把创建备份变成肌肉记忆，不问"这次需要吗"
+2. **语义化命名**：备份名包含分支、操作和时间，一目了然
+3. **远端留一份**：重要操作同时推送到远端备份
+4. **验证后再清理**：不要急于删除备份，确保改写结果正确且稳定运行一段时间
+5. **团队统一规范**：把"操作前备份"写进入职文档和团队规范
+6. **利用 reflog**：即使没有备份，reflog 通常也能救急，但不要依赖它
+7. **定期演练恢复**：偶尔用备份分支做一次恢复演练，确保流程有效
+
+## 注意事项
+
+1. `git branch backup` 创建的是轻量引用，几乎不占空间，不要心疼
+2. 备份分支不会自动更新，它只是某个时间点的快照
+3. 在共享分支上改写历史后，协作者需要重新同步，备份分支可以帮助协调
+4. 对于 filter-repo 这种彻底改写的操作，文件系统级的 `--mirror` 克隆是最安全的
+5. 不要把备份分支推送到共享仓库的默认命名空间，用 `backup/` 前缀隔离

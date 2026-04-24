@@ -1,0 +1,98 @@
+export const metadata = {
+  title: "git-rerere 教程",
+  slug: "git-rerere",
+  locale: "zh",
+  section: "commands",
+  summary: "启用并重用冲突解决方案，减少重复解决相同冲突的工作量。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rerere",
+  ],
+};
+
+# git-rerere 教程
+
+## 一句话理解
+
+git-rerere（Reuse Recorded Resolution）会在你解决一次冲突后自动记录解决方案，下次遇到**相同冲突**时自动应用，省去重复手工解决的麻烦。
+
+## 什么时候适合用
+
+- 当你频繁 rebase 或 merge 长期分支，且相同冲突反复出现
+- 当你想在实验性合并后先保存冲突解法，再决定是否保留合并
+- 当你需要减轻团队多人协作时重复处理同类冲突的负担
+
+## 基本示例
+
+```bash
+# 在仓库中启用 rerere
+git config --global rerere.enabled true
+
+# 现在遇到合并冲突并解决后，Git 会自动记录你的解法
+git merge feature-branch
+# Auto-merging src/api.js
+# CONFLICT (content): Merge conflict in src/api.js
+# Recorded preimage for 'src/api.js'
+
+# 编辑文件解决冲突
+git add src/api.js
+# Resolved 'src/api.js' using previous resolution.
+# Recorded resolution for 'src/api.js'.
+git commit -m "Merge feature-branch"
+
+# 之后如果再次遇到相同冲突（比如 rebase 时）
+git rebase main
+# Auto-merging src/api.js
+# CONFLICT (content): Merge conflict in src/api.js
+# Resolved 'src/api.js' using previous resolution.
+# 冲突已经被自动解决！
+```
+
+## 读这条命令时最该注意什么
+
+rerere 记录的是**冲突内容的文本差异**，不是文件路径。如果同一处代码在另一个文件中出现相同冲突，rerere 也能自动应用。但它不会记录你为解决冲突而做的额外修改（比如调整代码风格），只记录冲突标记之间的选择结果。
+
+## 一个更稳的实践建议
+
+启用 rerere 后，**不要因为它自动解决了冲突就跳过 review**。自动应用的解法可能已经过时，建议始终打开文件确认结果是否符合当前上下文。
+
+## 补充理解角度
+
+- `git rerere status` 查看当前有哪些冲突已被记录
+- `git rerere diff` 查看 rerere 记录的冲突和解法
+- `git rerere forget <file>` 清除某个文件的记录，下次重新手工解决
+- `git rerere clear` 清除所有记录（通常在仓库重置后使用）
+
+## 这条命令在流程里解决什么问题
+
+rerere 解决的是"重复劳动"问题。在 rebase-heavy 或长分支维护的场景中，同一冲突可能因反复变基、合并而多次出现。rerere 把每次手工解决变成可复用的资产，显著降低协作摩擦。
+
+## 典型用例
+
+- 维护长期发布的 release 分支时，频繁把 hotfix 合并到多个版本分支
+- 在 feature 分支上反复 rebase 到最新 main，同一冲突多次出现
+- 尝试性合并后决定放弃，之后重新合并时复用之前的冲突解法
+
+## 图例理解
+
+<CommandFlowFigure
+  title="rerere 工作视角"
+  caption="rerere 在第一次手工解决后记录解法，后续遇到相同冲突时自动复用，减少重复劳动。"
+  inputsLabel="冲突场景"
+  inputs="rebase 产生冲突|merge 产生冲突|cherry-pick 产生冲突"
+  commandLabel="git rerere"
+  outputsLabel="结果"
+  outputs="记录冲突解法|后续自动复用|减少重复手工解决"
+  note="rerere 只记录冲突本身的解法，不记录冲突外的额外修改。"
+/>
+
+## 特殊情况与边界
+
+- rerere 默认是关闭的，需要手动启用（全局或仓库级）
+- 记录的解法存储在 `.git/rr-cache/` 中，不会被 push 到远端
+- 如果冲突上下文发生了变化（比如冲突附近的代码被修改），rerere 可能无法自动应用
+- 在团队协作中，rerere 是个人本地功能，每个开发者需要各自启用
+- 删除 `.git/rr-cache/` 或运行 `git rerere clear` 会丢失所有记录
+
+## 延伸阅读
+
+继续搭配 `git rebase`、`git merge`、`git mergetool` 一起看，理解在哪些高频冲突场景中最值得启用 rerere。

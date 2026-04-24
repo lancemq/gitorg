@@ -1,0 +1,274 @@
+export const metadata = {
+  title: "Tagging and Versioning",
+  slug: "tagging-and-versioning",
+  locale: "en",
+  section: "best-practices",
+  summary: "Use Semantic Versioning (SemVer) and annotated tags to establish clear, traceable release conventions.",
+  sourceUrls: [
+    "https://semver.org/",
+    "https://git-scm.com/book/en/v2/Git-Basics-Tagging",
+  ],
+};
+
+# Tagging and Versioning
+
+## The short version
+
+Tags are **immutable references** pointing to specific commits in Git, making them ideal for marking release points. Combined with **Semantic Versioning (SemVer)**, version numbers themselves communicate the nature and impact of changes.
+
+## Semantic Versioning (SemVer)
+
+```
+Version format: MAJOR.MINOR.PATCH
+
+1.2.3
+│ │ │
+│ │ └── Patch: backward-compatible bug fixes
+│ └──── Minor: backward-compatible new features
+└────── Major: incompatible API changes
+
+Examples:
+v1.0.0   → First stable release
+v1.1.0   → New feature, backward compatible
+v1.1.1   → Bug fix, backward compatible
+v2.0.0   → Breaking change, incompatible with v1.x
+```
+
+### Prerelease versions
+
+```
+v1.0.0-alpha.1   → Internal testing
+v1.0.0-beta.2    → Public beta
+v1.0.0-rc.1      → Release candidate
+```
+
+## Tag type selection
+
+### Lightweight tag
+
+```bash
+# Just an alias for a commit, no metadata
+git tag v1.0.0
+
+# Suitable for: temporary markers, personal local use
+```
+
+### Annotated tag — recommended
+
+```bash
+# Contains tag name, tag message, date, and tagger
+git tag -a v1.0.0 -m "Release version 1.0.0"
+
+# View tag details
+git show v1.0.0
+
+# Suitable for: official releases, all team collaboration scenarios
+```
+
+### Signed tag
+
+```bash
+# Sign the tag with GPG to verify the tagger's identity
+git tag -s v1.0.0 -m "Release version 1.0.0"
+
+# Verify the signature
+git tag -v v1.0.0
+```
+
+## Release tagging workflow
+
+### Before release
+
+```bash
+# 1. Confirm current version
+git describe --tags --abbrev=0
+# v1.1.2
+
+# 2. View changes since the last release
+git log v1.1.2..HEAD --oneline
+
+# 3. Determine the version number based on change types
+# Bug fixes only → v1.1.3
+# New features added → v1.2.0
+# Breaking changes → v2.0.0
+```
+
+### During release
+
+```bash
+# 1. Ensure you are on the correct branch
+git checkout main
+git pull origin main
+
+# 2. Run full tests
+npm test
+npm run build
+
+# 3. Update version numbers (package.json, etc.)
+npm version patch   # or minor / major
+# This creates a commit and a tag
+
+# 4. Manually create a tag (if not using npm version)
+git tag -a v1.2.0 -m "Release v1.2.0
+
+Features:
+- Add dark mode support
+- Improve search performance
+
+Fixes:
+- Fix login redirect issue
+- Fix memory leak in dashboard"
+
+# 5. Push code and tags
+git push origin main
+git push origin v1.2.0
+```
+
+### After release
+
+```bash
+# 1. Verify the tag was pushed
+git ls-remote --tags origin | grep v1.2.0
+
+# 2. Create Release Notes on GitHub/GitLab
+# Should include: change summary, breaking change notes, migration guide
+
+# 3. If an issue is found, prepare a hotfix branch
+git checkout -b hotfix/v1.2.1 v1.2.0
+```
+
+## Tag naming conventions
+
+### Recommended formats
+
+```bash
+# Production releases
+v1.0.0
+v1.2.3
+
+# Prereleases
+v1.0.0-alpha.1
+v1.0.0-beta.2
+v1.0.0-rc.1
+
+# Deployment markers (optional)
+deployed-v1.2.3-prod
+deployed-v1.2.3-staging
+```
+
+### Practices to avoid
+
+```bash
+# Do not use dates as version numbers
+git tag 20240115   ❌
+
+# Do not mix formats
+git tag version-1.0   ❌
+git tag rel_1_0   ❌
+
+# Do not apply multiple tags with the same meaning to the same commit
+```
+
+## Tag management and maintenance
+
+### Viewing tags
+
+```bash
+# List all tags
+git tag
+
+# List tags matching a pattern
+git tag -l "v1.2.*"
+
+# Sort by version
+git tag -l "v*" --sort=-version:refname
+
+# View tag details
+git show v1.2.0
+```
+
+### Deleting tags
+
+```bash
+# Delete a local tag
+git tag -d v1.2.0
+
+# Delete a remote tag
+git push origin --delete v1.2.0
+```
+
+### Syncing tags
+
+```bash
+# Fetch all remote tags
+git fetch --tags
+
+# Push all local tags
+git push origin --tags
+
+# Push a specific tag
+git push origin v1.2.0
+```
+
+## CI/CD integration
+
+```yaml
+# .github/workflows/release.yml
+name: Release
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Build and test
+        run: |
+          npm ci
+          npm test
+          npm run build
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+```
+
+## Version change decision tree
+
+```
+What changed since the last release?
+├── Bug fixes only, no behavior changes
+│   └── PATCH +1  → v1.1.2 → v1.1.3
+├── New features, backward compatible
+│   └── MINOR +1  → v1.1.2 → v1.2.0
+├── API removed or incompatible behavior changes
+│   └── MAJOR +1  → v1.1.2 → v2.0.0
+└── Nothing (empty release)
+    └── Do not tag
+```
+
+## Best practices summary
+
+1. **Always use annotated tags**: Lightweight tags have no metadata and are unsuitable for official releases
+2. **Strictly follow SemVer**: Version numbers are not just numbers; they communicate compatibility promises
+3. **One tag per release**: Do not skip tags, and do not apply multiple tags to the same release
+4. **Detailed tag messages**: Describe what changed; do not just write "Release v1.0.0"
+5. **Push tags when pushing**: Do not forget `git push origin --tags`
+6. **Protect tags**: Set tag protection rules in GitHub/GitLab
+7. **Clean up prerelease tags regularly**: Too many alpha/beta tags create clutter
+
+## Key takeaways
+
+1. Once a tag is pushed, **do not modify it**. If you realize a tag is wrong, delete and recreate it; do not force push the tag
+2. Moving a tag (force push tag) causes local tags to diverge from the remote
+3. Tags are not branches; you cannot commit directly on them. You must create a branch from the commit the tag points to in order to continue development
+4. Some automation tools depend on tags to trigger; tag names must match tool configurations
+5. In a monorepo, consider using prefixed tags (e.g., `@app/v1.0.0`) to distinguish different packages

@@ -1,0 +1,238 @@
+export const metadata = {
+  title: "Large File Handling Workflow",
+  slug: "large-file-handling-workflow",
+  locale: "en",
+  section: "workflows",
+  summary: "Use Git LFS, sparse checkout, and repository-splitting strategies to manage large files while keeping clone speed and history maintainable.",
+  sourceUrls: [
+    "https://git-lfs.com/",
+    "https://git-scm.com/docs/git-sparse-checkout",
+  ],
+};
+
+# Large File Handling Workflow
+
+## The short version
+
+Git is not designed to directly manage large files (binaries, videos, datasets, etc.). This workflow uses **Git LFS**, **sparse checkout**, and **repository-splitting strategies** to let repositories include large file resources while maintaining clone speed, history maintainability, and team collaboration efficiency.
+
+## Why large files should not go directly into Git
+
+```bash
+# Problems with directly committing large files
+git add dataset.csv      # 100MB
+git add model.bin        # 500MB
+git add demo-video.mp4   # 50MB
+
+# Consequences:
+# 1. Clones become extremely slow, increasing onboarding cost
+# 2. History carries these large files forever; even deletion doesn't reduce size
+# 3. Push/pull bandwidth consumption is high
+# 4. CI/CD checkout time increases
+```
+
+## Git LFS workflow
+
+### 1. Install and initialize
+
+```bash
+# Install Git LFS
+# macOS
+brew install git-lfs
+
+# Ubuntu/Debian
+sudo apt-get install git-lfs
+
+# Enable in the repository
+git lfs install
+```
+
+### 2. Track large file types
+
+```bash
+# Track all PSD files
+git lfs track "*.psd"
+
+# Track specific directories
+git lfs track "assets/videos/*"
+
+# Track specific files
+git lfs track "data/training-set.zip"
+
+# View current tracking rules
+git lfs track
+
+# Commit .gitattributes (LFS rules are stored here)
+git add .gitattributes
+git commit -m "chore: track large files with LFS"
+```
+
+### 3. Normal usage
+
+```bash
+# Add a large file (Git LFS handles it automatically)
+git add design-v2.psd
+git commit -m "design: add new mockup"
+
+# LFS objects are uploaded separately on push
+git push origin main
+# Uploading LFS objects: 100% (5/5), 150 MB | 10 MB/s, done
+```
+
+### 4. Migrate existing large files to LFS
+
+```bash
+# Install git-lfs-migrate
+# Migrate large files in history to LFS (rewrites history)
+git lfs migrate import --include="*.psd,*.zip,*.mp4" --everything
+
+# Migrate only a specific branch
+git lfs migrate import --include="*.bin" --include-ref=main
+
+# Push (requires force push)
+git push --force-with-lease origin main
+```
+
+## Sparse checkout pairing (for large repositories)
+
+```bash
+# Clone only the most recent history
+git clone --depth 1 --filter=blob:none https://github.com/org/large-repo.git
+
+cd large-repo
+
+# Enable sparse checkout
+git sparse-checkout init --cone
+
+# Only check out directories you need
+git sparse-checkout set src/ docs/ scripts/
+
+# Add more directories later
+git sparse-checkout add tests/
+
+# View current checkout scope
+git sparse-checkout list
+```
+
+## Repository-splitting strategies
+
+### Strategy A: Completely separate code and large files
+
+```
+project-code/        ← Pure code repository, lightweight
+  src/
+  tests/
+  docs/
+
+project-assets/      ← Large file repository using LFS
+  images/
+  videos/
+  models/
+```
+
+### Strategy B: Submodule reference
+
+```bash
+# Main repository
+cd project-code
+git submodule add https://github.com/org/project-assets.git assets
+
+# Clone including submodules
+git clone --recurse-submodules https://github.com/org/project-code.git
+```
+
+### Strategy C: Monorepo + path filtering
+
+```bash
+# Only clone directories you need (with sparse-checkout)
+git clone --filter=blob:none --no-checkout https://github.com/org/monorepo.git
+cd monorepo
+git sparse-checkout init --cone
+git sparse-checkout set packages/frontend
+git checkout
+```
+
+## Large file review checklist
+
+```bash
+# Check the largest files in the repository
+git rev-list --objects --all | \
+  git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' | \
+  awk '$1 == "blob" {print $3, $4}' | \
+  sort -rn | \
+  head -20
+
+# Check which commits introduced large files
+git log --all --format="%H %s" | \
+  while read hash msg; do
+    size=$(git diff-tree -r -c -M --no-commit-id $hash | \
+      awk '{print $4}' | \
+      xargs git cat-file -s 2>/dev/null | \
+      awk '{sum+=$1} END {print sum}')
+    echo "$size $hash $msg"
+  done | \
+  sort -rn | \
+  head -20
+```
+
+## Team guidelines
+
+### Pre-commit file size check
+
+```bash
+# .git/hooks/pre-commit
+#!/bin/sh
+max_size=$((10 * 1024 * 1024))  # 10MB
+
+staged_files=$(git diff --cached --name-only --diff-filter=ACM)
+for file in $staged_files; do
+  size=$(git cat-file -s :"$file" 2>/dev/null || echo 0)
+  if [ "$size" -gt "$max_size" ]; then
+    echo "Error: $file is larger than 10MB ($size bytes)"
+    echo "Please use Git LFS for large files."
+    exit 1
+  fi
+done
+```
+
+### .gitattributes template
+
+```gitattributes
+# Images
+*.psd filter=lfs diff=lfs merge=lfs -text
+*.ai filter=lfs diff=lfs merge=lfs -text
+*.sketch filter=lfs diff=lfs merge=lfs -text
+
+# Audio / video
+*.mp4 filter=lfs diff=lfs merge=lfs -text
+*.mov filter=lfs diff=lfs merge=lfs -text
+*.wav filter=lfs diff=lfs merge=lfs -text
+*.mp3 filter=lfs diff=lfs merge=lfs -text
+
+# Datasets and models
+*.zip filter=lfs diff=lfs merge=lfs -text
+*.tar.gz filter=lfs diff=lfs merge=lfs -text
+*.bin filter=lfs diff=lfs merge=lfs -text
+*.onnx filter=lfs diff=lfs merge=lfs -text
+*.pkl filter=lfs diff=lfs merge=lfs -text
+
+# Documents
+*.pdf filter=lfs diff=lfs merge=lfs -text
+```
+
+## Best practices summary
+
+1. **Prevention > remediation**: Configure LFS when initializing the repository; don't wait until large files have already polluted history
+2. **10MB line**: Regular files over 10MB should be considered for LFS
+3. **Separate code and large files**: Put large files in a separate repository or submodule whenever possible
+4. **Educate the team**: Make sure everyone knows how to use LFS correctly, or large files will still be committed directly
+5. **Monitor repository size**: Run inspection scripts regularly; address abnormal growth promptly
+6. **Adapt CI/CD**: Ensure the CI environment has git-lfs installed, otherwise checkout will fail
+
+## Key takeaways
+
+1. Git LFS has bandwidth and storage quota limits (GitHub/GitLab free tiers are limited)
+2. LFS files do not appear in a normal clone; you need `git lfs pull` or `GIT_LFS_SKIP_SMUDGE=1`
+3. Migrating history to LFS requires rewriting history (force push), affecting all collaborators
+4. Git hosting platforms vary in LFS support; verify platform compatibility
+5. Forked repositories need separate LFS configuration; they do not automatically inherit the parent's LFS objects

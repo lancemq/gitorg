@@ -1,0 +1,195 @@
+export const metadata = {
+  title: "Bisect-Friendly Commits",
+  slug: "bisect-friendly-commits",
+  locale: "en",
+  section: "best-practices",
+  summary: "Keep every commit independently buildable and testable so git bisect can efficiently locate the commit that introduced a problem.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-bisect",
+  ],
+};
+
+# Bisect-Friendly Commits
+
+## The short version
+
+`git bisect` quickly locates the commit that introduced a bug through binary search, but this requires **every commit in history to be independently buildable and testable**. If an intermediate commit is broken, bisect produces incorrect results.
+
+## Why bisect-friendly commits matter
+
+```bash
+# Scenario: main has a bug, but you don't know which commit introduced it
+# If history is bisect-friendly:
+git bisect start
+git bisect bad HEAD          # Current version has the bug
+git bisect good v1.0.0       # This version is good
+# Git automatically bisects; each checked-out commit builds and tests cleanly
+# Finally pinpoints the problematic commit
+
+# If history is not bisect-friendly:
+# Bisect stops at a commit that does not compile
+# Unable to determine if this commit is "good" or "bad"
+# Binary search is forced to abort
+```
+
+## Core principles of bisect-friendly commits
+
+### 1. Every commit builds independently
+
+```bash
+# ❌ Bad practice: committing incomplete code
+git add src/module-a.js   # Only half the changes committed
+git commit -m "wip: refactor"
+# Code does not compile at this point!
+
+# ✅ Good practice: ensure every commit builds and tests cleanly
+git add src/module-a.js src/module-b.js tests/
+git commit -m "refactor: extract validation logic"
+# Complete changes, compiles, tests pass
+```
+
+### 2. Tests committed together with code
+
+```bash
+# ❌ Bad practice: tests and implementation in separate commits
+git commit -m "feat: add payment flow"      # Implementation only
+git commit -m "test: add payment tests"     # Tests in the next commit
+
+# Problem: the first commit has no tests; bisect cannot verify it
+
+# ✅ Good practice: tests and implementation in the same commit
+git commit -m "feat: add payment flow with tests"
+```
+
+### 3. Configuration changes take effect together with code
+
+```bash
+# ❌ Bad practice: configuration and code do not match
+git commit -m "chore: update database schema"
+# Database changed but code not yet updated; system crashes
+
+git commit -m "feat: adapt code to new schema"
+# Intermediate state is unusable
+
+# ✅ Good practice: schema migration and code adaptation in one commit
+# Or use a compatibility strategy: first make code compatible with both old and new schema, then migrate
+```
+
+## Relationship between atomic commits and bisect-friendly commits
+
+```bash
+# Atomic commit = one intent, one commit
+# Bisect-friendly = every commit can be independently verified
+
+# These goals usually overlap, but sometimes require trade-offs:
+
+# Large refactoring scenario:
+# Option A: One big commit (atomic but harder to review)
+git commit -m "refactor: rewrite entire auth system"
+
+# Option B: Split into smaller commits (easier to review, but each must be buildable)
+git commit -m "refactor: extract auth interface"
+git commit -m "refactor: migrate login to new interface"
+git commit -m "refactor: migrate logout to new interface"
+git commit -m "refactor: remove old auth implementation"
+
+# Option B is more bisect-friendly but requires more effort to ensure intermediate states are usable
+```
+
+## Compatibility strategies for large changes
+
+### Strategy 1: Expand-Contract
+
+```bash
+# Phase 1: Expand (support both old and new approaches)
+git commit -m "feat: add new API alongside old API"
+# System remains usable
+
+git commit -m "feat: migrate callers to new API"
+# System remains usable
+
+# Phase 2: Contract (remove the old)
+git commit -m "refactor: remove deprecated old API"
+# System remains usable
+```
+
+### Strategy 2: Feature flags
+
+```bash
+# Include a feature flag in the commit, defaulting to off
+git commit -m "feat: add new search algorithm"
+# New algorithm is behind a flag, default uses old logic; system is usable
+
+git commit -m "feat: enable new search in staging"
+# Only enabled in staging
+
+git commit -m "feat: roll out new search to production"
+# Fully enabled
+```
+
+## Bisect with automated tests
+
+```bash
+# Write a bisect script that automatically determines good/bad
+cat > bisect-test.sh << 'EOF'
+#!/bin/sh
+npm run build || exit 125   # Cannot build = skip
+npm test || exit 1          # Tests fail = bad
+exit 0                      # Tests pass = good
+EOF
+chmod +x bisect-test.sh
+
+# Run automated bisect
+git bisect start
+git bisect bad HEAD
+git bisect good v1.0.0
+git bisect run ./bisect-test.sh
+
+# Git automatically bisects, skipping commits that cannot build
+# Finally outputs the first bad commit
+```
+
+## Handling unavoidable WIP commits
+
+```bash
+# If history already contains incomplete commits, skip them during bisect
+git bisect start
+git bisect bad HEAD
+git bisect good v1.0.0
+
+# When bisect stops at a commit that cannot build
+git bisect skip
+# Git skips this commit and continues testing on other commits
+```
+
+## Team checklist
+
+```bash
+# Pre-commit self-check
+□ Run build: npm run build (or equivalent)
+□ Run tests: npm test
+□ Run lint: npm run lint
+□ Confirm no missing files: git status
+
+# If CI finds a build failure after committing
+□ Fix immediately or revert
+□ Do not leave "fix build" commits until the next day
+```
+
+## Best practices summary
+
+1. **Run full build and tests before committing**: This is the minimum requirement for bisect-friendly history
+2. **Prefer atomic commits**: one intent per commit, reducing intermediate states
+3. **Use compatibility strategies for large refactors**: expand-contract or feature flags to avoid long periods of unavailability
+4. **Commit tests together with code**: do not let commits without tests enter history
+5. **Fix broken builds immediately**: prioritize fixing over accumulating fix-up commits
+6. **Enforce with CI**: use CI to prevent PRs with build failures from merging
+7. **Practice bisect regularly**: use `git bisect run` to verify whether history is truly bisect-friendly
+
+## Key takeaways
+
+1. Bisect-friendly does not mean every commit must be perfect; it means every commit must be **verifiable**
+2. Fully achieving bisect-friendly history in fast-moving projects has a cost; balance efficiency and quality
+3. If history is already messy, define a "bisect-trusted range" — e.g., only guarantee the last 3 months
+4. Some changes (such as database migrations) are inherently difficult to make usable at every intermediate step; `git bisect skip` is a reasonable choice in these cases
+5. Bisect-friendly commits also benefit `git cherry-pick` and `git revert`, giving you multiple advantages

@@ -1,0 +1,195 @@
+export const metadata = {
+  title: "二分友好的提交",
+  slug: "bisect-friendly-commits",
+  locale: "zh",
+  section: "best-practices",
+  summary: "保持每次提交独立可构建、可测试，让 git bisect 能高效定位引入问题的提交。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-bisect",
+  ],
+};
+
+# 二分友好的提交
+
+## 一句话理解
+
+`git bisect` 通过二分查找快速定位引入 bug 的提交，但这要求历史中的**每次提交都能独立构建和测试**。如果中间提交是坏的，bisect 就会给出错误结果。
+
+## 为什么需要 bisect-friendly 提交
+
+```bash
+# 场景：main 分支有 bug，但不知道是哪个提交引入的
+# 如果历史是 bisect-friendly 的：
+git bisect start
+git bisect bad HEAD          # 当前有 bug
+git bisect good v1.0.0       # 这个版本是好的
+# Git 自动二分，每次 checkout 的提交都能构建测试
+# 最终精确定位到问题提交
+
+# 如果历史不是 bisect-friendly 的：
+# bisect 停在了一个无法编译的提交上
+# 无法判断这个提交是 "good" 还是 "bad"
+# 二分查找被迫中断
+```
+
+## bisect-friendly 的核心原则
+
+### 1. 每次提交都独立可构建
+
+```bash
+# ❌ 不好的做法：提交不完整的代码
+git add src/module-a.js   # 只提交了一半的改动
+git commit -m "wip: refactor"
+# 此时代码无法编译！
+
+# ✅ 好的做法：确保每次提交后都能构建通过
+git add src/module-a.js src/module-b.js tests/
+git commit -m "refactor: extract validation logic"
+# 完整改动，能编译，测试通过
+```
+
+### 2. 测试与代码同时提交
+
+```bash
+# ❌ 不好的做法：测试和实现分开提交
+git commit -m "feat: add payment flow"      # 只有实现
+git commit -m "test: add payment tests"     # 测试在下一个提交
+
+# 问题：第一个提交没有测试，bisect 到此时无法验证
+
+# ✅ 好的做法：测试和实现放在同一提交
+git commit -m "feat: add payment flow with tests"
+```
+
+### 3. 配置变更与代码同时生效
+
+```bash
+# ❌ 不好的做法：配置和代码不匹配
+git commit -m "chore: update database schema"
+# 此时数据库变了，但代码还没更新，系统崩溃
+
+git commit -m "feat: adapt code to new schema"
+# 中间状态无法运行
+
+# ✅ 好的做法： schema 迁移和代码适配一起提交
+# 或者使用兼容策略：先让代码兼容新旧 schema，再迁移
+```
+
+## 原子提交与 bisect-friendly 的关系
+
+```bash
+# 原子提交 = 一个意图，一个提交
+# bisect-friendly = 每个提交都能独立验证
+
+# 这两个目标通常是重合的，但有时需要权衡：
+
+# 大型重构场景：
+# 选项 A：一个大提交（原子但不利于 review）
+git commit -m "refactor: rewrite entire auth system"
+
+# 选项 B：拆成多个小提交（利于 review，但要保证每个都可构建）
+git commit -m "refactor: extract auth interface"
+git commit -m "refactor: migrate login to new interface"
+git commit -m "refactor: migrate logout to new interface"
+git commit -m "refactor: remove old auth implementation"
+
+# 选项 B 更 bisect-friendly，但需要更多精力保证中间状态可用
+```
+
+## 大型改型的兼容策略
+
+### 策略 1：扩展-收缩（Expand-Contract）
+
+```bash
+# Phase 1: 扩展（兼容旧新两种方式）
+git commit -m "feat: add new API alongside old API"
+# 系统仍可用
+
+git commit -m "feat: migrate callers to new API"
+# 系统仍可用
+
+# Phase 2: 收缩（移除旧的）
+git commit -m "refactor: remove deprecated old API"
+# 系统仍可用
+```
+
+### 策略 2：功能开关
+
+```bash
+# 在提交中包含功能开关，默认关闭
+git commit -m "feat: add new search algorithm"
+# 新算法在 flag 后，默认走旧逻辑，系统可用
+
+git commit -m "feat: enable new search in staging"
+# 只在 staging 环境开启
+
+git commit -m "feat: roll out new search to production"
+# 全量开启
+```
+
+## bisect 配合自动化测试
+
+```bash
+# 编写一个 bisect 脚本，自动判断 good/bad
+cat > bisect-test.sh << 'EOF'
+#!/bin/sh
+npm run build || exit 125   # 无法构建 = skip
+npm test || exit 1          # 测试失败 = bad
+exit 0                      # 测试通过 = good
+EOF
+chmod +x bisect-test.sh
+
+# 运行自动化 bisect
+git bisect start
+git bisect bad HEAD
+git bisect good v1.0.0
+git bisect run ./bisect-test.sh
+
+# Git 会自动二分，跳过无法构建的提交
+# 最终输出第一个 bad 提交
+```
+
+## 处理不可避免的 WIP 提交
+
+```bash
+# 如果历史中已经存在不完整的提交，bisect 时跳过它们
+git bisect start
+git bisect bad HEAD
+git bisect good v1.0.0
+
+# 当 bisect 停在一个无法构建的提交时
+git bisect skip
+# Git 会跳过这个提交，继续在其他提交上测试
+```
+
+## 团队检查清单
+
+```bash
+# 提交前自检
+□ 运行构建：npm run build（或等价命令）
+□ 运行测试：npm test
+□ 运行 lint：npm run lint
+□ 确认没有遗漏文件：git status
+
+# 如果提交后 CI 发现构建失败
+□ 立即修复或 revert
+□ 不要把 "fix build" 提交留到第二天
+```
+
+## 最佳实践总结
+
+1. **提交前运行完整构建和测试**：这是 bisect-friendly 的最低要求
+2. **原子提交优先**：一个意图一个提交，减少中间状态
+3. **大重构用兼容策略**：扩展-收缩或功能开关，避免长时间不可用
+4. **测试与代码一起提交**：不要让无测试的提交进入历史
+5. **立即修复 broken build**：如果构建失败，优先修复而不是堆积修复提交
+6. **配置 CI 强制执行**：用 CI 阻止构建失败的 PR 合并
+7. **定期演练 bisect**：用 `git bisect run` 验证历史是否真的 bisect-friendly
+
+## 注意事项
+
+1. bisect-friendly 不等于每个提交都要完美，而是每个提交都要**可验证**
+2. 在快速发展的项目中，完全做到 bisect-friendly 有成本，需要在效率和质量之间权衡
+3. 如果历史已经混乱，可以划定 "bisect 可信范围"，比如只保证最近 3 个月的历史
+4. 有些变更（如数据库迁移）天生难以做到每个中间状态都可用，此时 `git bisect skip` 是合理选择
+5. bisect-friendly 提交也有利于 `git cherry-pick` 和 `git revert`，一举多得

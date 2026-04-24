@@ -1,0 +1,96 @@
+export const metadata = {
+  title: "git-difftool 教程",
+  slug: "git-difftool",
+  locale: "zh",
+  section: "commands",
+  summary: "使用外部图形化工具查看差异，提升代码审查和冲突理解效率。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-difftool",
+  ],
+};
+
+# git-difftool 教程
+
+## 一句话理解
+
+git-difftool 调用你配置的**外部图形化差异工具**来查看工作区、暂存区或提交之间的差异，比命令行 `git diff` 更直观。
+
+## 什么时候适合用
+
+- 当你需要可视化地比较大量文件的差异
+- 当你想利用 IDE 的 diff 视图进行更直观的代码审查
+- 当命令行 diff 输出太长、难以快速定位关键变更时
+
+## 基本示例
+
+```bash
+# 使用默认配置的差异工具查看工作区与暂存区的差异
+git difftool
+
+# 查看暂存区与最新提交的差异
+git difftool --staged
+
+# 查看两个提交之间的差异
+git difftool HEAD~3 HEAD
+
+# 对某个文件使用 difftool
+git difftool src/app.js
+
+# 使用指定工具（即使不是默认配置）
+git difftool --tool=vimdiff
+
+# 列出所有可用的差异工具
+git difftool --tool-help
+```
+
+## 读这条命令时最该注意什么
+
+difftool 的行为**完全取决于你配置的外部工具**。不同的工具（如 VS Code、Beyond Compare、Kaleidoscope）启动方式和交互体验差异很大。确保你的团队成员了解你们项目使用的工具配置。
+
+## 一个更稳的实践建议
+
+统一团队默认的 difftool 配置，并在项目 README 或 onboarding 文档中说明。这样可以确保所有人审查差异时有一致的体验，也方便在 code review 讨论中互相参照。
+
+## 补充理解角度
+
+- 配置默认工具：`git config --global diff.tool vscode`
+- 配置工具路径：`git config --global difftool.vscode.cmd 'code --wait --diff $LOCAL $REMOTE'`
+- `--no-prompt` 参数跳过确认提示，直接打开工具
+- `--dir-diff` 模式可以比较整个目录树（部分工具支持）
+- `git difftool` 和 `git mergetool` 通常共用一套工具生态
+
+## 这条命令在流程里解决什么问题
+
+命令行 diff 在处理简单变更时足够高效，但当涉及多文件、复杂重构或需要逐行精确定位时，图形化 diff 工具的语法高亮、并排对比、折叠展开等功能能大幅提升理解速度。difftool 把 Git 的差异计算与专业工具的展示能力连接起来。
+
+## 典型用例
+
+- 审查一个大型 PR 前，用 difftool 快速浏览所有文件变更
+- 解决 merge 冲突前，先用 difftool 查看冲突双方的差异
+- 比较两个历史版本之间的完整变更集，理解代码演进过程
+- 查看某个文件在不同分支上的差异
+
+## 图例理解
+
+<CommandFlowFigure
+  title="difftool 工作视角"
+  caption="difftool 把 Git 的差异数据传递给外部图形化工具，提供更直观的审查体验。"
+  inputsLabel="差异请求"
+  inputs="工作区 vs 暂存区|暂存区 vs HEAD|提交 A vs 提交 B"
+  commandLabel="git difftool"
+  outputsLabel="外部工具展示"
+  outputs="并排对比|语法高亮|行级定位|折叠展开"
+  note="difftool 本身不产生差异，只是调用外部工具来展示 Git 计算出的差异。"
+/>
+
+## 特殊情况与边界
+
+- 如果没有配置默认工具，`git difftool` 会提示你选择
+- 某些工具（如 `vimdiff`）是终端内的，某些（如 `vscode`）需要 GUI 环境
+- `--trust-exit-code` 参数会让 difftool 的退出码反映工具本身的退出状态
+- 在 CI/CD 环境中通常不适合使用 difftool，因为没有图形界面
+- `difftool` 不会修改任何文件，它是只读的查看工具
+
+## 延伸阅读
+
+继续搭配 `git diff`、`git mergetool`、`git log -p` 一起看，理解命令行和图形化两种差异查看方式的适用边界。

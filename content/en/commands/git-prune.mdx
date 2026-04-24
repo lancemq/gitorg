@@ -1,0 +1,92 @@
+export const metadata = {
+  title: "git-prune Tutorial",
+  slug: "git-prune",
+  locale: "en",
+  section: "commands",
+  summary: "Clean up unreachable Git objects, working with gc and reflog to manage repository object lifecycle.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-prune",
+  ],
+};
+
+# git-prune Tutorial
+
+## The short version
+
+git-prune deletes objects in the object database that are **no longer pointed to by any reference** (unreachable objects). It is a core component of Git garbage collection.
+
+## When it is a good fit
+
+- When you know certain objects are unreachable and no longer needed, and you want to free space immediately
+- When you want to run the cleanup step separately before running `git gc`
+- After recovery operations when you've confirmed you no longer need old temporary objects
+
+## Basic example
+
+```bash
+# Delete all unreachable objects (default: only those older than 2 weeks)
+git prune
+
+# Immediately delete all unreachable objects (do not wait for expiration)
+git prune --expire=now
+
+# Dry run: see which objects would be deleted without actually deleting them
+git prune --dry-run
+
+# Keep only objects pointed to by HEAD and branches, delete everything else
+git prune --expire=now
+
+# View current loose object count
+git count-objects -v
+```
+
+## What to watch most closely
+
+prune is a **destructive command**. Once objects are deleted, if they are not retained by any reference (branch, tag, reflog, stash), they are truly gone. Always confirm you are not overlooking content you need to keep before running it.
+
+## A safer working habit
+
+**Do not run `git prune` directly**. In daily use, let `git gc` automatically handle object cleanup; it intelligently determines which objects can be safely deleted. If you do need to manually clean up, first check object state with `git fsck`, then preview the deletion scope with `git prune --dry-run`.
+
+## Useful angles for understanding it
+
+- `git gc` internally invokes `git prune` to complete object cleanup
+- The `--expire` parameter controls how long objects are retained; the default is `2.weeks.ago`
+- `git prune-packed` cleans up loose objects that are already included in pack files
+- After `git reflog expire` cleans up expired reflog entries, more objects become unreachable
+
+## What problem this command solves in a workflow
+
+Git's object database only grows (under normal operations). Rebase, reset, amend, and similar operations produce many old versions of commit objects. Although they are no longer referenced by branches, they still consume disk space. prune identifies and deletes these true "garbage" objects, a key step in repository maintenance.
+
+## Typical use cases
+
+- Clean up temporary commit objects produced by extensive rebase operations
+- Delete old commit trees left over after merged branches are deleted
+- Clean up useless objects before archiving or backing up a repository to reduce size
+- After using `git filter-repo` to purge large file history, delete remaining large file objects
+
+## Diagram view
+
+<CommandFlowFigure
+  title="prune object-cleanup view"
+  caption="prune traverses the object database and deletes unreachable objects that have no references pointing to them, freeing storage space."
+  inputsLabel="Object database"
+  inputs="reachable objects (with refs)|unreachable objects (no refs)|loose objects"
+  commandLabel="git prune"
+  outputsLabel="Result"
+  outputs="Preserve reachable objects|Delete expired unreachable objects|Free disk space"
+  note="prune is a destructive operation; deleted objects cannot be recovered."
+/>
+
+## Special cases and boundaries
+
+- `git prune` does not delete unreachable objects created within the last 2 weeks by default, to protect objects you might still be recovering
+- reflog preserves object reachability, so even after a branch reference moves, the reflog still protects objects for a while
+- `git gc --prune=now` is more commonly used; it packs first and then cleans up, making it safer and more efficient than running `git prune` alone
+- In team collaboration, prune only affects the local repository; it does not delete objects on remotes
+- If disk space is extremely tight, consider `git gc --aggressive` for deeper compression
+
+## Related reading
+
+Read it alongside `git gc`, `git fsck`, `git count-objects`, and `git reflog` to understand the complete mechanism of object lifecycle, reachability, and garbage collection.

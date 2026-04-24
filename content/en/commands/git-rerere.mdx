@@ -1,0 +1,98 @@
+export const metadata = {
+  title: "git-rerere Tutorial",
+  slug: "git-rerere",
+  locale: "en",
+  section: "commands",
+  summary: "Enable and reuse conflict resolutions to reduce repeated manual work for the same conflicts.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rerere",
+  ],
+};
+
+# git-rerere Tutorial
+
+## The short version
+
+git-rerere (Reuse Recorded Resolution) records your conflict resolution after you solve it once, then automatically applies it the next time the **same conflict** appears, saving you from repeating manual work.
+
+## When it is a good fit
+
+- When you frequently rebase or merge long-lived branches and the same conflicts recur
+- When you want to save a resolution after an experimental merge before deciding whether to keep it
+- When you need to reduce the burden of repeatedly handling similar conflicts across a team
+
+## Basic example
+
+```bash
+# Enable rerere in the repository
+git config --global rerere.enabled true
+
+# After encountering a merge conflict and resolving it, Git automatically records your resolution
+git merge feature-branch
+# Auto-merging src/api.js
+# CONFLICT (content): Merge conflict in src/api.js
+# Recorded preimage for 'src/api.js'
+
+# Edit the file to resolve the conflict
+git add src/api.js
+# Resolved 'src/api.js' using previous resolution.
+# Recorded resolution for 'src/api.js'.
+git commit -m "Merge feature-branch"
+
+# Later, if the same conflict appears again (e.g., during rebase)
+git rebase main
+# Auto-merging src/api.js
+# CONFLICT (content): Merge conflict in src/api.js
+# Resolved 'src/api.js' using previous resolution.
+# Conflict was automatically resolved!
+```
+
+## What to watch most closely
+
+rerere records the **textual difference of the conflict**, not the file path. If the same conflict appears in a different file, rerere can still apply automatically. But it does not record extra modifications you made beyond resolving the conflict markers (such as code style adjustments) — only the choice between conflict markers.
+
+## A safer working habit
+
+After enabling rerere, **do not skip review just because it automatically resolved a conflict**. The automatically applied resolution may have become outdated; always open the file and confirm the result makes sense in the current context.
+
+## Useful angles for understanding it
+
+- `git rerere status` — view which conflicts have been recorded
+- `git rerere diff` — view the conflicts and resolutions that rerere has stored
+- `git rerere forget <file>` — clear the record for a file so you can resolve it manually next time
+- `git rerere clear` — clear all records (typically used after resetting a repository)
+
+## What problem this command solves in a workflow
+
+rerere solves the "repetitive work" problem. In rebase-heavy or long-branch maintenance scenarios, the same conflict may appear multiple times due to repeated rebasing or merging. rerere turns each manual resolution into a reusable asset, significantly reducing collaboration friction.
+
+## Typical use cases
+
+- When maintaining long-lived release branches and frequently merging hotfixes into multiple version branches
+- When repeatedly rebasing a feature branch onto the latest main and encountering the same conflicts
+- After an experimental merge where you want to save the resolution before deciding whether to keep the merge
+
+## Diagram view
+
+<CommandFlowFigure
+  title="rerere resolution-reuse view"
+  caption="rerere records your resolution after the first manual fix, then automatically reuses it when the same conflict appears again."
+  inputsLabel="Conflict scenarios"
+  inputs="rebase conflict|merge conflict|cherry-pick conflict"
+  commandLabel="git rerere"
+  outputsLabel="Result"
+  outputs="Record resolution|Subsequent auto-reuse|Reduced manual repetition"
+  note="rerere only records the resolution of the conflict itself, not extra modifications outside the conflict."
+/>
+
+## Special cases and boundaries
+
+- rerere is disabled by default; you must enable it manually (globally or per repository)
+- Recorded resolutions are stored in `.git/rr-cache/` and are **not** pushed to remotes
+- If the conflict context has changed (e.g., nearby code was modified), rerere may fail to apply automatically
+- In team collaboration, rerere is a personal local feature; each developer must enable it individually
+- Deleting `.git/rr-cache/` or running `git rerere clear` will lose all recorded resolutions
+
+## Related reading
+
+Read it alongside `git rebase`, `git merge`, and `git mergetool` to understand which high-frequency conflict scenarios are most worth enabling rerere for.

@@ -1,0 +1,213 @@
+export const metadata = {
+  title: "Backup Before Rewriting",
+  slug: "backup-before-rewrite",
+  locale: "en",
+  section: "best-practices",
+  summary: "Establish a safety net before executing history-rewriting operations like rebase or filter-repo so mistakes are recoverable.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rebase",
+    "https://github.com/newren/git-filter-repo",
+  ],
+};
+
+# Backup Before Rewriting
+
+## The short version
+
+History-rewriting operations (rebase, amend, filter-repo, reset, etc.) are **high-risk**. Before executing them, create a **named branch or tag** as a safety net — essentially taking a snapshot of the current state so you can return to the origin at any time if something goes wrong.
+
+## Why backup is essential
+
+```bash
+# Rebase without backup
+git rebase -i HEAD~10
+# Errors during the operation, conflict resolution mistakes, accidental commit deletion...
+# Too late; the original commit positions are already lost
+
+# Rebase with backup
+git branch backup-before-rebase  # Backup first
+git rebase -i HEAD~10
+# Made a mistake? No problem; return to the backup at any time
+git reset --hard backup-before-rebase
+```
+
+## Backup strategies
+
+### Strategy 1: Backup branch (most common)
+
+```bash
+# Create a backup branch before starting the rewrite
+git branch backup/main-$(date +%Y%m%d-%H%M%S)
+
+# Or more semantic naming
+git branch backup/before-rebase-sprint-2024
+git branch backup/before-filter-repo-cleanup
+
+# After completion, if everything went well, delete the backup
+git branch -d backup/main-20240115-143022
+```
+
+### Strategy 2: Backup tag (more durable)
+
+```bash
+# Tags are not affected by regular branch cleanup; they are more durable
+git tag backup/before-rebase-$(date +%Y%m%d)
+
+# Delete after completion
+git tag -d backup/before-rebase-20240115
+```
+
+### Strategy 3: Remote backup (highest security)
+
+```bash
+# Push the current state to the remote
+git push origin main:backup/main-$(date +%Y%m%d)
+
+# Even if the local repository is corrupted, the remote still has a backup
+```
+
+## Backup checklist for common rewrite scenarios
+
+### Interactive rebase
+
+```bash
+# 1. Backup
+git branch backup/before-rebase
+
+# 2. Run rebase
+git rebase -i HEAD~5
+
+# 3. If satisfied, delete backup
+git branch -d backup/before-rebase
+
+# 4. If not satisfied, restore
+git reset --hard backup/before-rebase
+```
+
+### Amend commit
+
+```bash
+# Even for a simple amend, it is recommended to mark the position first
+git tag backup/before-amend
+git commit --amend
+
+# If you regret it, come back
+git reset --hard backup/before-amend
+```
+
+### Filter-repo (cleaning history)
+
+```bash
+# filter-repo is an extremely destructive operation; multiple backups are required
+
+# 1. Local backup branch
+git branch backup/before-filter-repo
+
+# 2. Remote backup
+git push origin main:backup/main-before-cleanup
+
+# 3. Filesystem backup (clone --mirror)
+git clone --mirror . ../repo-backup.git
+
+# 4. Run filter-repo
+git filter-repo --path src/old-module/ --invert-paths
+
+# 5. Verify results are correct before cleaning up backups
+```
+
+### Batch cherry-pick
+
+```bash
+# Cherry-picking multiple commits is error-prone
+git branch backup/before-cherry-pick
+git cherry-pick abc1234 def5678 ghi9012
+
+# If there are too many conflicts, just abort
+git cherry-pick --abort
+git reset --hard backup/before-cherry-pick
+```
+
+## Automated backup script
+
+```bash
+# scripts/git-backup.sh
+#!/bin/sh
+action="$1"
+branch=$(git branch --show-current)
+timestamp=$(date +%Y%m%d-%H%M%S)
+backup_name="backup/${branch}-${action}-${timestamp}"
+
+git branch "$backup_name"
+echo "Created backup branch: $backup_name"
+echo "If something goes wrong, run:"
+echo "  git reset --hard $backup_name"
+```
+
+## Backup naming conventions
+
+```bash
+# Recommended format
+backup/<branch>-<action>-<YYYYMMDD-HHMMSS>
+
+# Examples
+backup/main-rebase-20240115-143022
+backup/feature-auth-filter-repo-20240115-160000
+backup/main-before-amend-20240115-102030
+
+# Avoid
+backup1      # No idea what was backed up
+old-main     # No idea from what point in time
+tmp          # Easily cleaned up
+```
+
+## Cleaning up backups
+
+```bash
+# View all backup branches
+git branch | grep backup/
+
+# Delete backups that are confirmed safe
+git branch -d backup/main-rebase-20240115-143022
+
+# Bulk cleanup of backups older than one week (use with caution)
+git branch | grep "backup/" | while read branch; do
+  # Check backup branch dates, delete old ones
+  # ...
+done
+```
+
+## Team policy recommendations
+
+```bash
+# Document clearly in team documentation:
+#
+# The following operations must create a backup:
+# - Any interactive rebase (git rebase -i)
+# - Modifying already-pushed commits (git commit --amend + force push)
+# - History cleaning (git filter-repo, BFG)
+# - Batch cherry-pick (more than 3 commits)
+# - Any unfamiliar operation attempted for the first time
+#
+# The following operations are recommended to create a backup:
+# - Ordinary rebase
+# - reset --hard
+# - Complex merge conflict resolution
+```
+
+## Best practices summary
+
+1. **Backup before operating**: Make creating a backup muscle memory; do not ask "do I need one this time?"
+2. **Semantic naming**: Backup names include branch, operation, and time; clear at a glance
+3. **Keep a remote copy**: Push to the remote for important operations
+4. **Verify before cleaning**: Do not rush to delete backups; ensure the rewrite result is correct and has been stable for some time
+5. **Team-wide policy**: Write "backup before operating" into onboarding docs and team policies
+6. **Leverage reflog**: Even without a backup, the reflog can usually rescue you, but do not rely on it
+7. **Practice recovery periodically**: Occasionally use a backup branch to do a recovery drill to ensure the process works
+
+## Key takeaways
+
+1. `git branch backup` creates a lightweight reference that takes almost no space; do not hesitate
+2. Backup branches do not auto-update; they are just snapshots of a point in time
+3. After rewriting shared branch history, collaborators need to resync; backup branches can help coordinate
+4. For operations like filter-repo that completely rewrite history, a filesystem-level `--mirror` clone is the safest
+5. Do not push backup branches to the shared repository's default namespace; isolate them with a `backup/` prefix

@@ -1,0 +1,95 @@
+export const metadata = {
+  title: "git-interpret-trailers Tutorial",
+  slug: "git-interpret-trailers",
+  locale: "en",
+  section: "commands",
+  summary: "Parse, add, or normalize trailer fields in commit messages, such as Co-authored-by and Signed-off-by.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-interpret-trailers",
+  ],
+};
+
+# git-interpret-trailers Tutorial
+
+## The short version
+
+git-interpret-trailers is used to **parse, add, or normalize** trailer fields in commit messages, such as `Co-authored-by:`, `Signed-off-by:`, `Reviewed-by:`, etc., making commit-message metadata structured and consistent.
+
+## When it is a good fit
+
+- When you need to add standardized collaboration metadata (co-authors, reviewers, etc.) at the end of a commit message
+- When you want to automatically generate or validate trailer fields in commit messages
+- When you are writing Git hooks or CI scripts that need to parse structured trailers from commit messages
+
+## Basic example
+
+```bash
+# Parse trailers from stdin
+echo "Fix login bug
+
+Signed-off-by: Alice <alice@example.com>
+Co-authored-by: Bob <bob@example.com>" | git interpret-trailers
+
+# Add a new trailer
+echo "Fix login bug" | git interpret-trailers --trailer "Reviewed-by: Carol <carol@example.com>"
+
+# Add Signed-off-by (automatically uses Git-configured name and email)
+echo "Fix login bug" | git interpret-trailers --trailer "Signed-off-by=$(git config user.name) <$(git config user.email)>"
+
+# Parse all trailers from a commit
+git show --no-patch --format=%B HEAD | git interpret-trailers --parse
+
+# Extract only a specific trailer type
+git log --format=%B -1 | git interpret-trailers --if-exists add --trailer "Acked-by:"
+```
+
+## What to watch most closely
+
+Trailers must appear at the **end** of the commit message, in the format `Key: Value`, usually preceded by a blank line separating them from the body text. interpret-trailers intelligently handles grouping, deduplication, and sorting of trailers, but only if they conform to the standard trailer format.
+
+## A safer working habit
+
+In team collaboration, agree on a consistent naming convention for trailers (e.g., always use `Co-authored-by` rather than `Co-Authored-By`) and document it in the project docs. interpret-trailers can be customized via the `trailer.*` configuration to set behaviors such as automatically adding `Signed-off-by` or setting aliases.
+
+## Useful angles for understanding it
+
+- Common trailers: `Signed-off-by`, `Co-authored-by`, `Reviewed-by`, `Acked-by`, `Tested-by`
+- GitHub/GitLab automatically recognize `Co-authored-by` and display co-authors on the commit
+- `git config trailer.sign.key "Signed-off-by"` can configure shortcut aliases
+- `git interpret-trailers --in-place` can directly modify trailers in a file
+
+## What problem this command solves in a workflow
+
+A commit message is not just a description of what was done; it is also a carrier of "collaboration relationship" metadata. Trailers give commit messages structured metadata capabilities: who reviewed it, who co-authored it, who tested it. interpret-trailers encapsulates the complex details of these operations so scripts and tools can read and write this information in a standardized way.
+
+## Typical use cases
+
+- Automatically add `Reviewed-by` or `Merged-by` trailers when merging a PR
+- Add `Co-authored-by` after pair programming to record co-authors
+- Add `Signed-off-by` when an open-source project requires DCO (Developer Certificate of Origin)
+- Write a pre-commit hook that validates whether required trailers are present in the commit message
+
+## Diagram view
+
+<CommandFlowFigure
+  title="interpret-trailers metadata view"
+  caption="interpret-trailers transforms the end of a commit message into structured data, supporting automatic addition, parsing, and normalization."
+  inputsLabel="Commit message"
+  inputs="commit title|body description|trailer fields"
+  commandLabel="git interpret-trailers"
+  outputsLabel="Structured output"
+  outputs="Parse trailers|Add new fields|Normalize format"
+  note="Trailers must be at the end of the commit message, in Key: Value format, usually preceded by a blank line."
+/>
+
+## Special cases and boundaries
+
+- If a commit message's trailer format is not standard (e.g., missing the blank line separator), interpret-trailers may fail to recognize it correctly
+- Different projects prefer different trailer names; agree on conventions within your team
+- `git commit --trailer` is a higher-level shortcut that also relies on interpret-trailers under the hood
+- Complex trailer operations may require coordination with the `git config trailer.*` configuration family
+- Some Git platforms (e.g., GitHub) only recognize specific trailer names (such as `Co-authored-by`); custom trailers will not appear in the UI
+
+## Related reading
+
+Read it alongside `git commit`, `git log --format`, and the `trailer.*` configuration in `.gitconfig` to understand how to integrate trailers into your daily commit workflow.

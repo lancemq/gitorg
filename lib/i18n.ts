@@ -68,7 +68,13 @@ export type CommandSlug =
   | "git-gc"
   | "git-count-objects"
   | "git-verify-pack"
-  | "git-verify-tag";
+  | "git-verify-tag"
+  | "git-rerere"
+  | "git-difftool"
+  | "git-replace"
+  | "git-prune"
+  | "git-hash-object"
+  | "git-interpret-trailers";
 
 export type BestPracticeSlug =
   | "commit-hygiene"
@@ -92,7 +98,10 @@ export type BestPracticeSlug =
   | "code-review-handoff-quality"
   | "git-aliases"
   | "commit-message-advanced"
-  | "security-with-git";
+  | "security-with-git"
+  | "tagging-and-versioning"
+  | "bisect-friendly-commits"
+  | "backup-before-rewrite";
 
 export type WorkflowSlug =
   | "fetch-vs-pull"
@@ -133,7 +142,11 @@ export type WorkflowSlug =
   | "incident-retro-to-guardrail-workflow"
   | "pre-release-checklist"
   | "ci-optimization-with-git"
-  | "trunk-based-development";
+  | "trunk-based-development"
+  | "signing-commits-workflow"
+  | "pre-commit-hook-workflow"
+  | "large-file-handling-workflow"
+  | "rollback-deployment-workflow";
 
 export type GithubSlug =
   | "github-flow-basics"
@@ -637,6 +650,12 @@ export const commandSlugs = [
   "git-count-objects",
   "git-verify-pack",
   "git-verify-tag",
+  "git-rerere",
+  "git-difftool",
+  "git-replace",
+  "git-prune",
+  "git-hash-object",
+  "git-interpret-trailers",
 ] as const;
 
 export const basicCommandSlugs = [
@@ -707,6 +726,12 @@ export const advancedCommandSlugs = [
   "git-count-objects",
   "git-verify-pack",
   "git-verify-tag",
+  "git-rerere",
+  "git-difftool",
+  "git-replace",
+  "git-prune",
+  "git-hash-object",
+  "git-interpret-trailers",
 ] as const satisfies readonly CommandSlug[];
 
 export const bestPracticeSlugs = [
@@ -732,6 +757,9 @@ export const bestPracticeSlugs = [
   "git-aliases",
   "commit-message-advanced",
   "security-with-git",
+  "tagging-and-versioning",
+  "bisect-friendly-commits",
+  "backup-before-rewrite",
 ] as const satisfies readonly BestPracticeSlug[];
 
 export const workflowSlugs = [
@@ -774,6 +802,10 @@ export const workflowSlugs = [
   "pre-release-checklist",
   "ci-optimization-with-git",
   "trunk-based-development",
+  "signing-commits-workflow",
+  "pre-commit-hook-workflow",
+  "large-file-handling-workflow",
+  "rollback-deployment-workflow",
 ] as const satisfies readonly WorkflowSlug[];
 
 export const recoverySlugs = [
@@ -1539,6 +1571,30 @@ const zhDictionary: Dictionary = {
       { label: "复杂度", value: "中等偏高" },
       { label: "常见场景", value: "验证签名标签" },
     ],
+    "git-rerere": [
+      { label: "复杂度", value: "中等偏高" },
+      { label: "常见场景", value: "自动重用已解决的冲突方案" },
+    ],
+    "git-difftool": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "使用外部工具进行差异对比" },
+    ],
+    "git-replace": [
+      { label: "复杂度", value: "高" },
+      { label: "常见场景", value: "替换历史中的对象而不重写历史" },
+    ],
+    "git-prune": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "清理不可达对象和过期引用" },
+    ],
+    "git-hash-object": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "计算内容哈希并存储为 Git 对象" },
+    ],
+    "git-interpret-trailers": [
+      { label: "复杂度", value: "中等" },
+      { label: "常见场景", value: "解析和编辑提交尾部字段" },
+    ],
   },
 };
 
@@ -2248,6 +2304,30 @@ const enDictionary: Dictionary = {
     "git-verify-tag": [
       { label: "Complexity", value: "Medium to high" },
       { label: "Typical use", value: "Verify signed tags" },
+    ],
+    "git-rerere": [
+      { label: "Complexity", value: "Medium to high" },
+      { label: "Typical use", value: "Automatically reuse recorded conflict resolutions" },
+    ],
+    "git-difftool": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Compare changes with external diff tools" },
+    ],
+    "git-replace": [
+      { label: "Complexity", value: "High" },
+      { label: "Typical use", value: "Replace objects in history without rewriting it" },
+    ],
+    "git-prune": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Clean up unreachable objects and stale refs" },
+    ],
+    "git-hash-object": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Compute content hash and store as Git object" },
+    ],
+    "git-interpret-trailers": [
+      { label: "Complexity", value: "Medium" },
+      { label: "Typical use", value: "Parse and edit commit trailer fields" },
     ],
   },
 };

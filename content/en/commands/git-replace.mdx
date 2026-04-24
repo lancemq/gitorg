@@ -1,0 +1,92 @@
+export const metadata = {
+  title: "git-replace Tutorial",
+  slug: "git-replace",
+  locale: "en",
+  section: "commands",
+  summary: "Replace a commit object without rewriting history, useful for repository splitting or fixing specific nodes in history.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-replace",
+  ],
+};
+
+# git-replace Tutorial
+
+## The short version
+
+git-replace lets you **replace** a commit in history with a new commit object **without rewriting history or force pushing**. The replacement relationship is stored in the `refs/replace/` namespace, and other operations transparently follow the replacement.
+
+## When it is a good fit
+
+- When you need to fix a commit in history but cannot force push (e.g., a public repository)
+- When you want to split a subdirectory into its own repository while preserving historical connections
+- When you need to replace a large file in early history with a Git LFS pointer
+
+## Basic example
+
+```bash
+# Replace an old commit with a new one
+git replace <old-commit> <new-commit>
+
+# View all replacement relationships
+git replace -l
+
+# Delete a specific replacement
+git replace -d <old-commit>
+
+# Create an interactive replacement (edit commit content)
+git replace --edit <commit>
+
+# Convert replacement relationships into real history rewriting (use with caution)
+# First use filter-branch or filter-repo to materialize replacements
+```
+
+## What to watch most closely
+
+replace is a **reference-level mapping**, not actual history rewriting. It does not change the SHA-1 of the original commit object; it only makes Git automatically redirect to the replacement object when looking up objects. This means if you clone the repository to an environment without these replacement refs, the replacements disappear.
+
+## A safer working habit
+
+Replacement relationships created by replace are **not propagated on push** by default. If you need collaborators to see these replacements too, you must additionally push the replacement refs: `git push origin refs/replace/*`. A safer approach is to eventually use `git filter-repo` to materialize the replacements into actual rewritten history at the right time.
+
+## Useful angles for understanding it
+
+- `git replace` uses Git's **replace refs** mechanism in the `refs/replace/` namespace
+- `git --no-replace-objects log` lets you view the **original** un-replaced history
+- Replacements can be any object type (tree replacing tree, blob replacing blob)
+- Unlike grafts, replace is the more modern mechanism and is recommended over grafts
+
+## What problem this command solves in a workflow
+
+replace solves a core contradiction: you need to "modify" a node in history, but you cannot force push (because the repository is public, has many collaborators, or needs to preserve historical signature integrity). replace achieves object-level "transparent replacement" without moving any branch references.
+
+## Typical use cases
+
+- Replace a large file in an old commit with an LFS pointer to avoid downloading the large file on fresh clones
+- Fix incorrect information or file content in a historical commit while keeping all subsequent commit SHA-1s unchanged
+- When splitting a repository, use replace to connect the subdirectory's history to the new repository
+- Migrate grafts to the more modern replace mechanism
+
+## Diagram view
+
+<CommandFlowFigure
+  title="replace transparent-replacement view"
+  caption="replace creates a mapping in refs/replace/, letting Git operations transparently see the new object while the original object remains unchanged."
+  inputsLabel="Original object"
+  inputs="old commit|old tree|old blob"
+  commandLabel="git replace"
+  outputsLabel="Transparent mapping"
+  outputs="refs/replace/ mapping|new commit visible transparently|original object unaffected"
+  note="replace is a reference-level mapping, not actual history rewriting."
+/>
+
+## Special cases and boundaries
+
+- Replacement relationships only take effect locally by default; they are not automatically included on push
+- A large number of replacement refs may affect performance because every object lookup must check the replacement table
+- Some low-level operations (e.g., `git cat-file`) follow replacements by default, but `--no-replace-objects` lets you view the original object
+- If you want to make replacements permanent, you will still need tools like `git filter-repo` to actually rewrite history
+- Signed commits that are replaced will usually fail signature verification because the replacement changed the content
+
+## Related reading
+
+Read it alongside `git filter-repo`, `git commit-tree`, and `git hash-object` to understand the essential difference between object replacement and history rewriting, as well as migration paths between them.

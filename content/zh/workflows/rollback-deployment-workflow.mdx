@@ -1,0 +1,222 @@
+export const metadata = {
+  title: "部署回滚工作流",
+  slug: "rollback-deployment-workflow",
+  locale: "zh",
+  section: "workflows",
+  summary: "结合 Git 标签、revert 和快速分支切换，建立安全可控的部署回滚流程。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-revert",
+    "https://git-scm.com/docs/git-tag",
+  ],
+};
+
+# 部署回滚工作流
+
+## 一句话理解
+
+部署回滚工作流通过 **标签标记发布点**、**保留回滚分支**和**revert 策略**，让你在发现线上问题时能在几分钟内回到上一个稳定版本，而不是在紧急情况下手忙脚乱。
+
+## 回滚策略选择
+
+```
+场景 1：刚刚部署，发现问题
+  → 直接回退部署（如 k8s rollout undo）
+  → Git 侧不需要改动
+
+场景 2：部署已持续一段时间，需要代码回滚
+  → revert 有问题的提交
+  → 或切换到上一个发布标签
+
+场景 3：严重故障，需要立即恢复上一个完整版本
+  → 用发布标签快速切回
+  → 在独立分支上修复后重新部署
+```
+
+## 基于标签的回滚
+
+### 发布时打标签
+
+```bash
+# 每次发布都创建一个带注释的标签
+git tag -a v1.2.3 -m "Release v1.2.3 - feature X and bug fixes"
+git push origin v1.2.3
+
+# 同时记录部署时间
+git tag -a deployed-v1.2.3 -m "Deployed to production at 2024-01-15 14:30 UTC"
+```
+
+### 快速回滚到上一个版本
+
+```bash
+# 查看最近的发布标签
+git tag -l "v*" --sort=-version:refname | head -5
+# v1.2.3
+# v1.2.2
+# v1.2.1
+
+# 紧急回滚：把生产分支指向上一版本
+git checkout production
+git reset --hard v1.2.2
+git push --force-with-lease origin production
+
+# 更安全的做法：新建回滚分支
+git checkout -b rollback/v1.2.3 v1.2.2
+git push origin rollback/v1.2.3
+# 然后修改部署系统指向 rollback/v1.2.3
+```
+
+## 基于 Revert 的回滚
+
+### 单个提交导致的问题
+
+```bash
+# 定位有问题的提交
+git log --oneline --graph -20
+
+# revert 该提交（产生新的撤销提交，不破坏历史）
+git revert abc1234
+
+# 如果有冲突，解决后提交
+git add .
+git revert --continue
+
+# 推送到生产分支
+git push origin main
+```
+
+### 多个提交导致的问题
+
+```bash
+# 批量 revert 一段提交范围
+git revert abc1234..def5678
+
+# 或者逐个 revert
+git revert abc1234
+git revert def5678
+git revert ghi9012
+```
+
+### Revert 了 Revert（恢复之前的功能）
+
+```bash
+# 之前 revert 了一个提交
+git revert abc1234  # 产生了提交 xyz7890
+
+# 后来问题修复了，想恢复原来的功能
+git revert xyz7890  # 再次 revert，恢复原来的 abc1234 的改动
+```
+
+## 热修复分支工作流
+
+```bash
+# 1. 从上一个稳定标签创建热修复分支
+git checkout -b hotfix/critical-fix v1.2.2
+
+# 2. 修复问题并提交
+git add src/fix.js
+git commit -m "fix: resolve critical issue in payment flow"
+
+# 3. 打新的补丁版本标签
+git tag -a v1.2.4 -m "Hotfix v1.2.4 - critical payment fix"
+
+# 4. 部署
+git push origin hotfix/critical-fix
+git push origin v1.2.4
+
+# 5. 同时合并回主分支
+git checkout main
+git merge hotfix/critical-fix
+git push origin main
+```
+
+## 部署系统配合
+
+### Kubernetes 回滚
+
+```bash
+# 查看发布历史
+kubectl rollout history deployment/myapp
+
+# 回滚到上一个版本
+kubectl rollout undo deployment/myapp
+
+# 回滚到特定版本
+kubectl rollout undo deployment/myapp --to-revision=3
+```
+
+### Docker 镜像回滚
+
+```bash
+# 使用特定标签的镜像
+kubectl set image deployment/myapp myapp=myrepo/app:v1.2.2
+
+# 或修改 Helm values
+helm upgrade myapp ./chart --set image.tag=v1.2.2
+```
+
+## Git 与部署系统的关系
+
+```
+Git 层：                        部署层：
+main ──●──●──●──●──●──●──●      v1.2.3 正在运行
+       ↑        ↑    ↑          ↓ 发现问题
+       │        │    │          回滚到 v1.2.2
+       │        │    └── v1.2.3
+       │        └── v1.2.2 ←──── 快速切换
+       └── v1.2.1
+
+# Git 提供可回退的历史节点
+# 部署系统负责快速切换运行中的版本
+```
+
+## 回滚前检查清单
+
+```bash
+# 1. 确认当前运行的版本
+git describe --tags --abbrev=0
+
+# 2. 确认上一个稳定版本
+git tag -l "v*" --sort=-version:refname | head -2
+
+# 3. 查看两个版本之间的差异
+git log --oneline v1.2.2..v1.2.3
+
+# 4. 确认数据库迁移兼容性
+# 如果 v1.2.3 有数据库迁移，回滚到 v1.2.2 可能需要回滚迁移！
+
+# 5. 检查配置文件变更
+git diff v1.2.2..v1.2.3 -- config/
+```
+
+## 数据库迁移与回滚
+
+```bash
+# 部署前保存迁移状态
+# 把迁移版本号写入标签注释
+git tag -a v1.2.3 -m "Release v1.2.3
+Migration: add_user_preferences_table (timestamp: 20240115120000)
+Config: new feature flag enabled"
+
+# 回滚时同时回滚数据库
+git checkout v1.2.2
+# 运行数据库回滚脚本
+npm run db:migrate:down 20240115120000
+```
+
+## 最佳实践总结
+
+1. **每个发布都严格打标签**：标签是回滚的锚点，不可省略
+2. **标签命名统一**：使用语义化版本（Semantic Versioning）
+3. **优先 revert 而非 reset**：revert 不破坏共享历史，更安全
+4. **保留回滚分支**：不要直接 force push 生产分支，先创建回滚分支
+5. **数据库迁移要可逆**：每次迁移都要有对应的回滚脚本
+6. **演练回滚流程**：定期在 staging 环境演练回滚，确保流程有效
+7. **记录回滚原因**：在回滚提交或标签中说明回滚原因，便于复盘
+
+## 注意事项
+
+1. 回滚不是撤销部署的唯一方式，有时直接修复（forward fix）更快
+2. Force push 生产分支风险极高，务必使用 `--force-with-lease`
+3. 如果问题提交已经被其他人基于它继续开发，revert 会产生新的冲突
+4. 包含数据库 schema 变更的版本回滚需要特别谨慎
+5. 建议把部署系统的回滚能力（如 k8s rollback）与 Git 回滚配合使用

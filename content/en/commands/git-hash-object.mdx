@@ -1,0 +1,96 @@
+export const metadata = {
+  title: "git-hash-object Tutorial",
+  slug: "git-hash-object",
+  locale: "en",
+  section: "commands",
+  summary: "Compute the Git object ID (SHA-1) for a file or stdin, helping understand Git's content-addressing model.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-hash-object",
+  ],
+};
+
+# git-hash-object Tutorial
+
+## The short version
+
+git-hash-object computes the **Git object ID (SHA-1)** for given content, letting you directly observe Git's **content-addressing** model: identical content always produces the same hash, and different content (even a single byte difference) produces an entirely different hash.
+
+## When it is a good fit
+
+- When you want to understand Git's underlying object model and content-addressing mechanism
+- When you need to manually construct objects and compute their SHA-1 (e.g., when writing Git tools or scripts)
+- When you want to verify whether two files are considered "the same content" by Git
+- When you need to write a file directly into the object database without going through the working tree and index
+
+## Basic example
+
+```bash
+# Compute the object ID (blob) for a file
+git hash-object README.md
+# e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+
+# Compute the object ID from stdin
+echo "hello world" | git hash-object --stdin
+# 3b18e512dba79e4c8300dd08aeb37f8e728b8dad
+
+# Write the file directly into the object database
+git hash-object -w README.md
+# -w (write) writes the object into .git/objects/
+
+# Compute a tree object's ID
+git hash-object -t tree --stdin-format
+
+# Compute an object ID with an explicit type
+echo "hello" | git hash-object --stdin -t blob
+```
+
+## What to watch most closely
+
+hash-object computes a **Git object ID**, not a plain file SHA-1. When computing a blob object's hash, Git prepends a `blob <size>\0` header to the file content. Therefore, `git hash-object file.txt` and `sha1sum file.txt` produce **different** results.
+
+## A safer working habit
+
+When experimenting with hash-object, first use `--stdin` mode to test how the hash changes with different inputs, observing Git's content-addressing characteristics. This builds intuition about Git's object model, but you rarely need to use this command manually in daily development.
+
+## Useful angles for understanding it
+
+- Git object ID = SHA-1("type size\0 content")
+- blob type is for file content, tree type is for directory structure, commit type is for commits
+- `git cat-file -t <hash>` shows the object type; `git cat-file -p <hash>` shows the object content
+- After writing an object with `git hash-object -w`, you can read it with `git cat-file`
+
+## What problem this command solves in a workflow
+
+hash-object is one of the core **plumbing commands** in Git. It reveals Git's most fundamental design principle: **content-addressed storage**. Understanding this command means understanding why "the same content is stored only once" in Git, why renaming a file does not change its object ID, and why branches are just references pointing to commits.
+
+## Typical use cases
+
+- Teaching demonstration: show that identical content produces the same hash, proving Git's content-addressing property
+- Script development: manually construct and write Git objects in automation tools
+- Debugging the object database: verify whether an object exists and whether its content is correct
+- Understanding `git add`'s internals: when you `git add`, Git is essentially calling `hash-object -w`
+
+## Diagram view
+
+<CommandFlowFigure
+  title="hash-object content-addressing view"
+  caption="hash-object demonstrates Git's core design: content itself determines its unique identifier (SHA-1), not the filename or path."
+  inputsLabel="Input content"
+  inputs="file content|stdin|object header"
+  commandLabel="git hash-object"
+  outputsLabel="Output"
+  outputs="SHA-1 object ID|content-addressed unique identifier|writable to object database"
+  note="Git object hashes include type and size header information, which differs from plain sha1sum results."
+/>
+
+## Special cases and boundaries
+
+- hash-object defaults to computing a blob type object ID; you can specify other types with `-t`
+- Writing an object with `-w` does not update any references (branches, HEAD); the written object is "dangling"
+- Dangling objects will eventually be cleaned up by `git gc` unless you create references pointing to them
+- Computing a commit object ID requires following the strict commit object format (including tree, parent, author, committer, etc.)
+- Computing the hash-object for large files may be slow because the entire content must be read
+
+## Related reading
+
+Read it alongside `git cat-file`, `git mktree`, and `git commit-tree` — these form the core combination of Git plumbing commands and can give you a complete understanding of Git's object model.
