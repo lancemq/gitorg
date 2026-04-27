@@ -12,6 +12,15 @@ import {
 
 import type { SearchDoc } from "@/lib/content";
 import type { Locale } from "@/lib/i18n";
+import {
+  buildDisplayGroups,
+  expandQueryTerms,
+  getFallbackItems,
+  getQuickLinkItems,
+  scoreAndFilterDocs,
+  sectionLabels,
+  type SearchResult,
+} from "@/lib/search";
 
 type DocSearchProps = {
   label: string;
@@ -22,35 +31,6 @@ type SearchGroup = {
   id: string;
   title: string;
   items: SearchDoc[];
-};
-
-type SearchResult = SearchDoc & {
-  score: number;
-};
-
-const sectionLabels: Record<Locale, Record<SearchDoc["section"], string>> = {
-  zh: {
-    "learning-path": "学习路径",
-    commands: "命令专题",
-    "best-practices": "最佳实践",
-    workflows: "工作流",
-    github: "GitHub 专题",
-    gitlab: "GitLab 专题",
-    internals: "Git 原理",
-    recovery: "恢复手册",
-    concepts: "核心概念",
-  },
-  en: {
-    "learning-path": "Learning Path",
-    commands: "Commands",
-    "best-practices": "Best Practices",
-    workflows: "Workflows",
-    github: "GitHub",
-    gitlab: "GitLab",
-    internals: "Git Internals",
-    recovery: "Recovery",
-    concepts: "Concepts",
-  },
 };
 
 const emptyStates = {
@@ -81,16 +61,6 @@ const helperLabels = {
 const allFilterLabels = {
   zh: "全部",
   en: "All",
-};
-
-const quickLinkLabels = {
-  zh: "常用入口",
-  en: "Quick Links",
-};
-
-const recentLabels = {
-  zh: "最近访问",
-  en: "Recent Visits",
 };
 
 const emptySuggestionTitles = {
@@ -144,69 +114,7 @@ const tierLabels = {
   },
 } as const;
 
-const tierScoreBonus: Record<SearchDoc["tier"], number> = {
-  core: 5,
-  recommended: 2,
-  extended: 0,
-};
-
-const tierPriority: Record<SearchDoc["tier"], number> = {
-  core: 0,
-  recommended: 1,
-  extended: 2,
-};
-
-const searchSynonyms: Record<Locale, Record<string, string[]>> = {
-  zh: {
-    撤销: ["reset", "revert", "restore"],
-    回退: ["reset", "revert"],
-    恢复: ["reflog", "restore", "recovery"],
-    同步: ["fetch", "pull", "rebase"],
-    合并: ["merge", "rebase", "cherry-pick"],
-    变基: ["rebase"],
-    强推: ["push", "shared-history", "safe-push"],
-    暂存: ["add", "index", "staging"],
-    储藏: ["stash"],
-    冲突: ["merge", "rebase", "conflict"],
-    分支: ["branch", "switch", "checkout"],
-    标签: ["tag"],
-    远端: ["remote", "fetch", "push", "pull"],
-    对象: ["object", "database", "blob", "tree", "commit"],
-    原理: ["internals", "object", "refs", "commit-graph"],
-    历史: ["history", "rebase", "reflog", "log"],
-  },
-  en: {
-    undo: ["reset", "revert", "restore"],
-    rollback: ["reset", "revert"],
-    recover: ["reflog", "restore", "recovery"],
-    sync: ["fetch", "pull", "rebase"],
-    synchronize: ["fetch", "pull", "rebase"],
-    merge: ["merge", "rebase", "cherry-pick"],
-    rewrite: ["rebase", "commit", "history"],
-    stash: ["git-stash", "working-tree"],
-    branch: ["switch", "checkout", "branch"],
-    remote: ["fetch", "push", "pull", "origin"],
-    conflict: ["merge", "rebase", "conflict"],
-    internals: ["object", "refs", "commit-graph", "packfiles"],
-    history: ["log", "reflog", "rebase"],
-  },
-};
-
 const recentStorageKey = "git-org-academy-recent-searches";
-const sectionOrder: SearchDoc["section"][] = [
-  "learning-path",
-  "commands",
-  "workflows",
-  "best-practices",
-  "internals",
-  "concepts",
-  "recovery",
-];
-
-async function loadStaticSearchIndex(locale: Locale): Promise<SearchDoc[]> {
-  const { staticSearchIndex } = await import("@/lib/search-index-static");
-  return staticSearchIndex[locale] ?? [];
-}
 
 export function DocSearch({ label, locale }: DocSearchProps) {
   const pathname = usePathname();
@@ -237,18 +145,10 @@ export function DocSearch({ label, locale }: DocSearchProps) {
     () => normalizedQuery.split(/\s+/).filter(Boolean),
     [normalizedQuery],
   );
-  const expandedTerms = useMemo(() => {
-    if (!queryTokens.length) {
-      return [];
-    }
-
-    const synonyms = searchSynonyms[locale];
-    return Array.from(
-      new Set(
-        queryTokens.flatMap((token) => [token, ...(synonyms[token] ?? [])]),
-      ),
-    );
-  }, [locale, queryTokens]);
+  const expandedTerms = useMemo(
+    () => expandQueryTerms(queryTokens, locale),
+    [locale, queryTokens],
+  );
   const availableSections = useMemo(
     () =>
       Array.from(new Set(items.map((item) => item.section))).sort((a, b) =>
@@ -257,55 +157,10 @@ export function DocSearch({ label, locale }: DocSearchProps) {
     [items, locale],
   );
 
-  const results = useMemo<SearchResult[]>(() => {
-    const scopedItems =
-      activeSection === "all"
-        ? items
-        : items.filter((item) => item.section === activeSection);
-
-    if (!normalizedQuery) {
-      return scopedItems.slice(0, 8).map((item) => ({ ...item, score: 0 }));
-    }
-
-    return scopedItems
-      .map((item) => {
-        const haystack = [item.title, item.summary, item.slug, item.path]
-          .join(" ")
-          .toLowerCase();
-        const directTitleHit = item.title.toLowerCase().includes(normalizedQuery);
-        const directSlugHit = item.slug.toLowerCase().includes(normalizedQuery);
-        const directPathHit = item.path.toLowerCase().includes(normalizedQuery);
-        const directSummaryHit = item.summary.toLowerCase().includes(normalizedQuery);
-
-        const score = expandedTerms.reduce((total, term) => {
-          const titleHit = item.title.toLowerCase().includes(term);
-          const slugHit = item.slug.toLowerCase().includes(term);
-          const pathHit = item.path.toLowerCase().includes(term);
-          const summaryHit = item.summary.toLowerCase().includes(term);
-          const directTermBonus = term === normalizedQuery ? 3 : 0;
-
-          return (
-            total +
-            (titleHit ? 5 : 0) +
-            (slugHit ? 4 : 0) +
-            (pathHit ? 3 : 0) +
-            (summaryHit ? 2 : 0) +
-            (haystack.startsWith(term) ? 1 : 0) +
-            ((titleHit || slugHit || pathHit || summaryHit) ? directTermBonus : 0)
-          );
-        }, 0) +
-          (directTitleHit ? 6 : 0) +
-          (directSlugHit ? 4 : 0) +
-          (directPathHit ? 3 : 0) +
-          (directSummaryHit ? 2 : 0) +
-          tierScoreBonus[item.tier];
-
-        return { ...item, score };
-      })
-      .filter((item) => item.score > 0)
-      .sort((a, b) => b.score - a.score || a.title.localeCompare(b.title))
-      .slice(0, 8);
-  }, [activeSection, expandedTerms, items, normalizedQuery]);
+  const results = useMemo(
+    () => scoreAndFilterDocs(items, normalizedQuery, expandedTerms, activeSection),
+    [activeSection, expandedTerms, items, normalizedQuery],
+  );
   const recentItems = useMemo(
     () =>
       recentHrefs
@@ -314,75 +169,18 @@ export function DocSearch({ label, locale }: DocSearchProps) {
         .slice(0, 5),
     [items, recentHrefs],
   );
-  const quickLinkItems = useMemo(() => {
-    return sectionOrder
-      .map((section) =>
-        items
-          .filter((item) => item.section === section)
-          .sort((a, b) => tierPriority[a.tier] - tierPriority[b.tier])[0],
-      )
-      .filter((item): item is SearchDoc => Boolean(item))
-      .filter((item) => !recentItems.some((recentItem) => recentItem.href === item.href))
-      .slice(0, 6);
-  }, [items, recentItems]);
-  const fallbackItems = useMemo(() => {
-    if (!normalizedQuery || results.length > 0) {
-      return [];
-    }
-
-    const suggestions = expandedTerms
-      .filter((term) => term !== normalizedQuery)
-      .flatMap((term) =>
-        items.filter((item) =>
-          [item.title, item.summary, item.slug, item.path]
-            .join(" ")
-            .toLowerCase()
-            .includes(term),
-        ),
-      );
-
-    return Array.from(new Map(
-      [...suggestions, ...quickLinkItems].map((item) => [item.href, item]),
-    ).values()).slice(0, 4);
-  }, [expandedTerms, items, normalizedQuery, quickLinkItems, results.length]);
-  const displayGroups = useMemo<SearchGroup[]>(() => {
-    const isBrowsingState = !normalizedQuery && activeSection === "all";
-
-    if (isBrowsingState) {
-      return [
-        {
-          id: "recent",
-          title: recentLabels[locale],
-          items: recentItems,
-        },
-        {
-          id: "quick-links",
-          title: quickLinkLabels[locale],
-          items: quickLinkItems,
-        },
-      ].filter((group) => group.items.length > 0);
-    }
-
-    if (activeSection !== "all") {
-      return results.length
-        ? [
-            {
-              id: activeSection,
-              title: sectionLabels[locale][activeSection],
-              items: results,
-            },
-          ]
-        : [];
-    }
-
-    return availableSections
-      .map((section) => ({
-        id: section,
-        title: sectionLabels[locale][section],
-        items: results.filter((item) => item.section === section),
-      }))
-      .filter((group) => group.items.length > 0);
-  }, [activeSection, availableSections, locale, normalizedQuery, quickLinkItems, recentItems, results]);
+  const quickLinkItems = useMemo(
+    () => getQuickLinkItems(items, recentItems),
+    [items, recentItems],
+  );
+  const fallbackItems = useMemo(
+    () => getFallbackItems(items, normalizedQuery, expandedTerms, quickLinkItems),
+    [expandedTerms, items, normalizedQuery, quickLinkItems],
+  );
+  const displayGroups = useMemo<SearchGroup[]>(
+    () => buildDisplayGroups(results, normalizedQuery, activeSection, locale, recentItems, quickLinkItems),
+    [activeSection, locale, normalizedQuery, quickLinkItems, recentItems, results],
+  );
   const flatDisplayItems = useMemo(
     () => displayGroups.flatMap((group) => group.items),
     [displayGroups],
@@ -408,7 +206,7 @@ export function DocSearch({ label, locale }: DocSearchProps) {
           controller.abort("timeout");
         }, SEARCH_LOAD_TIMEOUT_MS);
 
-        const response = await fetch(`/api/search/${locale}`, {
+        const response = await fetch(`/search-index-${locale}.json`, {
           signal: controller.signal,
         });
 
@@ -426,30 +224,6 @@ export function DocSearch({ label, locale }: DocSearchProps) {
         if (shouldIgnore) {
           return;
         }
-
-        const wasTimeoutAbort =
-          controller.signal.aborted && controller.signal.reason === "timeout";
-
-        if (controller.signal.aborted && !wasTimeoutAbort) {
-          return;
-        }
-
-        try {
-          const fallbackItems = await loadStaticSearchIndex(locale);
-          if (shouldIgnore) {
-            return;
-          }
-
-          if (fallbackItems.length > 0) {
-            setItems(fallbackItems);
-            setHasLoaded(true);
-            setLoadError(false);
-            return;
-          }
-        } catch (fallbackError) {
-          console.error(fallbackError);
-        }
-
         console.error(error);
         setLoadError(true);
       } finally {

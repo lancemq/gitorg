@@ -4,7 +4,7 @@ import path from "node:path";
 const root = process.cwd();
 const contentRoot = path.join(root, "content");
 const contentTsPath = path.join(root, "lib", "content.ts");
-const outputPath = path.join(root, "lib", "search-index-static.ts");
+const publicDir = path.join(root, "public");
 
 function extractQuotedStrings(block) {
   return Array.from(block.matchAll(/"([^"]+)"/g), (match) => match[1]);
@@ -87,10 +87,11 @@ async function main() {
   );
 
   const locales = ["zh", "en"];
-  const index = {};
+
+  await fs.mkdir(publicDir, { recursive: true });
 
   for (const locale of locales) {
-    index[locale] = [];
+    const index = [];
 
     for (const docPath of docPathRegistry) {
       const filePath = path.join(contentRoot, locale, `${docPath}.mdx`);
@@ -101,7 +102,7 @@ async function main() {
       const summary = extractMetadataField(metadataBlock, "summary");
       const section = extractMetadataField(metadataBlock, "section");
 
-      index[locale].push({
+      index.push({
         href: getDocHref(locale, docPath),
         path: docPath,
         section,
@@ -112,15 +113,11 @@ async function main() {
         suggestions: [],
       });
     }
+
+    const outputPath = path.join(publicDir, `search-index-${locale}.json`);
+    await fs.writeFile(outputPath, JSON.stringify(index, null, 2), "utf8");
+    console.log(`Wrote ${outputPath} (${index.length} docs)`);
   }
-
-  const output = `import type { SearchDoc } from "@/lib/content";
-import type { Locale } from "@/lib/i18n";
-
-export const staticSearchIndex: Record<Locale, SearchDoc[]> = ${JSON.stringify(index, null, 2)};\n`;
-
-  await fs.writeFile(outputPath, output, "utf8");
-  console.log(`Wrote ${outputPath}`);
 }
 
 await main();
