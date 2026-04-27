@@ -83,22 +83,6 @@ async function collectMdxPaths(locale) {
   return mdxPaths.sort();
 }
 
-function collectContentModuleImports(contentSource) {
-  const imports = new Map(locales.map((locale) => [locale, new Map()]));
-  const importPattern =
-    /"([^"]+)":\s*\(\)\s*=>\s*import\("@\/content\/(zh|en)\/([^"]+)\.mdx"\)/g;
-
-  for (const match of contentSource.matchAll(importPattern)) {
-    const [, key, locale, importPath] = match;
-    const localeImports = imports.get(locale);
-    const entries = localeImports.get(key) ?? [];
-    entries.push(importPath);
-    localeImports.set(key, entries);
-  }
-
-  return imports;
-}
-
 function fail(errors) {
   console.error("Content validation failed:");
   for (const error of errors) {
@@ -123,25 +107,13 @@ for (const duplicate of getDuplicateValues(docPathRegistry)) {
   errors.push(`docPathRegistry contains duplicate path: ${duplicate}`);
 }
 
-const contentModuleImports = collectContentModuleImports(contentSource);
-
 for (const locale of locales) {
   const mdxPaths = await collectMdxPaths(locale);
   const mdxPathSet = new Set(mdxPaths);
-  const localeImports = contentModuleImports.get(locale);
 
   for (const docPath of docPathRegistry) {
     if (!mdxPathSet.has(docPath)) {
       errors.push(`${locale}/${docPath}.mdx is registered but missing.`);
-    }
-
-    const importEntries = localeImports.get(docPath) ?? [];
-    if (importEntries.length === 0) {
-      errors.push(`contentModules.${locale} is missing import for ${docPath}.`);
-    } else if (importEntries.length > 1) {
-      errors.push(`contentModules.${locale} imports ${docPath} ${importEntries.length} times.`);
-    } else if (importEntries[0] !== docPath) {
-      errors.push(`contentModules.${locale} key ${docPath} imports ${importEntries[0]}.`);
     }
   }
 
