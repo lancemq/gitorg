@@ -16,6 +16,18 @@ export const metadata = {
 
 部署回滚工作流通过 **标签标记发布点**、**保留回滚分支**和**revert 策略**，让你在发现线上问题时能在几分钟内回到上一个稳定版本，而不是在紧急情况下手忙脚乱。
 
+<CommandFlowFigure
+  title="部署回滚工作流"
+  caption="回滚的关键是通过标签快速定位到最后一个已知稳定版本，尽可能减少对当前进行中工作的影响。"
+  inputsLabel="回滚输入"
+  inputs="最新标签|部署记录|影响评估"
+  commandLabel="checkout tag → deploy → verify"
+  outputsLabel="回滚后状态"
+  outputs="服务恢复稳定|版本可追溯|损失最小化"
+  note="每次部署都打标签是回滚的前提。没有标签的回滚很可能是盲目的。"
+/>
+
+
 ## 回滚策略选择
 
 ```

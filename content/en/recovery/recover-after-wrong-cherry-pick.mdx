@@ -20,6 +20,15 @@ The critical decision is whether the picked commit is already shared.
 - private/local only: reset is often acceptable
 - shared/public branch: prefer revert for traceable correction
 
+<CherryPickFigure
+  title="Recover After Wrong Cherry-pick"
+  caption="A wrong cherry-pick can be recovered by reverting to the pre-pick state, usually via reflog or reset."
+  sourceLabel="Wrong picked commit"
+  targetLabel="Current branch"
+  transferLabel="Rollback operation"
+/>
+
+
 ## Locate pre-pick state
 
 ```bash

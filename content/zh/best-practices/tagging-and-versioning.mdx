@@ -16,6 +16,18 @@ export const metadata = {
 
 标签是 Git 中指向特定提交的**不可变引用**，最适合标记发布节点。配合**语义化版本规范（SemVer）**，能让版本号本身传达变更的性质和影响范围。
 
+<CommandFlowFigure
+  title="标签与版本管理"
+  caption="标签是版本的快照点，让回滚、比较和发布都有明确的参考物。"
+  inputsLabel="发布准备"
+  inputs="更新 CHANGELOG|更新版本号|打标签"
+  commandLabel="tag → push tags → release"
+  outputsLabel="发布成果"
+  outputs="版本可追溯|发布文档完整|回滚点确定"
+  note="千万不要在标签名上省时间。一致的 SemVer 命名是团队沟通的基础。"
+/>
+
+
 ## 语义化版本（SemVer）
 
 ```

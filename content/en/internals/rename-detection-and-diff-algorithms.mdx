@@ -19,6 +19,18 @@ Git objects do not store a built-in “rename event.” Rename is usually inferr
 
 Git matches delete/add pairs by content similarity.
 
+<CommandFlowFigure
+  title="Rename Detection and Diff Algorithms"
+  caption="Git infers renames through content similarity; the diff algorithm determines how line-level differences are matched during merge."
+  inputsLabel="Input"
+  inputs="Old file path|New file path|Content similarity"
+  commandLabel="diff --find-renames"
+  outputsLabel="Output"
+  outputs="Rename detection|Line-level diff|Algorithm choice"
+  note="Rename detection is not a storage-layer truth, but an inference made during diff."
+/>
+
+
 ## Why rename may appear as delete plus add
 
 - similarity score below threshold

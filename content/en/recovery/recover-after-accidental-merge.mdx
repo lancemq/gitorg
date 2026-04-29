@@ -20,6 +20,18 @@ Most merge-recovery mistakes happen when teams use `reset` where `revert -m` is 
 1. Has the merge commit been pushed?
 2. Has anyone branched from it?
 
+<CommandFlowFigure
+  title="Recover After Accidental Merge"
+  caption="Don't panic after an accidental merge. Assess impact scope first, then choose rollback or reset."
+  inputsLabel="Assessment"
+  inputs="Merge time|Pushed or not|Affected file count"
+  commandLabel="assess → choose strategy"
+  outputsLabel="Recovery Strategy"
+  outputs="git reset --merge|git revert|git reflog"
+  note="If already pushed to a shared branch, do not reset; use revert instead."
+/>
+
+
 ## First inspection
 
 ```bash

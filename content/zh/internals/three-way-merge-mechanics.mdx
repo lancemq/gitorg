@@ -23,6 +23,15 @@ Git merge 的核心不是“把两边拼起来”，而是用三方输入计算�
 
 Git 对比的是 “base→ours” 与 “base→theirs” 的改动差异。
 
+<MergeFigure
+  title="三方合并机制"
+  caption="三方合并使用两个分支的顶点和它们的共同祖先，尝试自动合并非冲突部分。"
+  beforeLabel="合并前"
+  afterLabel="合并后"
+  modeLabel="three-way merge"
+/>
+
+
 ## 为什么会冲突
 
 当两边都修改了同一位置且结果不可自动判定时，就会触发冲突。

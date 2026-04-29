@@ -20,6 +20,18 @@ export const metadata = {
 1. 这个 merge commit 是否已推送共享？
 2. 是否有人基于它继续开发？
 
+<CommandFlowFigure
+  title="意外合并后的恢复"
+  caption="误合并后不要慌，先评估影响范围，再选择是回滚还是重置。"
+  inputsLabel="判断输入"
+  inputs="合并时间|是否已 push|影响文件数"
+  commandLabel="assess → choose strategy"
+  outputsLabel="恢复策略"
+  outputs="git reset --merge|git revert|git reflog"
+  note="如果已经 push 到共享分支，不要 reset 而是 revert。"
+/>
+
+
 ## merge 后第一轮检查
 
 ```bash

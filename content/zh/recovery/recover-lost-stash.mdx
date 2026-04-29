@@ -21,6 +21,15 @@ stash 看起来“消失”时，最常见场景不是永久丢失，而是引�
 2. 手动 `drop` / `clear` 过
 3. 引用变化后 stash 提交仍在对象库里
 
+<ReflogFigure
+  title="找回丢失的 Stash"
+  caption="stash 的内容不会立即被删除，通过 reflog 可能还能找回对应的提交对象。"
+  historyLabel="stash 历史"
+  rescueLabel="找回操作"
+  nowLabel="当前"
+/>
+
+
 ## 第一轮检查
 
 ```bash

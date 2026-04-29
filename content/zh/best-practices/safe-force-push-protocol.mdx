@@ -22,6 +22,18 @@ export const metadata = {
 3. 默认使用 `--force-with-lease`
 4. 执行后发布恢复指引
 
+<CommandFlowFigure
+  title="安全 Force-push 协议"
+  caption="安全的 force-push 不是不用，而是在严格的先验条件下使用。"
+  inputsLabel="强制先验"
+  inputs="确认没有人基于当前分支|创建备份|使用 --force-with-lease"
+  commandLabel="force-push protocol"
+  outputsLabel="安全结果"
+  outputs="不覆盖他人工作|可恢复|团队可同步"
+  note="--force-with-lease 是 force-push 的安全版本，它会检查远程是否与预期一致。"
+/>
+
+
 ## 推荐执行顺序
 
 ```bash

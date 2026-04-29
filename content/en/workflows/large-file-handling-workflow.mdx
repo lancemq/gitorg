@@ -16,6 +16,18 @@ export const metadata = {
 
 Git is not designed to directly manage large files (binaries, videos, datasets, etc.). This workflow uses **Git LFS**, **sparse checkout**, and **repository-splitting strategies** to let repositories include large file resources while maintaining clone speed, history maintainability, and team collaboration efficiency.
 
+<CommandFlowFigure
+  title="Large File Handling Workflow"
+  caption="The correct approach is to detect file size before commit, move threshold-exceeding files to LFS, and keep the repository lightweight and reproducible."
+  inputsLabel="Preparation"
+  inputs="Check file sizes|Configure .gitattributes|Install Git LFS"
+  commandLabel="track → commit → push"
+  outputsLabel="Expected Result"
+  outputs="Lightweight repo|Large files in LFS|Team needs no extra steps"
+  note="Don't wait until the repository is bloated to consider LFS. Early planning costs far less than later migration."
+/>
+
+
 ## Why large files should not go directly into Git
 
 ```bash

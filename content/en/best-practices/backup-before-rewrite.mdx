@@ -16,6 +16,18 @@ export const metadata = {
 
 History-rewriting operations (rebase, amend, filter-repo, reset, etc.) are **high-risk**. Before executing them, create a **named branch or tag** as a safety net — essentially taking a snapshot of the current state so you can return to the origin at any time if something goes wrong.
 
+<CommandFlowFigure
+  title="Backup Before Rewrite Protocol"
+  caption="Before rebase, filter-branch, or large-scale history rewriting, create a recoverable reference point first."
+  inputsLabel="Before Rewrite"
+  inputs="Create branch backup|Add tag|Push to remote"
+  commandLabel="rewrite (rebase/filter-branch)"
+  outputsLabel="Safety Net"
+  outputs="Fast recovery possible|History not lost|Team can sync"
+  note="Pre-rewrite backup is insurance, not paranoia. Whenever you think 'this time nothing will go wrong' is exactly when you need it most."
+/>
+
+
 ## Why backup is essential
 
 ```bash

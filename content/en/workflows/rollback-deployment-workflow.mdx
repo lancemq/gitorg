@@ -16,6 +16,18 @@ export const metadata = {
 
 The rollback deployment workflow uses **tagged release points**, **rollback branches**, and **revert strategies** to let you return to the last stable version within minutes when a production issue is discovered, instead of scrambling in an emergency.
 
+<CommandFlowFigure
+  title="Rollback Deployment Workflow"
+  caption="The key to rollback is quickly locating the last known stable version via tags, minimizing impact on ongoing work."
+  inputsLabel="Rollback Input"
+  inputs="Latest tag|Deploy history|Impact assessment"
+  commandLabel="checkout tag → deploy → verify"
+  outputsLabel="Post-rollback State"
+  outputs="Service restored stable|Version traceable|Loss minimized"
+  note="Tagging every deployment is the prerequisite for rollback. Rolling back without tags is often blind."
+/>
+
+
 ## Rollback strategy selection
 
 ```

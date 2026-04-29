@@ -16,6 +16,18 @@ export const metadata = {
 
 签名提交通过 **GPG 或 SSH 密钥**对每次提交进行加密签名，让协作者可以验证提交确实来自声称的作者，防止身份伪造和供应链攻击。
 
+<CommandFlowFigure
+  title="签名提交工作流"
+  caption="GPG 签名确保提交来源可验证，是开源项目和企业环境中信任链的重要一环。"
+  inputsLabel="准备"
+  inputs="GPG 密钥对|配置 git config|公钥上传平台"
+  commandLabel="commit -S → push → verify"
+  outputsLabel="验证结果"
+  outputs="提交带签名标记|平台显示 Verified|仓库完整性可检"
+  note="签名不是可选项，而是信任基础设施。从第一天就配置好比中途补救容易。"
+/>
+
+
 ## 为什么需要签名提交
 
 在开源项目和大型团队中，任何人都可以设置任意的 `user.name` 和 `user.email`。恶意攻击者可以伪造身份提交恶意代码。签名提交让**身份可验证**、**历史可信任**。

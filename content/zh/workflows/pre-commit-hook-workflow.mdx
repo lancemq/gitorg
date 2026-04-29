@@ -16,6 +16,18 @@ export const metadata = {
 
 pre-commit hook 在 `git commit` 执行前触发，让你可以在代码**正式进入 Git 历史之前**自动运行 lint、测试、格式化等检查，把住质量的第一道关。
 
+<CommandFlowFigure
+  title="Pre-commit Hook 工作流"
+  caption="pre-commit hook 在本地提交前执行检查，在问题进入仓库之前就捞出来。"
+  inputsLabel="触发时机"
+  inputs="git commit|编辑器保存|文件暂存区"
+  commandLabel="pre-commit hook"
+  outputsLabel="检查项"
+  outputs="代码格式|lint 结果|测试通过|敏感信息扫描"
+  note="hook 是最便宜的防御线，在本地阻止问题比在 CI 中发现要快得多。"
+/>
+
+
 ## 为什么需要 pre-commit hook
 
 ```bash

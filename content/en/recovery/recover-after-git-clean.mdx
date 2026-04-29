@@ -25,6 +25,18 @@ git clean -nd
 
 If deletion already happened, avoid further write-heavy actions on the same disk.
 
+<CommandFlowFigure
+  title="Recover After git clean"
+  caption="git clean is irreversible, but other sources might still help recover files."
+  inputsLabel="Check Sources"
+  inputs="Trash|Editor undo|Filesystem recovery"
+  commandLabel="search → verify → restore"
+  outputsLabel="Possible Recovery"
+  outputs="Untracked files|Editor cache|System backup"
+  note="reflog is of little help for clean because clean does not trigger reference changes."
+/>
+
+
 ## Practical recovery sources
 
 1. IDE local history or system snapshots

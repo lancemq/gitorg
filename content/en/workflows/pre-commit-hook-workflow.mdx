@@ -16,6 +16,18 @@ export const metadata = {
 
 A pre-commit hook triggers before `git commit` executes, letting you automatically run lint, tests, formatting checks, and more **before code officially enters Git history**, catching quality issues at the first gate.
 
+<CommandFlowFigure
+  title="Pre-commit Hook Workflow"
+  caption="The pre-commit hook runs checks locally before a commit, catching issues before they enter the repository."
+  inputsLabel="Trigger"
+  inputs="git commit|Editor save|Staged files"
+  commandLabel="pre-commit hook"
+  outputsLabel="Checks"
+  outputs="Code format|Lint results|Tests pass|Secrets scan"
+  note="Hooks are the cheapest defense line. Stopping issues locally is much faster than discovering them in CI."
+/>
+
+
 ## Why pre-commit hooks are needed
 
 ```bash

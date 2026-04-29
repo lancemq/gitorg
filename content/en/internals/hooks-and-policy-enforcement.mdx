@@ -20,6 +20,18 @@ Git hooks let teams attach automation and policy checks to commit and push lifec
 - local hooks: execute on developer machines
 - server hooks: execute when remote receives pushes
 
+<CommandFlowFigure
+  title="Hook Execution Flow"
+  caption="Git hooks execute scripts on specific event triggers, the lowest-cost way to enforce local policies."
+  inputsLabel="Trigger Events"
+  inputs="pre-commit|prepare-commit-msg|post-checkout"
+  commandLabel="hook script"
+  outputsLabel="Policy Checks"
+  outputs="Code style|Commit message|Branch naming"
+  note="Client-side hooks can be bypassed. Do not rely on them as the only security line."
+/>
+
+
 ## Responsibility split
 
 - local hooks for fast feedback (formatting, quick lint)

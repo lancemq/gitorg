@@ -19,6 +19,18 @@ Git 并不在对象层“记录文件被重命名”，重命名通常是 diff �
 
 Git 会基于内容相似度把“删除 + 新增”匹配为 rename。
 
+<CommandFlowFigure
+  title="重命名检测与 Diff 算法"
+  caption="Git 通过内容相似度推断重命名，diff 算法决定了合并时如何匹配行级差异。"
+  inputsLabel="输入"
+  inputs="旧文件路径|新文件路径|内容相似度"
+  commandLabel="diff --find-renames"
+  outputsLabel="输出"
+  outputs="重命名检测|行级 diff|算法选择"
+  note="重命名检测不是存储层的真实记录，而是 diff 时的推断。"
+/>
+
+
 ## 为什么有时看起来像删了再新建
 
 - 相似度阈值没达到

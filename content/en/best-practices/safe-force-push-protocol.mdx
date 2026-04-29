@@ -22,6 +22,18 @@ Force-push should be governed, not improvised.
 3. default to `--force-with-lease`
 4. share post-push recovery guidance
 
+<CommandFlowFigure
+  title="Safe Force-push Protocol"
+  caption="Safe force-push is not about never using it, but using it under strict preconditions."
+  inputsLabel="Mandatory Preconditions"
+  inputs="Confirm no one based on current branch|Create backup|Use --force-with-lease"
+  commandLabel="force-push protocol"
+  outputsLabel="Safe Outcome"
+  outputs="Does not overwrite others' work|Recoverable|Team can sync"
+  note="--force-with-lease is the safe version of force-push; it checks whether remote matches expectations."
+/>
+
+
 ## Recommended sequence
 
 ```bash

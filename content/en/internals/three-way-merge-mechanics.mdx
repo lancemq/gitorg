@@ -23,6 +23,15 @@ Git merge is a three-input computation: `base`, `ours`, and `theirs`.
 
 Git compares `base→ours` and `base→theirs`, then synthesizes result.
 
+<MergeFigure
+  title="Three-way Merge Mechanics"
+  caption="Three-way merge uses the tips of two branches and their common ancestor, attempting to automatically merge non-conflicting parts."
+  beforeLabel="Before merge"
+  afterLabel="After merge"
+  modeLabel="three-way merge"
+/>
+
+
 ## Why conflicts appear
 
 Conflicts occur when both sides changed overlapping regions and Git cannot choose semantics safely.

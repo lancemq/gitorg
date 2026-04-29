@@ -26,6 +26,18 @@ git clean -nd
 
 若已经删除，马上停止进一步写盘操作，减少覆盖风险。
 
+<CommandFlowFigure
+  title="git clean 后的恢复"
+  caption="git clean 是不可逆的，但可能还有其他来源可以找回文件。"
+  inputsLabel="检查来源"
+  inputs="垃圾筒|编辑器撤销|文件系统恢复"
+  commandLabel="search → verify → restore"
+  outputsLabel="可能恢复"
+  outputs="未跟踪文件|编辑器缓存|系统备份"
+  note="reflog 对 clean 帮助不大，因为 clean 不触发引用变化。"
+/>
+
+
 ## 可尝试的恢复来源
 
 1. IDE Local History / Time Machine / 文件系统快照

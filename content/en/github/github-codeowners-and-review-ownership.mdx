@@ -20,6 +20,18 @@ CODEOWNERS is an ownership-routing mechanism, not just an extra review formality
 2. avoid single-owner critical paths
 3. maintain ownership map as team topology changes
 
+<PlatformHierarchyFigure
+  title="CODEOWNERS and Review Ownership"
+  caption="CODEOWNERS binds file paths to reviewers, ensuring key code changes must be reviewed by the right people."
+  topLabel="File Paths"
+  topItems="src/|docs/|config/"
+  middleLabel="CODEOWNERS"
+  middleItems="@team-backend|@team-docs|@team-devops"
+  bottomLabel="Review Requirements"
+  bottomItems="Mandatory approval|Auto assignment|Clear ownership"
+/>
+
+
 ## With branch protection
 
 When “require review from code owners” is enabled, PRs touching owned paths cannot merge without owner review.

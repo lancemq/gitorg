@@ -15,6 +15,16 @@ export const metadata = {
 
 `git bisect` 通过二分查找快速定位引入 bug 的提交，但这要求历史中的**每次提交都能独立构建和测试**。如果中间提交是坏的，bisect 就会给出错误结果。
 
+<CommitGraphFigure
+  title="bisect-friendly 的提交历史"
+  caption="每次提交只做一件事，并且每个提交都能独立通过测试，这样 git bisect 才能快速定位问题。"
+  linearLabel="线性提交"
+  mergeLabel="合并点"
+  rewriteLabel="重写后"
+  pointerLabel="当前分支"
+/>
+
+
 ## 为什么需要 bisect-friendly 提交
 
 ```bash

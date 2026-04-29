@@ -20,6 +20,18 @@ CODEOWNERS 的核心价值不是“多一个审批步骤”，而是让关键路
 2. 避免单点 owner，关键模块至少双 owner
 3. 定期同步组织结构变化
 
+<PlatformHierarchyFigure
+  title="CODEOWNERS 与审查责任分配"
+  caption="CODEOWNERS 将文件路径与审查者绑定，确保关键代码变更必须经过合适的人审查。"
+  topLabel="文件路径"
+  topItems="src/|docs/|config/"
+  middleLabel="CODEOWNERS"
+  middleItems="@team-backend|@team-docs|@team-devops"
+  bottomLabel="审查要求"
+  bottomItems="必须审批|自动分配|责任明确"
+/>
+
+
 ## 与分支保护联动
 
 当开启 “require review from code owners”，关键文件变更会自动触发 owner 审批门禁。

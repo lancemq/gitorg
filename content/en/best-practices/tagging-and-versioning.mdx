@@ -16,6 +16,18 @@ export const metadata = {
 
 Tags are **immutable references** pointing to specific commits in Git, making them ideal for marking release points. Combined with **Semantic Versioning (SemVer)**, version numbers themselves communicate the nature and impact of changes.
 
+<CommandFlowFigure
+  title="Tagging and Versioning"
+  caption="Tags are snapshot points of versions, providing clear references for rollback, comparison, and release."
+  inputsLabel="Release Prep"
+  inputs="Update CHANGELOG|Bump version|Create tag"
+  commandLabel="tag → push tags → release"
+  outputsLabel="Release Outcome"
+  outputs="Traceable versions|Complete release docs|Determined rollback point"
+  note="Never save time on tag naming. Consistent SemVer naming is the foundation of team communication."
+/>
+
+
 ## Semantic Versioning (SemVer)
 
 ```

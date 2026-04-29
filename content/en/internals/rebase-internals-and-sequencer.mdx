@@ -22,6 +22,15 @@ Rebase is ordered commit replay. The sequencer coordinates replay state and paus
 3. pauses on conflict
 4. resumes until queue is complete
 
+<RebaseFigure
+  title="Rebase Internals"
+  caption="Rebase essentially replays a commit sequence onto a new base, giving each commit a new ID."
+  beforeLabel="Before rebase"
+  afterLabel="After rebase"
+  modeLabel="sequencer replay"
+/>
+
+
 ## Why commit IDs change
 
 Replayed commits are new objects with potentially different parents and metadata.

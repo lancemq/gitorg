@@ -15,6 +15,16 @@ export const metadata = {
 
 `git bisect` quickly locates the commit that introduced a bug through binary search, but this requires **every commit in history to be independently buildable and testable**. If an intermediate commit is broken, bisect produces incorrect results.
 
+<CommitGraphFigure
+  title="Bisect-friendly Commit History"
+  caption="Each commit should do one thing and independently pass tests, so git bisect can quickly pinpoint problems."
+  linearLabel="Linear commits"
+  mergeLabel="Merge point"
+  rewriteLabel="After rewrite"
+  pointerLabel="Current branch"
+/>
+
+
 ## Why bisect-friendly commits matter
 
 ```bash

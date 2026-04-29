@@ -21,6 +21,15 @@ A “missing stash” is often a missing reference, not immediate data destructi
 2. stash was dropped or cleared
 3. stash commit still exists but ref moved
 
+<ReflogFigure
+  title="Recover Lost Stash"
+  caption="Stash contents are not immediately deleted; the corresponding commit object may still be recoverable via reflog."
+  historyLabel="Stash history"
+  rescueLabel="Recovery action"
+  nowLabel="Current"
+/>
+
+
 ## First checks
 
 ```bash

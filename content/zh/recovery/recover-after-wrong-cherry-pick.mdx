@@ -20,6 +20,15 @@ export const metadata = {
 - 未共享：通常可以用 `reset` 回到 pick 前
 - 已共享：优先 `revert` 保持公共历史可解释
 
+<CherryPickFigure
+  title="错误 Cherry-pick 后的恢复"
+  caption="错误的 cherry-pick 可以通过找回 pick 前的状态来恢复，通常用 reflog 或重置。"
+  sourceLabel="错误 pick 的提交"
+  targetLabel="当前分支"
+  transferLabel="回滚操作"
+/>
+
+
 ## 快速定位 pick 前位置
 
 ```bash

@@ -21,6 +21,18 @@ Branch protection defines merge safety on specific branches; rulesets scale that
 3. require at least one review
 4. restrict force-push and branch deletion
 
+<PlatformHierarchyFigure
+  title="Branch Protection and Rulesets Hierarchy"
+  caption="Rulesets are the next-generation branch protection mechanism, supporting finer-grained scope and standardized management."
+  topLabel="Repository-level Policy"
+  topItems="Default branch|Tag rules"
+  middleLabel="Rulesets"
+  middleItems="Target branches|Trigger conditions|Constraint rules"
+  bottomLabel="Protection Result"
+  bottomItems="Compliant merges|Mandatory reviews|Automated checks"
+/>
+
+
 ## Why rulesets matter
 
 - policy reuse across branch scopes

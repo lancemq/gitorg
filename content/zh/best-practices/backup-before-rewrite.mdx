@@ -16,6 +16,18 @@ export const metadata = {
 
 改写历史（rebase、amend、filter-repo、reset 等）是**高风险操作**。在执行前建立一个**命名分支或标签**作为安全网，相当于给当前状态拍一张快照，失误时随时能回到原点。
 
+<CommandFlowFigure
+  title="重写前备份协议"
+  caption="在 rebase、filter-branch 或大规模历史修改前，先创建一个可恢复的参考点。"
+  inputsLabel="重写前"
+  inputs="创建分支备份|打标签|推送到 remote"
+  commandLabel="rewrite (rebase/filter-branch)"
+  outputsLabel="安全网"
+  outputs="可快速恢复|历史不丢失|团队可同步"
+  note="重写前的备份是保险，不是冒失。每次觉得“这次不会出事”时，就是最需要备份的时候。"
+/>
+
+
 ## 为什么必须备份
 
 ```bash

@@ -16,6 +16,18 @@ export const metadata = {
 
 Git 不适合直接管理大文件（二进制、视频、数据集等）。本工作流通过 **Git LFS**、**稀疏检出**和**分包策略**，让仓库在包含大文件资源的同时，保持克隆速度、历史可维护性和团队协作效率。
 
+<CommandFlowFigure
+  title="大文件处理工作流"
+  caption="对大文件的正确做法是在提交前识别文件大小，将超过阈值的文件移交 LFS，保持仓库轻量且可复现。"
+  inputsLabel="准备阶段"
+  inputs="检查文件大小|配置 .gitattributes|安装 Git LFS"
+  commandLabel="track → commit → push"
+  outputsLabel="期望结果"
+  outputs="仓库保持轻量|大文件存储在 LFS|团队无需额外操作"
+  note="不要等到仓库肿起来才想起 LFS，初期规划比后期迁移成本低得多。"
+/>
+
+
 ## 为什么不直接把大文件放进 Git
 
 ```bash

@@ -20,6 +20,18 @@ Git hooks 是把流程规则嵌入仓库生命周期的机制。
 - 本地 hooks：在开发者机器上执行（如 pre-commit）
 - 服务端 hooks：在远端仓库接收推送时执行（如 pre-receive）
 
+<CommandFlowFigure
+  title="Hook 执行流"
+  caption="Git hooks 在特定事件触发时执行脚本，是本地策略执行的最低成本方案。"
+  inputsLabel="触发事件"
+  inputs="pre-commit|prepare-commit-msg|post-checkout"
+  commandLabel="hook 脚本"
+  outputsLabel="策略检查"
+  outputs="代码风格|commit message|branch 规范"
+  note="客户端 hooks 可以被绕过，不要它们作为唯一的安全防线。"
+/>
+
+
 ## 职责边界
 
 - 本地 hooks 适合快速反馈（格式、基础 lint）

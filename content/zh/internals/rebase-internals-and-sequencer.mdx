@@ -22,6 +22,15 @@ rebase 本质上是“按顺序重放提交”，而 sequencer 是管理这条�
 3. 遇冲突暂停，等待用户处理
 4. 继续直到队列结束
 
+<RebaseFigure
+  title="Rebase 内部机制"
+  caption="rebase 本质上是将提交序列重新应用到新的基准点，每个提交都会获得新的 ID。"
+  beforeLabel="rebase 前"
+  afterLabel="rebase 后"
+  modeLabel="sequencer replay"
+/>
+
+
 ## 为什么提交 ID 会变化
 
 因为 rebase 生成的是新提交对象，父指针和对象内容都可能变化。

@@ -16,6 +16,18 @@ export const metadata = {
 
 Signed commits cryptographically sign each commit using a **GPG or SSH key**, letting collaborators verify that the commit truly came from the claimed author and preventing identity forgery and supply-chain attacks.
 
+<CommandFlowFigure
+  title="Signing Commits Workflow"
+  caption="GPG signing ensures commit origin is verifiable, an important part of the trust chain in open-source and enterprise environments."
+  inputsLabel="Setup"
+  inputs="GPG key pair|Configure git config|Upload public key to platform"
+  commandLabel="commit -S → push → verify"
+  outputsLabel="Verification"
+  outputs="Commit has signature badge|Platform shows Verified|Repository integrity checkable"
+  note="Signing is not optional; it is trust infrastructure. Configuring from day one is easier than retrofitting later."
+/>
+
+
 ## Why signed commits are needed
 
 In open-source projects and large teams, anyone can set arbitrary `user.name` and `user.email`. A malicious attacker can forge an identity to commit harmful code. Signed commits make **identity verifiable** and **history trustworthy**.

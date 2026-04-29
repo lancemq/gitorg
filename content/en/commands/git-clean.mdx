@@ -96,6 +96,10 @@ git clean -fdx    # only run after confirming the list is safe
 
 Real-world horror story: running `git clean -fdx` in a project root has deleted `.env` files containing production database credentials. Never use `-x` without a thorough dry-run.
 
+<WarningBox title="`-x` deletes .gitignore files too">
+  <p>The `-x` flag ignores `.gitignore` rules and deletes all untracked files — including IDE configs, `.env` files, and local toolchains you deliberately ignored. Always run `git clean -fdxn` to carefully inspect the output list before executing `git clean -fdx`.</p>
+</WarningBox>
+
 ## Interactive clean mode
 
 `git clean -i` provides a menu-driven interface for selective deletion:
@@ -202,3 +206,7 @@ git clean -fd && git reset --hard HEAD
 ```
 
 **Warning**: This combination is irreversible for uncommitted changes. Make sure you do not need any local modifications before running it.
+
+<WarningBox title="Double operation is irreversible">
+  <p>`git reset --hard && git clean -fdx` brings the working tree completely back to HEAD state. All uncommitted changes and untracked files will be deleted. Make sure you do not need to keep any local modifications before running it.</p>
+</WarningBox>
