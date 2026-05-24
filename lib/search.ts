@@ -78,6 +78,12 @@ export const sectionLabels: Record<Locale, Record<SearchDoc["section"], string>>
     internals: "Git 原理",
     recovery: "恢复手册",
     concepts: "核心概念",
+    "ci-cd": "CI/CD 集成",
+    ide: "IDE 集成",
+    security: "安全",
+    performance: "性能优化",
+    migration: "迁移指南",
+    hosting: "托管方案",
   },
   en: {
     "learning-path": "Learning Path",
@@ -89,6 +95,12 @@ export const sectionLabels: Record<Locale, Record<SearchDoc["section"], string>>
     internals: "Git Internals",
     recovery: "Recovery",
     concepts: "Concepts",
+    "ci-cd": "CI/CD",
+    ide: "IDE",
+    security: "Security",
+    performance: "Performance",
+    migration: "Migration",
+    hosting: "Hosting",
   },
 };
 

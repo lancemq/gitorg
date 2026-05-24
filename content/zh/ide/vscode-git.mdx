@@ -1,0 +1,149 @@
+export const metadata = {
+  title: "VS Code Git 集成深度指南",
+  slug: "vscode-git",
+  locale: "zh",
+  section: "ide",
+  summary: "系统介绍 VS Code 内置 Git 功能的面板、编辑器快捷键、diff 编辑器、冲突解决工具和 GitLens 等扩展。",
+  sourceUrls: [
+    "https://code.visualstudio.com/docs/sourcecontrol/overview",
+    "https://code.visualstudio.com/docs/editor/versioncontrol",
+  ],
+};
+
+# VS Code Git 集成深度指南
+
+## 一句话理解
+
+VS Code 内置了完整的 Git 操作界面，从暂存、提交、推送、分支管理到冲突解决，让你在编辑器内完成大部分 Git 操作而无需切换到终端。
+
+## 核心界面
+
+### 源代码管理视图（Source Control View）
+
+`Ctrl+Shift+G`（或左侧面板的 Git 图标）打开，包含：
+
+- **更改（Changes）**：未暂存的修改
+- **暂存的更改（Staged Changes）**：已暂存的修改
+- **合并更改**：冲突文件列表
+
+### 时间线视图（Timeline View）
+
+文件底部的时间线面板自动显示文件的 Git 历史，无需运行 `git log`。
+
+### Git 状态栏
+
+状态栏右下角显示：
+- 当前分支名
+- 同步状态（↑↓ 箭头表示 ahead/behind）
+- 未推送的提交数
+- 未暂存的修改数
+
+## 日常操作
+
+### 暂存与提交
+
+```bash
+# 界面操作
+# Ctrl+Shift+G → 点击文件旁的 +（暂存）
+# 输入提交信息 → Ctrl+Enter（提交）
+
+# 对应 Git 命令
+git add <file>
+git commit -m "message"
+```
+
+### 分支操作
+
+`Ctrl+Shift+G` → 点击底部分支名 → 显示分支列表：
+
+- 切换分支（checkout）
+- 创建新分支
+- 删除分支
+- 合并分支
+- Rebase 分支
+
+### 推送与同步
+
+状态栏的同步按钮（↻）执行 `git pull --rebase` + `git push`。
+
+## 高级功能
+
+### Diff 编辑器
+
+VS Code 的 diff 编辑器支持：
+
+- 行内修改对比
+- 暂存区与工作区的对比
+- 任意两个提交的对比
+- 并排视图和行内视图切换
+
+### 冲突解决
+
+冲突文件会用 Three-way merge 编辑器显示：
+
+```
+当前更改（Current Change）  |  合并结果（Result）  |  传入更改（Incoming Change）
+```
+
+可视化选择接受当前、接受传入或手动编辑合并结果。
+
+### Git 历史
+
+- 右键文件 → Git: View File History
+- 在时间线面板查看文件级提交历史
+- 安装 Git History 扩展获得更强大的历史浏览
+
+## 推荐的 Git 扩展
+
+### GitLens
+
+最流行的 Git 扩展，功能包括：
+
+- **Blame 注释行内显示**：每行末尾显示作者和提交时间
+- **CodeLens**：方法上方显示最近修改信息
+- **文件历史**：可视化文件演进
+- **搜索历史**：按作者、模式搜索提交
+- **Worktree 管理**：图形化创建和管理 worktree
+
+### Git Graph
+
+- 图形化提交历史
+- 右键执行 rebase、merge、cherry-pick
+- 查看分支拓扑
+
+### Git History
+
+- 文件级提交历史浏览器
+- 搜索提交信息
+- 比较任意两个提交
+
+## VS Code 设置
+
+推荐相关设置：
+
+```json
+{
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "git.suggestedCommands": true,
+  "git.terminalGitEditor": true,
+  "diffEditor.codeLens": true,
+  "githubPullRequests.pullBranch": "never"
+}
+```
+
+## 终端与 UI 的结合
+
+VS Code 的集成终端可以随时执行 Git 命令，UI 操作和终端操作互补：
+
+- **日常操作**：UI（暂存、提交、推送）
+- **复杂操作**：终端（rebase -i、filter-branch、bisect）
+- **查看状态**：UI（改动概览）
+- **深度分析**：终端或扩展
+
+## 继续学习建议
+
+1. `commands/git-config` — 配置 Git 编辑器与 difftool
+2. `workflows/pre-commit-hook-workflow` — 提交前自动化检查
+3. `commands/git-mergetool` — 配置和使用合并工具

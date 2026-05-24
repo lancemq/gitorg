@@ -1,0 +1,185 @@
+export const metadata = {
+  title: "JetBrains IDE Git Integration",
+  slug: "jetbrains-git",
+  locale: "en",
+  section: "ide",
+  summary: "Master Git operations in JetBrains IDEs including the Commit tool window, Annotate, Log, interactive rebase, and conflict resolution.",
+  sourceUrls: [
+    "https://www.jetbrains.com/help/idea/version-control-integration.html",
+    "https://www.jetbrains.com/help/idea/commit-and-push-changes.html",
+  ],
+};
+
+# JetBrains IDE Git Integration
+
+## One-Sentence Understanding
+
+JetBrains IDEs provide the richest Git tooling of any IDE, with visual log, interactive rebase GUI, changelists, and deep conflict resolution tools.
+
+## The Commit Tool Window
+
+Open with `Alt+9` / `Cmd+9` or click the Git tool window.
+
+### Layout
+
+```
+=== Commit ==================================
+  [Author: you <you@example.com]             
+  [Message                               ▼]
+  ┌─────────────────────────────────────┐
+  │ Create feature X                    │
+  │                                     │
+  │ - Added user authentication         │
+  │ - Refactored API client             │
+  └─────────────────────────────────────┘
+  [Commit] [Commit & Push...] [▼]        
+
+=== Unversioned Files ======================
+  > Local Changes
+    file.ts       [+ Add]      [Diff] [Revert]
+    file2.ts
+
+  > Shelf
+    shelved-change  [Unshelve] [Drop]
+
+  > Log
+```
+
+### Commit Area
+
+The commit area is divided into several panes:
+
+**Left toolbar:**
+- `✓` Commit
+- `▶` Commit & Push (or `Ctrl+Shift+K` / `Cmd+Shift+K`)
+- `←` Amend commit
+- `☰` More options (stash, shelf, etc.)
+
+**Uncommitted changes:**
+- Files with different colors: modified (blue), added (green), deleted (red)
+- Right-click → Show Diff, Revert, Shelve, etc.
+
+## Essential Operations
+
+### Staging
+
+JetBrains uses a model similar to Git's staging area:
+
+- **Changes**: Files not yet staged (right pane)
+- **Default Changelist**: Staged files
+- Drag files between changelists to stage/unstage
+
+### Committing
+
+**Commit shortcut**: `Ctrl+K` / `Cmd+K`
+
+The commit dialog includes:
+- Author selection (for different identities)
+- Sign-off checkbox (`Signed-off-by`)
+- GPG sign checkbox
+- Amend option
+- Recent commit messages
+- Code analysis integration
+
+### Changelists
+
+Changelists are JetBrains' unique feature — like multiple staging areas:
+
+| Changelist | Use Case |
+|------------|----------|
+| Default | Active work |
+| Bugfix | Separate bug fix from feature work |
+| Review | Group changes for code review |
+| Shelf | Temporary changes (like stash) |
+
+Create a new changelist: `Ctrl+Alt+Shift+` / right-click → New Changelist
+
+### Shelving
+
+Shelving (similar to `git stash` but more visual):
+1. Right-click changes → Shelve Changes
+2. A patch file is created
+3. Unshelve later from the Shelf tab
+
+## Visual Log
+
+The Git Log (`Alt+9` → Log tab, or `Ctrl+9` / `Cmd+9` → Log) provides:
+
+- Graphical branch visualization
+- Filter by branch, user, date, message
+- Search in commit messages
+- Right-click → Branch / Tag / Cherry-pick / Revert
+
+### Interactive Rebase GUI
+
+Right-click on a commit → **Interactively Rebase from Here...**
+
+This opens a visual rebase editor where you can:
+- Reorder commits (drag and drop)
+- Squash commits
+- Edit commit messages
+- Drop commits
+- Fixup commits
+
+## Conflict Resolution
+
+### Merge Dialog
+
+When conflicts are detected, a dedicated dialog opens:
+
+```
+=== Merge ===================================
+[Accept Left] [Accept Right] [Accept Both]
+  ┌──────────────┬──────────────┐
+  │ Left (Yours) │ Right        │
+  │              │ (Theirs)     │
+  │  code A      │  code B      │
+  └──────────────┴──────────────┘
+  ┌──────────────────────────────┐
+  │ Result                       │
+  │ merged code                  │
+  └──────────────────────────────┘
+  [Apply] [Cancel]
+```
+
+Left/Right panels show the two versions. Click arrows to apply specific changes to the result panel. Keyboard shortcuts available for each action.
+
+### Resolve in Editor
+
+Like VS Code, conflict markers are highlighted. JetBrains provides gutter icons to accept/reject changes.
+
+## Annotate (Blame)
+
+Right-click in the editor gutter → **Annotate with Git Blame**
+
+Shows for each line:
+- Commit SHA
+- Author
+- Date
+
+Click on an annotation to see commit details. Navigate to the commit in the Log view.
+
+## Useful Settings
+
+```text
+Settings → Version Control → Git
+  → Auto-add files to commit: ✓
+  → Warn when committing in detached HEAD or during rebase: ✓
+  → Use credential helper: ✓
+  → Path to Git executable: (auto-detected)
+  → Update method: Merge / Rebase
+  → Push tags: All / Current / None
+```
+
+### Speed Searching
+
+In JetBrains:
+1. `Ctrl+Shift+A` / `Cmd+Shift+A` → Search Everywhere
+2. Type `git` or any action name
+3. Directly run Git commands from the search
+
+## Continue Learning
+
+1. `ide/vscode-git` — VS Code Git features
+2. `concepts/stash-and-shelf` — Stash vs Shelf
+3. `commands/git-rebase` — Interactive rebase

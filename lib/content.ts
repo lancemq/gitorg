@@ -11,6 +11,12 @@ import {
   learningPathSlugs,
   recoverySlugs,
   workflowSlugs,
+  ciCdSlugs,
+  ideSlugs,
+  securitySlugs,
+  performanceSlugs,
+  migrationSlugs,
+  hostingSlugs,
   type CommandSlug,
   type InternalsSlug,
   type Locale,
@@ -26,7 +32,13 @@ export type DocSection =
   | "gitlab"
   | "internals"
   | "recovery"
-  | "concepts";
+  | "concepts"
+  | "ci-cd"
+  | "ide"
+  | "security"
+  | "performance"
+  | "migration"
+  | "hosting";
 
 export type DocTier = "core" | "recommended" | "extended";
 
@@ -252,6 +264,18 @@ export const docPathRegistry = [
   "best-practices/tagging-and-versioning",
   "best-practices/bisect-friendly-commits",
   "best-practices/backup-before-rewrite",
+  "ci-cd/github-actions-basics",
+  "ci-cd/gitlab-ci-basics",
+  "ide/vscode-git",
+  "ide/jetbrains-git",
+  "security/ssh-key-management",
+  "security/gpg-signing",
+  "performance/large-repo-optimization",
+  "performance/partial-clone",
+  "migration/svn-to-git",
+  "migration/hg-to-git",
+  "hosting/platform-comparison",
+  "hosting/self-hosted-git",
 ] as const;
 
 export type DocPath = (typeof docPathRegistry)[number];
@@ -451,6 +475,30 @@ const sectionSearchSuggestionDefaults: Partial<
     prerequisite: "commands/git-reflog",
     risk: "best-practices/shared-history-boundaries",
   },
+  "ci-cd": {
+    prerequisite: "learning-path/sync-with-remote",
+    risk: "best-practices/shared-history-boundaries",
+  },
+  ide: {
+    prerequisite: "learning-path/quick-start",
+    risk: "best-practices/shared-history-boundaries",
+  },
+  security: {
+    prerequisite: "commands/git-config",
+    risk: "best-practices/shared-history-boundaries",
+  },
+  performance: {
+    prerequisite: "internals/packfiles-and-storage",
+    risk: "recovery/reflog-recovery",
+  },
+  migration: {
+    prerequisite: "learning-path/quick-start",
+    risk: "best-practices/shared-history-boundaries",
+  },
+  hosting: {
+    prerequisite: "learning-path/sync-with-remote",
+    risk: "best-practices/shared-history-boundaries",
+  },
 };
 
 const searchSuggestionOverrides: Partial<
@@ -545,6 +593,36 @@ const primerDefaults: Record<Locale, Record<DocSection, DocPrimerSeed>> = {
       prerequisites: ["知道提交不是文件快照列表那么简单"],
       risks: ["把概念页当命令说明页使用"],
     },
+    "ci-cd": {
+      audience: ["要在 CI/CD 中使用 Git 的开发者", "想理解管线中 Git 操作的边界和安全性"],
+      prerequisites: ["知道 branch、commit、push 的基本用法", "有基础 CI/CD 概念"],
+      risks: ["在 CI 中误用 GITHUB_TOKEN 导致安全风险", "不理解 shallow clone 和 partial clone 的区别"],
+    },
+    ide: {
+      audience: ["想提升 IDE 中 Git 使用效率的开发者"],
+      prerequisites: ["知道基本的 Git 命令"],
+      risks: ["依赖 IDE 操作而不理解底层 Git 行为"],
+    },
+    security: {
+      audience: ["需要配置 Git 安全认证的开发者"],
+      prerequisites: ["知道 SSH 的基本概念", "有命令行操作经验"],
+      risks: ["密钥管理不当导致安全泄露", "不理解签名策略导致提效验证失败"],
+    },
+    performance: {
+      audience: ["管理大型 Git 仓库的开发者", "需要优化 CI 流水线速度的人"],
+      prerequisites: ["知道克隆和 fetch 的基本机制", "了解对象数据库的基本概念"],
+      risks: ["在不支持 partial clone 的服务端使用", "sparse checkout 配置不当导致工作区不完整"],
+    },
+    migration: {
+      audience: ["正在从 SVN 或 Hg 迁移到 Git 的团队"],
+      prerequisites: ["知道 SVN 或 Hg 的基本操作", "有 Git 基础使用经验"],
+      risks: ["迁移后作者信息丢失或映射错误", "大文件未处理导致迁移后仓库膨胀"],
+    },
+    hosting: {
+      audience: ["正在选择 Git 托管方案的团队负责人或开发者"],
+      prerequisites: ["知道 Git 远端操作的基础知识", "理解代码托管的基本需求"],
+      risks: ["只对比功能列表而忽略运维成本", "自建方案选型后维护能力跟不上的风险"],
+    },
   },
   en: {
     commands: {
@@ -591,6 +669,36 @@ const primerDefaults: Record<Locale, Record<DocSection, DocPrimerSeed>> = {
       audience: ["Readers who want the history model before advanced commands"],
       prerequisites: ["A basic sense that commits are not just a file list"],
       risks: ["Treating a concepts page like a command how-to"],
+    },
+    "ci-cd": {
+      audience: ["Developers using Git in CI/CD pipelines", "Readers who want to understand Git operation boundaries in automation"],
+      prerequisites: ["Basic understanding of branch, commit, and push", "Basic CI/CD concepts"],
+      risks: ["Misusing GITHUB_TOKEN causing security issues", "Not understanding the trade-off between shallow and partial clone"],
+    },
+    ide: {
+      audience: ["Developers who want to improve Git efficiency in their IDE"],
+      prerequisites: ["Basic Git command knowledge"],
+      risks: ["Relying on IDE operations without understanding underlying Git behavior"],
+    },
+    security: {
+      audience: ["Developers who need to configure Git security and authentication"],
+      prerequisites: ["Basic SSH concepts", "Command-line experience"],
+      risks: ["Poor key management leading to security leaks", "Not understanding signing policy causing verification failures"],
+    },
+    performance: {
+      audience: ["Developers managing large Git repositories", "Developers optimizing CI pipeline speed"],
+      prerequisites: ["Basic understanding of clone and fetch mechanisms", "Awareness of the object database concept"],
+      risks: ["Using partial clone on unsupported servers", "Misconfigured sparse checkout leading to incomplete workspace"],
+    },
+    migration: {
+      audience: ["Teams migrating from SVN or Hg to Git"],
+      prerequisites: ["Basic knowledge of SVN or Hg operations", "Basic Git experience"],
+      risks: ["Author information lost or mis-mapped after migration", "Large files not handled, causing repository bloat after migration"],
+    },
+    hosting: {
+      audience: ["Team leads or developers choosing a Git hosting solution"],
+      prerequisites: ["Basic Git remote operation knowledge", "Understanding of code hosting requirements"],
+      risks: ["Comparing only feature lists while ignoring operational costs", "Choosing a self-hosted solution without sufficient maintenance capacity"],
     },
   },
 } as const;
@@ -789,6 +897,18 @@ function getOrderedPathSeries(section: DocSection): DocPath[] {
       return recoverySlugs.map((slug) => `recovery/${slug}` as DocPath);
     case "concepts":
       return [];
+    case "ci-cd":
+      return ciCdSlugs.map((slug) => `ci-cd/${slug}` as DocPath);
+    case "ide":
+      return ideSlugs.map((slug) => `ide/${slug}` as DocPath);
+    case "security":
+      return securitySlugs.map((slug) => `security/${slug}` as DocPath);
+    case "performance":
+      return performanceSlugs.map((slug) => `performance/${slug}` as DocPath);
+    case "migration":
+      return migrationSlugs.map((slug) => `migration/${slug}` as DocPath);
+    case "hosting":
+      return hostingSlugs.map((slug) => `hosting/${slug}` as DocPath);
     default:
       return [];
   }
@@ -806,6 +926,12 @@ function sortBySeriesOrder<T extends { path: DocPath }>(docs: T[]) {
       ...getOrderedPathSeries("internals"),
       ...getOrderedPathSeries("recovery"),
       ...getOrderedPathSeries("concepts"),
+      ...getOrderedPathSeries("ci-cd"),
+      ...getOrderedPathSeries("ide"),
+      ...getOrderedPathSeries("security"),
+      ...getOrderedPathSeries("performance"),
+      ...getOrderedPathSeries("migration"),
+      ...getOrderedPathSeries("hosting"),
     ].map((path, index) => [path, index]),
   );
 
@@ -865,6 +991,36 @@ export async function getRecoveryDocs(locale: Locale) {
   return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("recovery/")));
 }
 
+export async function getCiCdDocs(locale: Locale) {
+  const docs = await getIndexedDocs(locale);
+  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("ci-cd/")));
+}
+
+export async function getIdeDocs(locale: Locale) {
+  const docs = await getIndexedDocs(locale);
+  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("ide/")));
+}
+
+export async function getSecurityDocs(locale: Locale) {
+  const docs = await getIndexedDocs(locale);
+  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("security/")));
+}
+
+export async function getPerformanceDocs(locale: Locale) {
+  const docs = await getIndexedDocs(locale);
+  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("performance/")));
+}
+
+export async function getMigrationDocs(locale: Locale) {
+  const docs = await getIndexedDocs(locale);
+  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("migration/")));
+}
+
+export async function getHostingDocs(locale: Locale) {
+  const docs = await getIndexedDocs(locale);
+  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("hosting/")));
+}
+
 export function getDocHref(locale: Locale, docPath: DocPath) {
   if (docPath.startsWith("commands/")) {
     return `/${locale}/commands/${docPath.replace("commands/", "")}`;
@@ -896,6 +1052,30 @@ export function getDocHref(locale: Locale, docPath: DocPath) {
 
   if (docPath.startsWith("recovery/")) {
     return `/${locale}/recovery/${docPath.replace("recovery/", "")}`;
+  }
+
+  if (docPath.startsWith("ci-cd/")) {
+    return `/${locale}/ci-cd/${docPath.replace("ci-cd/", "")}`;
+  }
+
+  if (docPath.startsWith("ide/")) {
+    return `/${locale}/ide/${docPath.replace("ide/", "")}`;
+  }
+
+  if (docPath.startsWith("security/")) {
+    return `/${locale}/security/${docPath.replace("security/", "")}`;
+  }
+
+  if (docPath.startsWith("performance/")) {
+    return `/${locale}/performance/${docPath.replace("performance/", "")}`;
+  }
+
+  if (docPath.startsWith("migration/")) {
+    return `/${locale}/migration/${docPath.replace("migration/", "")}`;
+  }
+
+  if (docPath.startsWith("hosting/")) {
+    return `/${locale}/hosting/${docPath.replace("hosting/", "")}`;
   }
 
   if (docPath === "learning-path/quick-start") {
@@ -1381,6 +1561,29 @@ const representativeSectionPaths = {
     "recovery/recover-after-reset",
     "recovery/undo-after-pull",
   ],
+  "ci-cd": [
+    "ci-cd/github-actions-basics",
+    "ci-cd/gitlab-ci-basics",
+  ],
+  ide: [
+    "ide/vscode-git",
+    "ide/jetbrains-git",
+  ],
+  security: [
+    "security/ssh-key-management",
+    "security/gpg-signing",
+  ],
+  performance: [
+    "performance/large-repo-optimization",
+  ],
+  migration: [
+    "migration/svn-to-git",
+    "migration/hg-to-git",
+  ],
+  hosting: [
+    "hosting/platform-comparison",
+    "hosting/self-hosted-git",
+  ],
 } as const satisfies Partial<Record<DocSection, readonly DocPath[]>>;
 
 const latestHomeDocPaths = [
@@ -1412,10 +1615,10 @@ export async function getRelatedDocs(
 
 export async function getFeaturedSectionDocs(
   locale: Locale,
-  section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "github" | "gitlab" | "internals" | "recovery">,
+  section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "github" | "gitlab" | "internals" | "recovery" | "ci-cd" | "ide" | "security" | "performance" | "migration" | "hosting">,
   limit = 3,
 ): Promise<DocCard[]> {
-  const docs =
+   const docs =
     section === "learning-path"
       ? await getLearningPathDocs(locale)
       : section === "commands"
@@ -1430,14 +1633,26 @@ export async function getFeaturedSectionDocs(
               ? await getGitlabDocs(locale)
             : section === "internals"
               ? await getInternalsDocs(locale)
-              : await getRecoveryDocs(locale);
+              : section === "recovery"
+                ? await getRecoveryDocs(locale)
+                : section === "ci-cd"
+                  ? await getCiCdDocs(locale)
+                  : section === "ide"
+                    ? await getIdeDocs(locale)
+                    : section === "security"
+                      ? await getSecurityDocs(locale)
+                      : section === "performance"
+                        ? await getPerformanceDocs(locale)
+                        : section === "migration"
+                          ? await getMigrationDocs(locale)
+                          : await getHostingDocs(locale);
 
   return sortByTierAndSeriesOrder(docs).slice(0, limit).map((doc) => toIndexedDocCard(locale, doc));
 }
 
 export async function getRepresentativeSectionDocs(
   locale: Locale,
-  section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "github" | "gitlab" | "internals" | "recovery">,
+  section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "github" | "gitlab" | "internals" | "recovery" | "ci-cd" | "ide" | "security" | "performance" | "migration" | "hosting">,
   limit = 3,
 ): Promise<DocCard[]> {
   const paths = representativeSectionPaths[section] ?? [];
@@ -1470,6 +1685,12 @@ export async function getContentStats(locale: Locale): Promise<ContentStats> {
       internals: 0,
       recovery: 0,
       concepts: 0,
+      "ci-cd": 0,
+      ide: 0,
+      security: 0,
+      performance: 0,
+      migration: 0,
+      hosting: 0,
     } as Record<DocSection, number>,
   );
 

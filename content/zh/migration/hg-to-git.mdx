@@ -1,0 +1,175 @@
+export const metadata = {
+  title: "Mercurial 到 Git 迁移指南",
+  slug: "hg-to-git",
+  locale: "zh",
+  section: "migration",
+  summary: "系统介绍从 Mercurial（Hg）迁移到 Git 的流程，包括 hg-fast-export 工具、分支和标签转换、以及常见差异处理。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-and-Other-Systems-Migrating-to-Git",
+    "https://github.com/frej/fast-export",
+  ],
+};
+
+# Mercurial 到 Git 迁移指南
+
+## 一句话理解
+
+Mercurial 和 Git 在概念上相似（都是分布式版本控制），但命令集、分支模型和内部数据结构不同。迁移不仅是数据转换，更是工作流的重新设计。
+
+## 迁移前的概念对比
+
+| 概念 | Mercurial (Hg) | Git |
+|------|---------------|-----|
+| 提交标识 | 全局递增数字（r1, r2） | SHA 哈希 |
+| 分支 | 永久的 named branches | 轻量指针 |
+| 书签 | Bookmarks | 分支 |
+| MQ | Mercurial Queues（补丁管理） | Stash + Rebase |
+| 工作区 | 单一工作目录 | 工作区 + 暂存区 |
+| .hgignore | 全局忽略模式 | .gitignore + .git/info/exclude |
+
+## 使用 hg-fast-export 迁移
+
+### 安装工具
+
+```bash
+# 克隆 hg-fast-export
+git clone https://github.com/frej/fast-export.git
+export PATH="$PATH:$PWD/fast-export"
+```
+
+### 执行迁移
+
+```bash
+# 创建空的 Git 仓库
+mkdir project-git
+cd project-git
+git init
+
+# 从 Mercurial 仓库导入
+hg-fast-export.sh -r /path/to/hg-repo
+
+# 检出新迁移的分支
+git checkout HEAD
+```
+
+### 作者映射
+
+Mercurial 提交有作者邮箱，但格式可能不规范。创建映射文件：
+
+```bash
+# authors.txt
+hg_author_name <hg_author_email> = Full Name <email@example.com>
+```
+
+使用映射：
+
+```bash
+hg-fast-export.sh -r /path/to/hg-repo --mapping authors.txt
+```
+
+## 处理 Hg 特有概念
+
+### Named Branches（命名分支）
+
+Mercurial 的 named branches 是永久记录在提交上的。`hg-fast-export` 默认将它们转换为 Git 分支：
+
+```bash
+# 查看转换后的分支
+git branch -a
+
+# 某些 branch 名称可能包含空格
+# 需要手动处理
+```
+
+### Bookmarks（书签）
+
+Mercurial bookmarks 转换为 Git 分支。如果 bookmarks 与 named branches 冲突，需要特别处理。
+
+### MQ（Mercurial Queues）
+
+Hg 的补丁队列（MQ）通常不迁移。建议将 MQ 补丁先应用到分支上再迁移：
+
+```bash
+hg qfinish -a  # 把所有补丁转换为正式提交
+# 然后再迁移
+```
+
+### Subrepositories（子仓库）
+
+Mercurial subrepos 类似于 Git submodules：
+
+```bash
+# 迁移后需要重新注册 submodules
+git submodule init
+git submodule update
+```
+
+## 迁移后检查清单
+
+### 完整性验证
+
+```bash
+# 比较提交数量
+hg log --template '{node}\n' | wc -l
+git rev-list --count --all
+
+# 比较分支
+hg branches
+git branch -a
+
+# 比较标签
+hg tags
+git tag
+```
+
+### 工作流调整
+
+- Hg 的 `hg update` → Git 的 `git checkout` / `git switch`
+- Hg 的 `hg merge` → Git 的 `git merge`
+- Hg 的 `hg rebase` → Git 的 `git rebase`
+- Hg 的 `hg histedit` → Git 的 `git rebase -i`
+
+## 常见陷阱
+
+### 空提交
+
+Mercurial 允许空提交，Git 默认不允许。迁移后可能发现某些 Git 提交缺少变更内容，这是正常现象。
+
+### 大文件
+
+与 SVN 迁移相同，检查大文件并使用 Git LFS：
+
+```bash
+git lfs migrate import --include="*.psd,*.zip" --everything
+```
+
+### 扩展
+
+Mercurial 有丰富的扩展生态（如 `evolve`、`shelve`）。这些扩展的功能在 Git 中没有直接对应，需要找到替代方案：
+
+| Hg 扩展 | Git 替代 |
+|---------|---------|
+| evolve | `git rebase` + `git cherry-pick` |
+| shelve | `git stash` |
+| record | `git add -p` |
+| hgflow | `git flow` 扩展或 worktree |
+
+## 团队过渡策略
+
+1. **并行运行**：两个 VCS 同时运行 2-4 周
+2. **培训重点**：暂存区概念、rebase 流程、PR/MR 模式
+3. **常见误区**：Hg 用户容易误用 `git pull`（相当于 `hg pull && hg update`）
+4. **脚本辅助**：为常用 Hg 命令创建 Git 别名
+
+```bash
+# 为前 Hg 用户创建 Git 别名
+git config --global alias.summary "log --oneline --graph --all"
+git config --global alias.record "add -p"
+git config --global alias.sync "pull --rebase"
+```
+
+## 继续学习建议
+
+1. `learning-path/quick-start` — Git 快速上手
+2. `workflows/squash-vs-rebase-merge` — 整合策略对比
+3. `concepts/three-layers` — Git 三层模型

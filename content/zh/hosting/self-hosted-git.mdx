@@ -1,0 +1,160 @@
+export const metadata = {
+  title: "自建 Git 服务方案对比",
+  slug: "self-hosted-git",
+  locale: "zh",
+  section: "hosting",
+  summary: "对比 GitLab CE、Gitea、Gogs 等自建 Git 服务的功能、部署方式和维护成本，帮助你选择最适合团队的自托管方案。",
+  sourceUrls: [
+    "https://docs.gitlab.com/ee/install/",
+    "https://gitea.com/",
+    "https://gogs.io/",
+  ],
+};
+
+# 自建 Git 服务方案对比
+
+## 一句话理解
+
+自建 Git 服务让你完全控制代码数据、权限和 DevOps 流程，适合对合规性、数据主权或定制化有高要求的团队。
+
+## 为什么选择自建
+
+| 因素 | 云平台 | 自建 |
+|------|--------|------|
+| 数据主权 | 数据存放在第三方 | 完全控制 |
+| 合规性 | 需评估合规性 | 自主满足合规 |
+| 定制化 | 有限 | 完全可控 |
+| 运维成本 | 零运维 | 需专人维护 |
+| 可用性 | SLA 保障 | 自行保障 |
+| 功能更新 | 即时 | 需自行升级 |
+
+## 主流自建方案
+
+### GitLab CE（Community Edition）
+
+最完整的自建 DevOps 平台。
+
+```yaml
+部署方式：Omnibus 包 / Docker / Helm（K8s）
+资源要求：4GB RAM 起，推荐 8GB+
+功能覆盖：完整 DevOps（CI/CD、Registry、Pages、K8s）
+```
+
+**优点：**
+- 功能最完整，接近 SaaS 版
+- 内置 CI/CD（共用 Runner）
+- 支持 LDAP、SAML、OAuth
+- 社区活跃，更新频繁
+
+**缺点：**
+- 资源消耗较大
+- 升级有时有破坏性变更
+- 配置复杂
+
+### Gitea
+
+轻量级 Git 服务，Go 语言开发。
+
+```yaml
+部署方式：单二进制文件 / Docker
+资源要求：1GB RAM 起，256MB 可运行
+功能覆盖：代码托管 + Issue + PR + Actions（实验性）
+```
+
+**优点：**
+- 极轻量，可在树莓派上运行
+- 部署简单（一个二进制文件）
+- 资源消耗极低
+- 支持 LDAP、OAuth
+
+**缺点：**
+- CI/CD 功能较新（Gitea Actions）
+- 插件生态不如 GitLab
+- 大规模仓库性能有限
+
+### Gogs
+
+比 Gitea 更轻量的 Go 语言 Git 服务，Gitea 的前身。
+
+```yaml
+部署方式：单二进制文件 / Docker
+资源要求：512MB RAM 起，128MB 可运行
+功能覆盖：核心代码托管 + Issue + PR
+```
+
+**优点：**
+- 最轻量级的选择
+- 极简部署
+- 适合极小团队
+
+**缺点：**
+- 功能最少，更新较慢
+- 没有内置 CI/CD
+- 社区规模小
+
+### 其他选择
+
+| 方案 | 语言 | 特点 |
+|------|------|------|
+| Gitea Fork (Codeberg) | Go | 基于 Gitea 的社区分支 |
+| Onedev | Java | 内置 CI/CD，功能丰富 |
+| RhodeCode | Python | 企业级代码审查 |
+| Bitbucket DC | Java | Atlassian 生态 |
+
+## 部署与运维
+
+### Docker 快速部署
+
+```yaml
+# docker-compose.yml
+version: '3'
+services:
+  gitea:
+    image: gitea/gitea:latest
+    ports:
+      - "3000:3000"
+      - "22:22"
+    volumes:
+      - ./gitea:/data
+    restart: always
+
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    ports:
+      - "8080:80"
+      - "2222:22"
+    volumes:
+      - ./gitlab/config:/etc/gitlab
+      - ./gitlab/logs:/var/log/gitlab
+      - ./gitlab/data:/var/opt/gitlab
+```
+
+### 备份策略
+
+```bash
+# GitLab 备份
+gitlab-rake gitlab:backup:create
+
+# Gitea 备份
+rsync -av /path/to/gitea/data/ /backup/gitea/
+
+# 常规 Git 仓库备份
+git clone --mirror <url> backup.git
+```
+
+## 选型建议
+
+| 团队规模 | 推荐方案 | 理由 |
+|---------|---------|------|
+| 1-5 人 | Gitea | 极简部署、低维护成本 |
+| 5-20 人 | Gitea / GitLab CE | 根据 CI/CD 需求选择 |
+| 20-100 人 | GitLab CE | 完整 DevOps 功能 |
+| 100+ 人 | GitLab EE / GitHub ES | 企业级功能和支持 |
+| 合规要求高 | GitLab EE / Bitbucket DC | 审计和管理功能 |
+
+## 持续学习建议
+
+1. `hosting/platform-comparison` — 托管平台对比
+2. `github/github-actions-and-skills` — CI/CD 集成
+3. `gitlab/gitlab-ci-and-runners` — GitLab CI 配置
+4. `internals/transfer-protocols-and-negotiation` — Git 传输协议

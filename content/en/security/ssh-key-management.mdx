@@ -1,0 +1,169 @@
+export const metadata = {
+  title: "SSH Key Management & Git Authentication",
+  slug: "ssh-key-management",
+  locale: "en",
+  section: "security",
+  summary: "A systematic guide to SSH key generation, configuration, management, and Git authentication, including multiple keys, ssh-agent, deploy keys, and security best practices.",
+  sourceUrls: [
+    "https://docs.github.com/en/authentication/connecting-to-github-with-ssh",
+    "https://git-scm.com/book/en/v2/Git-on-the-Server-Generating-Your-SSH-Public-Key",
+  ],
+};
+
+# SSH Key Management & Git Authentication
+
+## One-Sentence Understanding
+
+SSH keys are one of the most secure ways to authenticate for Git remote operations. Proper SSH key management lets you push and pull code securely without entering passwords.
+
+## SSH Key Basics
+
+### Generating a Key Pair
+
+```bash
+# Generate Ed25519 key (recommended)
+ssh-keygen -t ed25519 -C "your_email@example.com"
+
+# Or RSA key (for older systems)
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+```
+
+Ed25519 is faster and more secure than RSA.
+
+### Adding Public Key to Git Platforms
+
+```bash
+# Copy public key
+cat ~/.ssh/id_ed25519.pub
+
+# Paste into GitHub/GitLab/Bitbucket SSH Keys settings
+```
+
+### Test Connection
+
+```bash
+# GitHub
+ssh -T git@github.com
+
+# GitLab
+ssh -T git@gitlab.com
+
+# Bitbucket
+ssh -T git@bitbucket.org
+```
+
+## Multi-Key Management
+
+### The Problem
+
+When you have multiple Git accounts (e.g., personal GitHub + company GitLab), you need different keys for different hosts.
+
+### Solution: ~/.ssh/config
+
+```ssh-config
+# Personal GitHub account
+Host github.com
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_personal
+
+# Company GitLab
+Host gitlab.company.com
+  HostName gitlab.company.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_work
+
+# Second GitHub account
+Host github-work
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_work
+```
+
+For the second GitHub account, change remote URLs to:
+
+```bash
+git remote set-url origin git@github-work:username/repo.git
+```
+
+## ssh-agent
+
+ssh-agent caches your SSH keys so you don't need to enter your passphrase repeatedly.
+
+### Starting and Managing
+
+```bash
+# Start ssh-agent
+eval "$(ssh-agent -s)"
+
+# Add key
+ssh-add ~/.ssh/id_ed25519
+
+# List added keys
+ssh-add -l
+
+# macOS: persist with Keychain
+ssh-add --apple-use-keychain ~/.ssh/id_ed25519
+```
+
+### macOS Configuration
+
+```ssh-config
+Host *
+  UseKeychain yes
+  AddKeysToAgent yes
+  IdentityFile ~/.ssh/id_ed25519
+```
+
+## Deploy Keys
+
+Deploy keys allow read-only (or read-write) access to a single repository, commonly used for CI/CD:
+
+```bash
+# Generate a dedicated deploy key
+ssh-keygen -t ed25519 -f ~/.ssh/deploy_key -C "ci-deploy@company.com"
+
+# Add in GitHub repo settings as Deploy Key
+# Check "Allow write access" for push access
+```
+
+Using deploy keys:
+
+```bash
+GIT_SSH_COMMAND="ssh -i ~/.ssh/deploy_key" git push origin main
+```
+
+## SSH Commit Signing
+
+Git supports commit verification with SSH signatures:
+
+```bash
+# Configure signing key
+git config --global user.signingkey ~/.ssh/id_ed25519.pub
+git config --global gpg.format ssh
+
+# Sign commits
+git commit -S -m "signed commit"
+
+# Configure global signing
+git config --global commit.gpgsign true
+```
+
+## Security Best Practices
+
+### Key Protection
+
+- Always use a passphrase
+- Use different keys for different platforms
+- Rotate keys periodically
+- Verify fingerprints with `ssh-keygen -l -f ~/.ssh/id_ed25519.pub`
+
+### Revoking Compromised Keys
+
+Remove both public and private key files immediately, generate a new pair, and delete the old public key from all platforms.
+
+## Continue Learning
+
+1. `best-practices/security-with-git` — Git security best practices
+2. `commands/git-config` — Git configuration management
+3. GPG signing & verification

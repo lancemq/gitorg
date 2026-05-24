@@ -2118,5 +2118,125 @@
     "title": "Backup Before Rewriting",
     "summary": "Establish a safety net before executing history-rewriting operations like rebase or filter-repo so mistakes are recoverable.",
     "suggestions": []
+  },
+  {
+    "href": "/en/ci-cd/github-actions-basics",
+    "path": "ci-cd/github-actions-basics",
+    "section": "ci-cd",
+    "tier": "extended",
+    "slug": "github-actions-basics",
+    "title": "Git Actions & CI/CD Basics",
+    "summary": "An introduction to using Git with GitHub Actions for CI/CD pipelines, including trigger strategies, checkout action, Git context, and secure token management.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/ci-cd/gitlab-ci-basics",
+    "path": "ci-cd/gitlab-ci-basics",
+    "section": "ci-cd",
+    "tier": "extended",
+    "slug": "gitlab-ci-basics",
+    "title": "GitLab CI & Git Integration",
+    "summary": "Understanding how GitLab CI/CD integrates with Git, including pipeline triggers, CI_JOB_TOKEN, Git strategy, and workflow rules based on Git data.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/ide/vscode-git",
+    "path": "ide/vscode-git",
+    "section": "ide",
+    "tier": "extended",
+    "slug": "vscode-git",
+    "title": "VS Code Git Integration",
+    "summary": "Master VS Code's built-in Git integration, including the Source Control panel, diff editor, inline blame, staging, branching, and conflict resolution.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/ide/jetbrains-git",
+    "path": "ide/jetbrains-git",
+    "section": "ide",
+    "tier": "extended",
+    "slug": "jetbrains-git",
+    "title": "JetBrains IDE Git Integration",
+    "summary": "Master Git operations in JetBrains IDEs including the Commit tool window, Annotate, Log, interactive rebase, and conflict resolution.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/security/ssh-key-management",
+    "path": "security/ssh-key-management",
+    "section": "security",
+    "tier": "extended",
+    "slug": "ssh-key-management",
+    "title": "SSH Key Management & Git Authentication",
+    "summary": "A systematic guide to SSH key generation, configuration, management, and Git authentication, including multiple keys, ssh-agent, deploy keys, and security best practices.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/security/gpg-signing",
+    "path": "security/gpg-signing",
+    "section": "security",
+    "tier": "extended",
+    "slug": "gpg-signing",
+    "title": "GPG Signing & Git Commit Verification",
+    "summary": "A systematic guide to signing Git commits and tags with GPG, configuring verification, and enforcing signing policies in teams.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/performance/large-repo-optimization",
+    "path": "performance/large-repo-optimization",
+    "section": "performance",
+    "tier": "extended",
+    "slug": "large-repo-optimization",
+    "title": "Large Repository Performance Optimization",
+    "summary": "Strategies for optimizing Git performance in large repositories, including partial clone, sparse checkout, shallow clone, git gc, and Git LFS.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/performance/partial-clone",
+    "path": "performance/partial-clone",
+    "section": "performance",
+    "tier": "extended",
+    "slug": "partial-clone",
+    "title": "Partial Clone: On-Demand Git Object Fetching",
+    "summary": "An in-depth look at Git partial clone — how filters and promisor remotes work, and how to speed up clone and fetch in large repositories.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/migration/svn-to-git",
+    "path": "migration/svn-to-git",
+    "section": "migration",
+    "tier": "extended",
+    "slug": "svn-to-git",
+    "title": "SVN to Git Migration Guide",
+    "summary": "A complete guide to migrating from Subversion (SVN) to Git, covering history conversion, branch mapping, team training, and common pitfalls.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/migration/hg-to-git",
+    "path": "migration/hg-to-git",
+    "section": "migration",
+    "tier": "extended",
+    "slug": "hg-to-git",
+    "title": "Mercurial to Git Migration Guide",
+    "summary": "A guide to migrating from Mercurial (Hg) to Git, including hg-fast-export, branch/tag conversion, and common difference handling.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/hosting/platform-comparison",
+    "path": "hosting/platform-comparison",
+    "section": "hosting",
+    "tier": "extended",
+    "slug": "platform-comparison",
+    "title": "Git Platform Comparison: GitHub vs GitLab vs Bitbucket",
+    "summary": "A systematic comparison of GitHub, GitLab, and Bitbucket's features, pricing, CI/CD integration, and collaboration models to help you choose the right platform.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/hosting/self-hosted-git",
+    "path": "hosting/self-hosted-git",
+    "section": "hosting",
+    "tier": "extended",
+    "slug": "self-hosted-git",
+    "title": "Self-Hosted Git Service Comparison",
+    "summary": "A comparison of self-hosted Git solutions including GitLab CE, Gitea, Gogs, and others — covering features, deployment, and maintenance.",
+    "suggestions": []
   }
 ]

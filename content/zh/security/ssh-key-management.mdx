@@ -1,0 +1,179 @@
+export const metadata = {
+  title: "SSH 密钥管理与 Git 安全认证",
+  slug: "ssh-key-management",
+  locale: "zh",
+  section: "security",
+  summary: "系统介绍 SSH 密钥的生成、配置、管理与 Git 认证，包括多密钥管理、ssh-agent、部署密钥和安全最佳实践。",
+  sourceUrls: [
+    "https://docs.github.com/en/authentication/connecting-to-github-with-ssh",
+    "https://git-scm.com/book/en/v2/Git-on-the-Server-Generating-Your-SSH-Public-Key",
+  ],
+};
+
+# SSH 密钥管理与 Git 安全认证
+
+## 一句话理解
+
+SSH 密钥是 Git 远程操作中最安全的认证方式之一。正确管理 SSH 密钥可以让你在不输入密码的情况下安全地推送和拉取代码。
+
+## SSH 密钥基础
+
+### 生成密钥对
+
+```bash
+# 生成 Ed25519 密钥（推荐）
+ssh-keygen -t ed25519 -C "your_email@example.com"
+
+# 或 RSA 密钥（兼容旧系统）
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+```
+
+Ed25519 比 RSA 更快、更安全，推荐使用。
+
+### 添加公钥到 Git 平台
+
+```bash
+# 复制公钥
+cat ~/.ssh/id_ed25519.pub
+
+# 粘贴到 GitHub/GitLab/Bitbucket 的 SSH Keys 设置中
+```
+
+### 测试连接
+
+```bash
+# GitHub
+ssh -T git@github.com
+
+# GitLab
+ssh -T git@gitlab.com
+
+# Bitbucket
+ssh -T git@bitbucket.org
+```
+
+## 多密钥管理
+
+### 问题场景
+
+当你有多个 Git 账号时（如个人 GitHub + 公司 GitLab），需要为不同主机使用不同密钥。
+
+### 解决方案：~/.ssh/config
+
+```ssh-config
+# 个人 GitHub 账号
+Host github.com
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_personal
+
+# 公司 GitLab
+Host gitlab.company.com
+  HostName gitlab.company.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_work
+
+# 第二个 GitHub 账号
+Host github-work
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_work
+```
+
+使用第二个 GitHub 账号时，将 remote 地址改为：
+
+```bash
+git remote set-url origin git@github-work:username/repo.git
+```
+
+## ssh-agent
+
+ssh-agent 是 SSH 密钥的缓存管理器，让你无需每次操作都输入密码。
+
+### 启动和管理
+
+```bash
+# 启动 ssh-agent
+eval "$(ssh-agent -s)"
+
+# 添加密钥
+ssh-add ~/.ssh/id_ed25519
+
+# 列出已添加的密钥
+ssh-add -l
+
+# macOS 上使用 Keychain 持久化
+ssh-add --apple-use-keychain ~/.ssh/id_ed25519
+```
+
+### macOS 配置
+
+```ssh-config
+Host *
+  UseKeychain yes
+  AddKeysToAgent yes
+  IdentityFile ~/.ssh/id_ed25519
+```
+
+## 部署密钥
+
+部署密钥允许只读（或读写）访问单个仓库，常用于 CI/CD 或自动化脚本。
+
+```bash
+# 生成部署专用密钥
+ssh-keygen -t ed25519 -f ~/.ssh/deploy_key -C "ci-deploy@company.com"
+
+# 在 GitHub 仓库设置中添加为 Deploy Key
+# 勾选 Allow write access 如果需要推送
+```
+
+使用部署密钥：
+
+```bash
+GIT_SSH_COMMAND="ssh -i ~/.ssh/deploy_key" git push origin main
+```
+
+## SSH 签名提交
+
+Git 支持使用 SSH 签名验证提交：
+
+```bash
+# 配置签名密钥
+git config --global user.signingkey ~/.ssh/id_ed25519.pub
+git config --global gpg.format ssh
+
+# 签名提交
+git commit -S -m "signed commit"
+
+# 配置全局签名
+git config --global commit.gpgsign true
+```
+
+## 安全最佳实践
+
+### 密钥保护
+
+- 始终为密钥设置密码（passphrase）
+- 不同平台使用不同密钥
+- 定期轮换密钥
+- 使用 `ssh-keygen -l -f ~/.ssh/id_ed25519.pub` 验证指纹
+
+### 检查已授权的密钥
+
+```bash
+# 查看 GitHub 上授权的密钥
+curl -H "Authorization: token YOUR_TOKEN" https://api.github.com/user/keys
+
+# 查看 GitLab 上授权的密钥
+curl --header "PRIVATE-TOKEN: YOUR_TOKEN" https://gitlab.com/api/v4/user/keys
+```
+
+### 吊销泄露的密钥
+
+立即删除公钥和私钥文件，生成新密钥对，并从所有平台删除旧公钥。
+
+## 继续学习建议
+
+1. `best-practices/security-with-git` — Git 安全最佳实践
+2. `commands/git-config` — Git 配置管理
+3. GPG 签名与验证

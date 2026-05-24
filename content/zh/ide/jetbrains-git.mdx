@@ -1,0 +1,162 @@
+export const metadata = {
+  title: "JetBrains IDE Git 操作深度指南",
+  slug: "jetbrains-git",
+  locale: "zh",
+  section: "ide",
+  summary: "系统介绍 IntelliJ IDEA、WebStorm 等 JetBrains IDE 的 Git 集成，包括 VCS 面板、交互式 rebase 和冲突解决。",
+  sourceUrls: [
+    "https://www.jetbrains.com/help/idea/version-control-integration.html",
+    "https://www.jetbrains.com/help/idea/commit-and-push-changes.html",
+  ],
+};
+
+# JetBrains IDE Git 操作深度指南
+
+## 一句话理解
+
+JetBrains IDE 的 Git 集成是其最成熟的功能之一，提供图形化的分支管理、提交编排、交互式 rebase 和冲突合并工具，适合从新手到专家的所有用户。
+
+## 核心界面
+
+### VCS 主菜单
+
+`VCS` 菜单（或 `Ctrl+K` / `Cmd+K`）是 Git 操作的入口。
+
+### Git 工具窗口
+
+`Alt+9`（或 View → Tool Windows → Git）打开，包含：
+
+| 标签页 | 功能 |
+|--------|------|
+| Log | 图形化提交历史，支持搜索和过滤 |
+| Console | Git 命令终端窗口，显示实际执行的命令 |
+| Branches | 本地和远程分支管理 |
+
+### Local Changes 视图
+
+`Alt+0` 显示所有未提交的改动，支持：
+
+- 暂存/取消暂存
+- 创建 Changelist（逻辑分组）
+- 显示 diff 预览
+
+## 日常操作
+
+### 提交
+
+`Ctrl+K` 打开提交对话框：
+
+- 选择要包含的文件
+- 编写提交信息（支持模板）
+- 勾选自动格式化、优化 imports、执行检查
+- 提交前 diff 预览
+
+对应的 Git 操作：
+
+```bash
+# IDE 提交相当于
+git add <selected-files>
+git commit -m "message"
+```
+
+### 获取与推送
+
+`Ctrl+T`（Update Project）执行：
+
+- `git fetch`（默认）
+- 可选择 merge 或 rebase 方式整合
+
+`Ctrl+Shift+K` 推送。
+
+## 高级功能
+
+### 交互式 Rebase
+
+VCS → Git → Rebase... → 交互式模式：
+
+- 图形化拖拽排序提交
+- 选择每个提交的动作（pick、squash、fixup、drop 等）
+- 实时预览 rebase 结果
+
+### 图形化分支管理
+
+Branches 弹出窗口支持：
+
+- 创建和切换分支
+- 基于某个提交创建分支
+- 比较分支差异
+- Merge 和 Rebase
+- 删除远程分支
+
+### 冲突解决
+
+JetBrains 的三方合并工具：
+
+```
+左（本地）  |  中（合并结果）  |  右（服务器）
+```
+
+- 逐行接受/拒绝
+- 支持非代码文件（图片、文档）的冲突标记高亮
+- 自动合并模式
+
+### Shelve 与 Stash
+
+JetBrains 提供 Shelve（搁置）功能，是 Git stash 的替代：
+
+- 可视化管理搁置的改动
+- 支持部分搁置
+- 与 Git stash 双向兼容
+
+## 增强功能
+
+### Annotations（Blame 行内显示）
+
+右键装订线 → Annotate with Git Blame：
+
+- 每行显示最后修改者和日期
+- 点击跳转到对应的提交详情
+- 过滤器按作者和时间筛选
+
+### 历史浏览
+
+- 文件级历史：右键 → Git → Show History
+- 选择两个版本对比
+- 查看分支上的提交
+
+### 修复提交信息
+
+VCS → Git → Edit Commit Message... 修改最近一次提交（对应 `git commit --amend`）。
+
+## 推荐设置
+
+```yaml
+Settings → Version Control → Git:
+  - Auto-update if push is rejected: Never
+  - Update method: Rebase (比 merge 更整洁)
+  - Path to Git executable: 使用捆绑的或系统 Git
+  - Use credential helper: 勾选
+
+Settings → Version Control → Commit:
+  - Use non-modal commit interface: 勾选
+  - Optimize imports: 提交前优化
+  - Reformat code: 根据项目规范
+  - Perform code analysis: 勾选
+```
+
+## VS Code vs JetBrains Git 功能对比
+
+| 功能 | VS Code | JetBrains |
+|------|---------|-----------|
+| 提交界面 | 内置面板 | 高级对话框 |
+| 交互式 rebase | 需扩展 | 内置图形化 |
+| 冲突解决 | 基础 three-way | 高级合并工具 |
+| Shelve | 无 | 内置 Shelve |
+| Git Flow | 需扩展 | 内置 |
+| SSH 密钥管理 | 系统级 | IDE 内管理 |
+
+## 继续学习建议
+
+1. `commands/git-rebase` — 交互式 rebase 的完整教程
+2. `commands/git-merge` — 合并策略与冲突解决
+3. `best-practices/commit-hygiene` — 提交卫生与提交信息规范

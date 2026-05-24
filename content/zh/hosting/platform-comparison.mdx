@@ -1,0 +1,124 @@
+export const metadata = {
+  title: "Git 托管平台对比：GitHub vs GitLab vs Bitbucket",
+  slug: "platform-comparison",
+  locale: "zh",
+  section: "hosting",
+  summary: "系统对比 GitHub、GitLab、Bitbucket 三大 Git 托管平台的功能、定价、CI/CD 集成和协作模式，帮助你选择合适的平台。",
+  sourceUrls: [
+    "https://docs.github.com/en",
+    "https://docs.gitlab.com/",
+    "https://bitbucket.org/product/guides",
+  ],
+};
+
+# Git 托管平台对比：GitHub vs GitLab vs Bitbucket
+
+## 一句话理解
+
+GitHub、GitLab 和 Bitbucket 都是基于 Git 的代码托管平台，但在 CI/CD、权限模型、DevOps 集成和定价方面有显著差异。
+
+## 平台概览
+
+| 维度 | GitHub | GitLab | Bitbucket |
+|------|--------|--------|-----------|
+| 推出时间 | 2008 | 2011 | 2008 |
+| 母公司 | Microsoft | GitLab Inc. | Atlassian |
+| 免费计划 | 无限私有仓库 | 无限私有仓库 | 最多 5 人 |
+| 自托管 | GitHub Enterprise Server | GitLab CE/EE | Bitbucket Data Center |
+| 核心定位 | 开源协作平台 | 完整 DevOps 平台 | Atlassian 生态集成 |
+
+## 功能深度对比
+
+### 代码协作
+
+| 功能 | GitHub | GitLab | Bitbucket |
+|------|--------|--------|-----------|
+| Pull/Merge Request | ✓ PR | ✓ MR | ✓ PR |
+| Code Review | ✓ 行内评论 | ✓ 行内评论 | ✓ 行内评论 |
+| 草稿 PR | ✓ | ✓ | ✓ |
+| 代码所有者 | ✓ CODEOWNERS | ✓ CODEOWNERS | ✓ CODEOWNERS |
+| Stacked PR 支持 | 有限 | 有限 | 有限 |
+
+### CI/CD 集成
+
+| 功能 | GitHub | GitLab | Bitbucket |
+|------|--------|--------|-----------|
+| 内置 CI/CD | GitHub Actions | GitLab CI/CD | Bitbucket Pipelines |
+| 定价模型 | 免费 2000 分钟/月 | 免费 400 分钟/月 | 免费 50 分钟/月 |
+| 自建 Runner | ✓ | ✓ | ✓ |
+| Kubernetes 集成 | ✓ | ✓ | ✓ |
+| 部署环境 | ✓ Environments | ✓ Environments | ✓ Deployments |
+
+### 项目管理
+
+| 功能 | GitHub | GitLab | Bitbucket |
+|------|--------|--------|-----------|
+| Issue 跟踪 | ✓ Issues | ✓ Issues | ✓ Jira 集成 |
+| 项目看板 | ✓ Projects | ✓ Issue Board | ✓ Jira |
+| Wiki | ✓ | ✓ | ✓ |
+| 里程碑 | ✓ Milestones | ✓ Milestones | ✓ |
+| Roadmap | ✓ | ✓ ✓ 内建 | 通过 Jira |
+
+### 安全功能
+
+| 功能 | GitHub | GitLab | Bitbucket |
+|------|--------|--------|-----------|
+| 密钥扫描 | ✓ Secret Scanning | ✓ Secret Detection | ✓ |
+| Dependabot/Dependency Scanning | ✓ Dependabot | ✓ Dependency Scan | ✓ Snyk 集成 |
+| Code Scanning | ✓ CodeQL | ✓ SAST | 第三方 |
+| 分支保护 | ✓ 规则集 | ✓ 保护分支 | ✓ 分支限制 |
+
+## 平台选择决策树
+
+### 选择 GitHub 当...
+
+- 你的项目是开源项目（GitHub 是开源的标准平台）
+- 需要丰富的第三方集成和 Actions 生态
+- 团队习惯 GitHub Flow
+- 需要最大的社区和人才库
+
+### 选择 GitLab 当...
+
+- 你需要完整的 DevOps 工具链（从计划到监控一体化）
+- 合规和自托管是硬性要求
+- 团队用 GitLab Flow
+- 预算有限但需要 CI/CD
+
+### 选择 Bitbucket 当...
+
+- 团队深度使用 Atlassian 生态（Jira、Confluence）
+- 已经有基于 Mercurial 的 Bitbucket 仓库
+- 需要与 Jira 无缝集成
+- 小团队（5 人以下）希望低成本的私有仓库
+
+## 自托管选项
+
+| 维度 | GitHub Enterprise Server | GitLab CE/EE | Bitbucket Data Center |
+|------|------------------------|--------------|----------------------|
+| 许可 | 付费 | CE 免费 / EE 付费 | 付费 |
+| 安装复杂度 | 中等 | 简单（Omnibus） | 中等 |
+| 高可用 | ✓ | ✓ | ✓ |
+| 存储 | 内置 | 内置 + 对象存储 | 内置 |
+| 更新频率 | 季度 | 月度 | 季度 |
+
+## 迁移平台
+
+在不同平台间迁移是可能的：
+
+```bash
+# 从 GitHub 迁移到 GitLab
+# 方法 1：导入工具
+# 在 GitLab 中 "Import project → GitHub"
+
+# 方法 2：手动迁移
+git clone --mirror https://github.com/user/repo.git
+cd repo.git
+git remote add gitlab https://gitlab.com/user/repo.git
+git push --mirror gitlab
+```
+
+## 继续学习建议
+
+1. `github/github-flow-basics` — GitHub Flow 基础
+2. `gitlab/gitlab-flow-and-merge-requests` — GitLab Flow
+3. `hosting/self-hosted-git` — 自建 Git 服务

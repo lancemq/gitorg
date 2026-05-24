@@ -1,0 +1,147 @@
+export const metadata = {
+  title: "Large Repository Performance Optimization",
+  slug: "large-repo-optimization",
+  locale: "en",
+  section: "performance",
+  summary: "Strategies for optimizing Git performance in large repositories, including partial clone, sparse checkout, shallow clone, git gc, and Git LFS.",
+  sourceUrls: [
+    "https://git-scm.com/docs/partial-clone",
+    "https://git-scm.com/docs/git-sparse-checkout",
+    "https://git-scm.com/docs/git-gc",
+  ],
+};
+
+# Large Repository Performance Optimization
+
+## One-Sentence Understanding
+
+Git can slow down in very large repositories, but strategies like partial clone, sparse checkout, shallow clone, and regular gc can dramatically improve performance.
+
+## Diagnose Repository Performance
+
+Before optimizing, check your repo's current state:
+
+```bash
+# Repository size
+git count-objects -vH
+
+# Largest files
+git rev-list --objects --all | git cat-file --batch-check='%(objecttype) %(objectsize) %(rest)' | awk '/^blob/ {print}' | sort -k2 -n -r | head -10
+
+# Command timing
+time git status --porcelain | wc -l
+time git log --oneline -1
+```
+
+## Partial Clone
+
+Only download objects you need, fetching the rest on-demand:
+
+```bash
+# Clone without blob objects
+git clone --filter=blob:none <url>
+
+# Clone without tree or blob objects
+git clone --filter=tree:0 <url>
+
+# On-demand fetch
+git checkout main  # triggers missing file downloads
+```
+
+### Filter Comparison
+
+| Filter | Behavior | Use Case |
+|--------|----------|----------|
+| `blob:none` | Skip all blobs, fetch on-demand | General use |
+| `tree:0` | Skip trees and blobs | Metadata only |
+| `blob:limit=1m` | Skip blobs >1MB | Few large files |
+| `sparse:oid=<blob>` | Use sparse-checkout paths | Monorepo |
+
+## Sparse Checkout
+
+Only check out specific paths:
+
+```bash
+# Enable during clone
+git clone --sparse <url>
+
+# Enable in existing repo
+git sparse-checkout init --cone
+
+# Set directories to check out
+git sparse-checkout set src/api src/lib
+
+# Add more directories
+git sparse-checkout add docs
+
+# List active paths
+git sparse-checkout list
+```
+
+## Shallow Clone
+
+Clone only recent commits:
+
+```bash
+# Last 5 commits
+git clone --depth 5 <url>
+
+# Since a date
+git clone --shallow-since=2025-01-01 <url>
+
+# Exclude tags
+git clone --shallow-exclude=v1.0.0 <url>
+
+# Convert to full clone
+git fetch --unshallow
+```
+
+## Repository Maintenance
+
+```bash
+# Regular GC
+git gc
+
+# Aggressive GC
+git gc --aggressive
+
+# Auto GC (runs automatically)
+git gc --auto
+
+# Verify integrity
+git fsck
+
+# Repack
+git repack -a -d --depth=250 --window=250
+```
+
+## Git LFS
+
+```bash
+# Install LFS
+git lfs install
+
+# Track large file types
+git lfs track "*.psd"
+git lfs track "*.zip"
+
+# Migrate existing binaries
+git lfs migrate import --include="*.psd" --everything
+```
+
+## Strategy Guide
+
+| Scenario | Recommendation |
+|----------|---------------|
+| Large monorepo | sparse checkout + partial clone |
+| CI environment | shallow clone (`--depth 50`) |
+| Latest code only | shallow clone (`--depth 1`) |
+| Very deep history | partial clone + regular gc |
+| Many binaries | Git LFS |
+| Frequent branch switching | sparse checkout |
+
+## Continue Learning
+
+1. `concepts/worktree` — Multiple worktrees for parallel dev
+2. `internals/packfiles-and-storage` — Packfile & storage
+3. `commands/git-sparse-checkout` — Sparse checkout reference

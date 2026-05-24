@@ -1,0 +1,148 @@
+export const metadata = {
+  title: "Mercurial to Git Migration Guide",
+  slug: "hg-to-git",
+  locale: "en",
+  section: "migration",
+  summary: "A guide to migrating from Mercurial (Hg) to Git, including hg-fast-export, branch/tag conversion, and common difference handling.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-and-Other-Systems-Migrating-to-Git",
+    "https://github.com/frej/fast-export",
+  ],
+};
+
+# Mercurial to Git Migration Guide
+
+## One-Sentence Understanding
+
+Mercurial and Git are conceptually similar (both are distributed VCS), but differ in command set, branch model, and data structures. Migration requires not just data conversion but workflow redesign.
+
+## Pre-Migration Comparison
+
+| Concept | Mercurial (Hg) | Git |
+|---------|---------------|-----|
+| Revision ID | Global numbers (r1, r2) | SHA hashes |
+| Branches | Permanent named branches | Lightweight pointers |
+| Bookmarks | Bookmarks | Branches |
+| MQ | Mercurial Queues | Stash + Rebase |
+| Workspace | Single working directory | Working tree + staging area |
+| Ignore | .hgignore | .gitignore + .git/info/exclude |
+
+## Migrate with hg-fast-export
+
+### Install Tool
+
+```bash
+git clone https://github.com/frej/fast-export.git
+export PATH="$PATH:$PWD/fast-export"
+```
+
+### Execute Migration
+
+```bash
+mkdir project-git
+cd project-git
+git init
+hg-fast-export.sh -r /path/to/hg-repo
+git checkout HEAD
+```
+
+### Author Mapping
+
+```bash
+# authors.txt
+hg_author_name <hg_author_email> = Full Name <email@example.com>
+
+# Use during export
+hg-fast-export.sh -r /path/to/hg-repo --mapping authors.txt
+```
+
+## Handling Hg-Specific Concepts
+
+### Named Branches
+
+Converted to Git branches by default:
+
+```bash
+git branch -a
+```
+
+### MQ (Mercurial Queues)
+
+Apply patches to branches before migration:
+
+```bash
+hg qfinish -a  # Convert all patches to regular commits
+# Then migrate
+```
+
+### Subrepositories
+
+After migration, re-register Git submodules:
+
+```bash
+git submodule init
+git submodule update
+```
+
+## Post-Migration Checklist
+
+### Integrity Check
+
+```bash
+# Compare commit counts
+hg log --template '{node}\n' | wc -l
+git rev-list --count --all
+
+# Compare branches
+hg branches
+git branch -a
+
+# Compare tags
+hg tags
+git tag
+```
+
+### Workflow Adjustments
+
+- `hg update` → `git checkout` / `git switch`
+- `hg merge` → `git merge`
+- `hg rebase` → `git rebase`
+- `hg histedit` → `git rebase -i`
+
+## Common Pitfalls
+
+### Empty Commits
+
+Mercurial allows empty commits; Git does not by default. Some migrated commits may have no diffs — this is normal.
+
+### Hg Extensions
+
+| Hg Extension | Git Alternative |
+|-------------|----------------|
+| evolve | `rebase` + `cherry-pick` |
+| shelve | `git stash` |
+| record | `git add -p` |
+| hgflow | `git flow` extension or worktree |
+
+### Large Files
+
+Same as SVN migration — check large files and use Git LFS.
+
+## Team Transition Strategy
+
+1. **Parallel running**: Both VCS for 2-4 weeks
+2. **Training focus**: Staging area, rebase flow, PR/MR model
+3. **Common gotcha**: Hg users tend to misuse `git pull` (which = `hg pull && hg update`)
+4. **Helper aliases**:
+
+```bash
+git config --global alias.summary "log --oneline --graph --all"
+git config --global alias.record "add -p"
+git config --global alias.sync "pull --rebase"
+```
+
+## Continue Learning
+
+1. `learning-path/quick-start` — Git quick start
+2. `workflows/squash-vs-rebase-merge` — Integration strategies
+3. `concepts/three-layers` — Git's three-layer model

@@ -1,0 +1,160 @@
+export const metadata = {
+  title: "Self-Hosted Git Service Comparison",
+  slug: "self-hosted-git",
+  locale: "en",
+  section: "hosting",
+  summary: "A comparison of self-hosted Git solutions including GitLab CE, Gitea, Gogs, and others — covering features, deployment, and maintenance.",
+  sourceUrls: [
+    "https://docs.gitlab.com/ee/install/",
+    "https://gitea.com/",
+    "https://gogs.io/",
+  ],
+};
+
+# Self-Hosted Git Service Comparison
+
+## One-Sentence Understanding
+
+Self-hosted Git services give you full control over code data, permissions, and DevOps pipelines — ideal for teams with compliance, data sovereignty, or customization needs.
+
+## Why Self-Host?
+
+| Factor | Cloud | Self-Hosted |
+|--------|-------|-------------|
+| Data sovereignty | Third-party | Full control |
+| Compliance | Must evaluate | Self-managed |
+| Customization | Limited | Full control |
+| Operations | Zero ops | Requires maintenance |
+| Availability | SLA | Self-managed |
+| Updates | Instant | Manual upgrades |
+
+## Popular Solutions
+
+### GitLab CE
+
+Most complete self-hosted DevOps platform.
+
+```yaml
+Deploy: Omnibus / Docker / Helm (K8s)
+Resources: 4GB RAM minimum, 8GB+ recommended
+Coverage: Full DevOps (CI/CD, Registry, Pages, K8s)
+```
+
+**Pros:**
+- Most feature-complete
+- Built-in CI/CD (shared Runners)
+- LDAP, SAML, OAuth support
+- Active community
+
+**Cons:**
+- Heavy resource usage
+- Upgrades may have breaking changes
+- Complex configuration
+
+### Gitea
+
+Lightweight Git service in Go.
+
+```yaml
+Deploy: Single binary / Docker
+Resources: 1GB RAM minimum, 256MB usable
+Coverage: Code + Issues + PR + Actions (experimental)
+```
+
+**Pros:**
+- Extremely lightweight (runs on Raspberry Pi)
+- Simple deploy (one binary)
+- Very low resource usage
+- LDAP, OAuth support
+
+**Cons:**
+- CI/CD is newer (Gitea Actions)
+- Smaller plugin ecosystem
+- Limited large-repo performance
+
+### Gogs
+
+The original lightweight Go Git service (predecessor to Gitea).
+
+```yaml
+Deploy: Single binary / Docker
+Resources: 512MB RAM minimum, 128MB usable
+Coverage: Core hosting + Issues + PR
+```
+
+**Pros:**
+- Lightest option
+- Simplest deploy
+- Good for tiny teams
+
+**Cons:**
+- Least featured, slower updates
+- No built-in CI/CD
+- Smallest community
+
+### Other Options
+
+| Solution | Language | Highlights |
+|----------|----------|-----------|
+| Gitea Fork (Codeberg) | Go | Community fork of Gitea |
+| Onedev | Java | Built-in CI/CD, rich features |
+| RhodeCode | Python | Enterprise code review |
+| Bitbucket DC | Java | Atlassian ecosystem |
+
+## Deployment
+
+### Docker Quick Start
+
+```yaml
+# docker-compose.yml
+version: '3'
+services:
+  gitea:
+    image: gitea/gitea:latest
+    ports:
+      - "3000:3000"
+      - "22:22"
+    volumes:
+      - ./gitea:/data
+    restart: always
+
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    ports:
+      - "8080:80"
+      - "2222:22"
+    volumes:
+      - ./gitlab/config:/etc/gitlab
+      - ./gitlab/logs:/var/log/gitlab
+      - ./gitlab/data:/var/opt/gitlab
+```
+
+### Backup Strategy
+
+```bash
+# GitLab backup
+gitlab-rake gitlab:backup:create
+
+# Gitea backup
+rsync -av /path/to/gitea/data/ /backup/gitea/
+
+# Generic Git backup
+git clone --mirror <url> backup.git
+```
+
+## Recommendation
+
+| Team Size | Solution | Rationale |
+|-----------|----------|-----------|
+| 1-5 | Gitea | Minimal deploy, low maintenance |
+| 5-20 | Gitea / GitLab CE | Depends on CI/CD needs |
+| 20-100 | GitLab CE | Complete DevOps |
+| 100+ | GitLab EE / GitHub ES | Enterprise features |
+| High compliance | GitLab EE / Bitbucket DC | Audit and management |
+
+## Continue Learning
+
+1. `hosting/platform-comparison` — Platform comparison
+2. `github/github-actions-and-skills` — CI/CD integration
+3. `gitlab/gitlab-ci-and-runners` — GitLab CI setup
+4. `internals/transfer-protocols-and-negotiation` — Git protocols

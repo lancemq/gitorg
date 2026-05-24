@@ -1,0 +1,161 @@
+export const metadata = {
+  title: "SVN to Git Migration Guide",
+  slug: "svn-to-git",
+  locale: "en",
+  section: "migration",
+  summary: "A complete guide to migrating from Subversion (SVN) to Git, covering history conversion, branch mapping, team training, and common pitfalls.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-svn",
+    "https://git-scm.com/book/en/v2/Git-and-Other-Systems-Migrating-to-Git",
+  ],
+};
+
+# SVN to Git Migration Guide
+
+## One-Sentence Understanding
+
+Migrating from SVN to Git is not just copying code — it's shifting from "centralized file versioning" to "distributed snapshot engine" thinking.
+
+## Before Migration
+
+### Assess the SVN Repo
+
+```bash
+svn log -q --limit 1
+svn ls ^/
+
+# Confirm standard layout
+svn ls ^/trunk
+svn ls ^/branches
+svn ls ^/tags
+```
+
+### Prepare Author Mapping
+
+Create `authors.txt`:
+
+```
+svn_username = Full Name <email@example.com>
+jdoe = John Doe <john@example.com>
+```
+
+### Tool Selection
+
+| Tool | Best For | Notes |
+|------|----------|-------|
+| `git svn` clone | Small to medium repos | Built-in, reliable |
+| `svn2git` | More control | Wrapper around git svn |
+| `svn-all-fast-export` | Very large repos | Best performance (KDE project) |
+
+## Migrate with git svn
+
+### Step 1: Clone
+
+```bash
+git svn clone http://svn.example.com/project \
+  --stdlayout \
+  --authors-file=authors.txt \
+  --prefix=svn/ \
+  project-git
+
+cd project-git
+```
+
+### Step 2: Clean Up Tags
+
+```bash
+git for-each-ref --format='%(refname)' refs/remotes/svn/tags/ |
+while read tag; do
+  tag_name=${tag#refs/remotes/svn/tags/}
+  git tag "$tag_name" "$tag^{}"
+  git branch -r -d "svn/tags/$tag_name"
+done
+```
+
+### Step 3: Map Branches
+
+```bash
+git for-each-ref --format='%(refname)' refs/remotes/svn/ |
+  grep -v 'svn/tags' |
+while read branch; do
+  branch_name=${branch#refs/remotes/svn/}
+  git branch "$branch_name" "$branch"
+  git branch -r -d "svn/$branch_name"
+done
+```
+
+### Step 4: Push to Remote
+
+```bash
+git remote add origin git@github.com:user/project.git
+git push origin --all
+git push origin --tags
+```
+
+## Common Issues
+
+### Large Files
+
+```bash
+# Find large files
+git rev-list --objects --all | git cat-file --batch-check='%(objecttype) %(objectsize) %(rest)' | sort -k2 -n -r | head -20
+
+# Clean with BFG
+java -jar bfg.jar --strip-blobs-bigger-than 100M project.git
+```
+
+### Empty Directories
+
+```bash
+find . -type d -empty -not -path "./.git/*" -exec touch {}/.gitkeep \;
+```
+
+### Binary Files
+
+Use Git LFS:
+
+```bash
+git lfs install
+git lfs track "*.dll"
+git lfs migrate import --include="*.dll,*.exe" --everything
+```
+
+## Team Migration Plan
+
+### Phase 1: Assessment
+1. Evaluate SVN repo (history, size, branches)
+2. Prepare author mapping
+3. Choose migration tool
+4. Trial migration off-hours
+
+### Phase 2: Pilot
+1. Small team tests Git
+2. Collect feedback
+3. Improve documentation
+
+### Phase 3: Switchover
+1. Freeze SVN
+2. Final migration
+3. Verify results
+4. Full team switch
+
+### Phase 4: Transition
+1. SVN read-only (1-3 months)
+2. Train team on Git workflows
+3. Archive SVN repo
+
+## Mindset Comparison
+
+| Dimension | SVN | Git |
+|-----------|-----|-----|
+| Model | Centralized file versioning | Distributed snapshots |
+| Branches | Directory copies (slow, heavy) | Pointers (fast, light) |
+| Commits | Global sequential numbers | SHA hashes |
+| History | Linear | DAG |
+| Offline | Unavailable | Full functionality |
+
+## Continue Learning
+
+1. `learning-path/quick-start` — Git quick start
+2. `workflows/feature-branch-collaboration` — Feature branch workflow
+3. `best-practices/commit-hygiene` — Commit conventions

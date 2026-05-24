@@ -9,6 +9,12 @@ import {
   buildGithubNavItem,
   buildGitlabNavItem,
   buildRecoveryNavItem,
+  buildCicdNavItem,
+  buildIdeNavItem,
+  buildSecurityNavItem,
+  buildPerformanceNavItem,
+  buildMigrationNavItem,
+  buildHostingNavItem,
 } from "./index";
 import { commandSlugs } from "./slugs";
 
@@ -35,6 +41,12 @@ export const zhDictionary: Dictionary = {
             buildInternalsNavItem("zh", activePath),
             buildGithubNavItem("zh", activePath),
             buildGitlabNavItem("zh", activePath),
+            buildCicdNavItem("zh", activePath),
+            buildIdeNavItem("zh", activePath),
+            buildSecurityNavItem("zh", activePath),
+            buildPerformanceNavItem("zh", activePath),
+            buildMigrationNavItem("zh", activePath),
+            buildHostingNavItem("zh", activePath),
             buildRecoveryNavItem("zh", activePath),
           ],
         },
@@ -99,6 +111,36 @@ export const zhDictionary: Dictionary = {
     eyebrow: "Git Internals",
     title: "Git 原理频道",
     description: "把 Git 原理拆成多个原理点专题，从对象数据库、引用与 HEAD，到提交图与 packfiles，帮助你建立更稳定的底层心智模型。",
+  },
+  ciCdIndex: {
+    eyebrow: "CI/CD",
+    title: "CI/CD 集成",
+    description: "系统介绍 Git 与 CI/CD 管线的集成方式，包括 GitHub Actions、GitLab CI 的触发策略、认证与安全实践。",
+  },
+  ideIndex: {
+    eyebrow: "IDE",
+    title: "IDE 集成",
+    description: "掌握主流 IDE 中的 Git 集成功能，包括 VS Code 和 JetBrains 的源代码管理、差异对比与冲突解决。",
+  },
+  securityIndex: {
+    eyebrow: "Security",
+    title: "安全",
+    description: "系统学习 SSH 密钥管理与 GPG 签名，确保 Git 操作的认证安全与提交验证。",
+  },
+  performanceIndex: {
+    eyebrow: "Performance",
+    title: "性能优化",
+    description: "深入了解 Git 大仓库性能优化策略，包括 partial clone、sparse checkout、浅克隆与 Git LFS。",
+  },
+  migrationIndex: {
+    eyebrow: "Migration",
+    title: "迁移指南",
+    description: "从 Subversion（SVN）和 Mercurial（Hg）迁移到 Git 的完整流程、工具选择与常见陷阱。",
+  },
+  hostingIndex: {
+    eyebrow: "Hosting",
+    title: "托管方案",
+    description: "对比 GitHub、GitLab、Bitbucket 等托管平台，以及 GitLab CE、Gitea 等自建方案的选择与部署。",
   },
   home: {
     hero: {
@@ -443,6 +485,42 @@ export const zhDictionary: Dictionary = {
         title: "概念基础",
         description: "理解 Git 的对象、引用和 HEAD。",
       },
+      {
+        id: "ci-cd",
+        eyebrow: "CI/CD",
+        title: "CI/CD 集成",
+        description: "Git 与 CI/CD 管线集成。",
+      },
+      {
+        id: "ide",
+        eyebrow: "IDE",
+        title: "IDE 集成",
+        description: "主流 IDE 中的 Git 功能。",
+      },
+      {
+        id: "security",
+        eyebrow: "Security",
+        title: "安全",
+        description: "SSH 密钥与 GPG 签名。",
+      },
+      {
+        id: "performance",
+        eyebrow: "Performance",
+        title: "性能优化",
+        description: "大仓库性能优化策略。",
+      },
+      {
+        id: "migration",
+        eyebrow: "Migration",
+        title: "迁移指南",
+        description: "SVN/Hg 到 Git 迁移。",
+      },
+      {
+        id: "hosting",
+        eyebrow: "Hosting",
+        title: "托管方案",
+        description: "托管平台与自建方案。",
+      },
     ],
   },
   commandPage: {
@@ -459,6 +537,12 @@ export const zhDictionary: Dictionary = {
       faq: "常见问题",
       learningPath: "学习路径",
       recovery: "恢复与排障",
+      "ci-cd": "CI/CD 集成",
+      ide: "IDE 集成",
+      security: "安全",
+      performance: "性能优化",
+      migration: "迁移指南",
+      hosting: "托管方案",
     },
   },
   commandSlugs,

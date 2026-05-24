@@ -1,0 +1,200 @@
+export const metadata = {
+  title: "VS Code Git Integration",
+  slug: "vscode-git",
+  locale: "en",
+  section: "ide",
+  summary: "Master VS Code's built-in Git integration, including the Source Control panel, diff editor, inline blame, staging, branching, and conflict resolution.",
+  sourceUrls: [
+    "https://code.visualstudio.com/docs/sourcecontrol/overview",
+    "https://code.visualstudio.com/docs/sourcecontrol/intro-to-git",
+  ],
+};
+
+# VS Code Git Integration
+
+## One-Sentence Understanding
+
+VS Code's Git integration turns your editor into a visual Git client — every action you can do in the terminal has a button or shortcut in VS Code.
+
+## Source Control Panel
+
+Open with `Ctrl+Shift+G` / `Cmd+Shift+G` or the Git icon in the activity bar.
+
+### Panel Layout
+
+```
+=== SOURCE CONTROL ==========================
+[ Commit message box                        ]
+[ Ctrl+Enter to commit (or ↓ for more)      ]
+
+=== Changes =================================
+> Staged Changes (n)
+    file.ts        [diff view] [+ unstage]
+    file2.ts
+
+> Changes (n)
+    file.ts        [discard] [+ stage]
+    newfile.ts     [discard] [+ stage]
+
+=== Merge Changes (if conflict) =============
+    conflicted.ts  [accept current/ incoming/both]
+
+=== Branches ================================
+  main (active)
+  feature-x
+```
+
+## Essential Operations
+
+### Viewing Diffs
+
+Click a changed file to open the diff editor:
+
+| Action | Shortcut |
+|--------|----------|
+| Open diff | Click file in Changes list |
+| Stage hunk | Select lines → + icon |
+| Discard hunk | Select lines → − icon |
+| Next change | `Alt+F5` |
+| Previous change | `Alt+Shift+F5` |
+
+### Staging
+
+```mermaid
+flowchart LR
+    Working[Working Directory] -->|+ button| Staged[Staging Area]
+    Staged -->|unstage −| Working
+    Staged -->|commit ✓| Local[Local Repo]
+```
+
+- Stage file: hover file → `+`
+- Stage selection: select lines in diff → `+`
+- Stage all: hover Changes → `+`
+- Unstage: hover file in Staged → `−`
+
+### Committing
+
+1. Type commit message in the message box
+2. Press `Ctrl+Enter` / `Cmd+Enter`
+3. Or click the checkmark icon
+
+**Commit options** (click `↓` next to commit button):
+- Commit
+- Commit & Push
+- Commit & Sync
+- Amend commit
+
+### Branching
+
+Source Control Panel → `...` menu → Branch:
+
+```
+Branch → Create Branch...
+Branch → Switch to Branch...
+Branch → Merge Branch...
+Branch → Rebase Branch...
+```
+
+**Status bar**: Click the branch name (bottom-left) to quickly switch branches.
+
+## Inline Features
+
+### Inline Blame (GitLens-style)
+
+VS Code has built-in inline blame annotations:
+
+```
+Settings → Editor → Inlay Hints
+  → Enabled: "On"  (default for Git blame)
+```
+
+Shows commit message, author, and date inline.
+
+### Code Lens (Author info)
+
+```
+Settings → Git: Code Lens
+```
+
+Shows "n authors" above functions in the editor.
+
+### Source Control Timeline
+
+Explorer panel → Timeline view → show Git history for the current file.
+
+## Conflict Resolution
+
+### Three-Way Merge Editor
+
+VS Code 1.88+ has a dedicated merge editor:
+
+1. Click a conflicted file in Source Control
+2. Use the merge editor UI:
+   - **Incoming** (right): Changes from the branch you're merging
+   - **Current** (left): Your current branch
+   - **Result** (center): The merged result
+
+### Acceptance Buttons
+
+| Button | Action |
+|--------|--------|
+| Accept Current | Keep your side |
+| Accept Incoming | Take their side |
+| Accept Both | Combine both |
+| Accept Selection | Apply selected changes |
+| Compare | Side-by-side comparison |
+
+### Conflict Markers in Editor
+
+VS Code colorizes conflict markers, and provides action links above each conflict:
+
+```text
+<<<<<<< HEAD (Current Change)
+your code
+=======
+their code
+>>>>>>> feature-branch (Incoming Change)
+```
+
+Click **"Accept Current"** or **"Accept Incoming"** above the markers.
+
+## Git GUI in VS Code
+
+### Visual History (Git Graph)
+
+Use the Git Graph extension or built-in:
+
+```
+View → Timeline
+```
+
+Or install "Git Graph" extension for a richer visual history.
+
+### Interactive Rebase
+
+Not built-in, but can be done via terminal panel (`Ctrl+``):
+
+```bash
+git rebase -i HEAD~3
+```
+
+## Settings to Know
+
+```json
+// settings.json
+{
+  "git.enabled": true,
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.suggestedCommitMessages": true,
+  "git.inputValidation": true,
+  "git.mergeEditor": true,
+  "git.branchProtection": ["main", "master"]
+}
+```
+
+## Continue Learning
+
+1. `ide/jetbrains-git` — JetBrains Git integration
+2. `github/github-flow-basics` — GitHub Flow
+3. `commands/git-stash` — Stashing in Git

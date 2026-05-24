@@ -15,6 +15,12 @@ const sectionLabels: Record<Locale, Record<DocMetadata["section"], string>> = {
     internals: "Git 原理",
     recovery: "恢复与排障",
     concepts: "概念",
+    "ci-cd": "CI/CD 集成",
+    ide: "IDE 集成",
+    security: "安全",
+    performance: "性能优化",
+    migration: "迁移指南",
+    hosting: "托管方案",
   },
   en: {
     "learning-path": "Learning Path",
@@ -26,6 +32,12 @@ const sectionLabels: Record<Locale, Record<DocMetadata["section"], string>> = {
     internals: "Git Internals",
     recovery: "Recovery",
     concepts: "Concepts",
+    "ci-cd": "CI/CD",
+    ide: "IDE",
+    security: "Security",
+    performance: "Performance",
+    migration: "Migration",
+    hosting: "Hosting",
   },
 };
 
@@ -39,6 +51,12 @@ const learningResourceType: Record<DocMetadata["section"], string> = {
   internals: "Technical explainer",
   recovery: "Troubleshooting guide",
   concepts: "Concept guide",
+  "ci-cd": "Tutorial",
+  ide: "Tutorial",
+  security: "Best practice guide",
+  performance: "Technical guide",
+  migration: "Guide",
+  hosting: "Comparison guide",
 };
 
 const tierLabel: Record<DocTier, string> = {

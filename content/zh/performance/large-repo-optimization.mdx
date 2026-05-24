@@ -1,0 +1,200 @@
+export const metadata = {
+  title: "大仓库性能优化策略",
+  slug: "large-repo-optimization",
+  locale: "zh",
+  section: "performance",
+  summary: "系统介绍 Git 大仓库的性能优化策略，包括 partial clone、sparse checkout、浅克隆、git gc 和 Git LFS 等。",
+  sourceUrls: [
+    "https://git-scm.com/docs/partial-clone",
+    "https://git-scm.com/docs/git-sparse-checkout",
+    "https://git-scm.com/docs/git-gc",
+  ],
+};
+
+# 大仓库性能优化策略
+
+## 一句话理解
+
+Git 在处理超大仓库时可能变慢，但通过 partial clone、sparse checkout、浅克隆和定期 gc 等策略，可以显著提升性能。
+
+## 诊断仓库性能
+
+在优化之前，先诊断当前仓库的状态：
+
+```bash
+# 查看仓库大小
+git count-objects -vH
+
+# 查看最大的文件
+git rev-list --objects --all | git cat-file --batch-check='%(objecttype) %(objectsize) %(rest)' | awk '/^blob/ {print}' | sort -k2 -n -r | head -10
+
+# 查看引用数量
+git count-objects -v | grep "count"
+
+# 测量常用命令耗时
+git status --porcelain | wc -l
+time git log --oneline -1
+```
+
+## Partial Clone（部分克隆）
+
+Partial clone 允许只下载需要的对象，按需从远端获取。
+
+```bash
+# 创建部分克隆：只下载 blob 对象的上层元数据
+git clone --filter=blob:none <url>
+
+# 创建部分克隆：只下载最近提交的文件
+git clone --filter=tree:0 <url>
+
+# 按需获取
+git checkout main  # 触发缺失文件下载
+git log           # 本地操作，不需要网络
+```
+
+### Filter 类型对比
+
+| Filter | 行为 | 适用场景 |
+|--------|------|---------|
+| `blob:none` | 跳过所有 blob，按需获取文件内容 | 常用，平衡好 |
+| `tree:0` | 跳过所有 tree 和 blob | 仅需元数据时 |
+| `blob:limit=1m` | 跳过 >1MB 的大 blob | 大文件少时 |
+| `sparse:oid=<blob>` | 使用 sparse-checkout 指定路径 | monorepo |
+
+### 恢复完整仓库
+
+```bash
+# 获取所有对象
+git fetch --unshallow
+
+# 或逐步补全
+git fetch --refetch
+```
+
+## Sparse Checkout（稀疏检出）
+
+只检出仓库中部分路径的文件，减少工作区大小。
+
+### 启用稀疏检出
+
+```bash
+# 克隆时启用
+git clone --sparse <url>
+
+# 在已有仓库中启用
+git sparse-checkout init --cone
+
+# 设置要检出的目录
+git sparse-checkout set src/api src/lib
+
+# 添加更多目录
+git sparse-checkout add docs
+
+# 列出当前检出路径
+git sparse-checkout list
+```
+
+### Cone 模式
+
+`--cone` 模式是稀疏检出的高效模式，只检出根目录和指定的目录。
+
+```
+# 非 cone 模式（原始模式）
+# 需要精确指定每个文件
+echo "src/api/index.ts" >> .git/info/sparse-checkout
+
+# cone 模式
+# 只需要指定目录
+git sparse-checkout set src/api
+# 自动包括 src/api 下所有文件
+```
+
+## 浅克隆（Shallow Clone）
+
+只克隆最近 N 个提交，减少历史数据量。
+
+```bash
+# 克隆最近 5 个提交
+git clone --depth 5 <url>
+
+# 指定日期后
+git clone --shallow-since=2025-01-01 <url>
+
+# 指定排除某些标签
+git clone --shallow-exclude=v1.0.0 <url>
+
+# 将浅克隆转换为完整克隆
+git fetch --unshallow
+```
+
+### 浅克隆的限制
+
+- 不能 `git log` 到超过深度的历史
+- 不能 `git diff` 和深历史比较
+- 不能 `git bisect` 到浅历史之前的提交
+- `git push` 可能需要 `--force`（如果远端有深历史）
+
+## 仓库维护
+
+### 定期垃圾回收
+
+```bash
+# 常规 GC
+git gc
+
+# 积极 GC（更彻底的压缩，耗时更长）
+git gc --aggressive
+
+# 自动 GC（Git 自动运行）
+git gc --auto
+```
+
+### 其他维护操作
+
+```bash
+# 清理引用
+git prune
+
+# 检查仓库完整性
+git fsck
+
+# 重打包
+git repack -a -d --depth=250 --window=250
+```
+
+## Git LFS（Large File Storage）
+
+LFS 用文本指针替换大文件，实际内容存储在远端。
+
+```bash
+# 安装 LFS
+git lfs install
+
+# 跟踪大文件类型
+git lfs track "*.psd"
+git lfs track "*.zip"
+
+# 查看跟踪模式
+git lfs track
+
+# 迁移已有的二进制文件到 LFS
+git lfs migrate import --include="*.psd" --everything
+```
+
+## 优化策略选择指南
+
+| 场景 | 推荐策略 |
+|------|---------|
+| 超大 monorepo | sparse checkout + partial clone (`blob:none`) |
+| CI 环境 | shallow clone (`--depth 50`) |
+| 仅需要最新代码 | shallow clone (`--depth 1`) |
+| 历史很深的仓库 | partial clone + 定期 gc |
+| 包含大量二进制文件 | Git LFS |
+| 频繁切换分支 | sparse checkout |
+
+## 继续学习建议
+
+1. `concepts/worktree` — 多 worktree 优化并行开发
+2. `internals/packfiles-and-storage` — packfile 与存储原理
+3. `commands/git-gc` — GC 命令详解
+4. `commands/git-sparse-checkout` — 稀疏检出命令详解

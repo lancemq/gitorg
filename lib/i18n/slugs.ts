@@ -519,6 +519,60 @@ export const conceptSlugs = [
   "stash",
 ] as const satisfies readonly ConceptsSlug[];
 
+export type CiCdSlug =
+  | "github-actions-basics"
+  | "gitlab-ci-basics";
+
+export type IdeSlug =
+  | "vscode-git"
+  | "jetbrains-git";
+
+export type SecuritySlug =
+  | "ssh-key-management"
+  | "gpg-signing";
+
+export type PerformanceSlug =
+  | "large-repo-optimization"
+  | "partial-clone";
+
+export type MigrationSlug =
+  | "svn-to-git"
+  | "hg-to-git";
+
+export type HostingSlug =
+  | "platform-comparison"
+  | "self-hosted-git";
+
+export const ciCdSlugs = [
+  "github-actions-basics",
+  "gitlab-ci-basics",
+] as const satisfies readonly CiCdSlug[];
+
+export const ideSlugs = [
+  "vscode-git",
+  "jetbrains-git",
+] as const satisfies readonly IdeSlug[];
+
+export const securitySlugs = [
+  "ssh-key-management",
+  "gpg-signing",
+] as const satisfies readonly SecuritySlug[];
+
+export const performanceSlugs = [
+  "large-repo-optimization",
+  "partial-clone",
+] as const satisfies readonly PerformanceSlug[];
+
+export const migrationSlugs = [
+  "svn-to-git",
+  "hg-to-git",
+] as const satisfies readonly MigrationSlug[];
+
+export const hostingSlugs = [
+  "platform-comparison",
+  "self-hosted-git",
+] as const satisfies readonly HostingSlug[];
+
 export const internalsSlugs = [
   "object-database",
   "plumbing-and-porcelain",

@@ -1,0 +1,167 @@
+export const metadata = {
+  title: "Partial Clone：按需获取 Git 对象",
+  slug: "partial-clone",
+  locale: "zh",
+  section: "performance",
+  summary: "深入介绍 Git partial clone 的工作原理、filter 选项、promisor remote 机制，以及如何在大仓库中加速 clone 和 fetch。",
+  sourceUrls: [
+    "https://git-scm.com/docs/partial-clone",
+    "https://github.blog/2020-12-21-get-up-to-speed-with-partial-clone-and-shallow-clone/",
+  ],
+};
+
+# Partial Clone：按需获取 Git 对象
+
+## 一句话理解
+
+Partial clone 让你在克隆仓库时只下载必要的 Git 对象，其他对象在需要时自动从远端获取——就像"懒加载"一样。
+
+## 工作原理
+
+Partial clone 基于两个核心概念：
+
+### Filter（过滤器）
+
+在克隆时指定哪些对象应该被排除：
+
+```bash
+git clone --filter=blob:none <url>
+```
+
+过滤器在 `git fetch` 和 `git clone` 时生效，告诉服务器不要发送某些对象。
+
+### Promisor Remote（承诺远端）
+
+被过滤掉的对象并没有丢失——Git 知道它们可以从哪个远端获取。当需要这些对象时，Git 自动从 promisor remote 获取：
+
+```bash
+# 这是部分克隆的仓库
+cd repo
+
+# 此时工作区是空的，但元数据已下载
+git checkout main
+# → Git 自动从远端获取 main 分支的文件内容
+```
+
+## Filter 类型详解
+
+### blob:none
+
+排除所有 blob（文件内容）对象，只下载 commit、tree 和 tag 对象。
+
+```bash
+git clone --filter=blob:none <url>
+```
+
+- **优点**：大幅减少初始下载量（通常减少 70-90%）
+- **缺点**：首次 checkout 需要逐个下载文件
+- **适用**：大多数场景
+
+### tree:0
+
+排除所有 tree 和 blob 对象，只下载 commit 对象。
+
+```bash
+git clone --filter=tree:0 <url>
+```
+
+- **优点**：最小化初始下载
+- **缺点**：大部分操作需要远端请求
+- **适用**：只需要看 log 和元数据
+
+### `blob:limit=<size>`
+
+排除大于指定大小的 blob：
+
+```bash
+git clone --filter=blob:limit=1m <url>
+```
+
+- **优点**：精细控制
+- **适用**：仓库大部分文件小，少部分巨大
+
+### combine:...
+
+组合多个 filter：
+
+```bash
+git clone --filter="combine:blob:none+tree:0" <url>
+```
+
+## 实际操作指南
+
+### 克隆部分克隆仓库
+
+```bash
+# 标准部分克隆
+git clone --filter=blob:none https://github.com/example/large-repo.git
+
+# 部分克隆 + 稀疏检出组合
+git clone --filter=blob:none --sparse https://github.com/example/large-repo.git
+cd large-repo
+git sparse-checkout set src/my-team
+```
+
+### 在已有仓库启用部分克隆
+
+```bash
+# 启用部分克隆（Git 2.20+）
+git config core.repositoryformatversion 1
+git config extensions.partialClone origin
+
+# 删除本地所有 blob 对象
+git rev-list --objects --all | git pack-objects --stdout | git pack-objects --stdin --keep-unreachable
+git prune
+```
+
+### 获取缺失对象
+
+```bash
+# 手动触发 promisor 获取
+git fetch --refetch
+
+# 获取某个 blob
+git cat-file -p <blob-hash>
+# 如果对象缺失，Git 自动从远端获取
+```
+
+## 性能数据
+
+| 场景 | 完整克隆 | blob:none | 节省 |
+|------|---------|-----------|------|
+| 初始下载 | 500MB | 50MB | 90% |
+| git log | 快速 | 快速 | 相同 |
+| git checkout | 快速 | 需要获取文件 | 较慢 |
+| git status | 快速 | 需要获取文件 | 较慢 |
+
+## 限制和注意事项
+
+### 网络依赖
+
+部分克隆仓库的操作可能因网络请求变慢（首次 checkout、diff 等）。建议在稳定的网络环境下使用。
+
+### 部分服务端支持
+
+GitHub 完全支持，GitLab 需 13.6+，Bitbucket 支持有限。
+
+### 不能用于某些操作
+
+- `git gc` 在部分克隆仓库中需要特殊处理
+- `git archive` 可能无法包含缺失对象
+- 某些 git 工具（如旧版 IDE 集成）可能不兼容
+
+### 迁移回完整仓库
+
+```bash
+# 获取所有缺失对象（转换为完整仓库）
+git fetch --unshallow
+
+# 关闭部分克隆
+git config --unset extensions.partialClone
+```
+
+## 继续学习建议
+
+1. `performance/large-repo-optimization` — 大仓库综合优化策略
+2. `commands/git-sparse-checkout` — 稀疏检出命令详解
+3. `internals/packfiles-and-storage` — 对象存储与 packfile 原理

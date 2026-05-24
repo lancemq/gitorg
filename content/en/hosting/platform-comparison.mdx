@@ -1,0 +1,114 @@
+export const metadata = {
+  title: "Git Platform Comparison: GitHub vs GitLab vs Bitbucket",
+  slug: "platform-comparison",
+  locale: "en",
+  section: "hosting",
+  summary: "A systematic comparison of GitHub, GitLab, and Bitbucket's features, pricing, CI/CD integration, and collaboration models to help you choose the right platform.",
+  sourceUrls: [
+    "https://docs.github.com/en",
+    "https://docs.gitlab.com/",
+    "https://bitbucket.org/product/guides",
+  ],
+};
+
+# Git Platform Comparison: GitHub vs GitLab vs Bitbucket
+
+## One-Sentence Understanding
+
+GitHub, GitLab, and Bitbucket are all Git-based code hosting platforms, but differ significantly in CI/CD, permissions, DevOps integration, and pricing.
+
+## Platform Overview
+
+| Dimension | GitHub | GitLab | Bitbucket |
+|-----------|--------|--------|-----------|
+| Launched | 2008 | 2011 | 2008 |
+| Parent | Microsoft | GitLab Inc. | Atlassian |
+| Free plan | Unlimited private repos | Unlimited private repos | Up to 5 users |
+| Self-hosted | GitHub Enterprise | GitLab CE/EE | Bitbucket Data Center |
+| Focus | Open source collaboration | Complete DevOps | Atlassian ecosystem |
+
+## Feature Comparison
+
+### Code Collaboration
+
+| Feature | GitHub | GitLab | Bitbucket |
+|---------|--------|--------|-----------|
+| Pull/Merge Request | ✓ PR | ✓ MR | ✓ PR |
+| Code Review | ✓ Inline | ✓ Inline | ✓ Inline |
+| Draft PR | ✓ | ✓ | ✓ |
+| Code Owners | ✓ CODEOWNERS | ✓ CODEOWNERS | ✓ CODEOWNERS |
+
+### CI/CD
+
+| Feature | GitHub | GitLab | Bitbucket |
+|---------|--------|--------|-----------|
+| Built-in CI/CD | Actions | GitLab CI/CD | Pipelines |
+| Free minutes | 2000/mo | 400/mo | 50/mo |
+| Self-hosted runner | ✓ | ✓ | ✓ |
+| K8s integration | ✓ | ✓ | ✓ |
+
+### Project Management
+
+| Feature | GitHub | GitLab | Bitbucket |
+|---------|--------|--------|-----------|
+| Issue tracking | ✓ Issues | ✓ Issues | ✓ Jira integration |
+| Kanban boards | ✓ Projects | ✓ Issue Board | ✓ Jira |
+| Wiki | ✓ | ✓ | ✓ |
+| Roadmap | ✓ | ✓ ✓ Built-in | Via Jira |
+
+### Security
+
+| Feature | GitHub | GitLab | Bitbucket |
+|---------|--------|--------|-----------|
+| Secret scanning | ✓ Secret Scanning | ✓ Secret Detection | ✓ |
+| Dependency scanning | ✓ Dependabot | ✓ Dependency Scan | ✓ Snyk |
+| Code scanning | ✓ CodeQL | ✓ SAST | Third-party |
+| Branch protection | ✓ Rulesets | ✓ Protected branches | ✓ Branch restrictions |
+
+## Decision Tree
+
+### Choose GitHub when...
+
+- Your project is open source (GitHub is the standard)
+- You need rich third-party integrations and Actions ecosystem
+- Your team prefers GitHub Flow
+- Maximum community and talent pool
+
+### Choose GitLab when...
+
+- You need an end-to-end DevOps toolchain
+- Compliance and self-hosting are hard requirements
+- Your team uses GitLab Flow
+- Budget-conscious with CI/CD needs
+
+### Choose Bitbucket when...
+
+- Your team is deep in the Atlassian ecosystem (Jira, Confluence)
+- You already have Bitbucket repos from the Mercurial era
+- You need seamless Jira integration
+- Small team wanting low-cost private repos
+
+## Self-Hosting
+
+| Factor | GitHub Enterprise | GitLab CE/EE | Bitbucket Data Center |
+|--------|------------------|--------------|----------------------|
+| License | Paid | CE free / EE paid | Paid |
+| Installation | Medium | Easy (Omnibus) | Medium |
+| HA | ✓ | ✓ | ✓ |
+| Releases | Quarterly | Monthly | Quarterly |
+
+## Migration
+
+```bash
+# Migrate from GitHub to GitLab
+git clone --mirror https://github.com/user/repo.git
+cd repo.git
+git remote add gitlab https://gitlab.com/user/repo.git
+git push --mirror gitlab
+```
+
+## Continue Learning
+
+1. `github/github-flow-basics` — GitHub Flow basics
+2. `gitlab/gitlab-flow-and-merge-requests` — GitLab Flow
+3. `hosting/self-hosted-git` — Self-hosted Git services

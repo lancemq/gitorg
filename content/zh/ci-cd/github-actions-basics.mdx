@@ -1,0 +1,182 @@
+export const metadata = {
+  title: "GitHub Actions 与 Git 协同",
+  slug: "github-actions-basics",
+  locale: "zh",
+  section: "ci-cd",
+  summary: "系统介绍 GitHub Actions 如何与 Git 仓库协同工作，包括事件触发、工作流语法、CI/CD 集成和最佳实践。",
+  sourceUrls: [
+    "https://docs.github.com/en/actions",
+    "https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows",
+  ],
+};
+
+# GitHub Actions 与 Git 协同
+
+## 一句话理解
+
+GitHub Actions 是 GitHub 内置的 CI/CD 平台，它直接与 Git 事件（push、PR、release 等）绑定，实现"代码变更即触发自动化流水线"。
+
+## Actions 的 Git 事件模型
+
+GitHub Actions 的工作流由 Git 事件驱动。最常见的触发事件：
+
+```yaml
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  release:
+    types: [published]
+```
+
+### push 事件
+
+每次 `git push` 到远程仓库时触发。适合 CI 验证和部署。
+
+```yaml
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "src/**"
+      - "package.json"
+```
+
+### pull_request 事件
+
+PR 的 open、synchronize、reopened 等动作触发。适合代码审查前的自动化检查。
+
+```yaml
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+```
+
+### 其他 Git 相关事件
+
+- `create` / `delete`：分支或标签创建/删除
+- `workflow_dispatch`：手动触发
+- `schedule`：定时触发（cron）
+
+## 工作流与 Git 状态
+
+Actions 工作流运行时会自动检出代码：
+
+```yaml
+steps:
+  - uses: actions/checkout@v4
+```
+
+`actions/checkout` 默认检出触发工作流的提交（GITHUB_SHA）。你可以通过参数控制检出行为：
+
+```yaml
+- uses: actions/checkout@v4
+  with:
+    fetch-depth: 0      # 获取全部历史（用于 lint-staged、sonar 等）
+    ref: ${{ github.event.pull_request.head.sha }}
+```
+
+### fetch-depth 的策略
+
+| 值 | 场景 |
+|----|------|
+| `1`（默认） | 仅最新提交，最快的 CI |
+| `0` | 全部历史，用于需要 git log 或 diff 的工具 |
+| `2` | PR 场景下比 `1` 多一个父提交 |
+
+## 常见 CI/CD 模式
+
+### 模式一：PR 验证
+
+```yaml
+name: PR Check
+on: pull_request
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm run lint
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm test
+```
+
+### 模式二：推送后部署
+
+```yaml
+name: Deploy
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci && npm run build
+      - run: npm run deploy
+```
+
+### 模式三：语义版本发布
+
+利用 Git tag 触发发布：
+
+```yaml
+name: Release
+on:
+  push:
+    tags: ["v*"]
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci && npm run build
+      - uses: softprops/action-gh-release@v1
+```
+
+## Git 操作的最佳实践
+
+### 不要在 CI 中直接 force push
+
+Actions 运行时有 GITHUB_TOKEN，但不建议在 CI 中执行 `git push --force`。如果需要自动推送，使用受保护的 `GITHUB_TOKEN` 并限制权限。
+
+### 使用 GitHub Script 做 Git 操作
+
+```yaml
+- uses: actions/github-script@v7
+  with:
+    script: |
+      await github.rest.git.createRef({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        ref: 'refs/heads/release-${{ github.run_id }}',
+        sha: context.sha
+      })
+```
+
+### 矩阵构建与 Git
+
+```yaml
+strategy:
+  matrix:
+    node-version: [18, 20, 22]
+steps:
+  - uses: actions/checkout@v4
+  - uses: actions/setup-node@v4
+    with:
+      node-version: ${{ matrix.node-version }}
+  - run: npm test
+```
+
+## 继续学习建议
+
+1. `workflows/merge-queue-workflow` — GitHub Merge Queue 的工作流
+2. `workflows/ci-optimization-with-git` — CI 中的 Git 优化策略
+3. GitHub Actions 官方文档

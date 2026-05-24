@@ -1,0 +1,182 @@
+export const metadata = {
+  title: "GPG 签名与 Git 提交验证",
+  slug: "gpg-signing",
+  locale: "zh",
+  section: "security",
+  summary: "系统介绍如何使用 GPG 签名 Git 提交和标签，配置签名验证，以及团队中强制签名策略的最佳实践。",
+  sourceUrls: [
+    "https://docs.github.com/en/authentication/managing-commit-signature-verification",
+    "https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work",
+  ],
+};
+
+# GPG 签名与 Git 提交验证
+
+## 一句话理解
+
+GPG 签名让你为 Git 提交和标签添加加密签名，验证者可以确认提交确实来自你，而不是冒充者。
+
+## 为什么需要 GPG 签名
+
+Git 的提交作者信息（name + email）是文本字段，任何人都可以伪造：
+
+```bash
+git config user.name "Linus Torvalds"
+git config user.email "torvalds@linux-foundation.org"
+git commit -m "这不是 Linus 的提交"
+```
+
+GPG 签名通过加密方式验证提交的真实性。
+
+## 快速开始
+
+### 安装 GPG
+
+```bash
+# macOS
+brew install gpg
+
+# Ubuntu
+sudo apt install gpg
+
+# Windows
+choco install gpg4win
+```
+
+### 生成 GPG 密钥
+
+```bash
+gpg --full-generate-key
+
+# 选择 RSA and RSA（默认）
+# 密钥长度：4096
+# 过期时间：2年（推荐设置过期时间）
+# 填写姓名和邮箱（必须与 Git 配置一致）
+```
+
+### 列出密钥并导出
+
+```bash
+# 列出私钥
+gpg --list-secret-keys --keyid-format LONG
+
+# 导出公钥（复制输出到 GitHub/GitLab）
+gpg --armor --export KEY_ID
+```
+
+## 配置 Git 使用 GPG
+
+### 设置签名密钥
+
+```bash
+# 查看你的密钥 ID
+gpg --list-secret-keys --keyid-format LONG
+
+# 配置 Git 使用该密钥
+git config --global user.signingkey KEY_ID
+
+# 可选：对所有提交签名
+git config --global commit.gpgsign true
+```
+
+### 签名提交
+
+```bash
+# 手动签名单个提交
+git commit -S -m "signed commit"
+
+# 如果设置了 commit.gpgsign true，普通 commit 也会自动签名
+git commit -m "automatically signed"
+```
+
+### 签名标签
+
+```bash
+# 创建签名标签
+git tag -s v1.0.0 -m "v1.0.0 release"
+
+# 验证标签
+git tag -v v1.0.0
+```
+
+## 验证签名
+
+### 本地验证
+
+```bash
+# 验证提交签名
+git log --show-signature -1
+
+# 验证所有提交
+git log --show-signature
+
+# 只显示签名信息
+git log --format="%H %G? %GS"
+```
+
+输出中的 `%G?` 表示验证状态：
+- `G`：有效签名（good）
+- `B`：无效签名（bad）
+- `U`：签名者公钥未知
+- `N`：无签名
+
+### GitHub/GitLab 上的验证
+
+将 GPG 公钥添加到 GitHub/GitLab 后，已验证的提交会显示"Verified"标签。
+
+## 多邮箱管理
+
+如果你使用多个邮箱（工作和个人），需要为每个邮箱关联 GPG 密钥，或在 GPG 密钥中添加多个 UID：
+
+```bash
+# 在已有密钥中添加新邮箱
+gpg --edit-key KEY_ID
+gpg> adduid
+# 填写新的姓名和邮箱
+gpg> save
+```
+
+## 团队签名策略
+
+### 强制签名检查
+
+在 GitHub 仓库设置中启用：
+
+```
+Settings → Branches → Branch protection rules
+  → Require signed commits
+```
+
+GitLab 类似：
+
+```
+Settings → Repository → Protected Branches
+  → Require signature on commits
+```
+
+### CI 中验证签名
+
+```yaml
+# GitHub Actions 中验证提交签名
+- name: Verify commit signature
+  run: |
+    git log --show-signature -1
+    git verify-commit HEAD
+```
+
+## GPG vs SSH 签名
+
+Git 2.34+ 开始支持 SSH 签名作为 GPG 的轻量替代：
+
+| 维度 | GPG 签名 | SSH 签名 |
+|------|---------|---------|
+| 密钥管理 | 独立 PKI 体系 | 复用 SSH 密钥 |
+| 配置复杂度 | 较高 | 较低 |
+| 平台支持 | 全部支持 | 较新支持 |
+| 适用场景 | 开源项目、合规要求 | 团队内部 |
+
+## 继续学习建议
+
+1. `best-practices/security-with-git` — Git 安全最佳实践
+2. SSH 密钥管理与 Git 认证
+3. `workflows/signing-commits-workflow` — 签名提交工作流

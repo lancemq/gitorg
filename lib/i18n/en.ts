@@ -9,6 +9,12 @@ import {
   buildGithubNavItem,
   buildGitlabNavItem,
   buildRecoveryNavItem,
+  buildCicdNavItem,
+  buildIdeNavItem,
+  buildSecurityNavItem,
+  buildPerformanceNavItem,
+  buildMigrationNavItem,
+  buildHostingNavItem,
 } from "./index";
 import { commandSlugs } from "./slugs";
 
@@ -35,6 +41,12 @@ export const enDictionary: Dictionary = {
             buildInternalsNavItem("en", activePath),
             buildGithubNavItem("en", activePath),
             buildGitlabNavItem("en", activePath),
+            buildCicdNavItem("en", activePath),
+            buildIdeNavItem("en", activePath),
+            buildSecurityNavItem("en", activePath),
+            buildPerformanceNavItem("en", activePath),
+            buildMigrationNavItem("en", activePath),
+            buildHostingNavItem("en", activePath),
             buildRecoveryNavItem("en", activePath),
           ],
         },
@@ -99,6 +111,36 @@ export const enDictionary: Dictionary = {
     eyebrow: "Git Internals",
     title: "Git Internals Channel",
     description: "Learn Git internals as separate topics, from the object database and refs to commit graphs and packfiles.",
+  },
+  ciCdIndex: {
+    eyebrow: "CI/CD",
+    title: "CI/CD Integration",
+    description: "Learn how Git integrates with CI/CD pipelines including GitHub Actions, GitLab CI, triggers, authentication, and security practices.",
+  },
+  ideIndex: {
+    eyebrow: "IDE",
+    title: "IDE Integration",
+    description: "Master Git integration in popular IDEs including VS Code and JetBrains for source control, diffing, and conflict resolution.",
+  },
+  securityIndex: {
+    eyebrow: "Security",
+    title: "Security",
+    description: "Learn SSH key management and GPG signing to secure Git authentication and commit verification.",
+  },
+  performanceIndex: {
+    eyebrow: "Performance",
+    title: "Performance",
+    description: "Optimize Git for large repositories with partial clone, sparse checkout, shallow clone, and Git LFS.",
+  },
+  migrationIndex: {
+    eyebrow: "Migration",
+    title: "Migration",
+    description: "Complete guides for migrating from Subversion (SVN) and Mercurial (Hg) to Git with tools, workflows, and common pitfalls.",
+  },
+  hostingIndex: {
+    eyebrow: "Hosting",
+    title: "Hosting",
+    description: "Compare GitHub, GitLab, Bitbucket, and self-hosted solutions like GitLab CE and Gitea for your team's needs.",
   },
   home: {
     hero: {
@@ -443,6 +485,42 @@ export const enDictionary: Dictionary = {
         title: "Concepts",
         description: "Learn the foundations behind refs, HEAD, and history.",
       },
+      {
+        id: "ci-cd",
+        eyebrow: "CI/CD",
+        title: "CI/CD",
+        description: "Git integration with CI/CD pipelines.",
+      },
+      {
+        id: "ide",
+        eyebrow: "IDE",
+        title: "IDE",
+        description: "Git in popular IDEs.",
+      },
+      {
+        id: "security",
+        eyebrow: "Security",
+        title: "Security",
+        description: "SSH keys and GPG signing.",
+      },
+      {
+        id: "performance",
+        eyebrow: "Performance",
+        title: "Performance",
+        description: "Large repo optimization.",
+      },
+      {
+        id: "migration",
+        eyebrow: "Migration",
+        title: "Migration",
+        description: "SVN/Hg to Git migration.",
+      },
+      {
+        id: "hosting",
+        eyebrow: "Hosting",
+        title: "Hosting",
+        description: "Platforms and self-hosted solutions.",
+      },
     ],
   },
   commandPage: {
@@ -459,6 +537,12 @@ export const enDictionary: Dictionary = {
       faq: "FAQ",
       learningPath: "Learning Path",
       recovery: "Recovery",
+      "ci-cd": "CI/CD",
+      ide: "IDE",
+      security: "Security",
+      performance: "Performance",
+      migration: "Migration",
+      hosting: "Hosting",
     },
   },
   commandSlugs,

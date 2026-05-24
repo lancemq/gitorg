@@ -1,0 +1,144 @@
+export const metadata = {
+  title: "Partial Clone: On-Demand Git Object Fetching",
+  slug: "partial-clone",
+  locale: "en",
+  section: "performance",
+  summary: "An in-depth look at Git partial clone — how filters and promisor remotes work, and how to speed up clone and fetch in large repositories.",
+  sourceUrls: [
+    "https://git-scm.com/docs/partial-clone",
+    "https://github.blog/2020-12-21-get-up-to-speed-with-partial-clone-and-shallow-clone/",
+  ],
+};
+
+# Partial Clone: On-Demand Git Object Fetching
+
+## One-Sentence Understanding
+
+Partial clone lets you clone a repository downloading only the Git objects you need, fetching others on-demand — like lazy loading for Git.
+
+## How It Works
+
+### Filter
+
+At clone/fetch time, specify which objects to exclude:
+
+```bash
+git clone --filter=blob:none <url>
+```
+
+### Promisor Remote
+
+Filtered objects aren't lost — Git knows which remote can provide them. When needed, Git automatically fetches from the promisor remote:
+
+```bash
+# This is a partially cloned repo
+cd repo
+
+# The workspace is nearly empty, but metadata is local
+git checkout main
+# → Git auto-fetches file contents from the remote
+```
+
+## Filter Types
+
+### blob:none
+
+Exclude all blob objects (file contents), download only commit, tree, and tag objects:
+
+```bash
+git clone --filter=blob:none <url>
+```
+
+- Reduces initial download by 70-90%
+- First checkout needs network
+- Best for general use
+
+### tree:0
+
+Exclude tree and blob objects, download only commits:
+
+```bash
+git clone --filter=tree:0 <url>
+```
+
+- Minimal initial download
+- Most operations require remote requests
+- Best for log/metadata only
+
+### `blob:limit=<size>`
+
+Exclude blobs larger than the limit:
+
+```bash
+git clone --filter=blob:limit=1m <url>
+```
+
+### Combining Filters
+
+```bash
+git clone --filter="combine:blob:none+tree:0" <url>
+```
+
+## Practical Guide
+
+### Clone a Partial Clone Repo
+
+```bash
+# Standard partial clone
+git clone --filter=blob:none https://github.com/example/large-repo.git
+
+# With sparse checkout
+git clone --filter=blob:none --sparse https://github.com/example/large-repo.git
+cd large-repo
+git sparse-checkout set src/my-team
+```
+
+### Enable in Existing Repo
+
+```bash
+git config core.repositoryformatversion 1
+git config extensions.partialClone origin
+
+# Remove all local blob objects
+git rev-list --objects --all | git pack-objects --stdout | git pack-objects --stdin --keep-unreachable
+git prune
+```
+
+### Manual Fetch
+
+```bash
+# Trigger promisor fetch
+git fetch --refetch
+
+# Auto-fetch missing blobs
+git cat-file -p <blob-hash>
+```
+
+## Performance
+
+| Scenario | Full Clone | blob:none | Savings |
+|----------|-----------|-----------|---------|
+| Initial download | 500MB | 50MB | 90% |
+| git log | Fast | Fast | Same |
+| git checkout | Fast | Needs fetch | Slower |
+| git status | Fast | Needs fetch | Slower |
+
+## Limitations
+
+- Network dependency for first checkout and diffs
+- Server-side support: GitHub ✓, GitLab 13.6+ ✓, Bitbucket limited
+- `git gc` needs special handling
+- Some tools and old IDE integrations may not be compatible
+
+### Revert to Full Clone
+
+```bash
+git fetch --unshallow
+git config --unset extensions.partialClone
+```
+
+## Continue Learning
+
+1. `performance/large-repo-optimization` — Comprehensive optimization
+2. `commands/git-sparse-checkout` — Sparse checkout
+3. `internals/packfiles-and-storage` — Object storage & packfiles

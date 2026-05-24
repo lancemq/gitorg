@@ -1,0 +1,183 @@
+export const metadata = {
+  title: "SVN 到 Git 迁移指南",
+  slug: "svn-to-git",
+  locale: "zh",
+  section: "migration",
+  summary: "系统介绍从 Subversion（SVN）迁移到 Git 的完整流程，包括历史转换、分支映射、团队培训和常见陷阱。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-svn",
+    "https://git-scm.com/book/en/v2/Git-and-Other-Systems-Migrating-to-Git",
+  ],
+};
+
+# SVN 到 Git 迁移指南
+
+## 一句话理解
+
+从 SVN 迁移到 Git 不是简单的代码复制，而是从"中心化文件版本管理"到"分布式快照引擎"的思维转变。
+
+## 迁移前的准备
+
+### 评估 SVN 仓库
+
+```bash
+# 查看 SVN 仓库结构
+svn log -q --limit 1
+svn ls ^/
+
+# 确认标准布局
+svn ls ^/trunk
+svn ls ^/branches
+svn ls ^/tags
+```
+
+### 准备作者映射文件
+
+Git 记录作者和提交者的姓名+邮箱，SVN 只记录用户名。需要准备映射文件 `authors.txt`：
+
+```
+svn_username = Full Name <email@example.com>
+zhangsan = 张三 <zhangsan@example.com>
+lisi = 李四 <lisi@example.com>
+```
+
+### 工具选择
+
+| 工具 | 适用场景 | 说明 |
+|------|---------|------|
+| `git svn` clone | 小到中型仓库 | Git 内置，稳定可靠 |
+| `svn2git` | 需要更精细控制 | 基于 git svn 封装 |
+| `svn-all-fast-export` | 超大仓库 | KDE 项目用，性能最好 |
+
+## 使用 git svn 迁移
+
+### 第一步：克隆 SVN 仓库
+
+```bash
+# 标准布局（trunk/branches/tags）
+git svn clone http://svn.example.com/project \
+  --stdlayout \
+  --authors-file=authors.txt \
+  --prefix=svn/ \
+  project-git
+
+cd project-git
+```
+
+### 第二步：清理标签
+
+SVN 标签在 Git 中是远程分支，需要转换为 Git 标签：
+
+```bash
+# 将 svn/tags 下的分支转换为 Git 标签
+git for-each-ref --format='%(refname)' refs/remotes/svn/tags/ |
+while read tag; do
+  tag_name=${tag#refs/remotes/svn/tags/}
+  git tag "$tag_name" "$tag^{}"
+  git branch -r -d "svn/tags/$tag_name"
+done
+```
+
+### 第三步：分支映射
+
+SVN 分支转换为 Git 本地分支：
+
+```bash
+git for-each-ref --format='%(refname)' refs/remotes/svn/ |
+  grep -v 'svn/tags' |
+while read branch; do
+  branch_name=${branch#refs/remotes/svn/}
+  git branch "$branch_name" "$branch"
+  git branch -r -d "svn/$branch_name"
+done
+```
+
+### 第四步：推送到 Git 远端
+
+```bash
+git remote add origin git@github.com:user/project.git
+git push origin --all
+git push origin --tags
+```
+
+## 常见问题与解决方案
+
+### 大文件问题
+
+SVN 没有大文件检查机制，迁移时可能带入大文件：
+
+```bash
+# 检查大文件
+git rev-list --objects --all | git cat-file --batch-check='%(objecttype) %(objectsize) %(rest)' | sort -k2 -n -r | head -20
+
+# 使用 BFG Repo-Cleaner 清理
+java -jar bfg.jar --strip-blobs-bigger-than 100M project.git
+```
+
+### 空目录
+
+SVN 可以管理空目录，Git 不能。迁移脚本需要添加 `.gitkeep` 文件：
+
+```bash
+find . -type d -empty -not -path "./.git/*" -exec touch {}/.gitkeep \;
+```
+
+### 二进制文件
+
+SVN 中的二进制文件在 Git 中推荐使用 LFS：
+
+```bash
+# 安装 git-lfs
+git lfs install
+
+# 跟踪大文件类型
+git lfs track "*.dll"
+git lfs track "*.exe"
+
+# 迁移现有二进制文件
+git lfs migrate import --include="*.dll,*.exe" --everything
+```
+
+## 团队迁移计划
+
+### 第一阶段：评估与准备
+
+1. 评估 SVN 仓库（历史、大小、分支数）
+2. 准备作者映射
+3. 选择合适的迁移工具
+4. 在非工作时间进行试迁移
+
+### 第二阶段：试运行
+
+1. 让一个小团队先试用 Git
+2. 收集反馈
+3. 完善文档
+
+### 第三阶段：正式切换
+
+1. 冻结 SVN 提交
+2. 执行最终迁移
+3. 验证迁移结果
+4. 全员切换
+
+### 第四阶段：过渡期
+
+1. SVN 保持只读访问（1-3 个月）
+2. 团队培训 Git 工作流
+3. 清理 SVN 仓库
+
+## 思维模型对比
+
+| 维度 | SVN | Git |
+|------|-----|-----|
+| 模型 | 中心化文件版本 | 分布式快照引擎 |
+| 分支 | 目录复制（慢、重） | 指针（快、轻量） |
+| 提交 | 全局递增编号 | SHA 哈希 |
+| 历史 | 线性 | 有向无环图 |
+| 离线 | 不可用 | 完整功能 |
+
+## 继续学习建议
+
+1. `learning-path/quick-start` — Git 快速上手
+2. `workflows/feature-branch-collaboration` — 功能分支协作
+3. `best-practices/commit-hygiene` — 提交规范

@@ -8,6 +8,12 @@ import {
   type RecoverySlug,
   type LearningPathSlug,
   type ConceptsSlug,
+  type CiCdSlug,
+  type IdeSlug,
+  type SecuritySlug,
+  type PerformanceSlug,
+  type MigrationSlug,
+  type HostingSlug,
   learningPathSlugs,
   githubSlugs,
   gitlabSlugs,
@@ -19,6 +25,12 @@ import {
   recoverySlugs,
   conceptSlugs,
   internalsSlugs,
+  ciCdSlugs,
+  ideSlugs,
+  securitySlugs,
+  performanceSlugs,
+  migrationSlugs,
+  hostingSlugs,
 } from "./slugs";
 
 export {
@@ -31,6 +43,12 @@ export {
   type RecoverySlug,
   type LearningPathSlug,
   type ConceptsSlug,
+  type CiCdSlug,
+  type IdeSlug,
+  type SecuritySlug,
+  type PerformanceSlug,
+  type MigrationSlug,
+  type HostingSlug,
   learningPathSlugs,
   githubSlugs,
   gitlabSlugs,
@@ -42,6 +60,12 @@ export {
   recoverySlugs,
   conceptSlugs,
   internalsSlugs,
+  ciCdSlugs,
+  ideSlugs,
+  securitySlugs,
+  performanceSlugs,
+  migrationSlugs,
+  hostingSlugs,
 };
 
 export const locales = ["zh", "en"] as const;
@@ -92,7 +116,13 @@ export type DocsSectionId =
   | "workflows"
   | "internals"
   | "recovery"
-  | "concepts";
+  | "concepts"
+  | "ci-cd"
+  | "ide"
+  | "security"
+  | "performance"
+  | "migration"
+  | "hosting";
 
 export type Dictionary = {
   sidebar: {
@@ -134,6 +164,36 @@ export type Dictionary = {
     description: string;
   };
   internalsIndex: {
+    eyebrow: string;
+    title: string;
+    description: string;
+  };
+  ciCdIndex: {
+    eyebrow: string;
+    title: string;
+    description: string;
+  };
+  ideIndex: {
+    eyebrow: string;
+    title: string;
+    description: string;
+  };
+  securityIndex: {
+    eyebrow: string;
+    title: string;
+    description: string;
+  };
+  performanceIndex: {
+    eyebrow: string;
+    title: string;
+    description: string;
+  };
+  migrationIndex: {
+    eyebrow: string;
+    title: string;
+    description: string;
+  };
+  hostingIndex: {
     eyebrow: string;
     title: string;
     description: string;
@@ -251,6 +311,12 @@ export type Dictionary = {
       faq: string;
       learningPath: string;
       recovery: string;
+      "ci-cd": string;
+      ide: string;
+      security: string;
+      performance: string;
+      migration: string;
+      hosting: string;
     };
   };
   commandSlugs: readonly CommandSlug[];
@@ -343,6 +409,78 @@ export function buildGitlabNavItem(locale: Locale, activePath?: string): NavItem
     label: locale === "zh" ? "GitLab 专题" : "GitLab",
     href: `/${locale}/gitlab`,
     active: parentActive || activePath === "gitlab",
+  };
+}
+
+export function buildCicdNavItem(locale: Locale, activePath?: string): NavItem {
+  const parentActive =
+    activePath === "ci-cd-index" ||
+    ciCdSlugs.some((slug) => activePath === `ci-cd/${slug}`);
+
+  return {
+    label: locale === "zh" ? "CI/CD 集成" : "CI/CD",
+    href: `/${locale}/ci-cd`,
+    active: parentActive,
+  };
+}
+
+export function buildIdeNavItem(locale: Locale, activePath?: string): NavItem {
+  const parentActive =
+    activePath === "ide-index" ||
+    ideSlugs.some((slug) => activePath === `ide/${slug}`);
+
+  return {
+    label: locale === "zh" ? "IDE 集成" : "IDE Integration",
+    href: `/${locale}/ide`,
+    active: parentActive,
+  };
+}
+
+export function buildSecurityNavItem(locale: Locale, activePath?: string): NavItem {
+  const parentActive =
+    activePath === "security-index" ||
+    securitySlugs.some((slug) => activePath === `security/${slug}`);
+
+  return {
+    label: locale === "zh" ? "安全" : "Security",
+    href: `/${locale}/security`,
+    active: parentActive,
+  };
+}
+
+export function buildPerformanceNavItem(locale: Locale, activePath?: string): NavItem {
+  const parentActive =
+    activePath === "performance-index" ||
+    performanceSlugs.some((slug) => activePath === `performance/${slug}`);
+
+  return {
+    label: locale === "zh" ? "性能优化" : "Performance",
+    href: `/${locale}/performance`,
+    active: parentActive,
+  };
+}
+
+export function buildMigrationNavItem(locale: Locale, activePath?: string): NavItem {
+  const parentActive =
+    activePath === "migration-index" ||
+    migrationSlugs.some((slug) => activePath === `migration/${slug}`);
+
+  return {
+    label: locale === "zh" ? "迁移指南" : "Migration",
+    href: `/${locale}/migration`,
+    active: parentActive,
+  };
+}
+
+export function buildHostingNavItem(locale: Locale, activePath?: string): NavItem {
+  const parentActive =
+    activePath === "hosting-index" ||
+    hostingSlugs.some((slug) => activePath === `hosting/${slug}`);
+
+  return {
+    label: locale === "zh" ? "托管方案" : "Hosting",
+    href: `/${locale}/hosting`,
+    active: parentActive,
   };
 }
 
