@@ -1,0 +1,192 @@
+export const metadata = {
+  title: "Understanding Detached HEAD State",
+  slug: "detached-head",
+  locale: "en",
+  section: "concepts",
+  summary: "Explain what detached HEAD is, how you enter this state, and how to safely exit detached HEAD while preserving your work.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-switch",
+    "https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell",
+  ],
+};
+
+# Understanding Detached HEAD State
+
+## In One Sentence
+
+A detached HEAD means HEAD points directly to a commit instead of a branch name. It's not an error — it's Git's "temporary browsing mode" that lets you inspect history, but requires deliberate action to exit safely.
+
+## What Is HEAD
+
+Before understanding detached HEAD, you need to know what HEAD normally is.
+
+### Normal State: HEAD → Branch → Commit
+
+In a normal Git repository, HEAD points to a branch name, and the branch name points to a commit:
+
+```
+HEAD → main → C3 (commit)
+```
+
+When you run `git commit`, Git:
+1. Creates a new commit
+2. Moves the current branch pointer to the new commit
+3. HEAD still points to that branch
+
+This is why your branch naturally advances with each commit.
+
+### Detached HEAD: HEAD → Commit
+
+When you checkout a specific commit instead of a branch, HEAD points directly to that commit:
+
+```
+HEAD → C3 (commit)
+```
+
+You are not on any branch. Git will print a warning in the terminal indicating you're in detached HEAD state.
+
+## How to Enter Detached HEAD
+
+These operations enter detached HEAD:
+
+```bash
+# checkout a specific commit hash
+git checkout <commit-hash>
+
+# checkout a tag
+git checkout v1.0.0
+
+# checkout a remote-tracking branch
+git checkout origin/main
+
+# use revision syntax
+git checkout HEAD~3
+
+# use switch with --detach
+git switch --detach <commit-hash>
+```
+
+### Why These Trigger Detached HEAD
+
+Because the target is not a local branch name. Tags, remote branches, and commit hashes are not movable branch pointers, so Git cannot attach HEAD to something that would "advance automatically."
+
+## Working in Detached HEAD
+
+### What You Can Do
+
+- **Inspect historical commits**: the most common use case
+- **Run temporary experiments**: try changes and see the results
+- **Build and test old versions**: confirm when a bug was introduced
+- **Emergency patches against an old state**
+
+### Things to Watch For
+
+You can still make commits in detached HEAD:
+
+```bash
+# modify and commit while detached
+echo "experimental change" > test.txt
+git add test.txt
+git commit -m "experimental commit"
+```
+
+The commit graph becomes:
+
+```
+HEAD → C4 (new commit, only reachable via HEAD)
+       │
+       C3 ← main
+```
+
+C4 is only referenced by HEAD. If you switch back to main, HEAD leaves C4 behind, making C4 unreachable.
+
+## How to Safely Exit Detached HEAD
+
+### Option 1: No Changes to Keep
+
+If you were just browsing:
+
+```bash
+# switch back to a branch
+git switch main
+
+# or
+git checkout main
+```
+
+### Option 2: Keep Changes (Create a Branch)
+
+If you made commits in detached HEAD, **create a branch before switching away**:
+
+```bash
+# create a branch at current HEAD
+git switch -c my-experiment
+
+# or
+git branch my-experiment
+git switch my-experiment
+```
+
+After creating the branch:
+
+```
+HEAD → my-experiment → C4
+                        │
+                        C3 ← main
+```
+
+C4 is now referenced by my-experiment and will not be lost.
+
+### Option 3: Cherry-pick to an Existing Branch
+
+If you made several commits in detached HEAD and want them in an existing branch:
+
+```bash
+# note the commit hashes first
+git log --oneline -5
+
+# switch to target branch
+git switch main
+
+# cherry-pick the needed commits
+git cherry-pick <commit-hash>
+```
+
+## Risk Boundaries
+
+| Scenario | Risk |
+|----------|------|
+| Only viewing, no changes | None — just switch away |
+| Changed but didn't commit | Unstaged changes carry over or produce a warning on switch |
+| Committed but no branch created | Commits become unreachable (may be GC'd) |
+| Committed and created a branch | Safe — same as normal branch work |
+| Multiple commits, no branch | All commits unreachable, but recoverable via reflog |
+
+## Best Practices for Common Scenarios
+
+### bisect Naturally Uses Detached HEAD
+
+`git bisect` runs entirely in detached HEAD — this is expected. The bisect end command returns you to your original branch.
+
+### Reviewing Old Release Code
+
+```bash
+# checkout the v2.0.0 tag
+git checkout v2.0.0
+
+# switch back when done
+git switch main
+```
+
+### In CI and Scripts
+
+CI environments frequently checkout specific commits. Use `git checkout --detach` to make the intent explicit.
+
+## Continue Learning
+
+After understanding detached HEAD, continue with:
+
+1. `git switch` vs `git checkout` differences
+2. `git reflog` — recovering lost commits from detached HEAD
+3. `git bisect` — how it leverages detached HEAD for binary search
+4. `git branch` — creating branches to preserve experimental work

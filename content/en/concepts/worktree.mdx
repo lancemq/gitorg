@@ -1,0 +1,204 @@
+export const metadata = {
+  title: "Git Worktree: Parallel Working Directories",
+  slug: "worktree",
+  locale: "en",
+  section: "concepts",
+  summary: "A systematic explanation of Git worktree — how to check out multiple branches into different directories simultaneously, the problems it solves, and when to use it.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-worktree",
+    "https://git-scm.com/book/en/v2/Git-Tools-Working-with-Worktrees",
+  ],
+};
+
+# Git Worktree: Parallel Working Directories
+
+## In One Sentence
+
+Git worktree lets you **check out multiple branches into different directories** from the same repository, each with its own working tree and index, while sharing the same object database and references.
+
+## Why Worktree Exists
+
+In the traditional Git workflow, one repository can only check out one branch at a time. When you need to switch tasks:
+
+1. Stash current changes
+2. Commit half-finished work
+3. Create a full clone
+
+Each option has costs — stashes degrade, half-commits pollute history, and extra clones waste disk and network.
+
+Worktree offers a fourth option: **work on multiple branches simultaneously from the same repository, each in its own directory.**
+
+## Core Concepts
+
+### Shared Data
+
+All worktrees share the same `.git/` directory for:
+
+- Object database (objects)
+- References (refs)
+- Configuration (config)
+- Reference logs (reflogs)
+
+### Independent Data
+
+Each worktree has its own:
+
+- Working tree files
+- Index (staging area)
+- HEAD reference
+- Per-worktree refs (e.g., `refs/worktree/`)
+
+### Structure
+
+```
+my-repo/
+├── .git/                # shared storage
+│   ├── objects/         # object database (shared)
+│   ├── refs/            # references (shared)
+│   └── config           # configuration (shared)
+├── main/                # main worktree (main branch)
+│   ├── src/
+│   └── index            # independent staging area
+├── hotfix/              # additional worktree (hotfix branch)
+│   ├── src/
+│   └── index            # independent staging area
+└── feature-login/       # additional worktree (feature/login branch)
+    ├── src/
+    └── index            # independent staging area
+```
+
+## Core Operations
+
+### Adding a Worktree
+
+```bash
+# checkout a branch in a new directory
+git worktree add ../hotfix hotfix
+
+# create and checkout a new branch
+git worktree add ../feature-login -b feature/login
+
+# create a worktree at a specific commit (detached HEAD)
+git worktree add ../archive HEAD~3
+```
+
+### Listing Worktrees
+
+```bash
+git worktree list
+```
+
+Output:
+
+```
+/path/to/main        abc1234 [main]
+/path/to/hotfix      def5678 [hotfix]
+/path/to/feature-login  fedcba [feature/login]
+```
+
+### Removing a Worktree
+
+```bash
+# safe removal
+git worktree remove ../hotfix
+
+# force removal (discards uncommitted changes)
+git worktree remove --force ../hotfix
+```
+
+### Locking a Worktree
+
+Prevents accidental removal (e.g., for worktrees on removable media):
+
+```bash
+git worktree lock ../hotfix --reason "USB drive"
+```
+
+## Key Constraints
+
+### Same Branch in One Worktree Only
+
+```bash
+# if main is already checked out in the primary worktree
+git worktree add ../another-main main  # error!
+```
+
+Git prevents the same branch from being checked out in multiple worktrees to avoid overwrites.
+
+### No Nesting
+
+You cannot add a worktree inside an existing worktree directory.
+
+### Remove Worktree Before Deleting Branch
+
+A branch that is checked out in a worktree cannot be deleted until that worktree is removed.
+
+## Typical Use Cases
+
+### 1. Hotfix Alongside Feature Development
+
+```bash
+# main directory is working on feature/login
+git worktree add ../hotfix -b hotfix/critical-bug
+
+# work on the fix in ../hotfix without disturbing main
+# work on your feature in the main directory simultaneously
+```
+
+### 2. PR Review
+
+```bash
+# check out a PR branch in a dedicated directory
+git worktree add ../review-pr origin/feature/payment
+
+# clean up when review is done
+git worktree remove ../review-pr
+```
+
+### 3. Multi-Version Build and Test
+
+```bash
+# check out v1 and v2 simultaneously
+git worktree add ../release-v1 v1.0.0
+git worktree add ../release-v2 v2.0.0
+
+# build and test in separate directories
+```
+
+### 4. AI Coding Agent Parallel Work
+
+AI agents can use worktrees to work on multiple tasks in isolated directories without interference.
+
+## Worktree vs Multiple Clones
+
+| Dimension | Worktree | Multiple Clones |
+|-----------|----------|-----------------|
+| Disk Space | Shared objects, minimal overhead | Full copy per clone |
+| Network | No extra fetch needed | Each clone fetches independently |
+| Ref Sync | Shared — new branches visible everywhere | Manual sync required |
+| Isolation | Shared refs, branch-level isolation | Complete isolation |
+| Risk | GC in one worktree affects others | Fully independent |
+| Learning Curve | Must understand worktree concept | Traditional, no learning needed |
+
+## Caveats
+
+### Disk Usage
+
+While worktrees share the object database, each worktree has its own independent working tree files. For large repositories (especially monorepos), multiple worktrees can consume significant disk space.
+
+### Branch Management
+
+Branches created in one worktree are automatically visible in all others (shared refs). However, you must ensure a branch is not checked out in any worktree before deleting it.
+
+### Don't Run git init on Worktree Directories
+
+Worktree directories are not independent repositories. Running `git init` on one will break the worktree association.
+
+## Continue Learning
+
+After understanding worktree concepts, continue with:
+
+1. `git worktree` command reference
+2. `workflows/parallel-work-with-worktree` — parallel development workflow
+3. `workflows/ai-agent-worktree-mode` — AI agent worktree usage patterns
+4. `git worktree lock` and `git worktree prune` — maintenance operations

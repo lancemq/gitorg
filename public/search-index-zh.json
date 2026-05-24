@@ -1,0 +1,2122 @@
+[
+  {
+    "href": "/zh/learning-path",
+    "path": "learning-path/quick-start",
+    "section": "learning-path",
+    "tier": "core",
+    "slug": "quick-start",
+    "title": "Git 快速上手专题",
+    "summary": "把 Git 初学者最需要建立的最小闭环拆成一个可分步学习的专题，包括环境准备、暂存与提交、远端同步和第一个特性分支。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/learning-path/setup-and-clone",
+    "path": "learning-path/setup-and-clone",
+    "section": "learning-path",
+    "tier": "core",
+    "slug": "setup-and-clone",
+    "title": "环境与 clone",
+    "summary": "完成 Git 初学阶段最基础的准备动作：配置身份、拿到仓库、看懂首次 clone 后本地到底多了什么。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/learning-path/stage-and-commit",
+    "path": "learning-path/stage-and-commit",
+    "section": "learning-path",
+    "tier": "core",
+    "slug": "stage-and-commit",
+    "title": "暂存与 commit",
+    "summary": "理解工作区、暂存区和提交历史三层模型，并把文件修改稳定地变成清晰、可复用的本地提交。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/learning-path/sync-with-remote",
+    "path": "learning-path/sync-with-remote",
+    "section": "learning-path",
+    "tier": "core",
+    "slug": "sync-with-remote",
+    "title": "远端同步",
+    "summary": "把 fetch、pull、push 拆成“观察、整合、发布”三个动作来理解，减少初学者对同步操作的误判。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/learning-path/first-feature-branch",
+    "path": "learning-path/first-feature-branch",
+    "section": "learning-path",
+    "tier": "core",
+    "slug": "first-feature-branch",
+    "title": "第一个特性分支",
+    "summary": "从单人闭环进入最简单的协作节奏：创建特性分支、提交改动、同步主分支，并理解 merge 与 rebase 的边界。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/learning-path/open-first-pull-request",
+    "path": "learning-path/open-first-pull-request",
+    "section": "learning-path",
+    "tier": "core",
+    "slug": "open-first-pull-request",
+    "title": "发起第一个 Pull Request",
+    "summary": "从分支提交过渡到协作评审：整理改动范围、补齐说明信息、发起第一个可评审且可合并的 Pull Request。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/learning-path/handle-review-feedback",
+    "path": "learning-path/handle-review-feedback",
+    "section": "learning-path",
+    "tier": "core",
+    "slug": "handle-review-feedback",
+    "title": "处理评审反馈",
+    "summary": "掌握评审反馈处理节奏：区分必须修改与讨论项、按批次提交修订、维持 PR 可审查性与上下文连续性。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/learning-path/merge-and-close-task",
+    "path": "learning-path/merge-and-close-task",
+    "section": "learning-path",
+    "tier": "core",
+    "slug": "merge-and-close-task",
+    "title": "合并并关闭任务闭环",
+    "summary": "完成一次完整协作闭环：选择合并策略、确认主线状态、清理分支并更新任务状态，避免“代码已合并但流程未收口”。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/learning-path/first-safe-hotfix",
+    "path": "learning-path/first-safe-hotfix",
+    "section": "learning-path",
+    "tier": "core",
+    "slug": "first-safe-hotfix",
+    "title": "第一次安全热修复",
+    "summary": "在紧急修复场景下学习最小风险路径：快速止损、最小改动发布、回补主线与复盘，避免高压下扩大事故面。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-init",
+    "path": "commands/git-init",
+    "section": "commands",
+    "tier": "core",
+    "slug": "git-init",
+    "title": "git init 教程",
+    "summary": "解释 git init 如何初始化仓库、默认分支如何产生，以及它在新项目和已有目录中的常见用法。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-clone",
+    "path": "commands/git-clone",
+    "section": "commands",
+    "tier": "core",
+    "slug": "git-clone",
+    "title": "git clone 教程",
+    "summary": "说明 git clone 如何复制仓库、默认远端 origin 的作用，以及克隆后本地分支与远端分支的基本关系。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-status",
+    "path": "commands/git-status",
+    "section": "commands",
+    "tier": "core",
+    "slug": "git-status",
+    "title": "git status 教程",
+    "summary": "讲清 git status 如何查看工作区、暂存区和分支状态，以及它为什么是日常最应该频繁使用的命令之一。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-add",
+    "path": "commands/git-add",
+    "section": "commands",
+    "tier": "core",
+    "slug": "git-add",
+    "title": "git add 教程",
+    "summary": "说明 git add 如何把工作区改动加入暂存区、如何用 patch 精细暂存，以及怎样避免把不相关改动混进同一次提交。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-commit",
+    "path": "commands/git-commit",
+    "section": "commands",
+    "tier": "core",
+    "slug": "git-commit",
+    "title": "git commit 教程",
+    "summary": "解释 git commit 如何生成新的历史节点、怎样写出更有价值的提交信息，以及 amend 适合和不适合的边界。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-diff",
+    "path": "commands/git-diff",
+    "section": "commands",
+    "tier": "recommended",
+    "slug": "git-diff",
+    "title": "git diff 教程",
+    "summary": "讲清 git diff 如何比较工作区、暂存区和提交状态，如何正确选择比较范围，以及怎样避免看错层级。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-show",
+    "path": "commands/git-show",
+    "section": "commands",
+    "tier": "recommended",
+    "slug": "git-show",
+    "title": "git show",
+    "summary": "查看某个提交、标签或对象的详细内容，是把历史节点和对象读清楚的高频命令。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-log",
+    "path": "commands/git-log",
+    "section": "commands",
+    "tier": "core",
+    "slug": "git-log",
+    "title": "git log 教程",
+    "summary": "说明 git log 如何查看提交历史、分支图结构、作者和范围过滤，并把它真正用到评审、同步和恢复判断中。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-rm",
+    "path": "commands/git-rm",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-rm",
+    "title": "git rm",
+    "summary": "删除已跟踪文件并同步到暂存区，理解它有助于区分文件系统删除和 Git 记录删除。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-mv",
+    "path": "commands/git-mv",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-mv",
+    "title": "git mv",
+    "summary": "用于重命名或移动已跟踪文件，帮助你把文件系统变化和暂存区状态一次保持一致。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-fetch",
+    "path": "commands/git-fetch",
+    "section": "commands",
+    "tier": "core",
+    "slug": "git-fetch",
+    "title": "git fetch 教程",
+    "summary": "解释 git fetch 如何更新远端引用、为何它比 pull 更可控，以及它在日常同步中的最佳位置。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-pull",
+    "path": "commands/git-pull",
+    "section": "commands",
+    "tier": "core",
+    "slug": "git-pull",
+    "title": "git pull 教程",
+    "summary": "解释 git pull 是 fetch 加整合的组合动作，什么时候 pull 很方便，什么时候 fetch-first 更稳，以及 rebase / ff-only 会怎样改变结果。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-push",
+    "path": "commands/git-push",
+    "section": "commands",
+    "tier": "core",
+    "slug": "git-push",
+    "title": "git push 教程",
+    "summary": "说明 git push 如何发布本地分支、建立上游跟踪关系，以及怎样判断一次 push 是安全发布还是高风险改写。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-switch",
+    "path": "commands/git-switch",
+    "section": "commands",
+    "tier": "core",
+    "slug": "git-switch",
+    "title": "git switch 教程",
+    "summary": "介绍 git switch 如何负责切换和创建分支，以及它相对 checkout 更清晰的职责边界。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-branch",
+    "path": "commands/git-branch",
+    "section": "commands",
+    "tier": "core",
+    "slug": "git-branch",
+    "title": "git branch 教程",
+    "summary": "系统说明 git branch 如何查看、创建、重命名和删除分支，以及它与远端跟踪分支的关系。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-tag",
+    "path": "commands/git-tag",
+    "section": "commands",
+    "tier": "recommended",
+    "slug": "git-tag",
+    "title": "git tag 教程",
+    "summary": "介绍 git tag 如何标记发布点、轻量标签和附注标签的区别，以及标签推送的基本方式。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-remote",
+    "path": "commands/git-remote",
+    "section": "commands",
+    "tier": "recommended",
+    "slug": "git-remote",
+    "title": "git remote 教程",
+    "summary": "讲清 git remote 如何查看、添加、修改和删除远端仓库定义，以及 origin 在协作中的典型角色。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-rebase",
+    "path": "commands/git-rebase",
+    "section": "commands",
+    "tier": "core",
+    "slug": "git-rebase",
+    "title": "git rebase 教程",
+    "summary": "解释 git rebase 的核心模型、推荐流程、风险边界和恢复办法。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-merge",
+    "path": "commands/git-merge",
+    "section": "commands",
+    "tier": "core",
+    "slug": "git-merge",
+    "title": "git merge 教程",
+    "summary": "解释 git merge 的核心作用、fast-forward 与 merge commit 的区别，以及冲突处理策略。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-cherry-pick",
+    "path": "commands/git-cherry-pick",
+    "section": "commands",
+    "tier": "core",
+    "slug": "git-cherry-pick",
+    "title": "git cherry-pick 教程",
+    "summary": "解释如何把某个提交的改动拣选到当前分支，以及 cherry-pick 的典型适用边界。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-reset",
+    "path": "commands/git-reset",
+    "section": "commands",
+    "tier": "core",
+    "slug": "git-reset",
+    "title": "git reset 教程",
+    "summary": "解释 git reset 如何移动 HEAD、分支和暂存区，并区分 --soft、--mixed、--hard 的影响范围。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-stash",
+    "path": "commands/git-stash",
+    "section": "commands",
+    "tier": "core",
+    "slug": "git-stash",
+    "title": "git stash 教程",
+    "summary": "解释如何用 git stash 临时保存未提交改动，并在后续恢复、查看和清理 stash 条目。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-restore",
+    "path": "commands/git-restore",
+    "section": "commands",
+    "tier": "core",
+    "slug": "git-restore",
+    "title": "git restore 教程",
+    "summary": "说明 git restore 如何恢复工作区和暂存区中的文件状态，以及它和 reset、checkout 的边界。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-revert",
+    "path": "commands/git-revert",
+    "section": "commands",
+    "tier": "core",
+    "slug": "git-revert",
+    "title": "git revert 教程",
+    "summary": "讲清 git revert 为什么适合撤销已共享提交，以及它和 reset 在历史表达上的关键区别。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-reflog",
+    "path": "commands/git-reflog",
+    "section": "commands",
+    "tier": "core",
+    "slug": "git-reflog",
+    "title": "git reflog",
+    "summary": "查看引用移动历史，是 reset、rebase、误删分支等恢复场景里最常用的自救命令之一。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-bisect",
+    "path": "commands/git-bisect",
+    "section": "commands",
+    "tier": "recommended",
+    "slug": "git-bisect",
+    "title": "git bisect",
+    "summary": "通过二分法定位引入 bug 的提交，是排查回归问题时最有价值的高级命令之一。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-blame",
+    "path": "commands/git-blame",
+    "section": "commands",
+    "tier": "recommended",
+    "slug": "git-blame",
+    "title": "git blame",
+    "summary": "定位某一行代码最后由哪个提交引入或修改，适合排查行为来源和上下文。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-checkout",
+    "path": "commands/git-checkout",
+    "section": "commands",
+    "tier": "recommended",
+    "slug": "git-checkout",
+    "title": "git checkout 教程",
+    "summary": "说明 git checkout 作为旧式多用途命令的两大职责，以及它与 switch、restore 的现代分工。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-clean",
+    "path": "commands/git-clean",
+    "section": "commands",
+    "tier": "recommended",
+    "slug": "git-clean",
+    "title": "git clean 教程",
+    "summary": "解释 git clean 如何删除未跟踪文件和目录，以及为什么 dry-run 和 force 标志在这里非常重要。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-config",
+    "path": "commands/git-config",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-config",
+    "title": "git-config 教程",
+    "summary": "解释如何用 git-config 查看和修改 Git 配置。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-help",
+    "path": "commands/git-help",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-help",
+    "title": "git-help 教程",
+    "summary": "解释如何用 git-help 查阅命令帮助和手册页。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-describe",
+    "path": "commands/git-describe",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-describe",
+    "title": "git-describe 教程",
+    "summary": "解释如何用 git-describe 用最近标签描述当前提交。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-grep",
+    "path": "commands/git-grep",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-grep",
+    "title": "git-grep 教程",
+    "summary": "解释如何用 git-grep 在仓库内容中搜索文本。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-shortlog",
+    "path": "commands/git-shortlog",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-shortlog",
+    "title": "git-shortlog 教程",
+    "summary": "解释如何用 git-shortlog 按作者和主题汇总提交历史。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-show-ref",
+    "path": "commands/git-show-ref",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-show-ref",
+    "title": "git-show-ref 教程",
+    "summary": "解释如何用 git-show-ref 列出仓库中的引用及其目标。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-rev-parse",
+    "path": "commands/git-rev-parse",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-rev-parse",
+    "title": "git-rev-parse 教程",
+    "summary": "解释如何用 git-rev-parse 解析修订表达式和仓库路径信息。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-am",
+    "path": "commands/git-am",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-am",
+    "title": "git-am 教程",
+    "summary": "把邮件格式补丁序列应用为真实提交，适合 patch-by-email 协作；重点在冲突处理中保持提交序列完整性。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-apply",
+    "path": "commands/git-apply",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-apply",
+    "title": "git-apply 教程",
+    "summary": "解释如何用 git-apply 把补丁内容应用到工作区或暂存区。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-format-patch",
+    "path": "commands/git-format-patch",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-format-patch",
+    "title": "git-format-patch 教程",
+    "summary": "解释如何用 git-format-patch 把提交导出成可发送的补丁文件。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-send-email",
+    "path": "commands/git-send-email",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-send-email",
+    "title": "git-send-email 教程",
+    "summary": "将 `format-patch` 产出的补丁序列按邮件线程发送给维护者或邮件列表，适用于内核式补丁协作流程。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-request-pull",
+    "path": "commands/git-request-pull",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-request-pull",
+    "title": "git-request-pull 教程",
+    "summary": "生成“从哪个基线到哪个分支”的拉取摘要，适合邮件流或传统维护者流程中做可审阅的变更交付说明。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-archive",
+    "path": "commands/git-archive",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-archive",
+    "title": "git-archive 教程",
+    "summary": "解释如何用 git-archive 从某个提交或树对象导出归档包。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-bundle",
+    "path": "commands/git-bundle",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-bundle",
+    "title": "git-bundle 教程",
+    "summary": "把 Git 历史打包成单文件用于离线传输或受限网络同步，适合“不能直接 fetch/push”的场景。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-worktree",
+    "path": "commands/git-worktree",
+    "section": "commands",
+    "tier": "recommended",
+    "slug": "git-worktree",
+    "title": "git-worktree 教程",
+    "summary": "为同一仓库创建多个并行工作目录，避免频繁 stash/switch，提高多任务协作与紧急切换效率。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-submodule",
+    "path": "commands/git-submodule",
+    "section": "commands",
+    "tier": "recommended",
+    "slug": "git-submodule",
+    "title": "git-submodule 教程",
+    "summary": "管理父仓库中的外部依赖仓库指针，重点是“子模块提交更新后要提交父仓库指针”这一协作边界。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-sparse-checkout",
+    "path": "commands/git-sparse-checkout",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-sparse-checkout",
+    "title": "git-sparse-checkout 教程",
+    "summary": "解释如何用 git-sparse-checkout 只检出仓库中的部分目录。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-cat-file",
+    "path": "commands/git-cat-file",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-cat-file",
+    "title": "git-cat-file 教程",
+    "summary": "解释如何用 git-cat-file 直接查看 Git 对象的类型和内容。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-ls-files",
+    "path": "commands/git-ls-files",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-ls-files",
+    "title": "git-ls-files 教程",
+    "summary": "解释如何用 git-ls-files 列出索引和工作区里的受跟踪路径。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-ls-tree",
+    "path": "commands/git-ls-tree",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-ls-tree",
+    "title": "git-ls-tree 教程",
+    "summary": "解释如何用 git-ls-tree 列出某个树对象中的目录和文件条目。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-read-tree",
+    "path": "commands/git-read-tree",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-read-tree",
+    "title": "git-read-tree 教程",
+    "summary": "解释如何用 git-read-tree 把树对象读入索引进行底层操作。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-update-index",
+    "path": "commands/git-update-index",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-update-index",
+    "title": "git-update-index 教程",
+    "summary": "解释如何用 git-update-index 直接修改索引中的条目和属性。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-update-ref",
+    "path": "commands/git-update-ref",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-update-ref",
+    "title": "git-update-ref 教程",
+    "summary": "解释如何用 git-update-ref 以更底层的方式更新引用。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-symbolic-ref",
+    "path": "commands/git-symbolic-ref",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-symbolic-ref",
+    "title": "git-symbolic-ref 教程",
+    "summary": "解释如何用 git-symbolic-ref 读取或修改符号引用如 HEAD。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-rev-list",
+    "path": "commands/git-rev-list",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-rev-list",
+    "title": "git-rev-list 教程",
+    "summary": "解释如何用 git-rev-list 以脚本友好的方式枚举提交集合。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-merge-base",
+    "path": "commands/git-merge-base",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-merge-base",
+    "title": "git-merge-base 教程",
+    "summary": "解释如何用 git-merge-base 找出两个历史之间的最佳共同祖先。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-notes",
+    "path": "commands/git-notes",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-notes",
+    "title": "git-notes 教程",
+    "summary": "在不改写提交对象的前提下给提交补充审计、复盘或评审注释，适合需要保留原始历史又要追加上下文的团队。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-range-diff",
+    "path": "commands/git-range-diff",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-range-diff",
+    "title": "git-range-diff 教程",
+    "summary": "比较两组“补丁序列”而不是单点 diff，适合在 rebase 或重排提交后向 reviewer 解释“这次版本改动到底变了什么”。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-cherry",
+    "path": "commands/git-cherry",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-cherry",
+    "title": "git-cherry 教程",
+    "summary": "解释如何用 git-cherry 判断哪些提交尚未被另一条历史吸收。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-mergetool",
+    "path": "commands/git-mergetool",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-mergetool",
+    "title": "git-mergetool 教程",
+    "summary": "解释如何用 git-mergetool 调用外部工具辅助解决合并冲突。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-fsck",
+    "path": "commands/git-fsck",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-fsck",
+    "title": "git-fsck 教程",
+    "summary": "解释如何用 git-fsck 检查对象库和引用的完整性。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-gc",
+    "path": "commands/git-gc",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-gc",
+    "title": "git-gc 教程",
+    "summary": "解释如何用 git-gc 执行垃圾回收和仓库整理。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-count-objects",
+    "path": "commands/git-count-objects",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-count-objects",
+    "title": "git-count-objects 教程",
+    "summary": "解释如何用 git-count-objects 统计松散对象和包文件的数量。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-verify-pack",
+    "path": "commands/git-verify-pack",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-verify-pack",
+    "title": "git-verify-pack 教程",
+    "summary": "解释如何用 git-verify-pack 检查 pack 文件中的对象和偏移信息。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-verify-tag",
+    "path": "commands/git-verify-tag",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-verify-tag",
+    "title": "git-verify-tag 教程",
+    "summary": "解释如何用 git-verify-tag 验证带签名标签的真实性。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/commit-hygiene",
+    "path": "best-practices/commit-hygiene",
+    "section": "best-practices",
+    "tier": "core",
+    "slug": "commit-hygiene",
+    "title": "提交卫生与提交信息",
+    "summary": "把提交拆成逻辑独立的 changeset，并用可读的提交信息表达意图、动机和边界，让 review、revert 和 cherry-pick 都更轻。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/topic-branches",
+    "path": "best-practices/topic-branches",
+    "section": "best-practices",
+    "tier": "recommended",
+    "slug": "topic-branches",
+    "title": "主题分支策略",
+    "summary": "用 topic branch 隔离单项工作，让并行开发、回滚、rebase、review 和发布边界都更清楚。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/branch-workflow-and-lifecycle",
+    "path": "best-practices/branch-workflow-and-lifecycle",
+    "section": "best-practices",
+    "tier": "extended",
+    "slug": "branch-workflow-and-lifecycle",
+    "title": "分支策略与分支生命周期",
+    "summary": "把主线、发布线、修复线和主题分支的职责拆开，团队才更容易同时兼顾开发速度、评审质量和发布稳定性。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/fetch-first-sync",
+    "path": "best-practices/fetch-first-sync",
+    "section": "best-practices",
+    "tier": "core",
+    "slug": "fetch-first-sync",
+    "title": "先 fetch 再同步",
+    "summary": "把观察远端状态和真正改写本地分支分开，避免把同步决策完全交给默认 pull 行为。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/shared-history-boundaries",
+    "path": "best-practices/shared-history-boundaries",
+    "section": "best-practices",
+    "tier": "core",
+    "slug": "shared-history-boundaries",
+    "title": "共享历史的改写边界",
+    "summary": "明确哪些历史可以放心整理，哪些历史应该默认视为共享并谨慎处理，避免 rebase、amend、reset 和 force push 伤到别人。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/review-and-safe-push",
+    "path": "best-practices/review-and-safe-push",
+    "section": "best-practices",
+    "tier": "core",
+    "slug": "review-and-safe-push",
+    "title": "评审前整理与安全推送",
+    "summary": "在发起评审和推送之前，用一套轻量检查动作整理提交栈、确认差异范围，并优先采用更保守的推送方式。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/atomic-commits",
+    "path": "best-practices/atomic-commits",
+    "section": "best-practices",
+    "tier": "core",
+    "slug": "atomic-commits",
+    "title": "原子提交专题",
+    "summary": "把一次提交收敛成单一逻辑变更，降低 review 和回滚成本。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/focused-commits-and-topic-branch-hygiene",
+    "path": "best-practices/focused-commits-and-topic-branch-hygiene",
+    "section": "best-practices",
+    "tier": "extended",
+    "slug": "focused-commits-and-topic-branch-hygiene",
+    "title": "小步提交与主题分支整洁度",
+    "summary": "把提交粒度和主题分支边界同时管住，review 会更快，rebase 更稳，回滚也会轻松很多。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/branch-naming",
+    "path": "best-practices/branch-naming",
+    "section": "best-practices",
+    "tier": "recommended",
+    "slug": "branch-naming",
+    "title": "分支命名约定专题",
+    "summary": "建立稳定的分支命名模式，提升协作、自动化和排错效率。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/pull-request-prep",
+    "path": "best-practices/pull-request-prep",
+    "section": "best-practices",
+    "tier": "recommended",
+    "slug": "pull-request-prep",
+    "title": "提交评审前准备专题",
+    "summary": "在发起评审前收敛提交、同步基线并清理噪音改动。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/pull-request-review-readiness",
+    "path": "best-practices/pull-request-review-readiness",
+    "section": "best-practices",
+    "tier": "extended",
+    "slug": "pull-request-review-readiness",
+    "title": "Pull Request 评审准备与协作规范",
+    "summary": "评审质量很大程度上取决于送审前有没有把变更范围、提交叙事、上下文说明和后续响应机制准备清楚。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/conflict-resolution-routine",
+    "path": "best-practices/conflict-resolution-routine",
+    "section": "best-practices",
+    "tier": "recommended",
+    "slug": "conflict-resolution-routine",
+    "title": "冲突处理惯例专题",
+    "summary": "把冲突处理变成固定流程，减少临时操作带来的遗漏和误判。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/release-hygiene",
+    "path": "best-practices/release-hygiene",
+    "section": "best-practices",
+    "tier": "extended",
+    "slug": "release-hygiene",
+    "title": "发布前 Git 卫生专题",
+    "summary": "在发布前用一组 Git 检查动作降低标签、分支和版本记录出错概率。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/safe-cherry-picks",
+    "path": "best-practices/safe-cherry-picks",
+    "section": "best-practices",
+    "tier": "extended",
+    "slug": "safe-cherry-picks",
+    "title": "安全使用 cherry-pick专题",
+    "summary": "在回移修复或选择性复用提交时，避免重复、漏拣和上下文错配。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/small-batch-review",
+    "path": "best-practices/small-batch-review",
+    "section": "best-practices",
+    "tier": "extended",
+    "slug": "small-batch-review",
+    "title": "小批量评审专题",
+    "summary": "用更小的提交批次和更短的生命周期换取更快的 review 节奏。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/safe-force-push-protocol",
+    "path": "best-practices/safe-force-push-protocol",
+    "section": "best-practices",
+    "tier": "recommended",
+    "slug": "safe-force-push-protocol",
+    "title": "安全 force push 协议",
+    "summary": "需要重写历史时，用明确告警、冻结窗口和 `--force-with-lease` 协议降低误覆盖协作者提交的风险。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/commit-message-conventions",
+    "path": "best-practices/commit-message-conventions",
+    "section": "best-practices",
+    "tier": "recommended",
+    "slug": "commit-message-conventions",
+    "title": "提交信息规范约定",
+    "summary": "统一提交信息结构（动词、范围、原因）提升日志可读性、问题追踪效率和跨团队协作透明度。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/release-checklist-discipline",
+    "path": "best-practices/release-checklist-discipline",
+    "section": "best-practices",
+    "tier": "recommended",
+    "slug": "release-checklist-discipline",
+    "title": "发布清单纪律",
+    "summary": "通过固定发布清单把关键检查项前置并标准化，降低“靠经验记忆”导致的线上发布遗漏与事故。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/code-review-handoff-quality",
+    "path": "best-practices/code-review-handoff-quality",
+    "section": "best-practices",
+    "tier": "recommended",
+    "slug": "code-review-handoff-quality",
+    "title": "代码评审交接质量",
+    "summary": "通过高质量 review handoff（背景、范围、风险、验证）减少评审往返沟通成本并提升合并决策速度。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/fetch-vs-pull",
+    "path": "workflows/fetch-vs-pull",
+    "section": "workflows",
+    "tier": "core",
+    "slug": "fetch-vs-pull",
+    "title": "fetch 与 pull 的区别",
+    "summary": "解释为什么先 fetch 再决定 merge 或 rebase，往往比直接 pull 更可控。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/feature-branch-collaboration",
+    "path": "workflows/feature-branch-collaboration",
+    "section": "workflows",
+    "tier": "core",
+    "slug": "feature-branch-collaboration",
+    "title": "功能分支协作流",
+    "summary": "围绕 feature branch 的日常协作流程，整理从切分支、同步主线、提交整理到发起评审的稳定做法。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/gitflow-workflow",
+    "path": "workflows/gitflow-workflow",
+    "section": "workflows",
+    "tier": "core",
+    "slug": "gitflow-workflow",
+    "title": "Gitflow 工作流教程",
+    "summary": "基于 Atlassian 对 Gitflow 的说明，梳理 main、develop、feature、release、hotfix 的职责，以及它在现代团队中的适用边界。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/multi-person-sync-routine",
+    "path": "workflows/multi-person-sync-routine",
+    "section": "workflows",
+    "tier": "core",
+    "slug": "multi-person-sync-routine",
+    "title": "多人协作时的同步节奏",
+    "summary": "围绕多人并行开发，建立一套先 fetch、再观察、再整合的同步节奏，减少 pull 惊喜和共享历史误操作。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/prepare-commits-before-pull-request",
+    "path": "workflows/prepare-commits-before-pull-request",
+    "section": "workflows",
+    "tier": "recommended",
+    "slug": "prepare-commits-before-pull-request",
+    "title": "PR 前如何整理提交历史",
+    "summary": "在发起 PR 之前，围绕同步、提交整理、风险确认和 review 友好度，建立一套稳定的准备动作。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/parallel-work-with-worktree",
+    "path": "workflows/parallel-work-with-worktree",
+    "section": "workflows",
+    "tier": "extended",
+    "slug": "parallel-work-with-worktree",
+    "title": "用 worktree 并行处理多个任务",
+    "summary": "当你需要同时处理当前功能、紧急修复或评审修改时，用 git worktree 在同一个仓库上开出多个独立工作目录。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/ai-agent-worktree-mode",
+    "path": "workflows/ai-agent-worktree-mode",
+    "section": "workflows",
+    "tier": "recommended",
+    "slug": "ai-agent-worktree-mode",
+    "title": "AI Coding Agent 下的 git worktree 模式",
+    "summary": "把 git worktree 变成 AI coding agent 的默认并行工作模式，减少上下文污染、提升回滚安全性，并让多任务协作更清晰。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/monorepo-sparse-checkout-workflow",
+    "path": "workflows/monorepo-sparse-checkout-workflow",
+    "section": "workflows",
+    "tier": "extended",
+    "slug": "monorepo-sparse-checkout-workflow",
+    "title": "monorepo 场景下的稀疏检出与多工作树协作",
+    "summary": "在 monorepo 场景里，用 sparse-checkout 和 worktree 限定工作范围，降低上下文负担并支持并行任务。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/rerere-for-recurring-conflicts",
+    "path": "workflows/rerere-for-recurring-conflicts",
+    "section": "workflows",
+    "tier": "extended",
+    "slug": "rerere-for-recurring-conflicts",
+    "title": "用 rerere 处理重复冲突",
+    "summary": "当同一类冲突反复出现时，用 rerere 记录并复用你的解决结果，减少长期分支和频繁同步里的重复劳动。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/shared-branch-sync-boundaries",
+    "path": "workflows/shared-branch-sync-boundaries",
+    "section": "workflows",
+    "tier": "recommended",
+    "slug": "shared-branch-sync-boundaries",
+    "title": "多人共享分支的同步边界",
+    "summary": "当多人同时在同一分支协作时，明确什么动作可以做、什么动作不该做，减少同步混乱和历史覆盖。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/sync-before-review",
+    "path": "workflows/sync-before-review",
+    "section": "workflows",
+    "tier": "core",
+    "slug": "sync-before-review",
+    "title": "评审前同步主线",
+    "summary": "在发起评审前先同步主线并检查差异范围，减少 reviewer 面对过期基底、重复冲突和历史噪声的成本。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/pr-merge-strategy-and-platform-settings",
+    "path": "workflows/pr-merge-strategy-and-platform-settings",
+    "section": "workflows",
+    "tier": "extended",
+    "slug": "pr-merge-strategy-and-platform-settings",
+    "title": "PR 合并策略与平台配置",
+    "summary": "把 squash merge、rebase merge、merge commit 和平台配置放到同一个决策框架里，帮助团队统一 PR 落地方式。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/merge-queue-workflow",
+    "path": "workflows/merge-queue-workflow",
+    "section": "workflows",
+    "tier": "extended",
+    "slug": "merge-queue-workflow",
+    "title": "Merge Queue 工作流",
+    "summary": "当团队并发合并很多 PR 时，用 merge queue 降低串行抢占主线、重复排队和基底过期的问题。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/hotfix-and-urgent-fixes",
+    "path": "workflows/hotfix-and-urgent-fixes",
+    "section": "workflows",
+    "tier": "core",
+    "slug": "hotfix-and-urgent-fixes",
+    "title": "紧急修复工作流",
+    "summary": "当线上或发布链路出现高优先级问题时，如何从稳定分支切出 hotfix，快速修复并有序回流主线。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/hotfix-rollback-after-release",
+    "path": "workflows/hotfix-rollback-after-release",
+    "section": "workflows",
+    "tier": "recommended",
+    "slug": "hotfix-rollback-after-release",
+    "title": "发布后热修失败，如何回滚与稳定主线",
+    "summary": "当发布后热修本身引入问题时，优先判断回滚粒度、共享影响和后续补丁路径，而不是立刻继续叠加修复。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/open-source-fork-pr-contribution",
+    "path": "workflows/open-source-fork-pr-contribution",
+    "section": "workflows",
+    "tier": "extended",
+    "slug": "open-source-fork-pr-contribution",
+    "title": "开源贡献 / fork + PR 完整提交流程",
+    "summary": "把开源贡献里从 fork、同步上游、切分支、提交改动到发起 PR 的完整节奏串起来。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/release-branch-workflow",
+    "path": "workflows/release-branch-workflow",
+    "section": "workflows",
+    "tier": "core",
+    "slug": "release-branch-workflow",
+    "title": "发布分支工作流教程",
+    "summary": "梳理何时切发布分支、何时冻结功能、以及如何把修复回流主线。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/backport-with-cherry-pick",
+    "path": "workflows/backport-with-cherry-pick",
+    "section": "workflows",
+    "tier": "recommended",
+    "slug": "backport-with-cherry-pick",
+    "title": "使用 Cherry-pick 回移修复",
+    "summary": "把主线上的精确修复回移到维护分支，而不是把整条功能分支或无关历史一起合进去。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/post-release-multi-branch-backporting",
+    "path": "workflows/post-release-multi-branch-backporting",
+    "section": "workflows",
+    "tier": "extended",
+    "slug": "post-release-multi-branch-backporting",
+    "title": "发布后多维护线回移策略",
+    "summary": "当一个修复需要在多个已发布版本之间回移时，如何控制顺序、验证范围和分支边界。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/fork-upstream-sync",
+    "path": "workflows/fork-upstream-sync",
+    "section": "workflows",
+    "tier": "extended",
+    "slug": "fork-upstream-sync",
+    "title": "Fork 与上游同步教程",
+    "summary": "在 fork 模式协作中维持 origin 与 upstream 的清晰边界，稳定同步上游更新，并把自己的改动安全推回个人 fork。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/squash-vs-rebase-merge",
+    "path": "workflows/squash-vs-rebase-merge",
+    "section": "workflows",
+    "tier": "extended",
+    "slug": "squash-vs-rebase-merge",
+    "title": "Squash Merge 与 Rebase Merge 选择教程",
+    "summary": "比较两种常见合并策略对历史可读性、追踪性和回滚方式的影响。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/long-lived-branch-maintenance",
+    "path": "workflows/long-lived-branch-maintenance",
+    "section": "workflows",
+    "tier": "extended",
+    "slug": "long-lived-branch-maintenance",
+    "title": "长期分支维护教程",
+    "summary": "说明长期存在的分支如何同步主线、控制漂移，并减少大爆炸式合并。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/long-lived-branch-conflict-governance",
+    "path": "workflows/long-lived-branch-conflict-governance",
+    "section": "workflows",
+    "tier": "extended",
+    "slug": "long-lived-branch-conflict-governance",
+    "title": "长期分支冲突治理",
+    "summary": "把长期分支里的冲突处理从临时救火升级成可治理的流程，包括同步节奏、冲突热区识别和重复冲突复用。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/submodule-update-flow",
+    "path": "workflows/submodule-update-flow",
+    "section": "workflows",
+    "tier": "recommended",
+    "slug": "submodule-update-flow",
+    "title": "子模块更新流程教程",
+    "summary": "梳理子模块仓库更新、锁定版本和主仓库同步的基本流程。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/trunk-based-development-workflow",
+    "path": "workflows/trunk-based-development-workflow",
+    "section": "workflows",
+    "tier": "recommended",
+    "slug": "trunk-based-development-workflow",
+    "title": "Trunk-Based Development 工作流",
+    "summary": "用短生命周期分支和高频小批次合并，把主线始终保持在可发布状态，降低长期分叉与集成冲突成本。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/stacked-pull-requests-workflow",
+    "path": "workflows/stacked-pull-requests-workflow",
+    "section": "workflows",
+    "tier": "recommended",
+    "slug": "stacked-pull-requests-workflow",
+    "title": "Stacked Pull Requests 工作流",
+    "summary": "把一个大改动拆成有依赖关系的多层 PR，提升评审吞吐与可读性，同时降低一次性大 PR 的认知负担。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/bisect-regression-triage-workflow",
+    "path": "workflows/bisect-regression-triage-workflow",
+    "section": "workflows",
+    "tier": "recommended",
+    "slug": "bisect-regression-triage-workflow",
+    "title": "回归问题 bisect 排查工作流",
+    "summary": "当出现“最近坏了但不知道谁改坏的”问题时，用 git bisect 通过二分定位首个坏提交，显著缩短排查路径。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/code-freeze-and-release-candidate-workflow",
+    "path": "workflows/code-freeze-and-release-candidate-workflow",
+    "section": "workflows",
+    "tier": "recommended",
+    "slug": "code-freeze-and-release-candidate-workflow",
+    "title": "Code Freeze 与 Release Candidate 工作流",
+    "summary": "在发布前通过代码冻结与 RC 候选流程收敛变更范围，让问题暴露在发布前而不是发布后。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/revert-first-stabilization-workflow",
+    "path": "workflows/revert-first-stabilization-workflow",
+    "section": "workflows",
+    "tier": "recommended",
+    "slug": "revert-first-stabilization-workflow",
+    "title": "Revert-First 稳定化工作流",
+    "summary": "线上回归发生时先恢复服务稳定，再分离根因修复；通过 revert-first 策略缩短故障窗口并降低二次事故风险。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/feature-flag-rollout-workflow",
+    "path": "workflows/feature-flag-rollout-workflow",
+    "section": "workflows",
+    "tier": "recommended",
+    "slug": "feature-flag-rollout-workflow",
+    "title": "Feature Flag 渐进发布工作流",
+    "summary": "把代码合并与功能放量解耦，利用 feature flag 分阶段上线与回滚，降低大功能一次性发布风险。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/release-train-workflow",
+    "path": "workflows/release-train-workflow",
+    "section": "workflows",
+    "tier": "recommended",
+    "slug": "release-train-workflow",
+    "title": "Release Train 工作流",
+    "summary": "以固定节奏发车替代“功能等发布”，通过版本列车机制提高组织可预测性并降低临时插单造成的发布波动。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/cross-repo-integration-workflow",
+    "path": "workflows/cross-repo-integration-workflow",
+    "section": "workflows",
+    "tier": "recommended",
+    "slug": "cross-repo-integration-workflow",
+    "title": "跨仓库集成工作流",
+    "summary": "当一个需求跨多个仓库协同落地时，用统一分支命名、集成清单和串联验证流程降低联调失败率。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/canary-release-workflow",
+    "path": "workflows/canary-release-workflow",
+    "section": "workflows",
+    "tier": "recommended",
+    "slug": "canary-release-workflow",
+    "title": "Canary 发布工作流",
+    "summary": "通过小流量金丝雀发布逐步验证线上行为，在全量放量前提前暴露风险并降低事故半径。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/database-migration-safety-workflow",
+    "path": "workflows/database-migration-safety-workflow",
+    "section": "workflows",
+    "tier": "recommended",
+    "slug": "database-migration-safety-workflow",
+    "title": "数据库迁移安全工作流",
+    "summary": "将数据库 schema 变更拆分为可回退、可观测、可分阶段执行的迁移流程，降低发布期结构变更风险。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/api-versioning-change-workflow",
+    "path": "workflows/api-versioning-change-workflow",
+    "section": "workflows",
+    "tier": "recommended",
+    "slug": "api-versioning-change-workflow",
+    "title": "API 版本变更工作流",
+    "summary": "对外 API 发生破坏性变更时，通过并行版本、弃用窗口和迁移治理降低客户端升级成本与兼容事故。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/incident-retro-to-guardrail-workflow",
+    "path": "workflows/incident-retro-to-guardrail-workflow",
+    "section": "workflows",
+    "tier": "recommended",
+    "slug": "incident-retro-to-guardrail-workflow",
+    "title": "事故复盘到工程护栏工作流",
+    "summary": "将事故复盘结论转化为可执行的 CI/发布/代码护栏，避免复盘停留在文档层而无法降低未来风险。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/github/github-flow-basics",
+    "path": "github/github-flow-basics",
+    "section": "github",
+    "tier": "recommended",
+    "slug": "github-flow-basics",
+    "title": "GitHub Flow 基础教程",
+    "summary": "用 GitHub 官方的轻量协作模型理解 branch、pull request、review 与 merge 的最小闭环。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/github/pull-requests-and-reviews",
+    "path": "github/pull-requests-and-reviews",
+    "section": "github",
+    "tier": "recommended",
+    "slug": "pull-requests-and-reviews",
+    "title": "Pull Request 与 Code Review 教程",
+    "summary": "理解 Pull Request、review、分支保护和合并策略在团队协作中的位置，而不只是学会界面操作。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/github/forks-and-open-source-contribution",
+    "path": "github/forks-and-open-source-contribution",
+    "section": "github",
+    "tier": "extended",
+    "slug": "forks-and-open-source-contribution",
+    "title": "Fork 与开源贡献教程",
+    "summary": "把 fork、upstream、issue、贡献规范和 Pull Request 贡献节奏串成一条更真实的开源协作路径。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/github/issues-projects-and-discussions",
+    "path": "github/issues-projects-and-discussions",
+    "section": "github",
+    "tier": "extended",
+    "slug": "issues-projects-and-discussions",
+    "title": "Issues、Projects 与 Discussions 教程",
+    "summary": "理解 GitHub 上需求、任务、讨论和协作节奏的组织方式，而不把所有沟通都堆进 PR。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/github/github-actions-and-skills",
+    "path": "github/github-actions-and-skills",
+    "section": "github",
+    "tier": "extended",
+    "slug": "github-actions-and-skills",
+    "title": "GitHub Actions 与 GitHub Skills 入门",
+    "summary": "理解 GitHub Actions 的最小自动化模型，并用 GitHub Skills 建立更低成本的动手练习路径。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/github/github-branch-protection-and-rulesets",
+    "path": "github/github-branch-protection-and-rulesets",
+    "section": "github",
+    "tier": "recommended",
+    "slug": "github-branch-protection-and-rulesets",
+    "title": "GitHub 分支保护与 Rulesets",
+    "summary": "用 Branch protection 与 Rulesets 把分支策略从约定升级为平台强制，降低误推送和低质量合并风险。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/github/github-codeowners-and-review-ownership",
+    "path": "github/github-codeowners-and-review-ownership",
+    "section": "github",
+    "tier": "recommended",
+    "slug": "github-codeowners-and-review-ownership",
+    "title": "GitHub CODEOWNERS 与评审归属",
+    "summary": "通过 CODEOWNERS 建立文件级评审归属，减少关键模块无人负责或评审漂移的问题。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/gitlab/gitlab-flow-and-merge-requests",
+    "path": "gitlab/gitlab-flow-and-merge-requests",
+    "section": "gitlab",
+    "tier": "recommended",
+    "slug": "gitlab-flow-and-merge-requests",
+    "title": "GitLab Flow 与 Merge Request 教程",
+    "summary": "理解 GitLab Flow、环境感知的分支协作，以及 Merge Request 为什么会成为 GitLab 交付模型的中心。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/gitlab/gitlab-forks-and-contributions",
+    "path": "gitlab/gitlab-forks-and-contributions",
+    "section": "gitlab",
+    "tier": "extended",
+    "slug": "gitlab-forks-and-contributions",
+    "title": "GitLab Fork 与贡献流程",
+    "summary": "把 GitLab 上的 fork、贡献分支、Merge Request 和上游同步串成一条更真实的外部协作路径，并说明权限与 CI 边界。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/gitlab/gitlab-issues-boards-and-milestones",
+    "path": "gitlab/gitlab-issues-boards-and-milestones",
+    "section": "gitlab",
+    "tier": "extended",
+    "slug": "gitlab-issues-boards-and-milestones",
+    "title": "GitLab Issues、Boards 与 Milestones",
+    "summary": "理解 GitLab 如何用 issue、board 和 milestone 把计划、流转和交付组织起来，而不是把所有上下文都塞进 Merge Request。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/gitlab/gitlab-groups-projects-and-permissions",
+    "path": "gitlab/gitlab-groups-projects-and-permissions",
+    "section": "gitlab",
+    "tier": "extended",
+    "slug": "gitlab-groups-projects-and-permissions",
+    "title": "GitLab Groups、Projects 与权限模型",
+    "summary": "理解 GitLab 里 group、project、role 和权限继承的关系，避免团队协作一开始就把访问边界做乱。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/gitlab/gitlab-ci-and-runners",
+    "path": "gitlab/gitlab-ci-and-runners",
+    "section": "gitlab",
+    "tier": "recommended",
+    "slug": "gitlab-ci-and-runners",
+    "title": "GitLab CI/CD 与 Runners 入门",
+    "summary": "建立更扎实的 GitLab CI/CD、pipeline、job、runner 心智模型，并理解它们怎样参与 Merge Request 准入。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/gitlab/gitlab-protected-branches-and-approval-rules",
+    "path": "gitlab/gitlab-protected-branches-and-approval-rules",
+    "section": "gitlab",
+    "tier": "recommended",
+    "slug": "gitlab-protected-branches-and-approval-rules",
+    "title": "GitLab 受保护分支与审批规则",
+    "summary": "通过 Protected branches 与 Merge request approval rules 固化团队协作边界，减少高风险改动直接进入主线。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/gitlab/gitlab-merge-trains-and-merge-result-pipelines",
+    "path": "gitlab/gitlab-merge-trains-and-merge-result-pipelines",
+    "section": "gitlab",
+    "tier": "recommended",
+    "slug": "gitlab-merge-trains-and-merge-result-pipelines",
+    "title": "GitLab Merge Trains 与合并结果流水线",
+    "summary": "通过 Merge Trains 与 merge result pipelines 在合并前验证“真实合并结果”，降低并发 MR 导致的主线回归。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/object-database",
+    "path": "internals/object-database",
+    "section": "internals",
+    "tier": "core",
+    "slug": "object-database",
+    "title": "Git 对象数据库",
+    "summary": "理解 blob、tree、commit、tag 四类对象，以及 Git 为什么说自己是内容寻址的对象数据库。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/plumbing-and-porcelain",
+    "path": "internals/plumbing-and-porcelain",
+    "section": "internals",
+    "tier": "recommended",
+    "slug": "plumbing-and-porcelain",
+    "title": "Plumbing 与 Porcelain：Git 两层命令世界",
+    "summary": "理解 porcelain 与 plumbing 的分层，能帮助你看懂为什么有些 Git 命令偏“日常操作”，有些命令更像底层原语。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/index-and-working-tree",
+    "path": "internals/index-and-working-tree",
+    "section": "internals",
+    "tier": "core",
+    "slug": "index-and-working-tree",
+    "title": "工作区、暂存区与对象库",
+    "summary": "理解 working tree、index 和 object database 这三层，是看懂 add、commit、restore、reset 的关键前提。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/repository-layout-and-gitdir",
+    "path": "internals/repository-layout-and-gitdir",
+    "section": "internals",
+    "tier": "recommended",
+    "slug": "repository-layout-and-gitdir",
+    "title": "仓库布局、.git 目录与 GIT_DIR",
+    "summary": "理解 `.git` 目录、工作区、gitdir、common dir 和 worktree 之间的关系，能帮助你看懂仓库到底把什么放在了哪里。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/refs-and-head",
+    "path": "internals/refs-and-head",
+    "section": "internals",
+    "tier": "core",
+    "slug": "refs-and-head",
+    "title": "Git 中的引用与 HEAD",
+    "summary": "把分支、标签、远端跟踪引用和 HEAD 放到同一个模型里，理解 Git 如何用名字指向提交。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/remote-tracking-refs",
+    "path": "internals/remote-tracking-refs",
+    "section": "internals",
+    "tier": "core",
+    "slug": "remote-tracking-refs",
+    "title": "远端跟踪引用",
+    "summary": "理解 `main` 与 `origin/main` 的区别，能够帮助你更稳定地掌握 fetch、pull、push 和分支同步。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/revision-selection-and-ranges",
+    "path": "internals/revision-selection-and-ranges",
+    "section": "internals",
+    "tier": "extended",
+    "slug": "revision-selection-and-ranges",
+    "title": "修订选择、范围表达式与提交集合",
+    "summary": "很多 Git 命令真正处理的不是“一个提交”，而是一组通过 revision syntax 表达出来的提交集合。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/commit-graph",
+    "path": "internals/commit-graph",
+    "section": "internals",
+    "tier": "core",
+    "slug": "commit-graph",
+    "title": "Git 提交图与历史表达",
+    "summary": "理解为什么 Git 历史本质上是提交图，而不是简单时间线，以及 merge、rebase 如何重新表达这张图。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/packfiles-and-storage",
+    "path": "internals/packfiles-and-storage",
+    "section": "internals",
+    "tier": "recommended",
+    "slug": "packfiles-and-storage",
+    "title": "Git Packfiles 与对象存储",
+    "summary": "理解 Git 如何通过 packfiles、压缩和对象复用来高效存储与传输历史，而不是简单复制整份仓库。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/transfer-protocols-and-negotiation",
+    "path": "internals/transfer-protocols-and-negotiation",
+    "section": "internals",
+    "tier": "extended",
+    "slug": "transfer-protocols-and-negotiation",
+    "title": "传输协议、协商与 pack 交换",
+    "summary": "理解 fetch / clone / push 时的协商过程，能帮助你看懂 Git 不是在“整仓同步”，而是在交换对象与引用状态。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/environment-and-repository-variables",
+    "path": "internals/environment-and-repository-variables",
+    "section": "internals",
+    "tier": "extended",
+    "slug": "environment-and-repository-variables",
+    "title": "环境变量、仓库变量与 Git 运行上下文",
+    "summary": "理解 GIT_DIR、GIT_WORK_TREE、GIT_INDEX_FILE 等环境变量，能帮助你看懂 Git 如何决定“当前仓库上下文”到底是什么。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/reachability-and-garbage-collection",
+    "path": "internals/reachability-and-garbage-collection",
+    "section": "internals",
+    "tier": "recommended",
+    "slug": "reachability-and-garbage-collection",
+    "title": "对象可达性与垃圾回收",
+    "summary": "理解对象为什么有时还能恢复、有时会永久丢失，本质上取决于可达性和垃圾回收，而不只是命令本身。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/merge-base-and-ancestry",
+    "path": "internals/merge-base-and-ancestry",
+    "section": "internals",
+    "tier": "recommended",
+    "slug": "merge-base-and-ancestry",
+    "title": "共同祖先与历史祖先关系教程",
+    "summary": "解释 Git 如何基于共同祖先判断分支差异、合并基础和历史可达性。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/tree-objects-and-snapshots",
+    "path": "internals/tree-objects-and-snapshots",
+    "section": "internals",
+    "tier": "extended",
+    "slug": "tree-objects-and-snapshots",
+    "title": "Tree 对象与目录快照教程",
+    "summary": "说明 tree 对象如何表达目录层级，以及提交为何能表示完整文件树快照。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/blob-objects-and-content-addressing",
+    "path": "internals/blob-objects-and-content-addressing",
+    "section": "internals",
+    "tier": "extended",
+    "slug": "blob-objects-and-content-addressing",
+    "title": "Blob 对象与内容寻址教程",
+    "summary": "解释 blob 如何只按内容存储，以及哈希为什么成为对象身份。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/commit-message-and-parents",
+    "path": "internals/commit-message-and-parents",
+    "section": "internals",
+    "tier": "extended",
+    "slug": "commit-message-and-parents",
+    "title": "提交对象、父提交与提交说明教程",
+    "summary": "说明提交对象如何把 tree、父提交和说明文本连接成历史图。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/refspec-and-ref-updates",
+    "path": "internals/refspec-and-ref-updates",
+    "section": "internals",
+    "tier": "extended",
+    "slug": "refspec-and-ref-updates",
+    "title": "Refspec 与引用更新教程",
+    "summary": "解释 fetch 和 push 时 refspec 如何决定哪些引用被映射和更新。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/three-way-merge-mechanics",
+    "path": "internals/three-way-merge-mechanics",
+    "section": "internals",
+    "tier": "recommended",
+    "slug": "three-way-merge-mechanics",
+    "title": "三方合并机制",
+    "summary": "理解 Git 如何基于 merge-base 做三方合并，有助于准确判断冲突来源、合并结果与冲突解决策略。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/rename-detection-and-diff-algorithms",
+    "path": "internals/rename-detection-and-diff-algorithms",
+    "section": "internals",
+    "tier": "recommended",
+    "slug": "rename-detection-and-diff-algorithms",
+    "title": "重命名检测与差异算法",
+    "summary": "理解 Git 的 rename 检测与 diff 算法有助于解释“为何这个改动显示为删除+新增或重命名”，并优化评审可读性。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/rebase-internals-and-sequencer",
+    "path": "internals/rebase-internals-and-sequencer",
+    "section": "internals",
+    "tier": "recommended",
+    "slug": "rebase-internals-and-sequencer",
+    "title": "rebase 内部机制与 sequencer",
+    "summary": "从 sequencer 视角理解 rebase 的提交重放过程，帮助定位 rebase 中断、冲突恢复与历史重写后的提交变化。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/internals/hooks-and-policy-enforcement",
+    "path": "internals/hooks-and-policy-enforcement",
+    "section": "internals",
+    "tier": "recommended",
+    "slug": "hooks-and-policy-enforcement",
+    "title": "hooks 与策略执行",
+    "summary": "理解本地 hooks 与服务端 hooks 的职责边界，帮助把提交与推送策略从“口头约定”转成“系统强制执行”。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/recovery/reflog-recovery",
+    "path": "recovery/reflog-recovery",
+    "section": "recovery",
+    "tier": "core",
+    "slug": "reflog-recovery",
+    "title": "reflog 恢复手册",
+    "summary": "当 reset、rebase、pull 或误删分支后找不到原来位置时，优先用 reflog 重新定位并建立恢复路径。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/recovery/recover-after-reset",
+    "path": "recovery/recover-after-reset",
+    "section": "recovery",
+    "tier": "core",
+    "slug": "recover-after-reset",
+    "title": "reset 过头后怎么恢复",
+    "summary": "当 reset 把分支、暂存区或工作区挪得太远时，先分清是哪一层变了，再用 reflog、ORIG_HEAD 或救援分支恢复。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/recovery/recover-after-rebase",
+    "path": "recovery/recover-after-rebase",
+    "section": "recovery",
+    "tier": "core",
+    "slug": "recover-after-rebase",
+    "title": "rebase 出错后怎么恢复",
+    "summary": "当 rebase 过程中冲突、提交丢失或结果不对时，先停止继续改写历史，再用 reflog、abort 和救援分支恢复可控状态。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/recovery/recover-deleted-branch",
+    "path": "recovery/recover-deleted-branch",
+    "section": "recovery",
+    "tier": "recommended",
+    "slug": "recover-deleted-branch",
+    "title": "误删分支后怎么找回",
+    "summary": "分支删掉后，通常先确认是名字没了还是提交也不可达了，再用 reflog、merge-base 和旧引用位置把分支接回来。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/recovery/detached-head-rescue",
+    "path": "recovery/detached-head-rescue",
+    "section": "recovery",
+    "tier": "core",
+    "slug": "detached-head-rescue",
+    "title": "detached HEAD 状态下如何自救",
+    "summary": "detached HEAD 本身不是错误，真正的风险是你在这个状态下产生了值得保留的提交却没有立刻接住它们。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/recovery/undo-after-pull",
+    "path": "recovery/undo-after-pull",
+    "section": "recovery",
+    "tier": "core",
+    "slug": "undo-after-pull",
+    "title": "pull 之后后悔了怎么撤回",
+    "summary": "当 pull 之后发现分支状态不对、自动 merge 不符合预期，或者 rebase 结果混乱时，先判断 pull 实际做了什么，再选择 ORIG_HEAD、reflog 或救援分支。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/recovery/assess-force-push-impact",
+    "path": "recovery/assess-force-push-impact",
+    "section": "recovery",
+    "tier": "recommended",
+    "slug": "assess-force-push-impact",
+    "title": "force push 之后怎么判断影响范围",
+    "summary": "force push 之后，真正关键的不是立刻再推一次，而是先判断哪些引用被覆盖、哪些同事可能已基于旧历史继续工作，以及恢复窗口还有多大。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/recovery/recover-lost-stash",
+    "path": "recovery/recover-lost-stash",
+    "section": "recovery",
+    "tier": "extended",
+    "slug": "recover-lost-stash",
+    "title": "找回“消失的 stash”",
+    "summary": "当 stash 列表里看不到之前保存的内容时，先判断是 pop 后丢失、误删还是引用漂移，再用 reflog 与 dangling commit 进行恢复。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/recovery/recover-after-wrong-cherry-pick",
+    "path": "recovery/recover-after-wrong-cherry-pick",
+    "section": "recovery",
+    "tier": "extended",
+    "slug": "recover-after-wrong-cherry-pick",
+    "title": "cherry-pick 挑错提交后的恢复",
+    "summary": "当 cherry-pick 了错误提交或错误顺序后，根据是否已共享分支历史，选择 reset、revert 或重建补丁链恢复正确状态。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/recovery/recover-after-accidental-merge",
+    "path": "recovery/recover-after-accidental-merge",
+    "section": "recovery",
+    "tier": "extended",
+    "slug": "recover-after-accidental-merge",
+    "title": "误合并分支后的恢复",
+    "summary": "当错误地 merge 了不该合并的分支时，先识别 merge 是否已共享，再选择 reset 或 revert -m 安全撤销。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/recovery/recover-after-git-clean",
+    "path": "recovery/recover-after-git-clean",
+    "section": "recovery",
+    "tier": "extended",
+    "slug": "recover-after-git-clean",
+    "title": "误用 git clean 后的恢复",
+    "summary": "git clean 删除未跟踪文件后，优先从 IDE 本地历史、系统快照或构建产物来源恢复，并建立 clean 前预演与备份习惯。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/recovery/recover-after-cherry-pick",
+    "path": "recovery/recover-after-cherry-pick",
+    "section": "recovery",
+    "tier": "extended",
+    "slug": "recover-after-cherry-pick",
+    "title": "cherry-pick 冲突或出错后怎么恢复",
+    "summary": "cherry-pick 遇到冲突、中止或结果不对时的完整恢复流程，包括 --abort、--continue、--skip 以及 cherry-pick 完成后的补救方法。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/recovery/undo-merge-commit",
+    "path": "recovery/undo-merge-commit",
+    "section": "recovery",
+    "tier": "extended",
+    "slug": "undo-merge-commit",
+    "title": "合并提交后怎么撤销",
+    "summary": "merge commit 创建后发现有问题时的正确撤销方法。重点讲解 git revert -m 的 parent 编号原理和常见误区。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/recovery/fix-broken-interactive-rebase",
+    "path": "recovery/fix-broken-interactive-rebase",
+    "section": "recovery",
+    "tier": "extended",
+    "slug": "fix-broken-interactive-rebase",
+    "title": "交互式 rebase 中途出问题怎么救",
+    "summary": "交互式 rebase 过程中常见的错误（选错动作、冲突、编辑器问题）及恢复办法，包括 --abort、--edit-todo 和 reflog 找回。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/recovery/recover-lost-commits",
+    "path": "recovery/recover-lost-commits",
+    "section": "recovery",
+    "tier": "extended",
+    "slug": "recover-lost-commits",
+    "title": "提交丢失后怎么找回",
+    "summary": "各种场景下提交“丢失”后的恢复策略：detached HEAD 提交、filter-branch 后、误删分支、reset 过头。核心工具是 reflog 和 fsck。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/recovery/recover-from-corrupted-repo",
+    "path": "recovery/recover-from-corrupted-repo",
+    "section": "recovery",
+    "tier": "extended",
+    "slug": "recover-from-corrupted-repo",
+    "title": "仓库损坏后怎么恢复",
+    "summary": "仓库损坏（pack 损坏、对象丢失、磁盘故障）后的诊断和恢复策略。包括 git fsck 诊断、从远端重新 clone、恢复 pack 文件、备份恢复和预防措施。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/recovery/fix-detached-head-accidentally-committed",
+    "path": "recovery/fix-detached-head-accidentally-committed",
+    "section": "recovery",
+    "tier": "extended",
+    "slug": "fix-detached-head-accidentally-committed",
+    "title": "detached HEAD 上提交了怎么接回分支",
+    "summary": "在 detached HEAD 状态下做了提交后，如何正确接回分支。包括创建新分支、合并到已有分支、预防措施。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/recovery/fix-wrong-author-or-commit-message",
+    "path": "recovery/fix-wrong-author-or-commit-message",
+    "section": "recovery",
+    "tier": "extended",
+    "slug": "fix-wrong-author-or-commit-message",
+    "title": "提交后发现作者或信息写错怎么修正",
+    "summary": "提交后发现作者信息、提交信息写错，或者漏了文件的修正方法。包括 amend、rebase -i、filter-repo 批量修改等。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/git-aliases",
+    "path": "best-practices/git-aliases",
+    "section": "best-practices",
+    "tier": "extended",
+    "slug": "git-aliases",
+    "title": "Git 别名与效率提升",
+    "summary": "高效 Git 别名配置、常用别名清单、Shell 别名、团队共享别名配置与最佳实践。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/commit-message-advanced",
+    "path": "best-practices/commit-message-advanced",
+    "section": "best-practices",
+    "tier": "extended",
+    "slug": "commit-message-advanced",
+    "title": "高级提交信息规范",
+    "summary": "Conventional Commits、语义化提交、Co-authored-by、Breaking Changes 等高级提交信息规范与工具支持。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/security-with-git",
+    "path": "best-practices/security-with-git",
+    "section": "best-practices",
+    "tier": "extended",
+    "slug": "security-with-git",
+    "title": "Git 安全实践",
+    "summary": "敏感信息泄露处理、密钥管理、.env 安全、git-secrets、GPG 签名提交、SSH 密钥管理等安全实践。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/pre-release-checklist",
+    "path": "workflows/pre-release-checklist",
+    "section": "workflows",
+    "tier": "extended",
+    "slug": "pre-release-checklist",
+    "title": "发布前的 Git 检查清单",
+    "summary": "发布前的完整 Git 检查清单：分支状态、tag 创建、changelog 生成、版本号、CI 验证。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/ci-optimization-with-git",
+    "path": "workflows/ci-optimization-with-git",
+    "section": "workflows",
+    "tier": "extended",
+    "slug": "ci-optimization-with-git",
+    "title": "CI/CD 中的 Git 优化",
+    "summary": "CI/CD 中的 Git 优化策略：浅克隆、缓存、partial clone、只拉变更，以及 GitHub Actions / GitLab CI 中的具体配置。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/trunk-based-development",
+    "path": "workflows/trunk-based-development",
+    "section": "workflows",
+    "tier": "extended",
+    "slug": "trunk-based-development",
+    "title": "主干开发工作流",
+    "summary": "主干开发 vs 分支开发对比、feature flag 配合、短分支策略、小步提交实践。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/concepts/three-layers",
+    "path": "concepts/three-layers",
+    "section": "concepts",
+    "tier": "extended",
+    "slug": "three-layers",
+    "title": "Git 三层模型：工作区、暂存区与对象库",
+    "summary": "解释 Git 最核心的三层架构——工作区（Working Tree）、暂存区（Index）与对象库（Objects Database）——以及它们如何协同工作。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/history",
+    "path": "concepts/git-history",
+    "section": "concepts",
+    "tier": "core",
+    "slug": "git-history",
+    "title": "Git 历史说明",
+    "summary": "系统解释 Git 如何记录历史、为什么提交历史是一个有向图，以及这对协作、恢复和变更审查意味着什么。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/concepts/git-ignore",
+    "path": "concepts/git-ignore",
+    "section": "concepts",
+    "tier": "extended",
+    "slug": "git-ignore",
+    "title": ".gitignore 完整指南",
+    "summary": "系统解释 .gitignore 规则语法、优先级、通配符、全局配置，以及如何排除不该提交的文件。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/concepts/git-attributes",
+    "path": "concepts/git-attributes",
+    "section": "concepts",
+    "tier": "extended",
+    "slug": "git-attributes",
+    "title": "Git Attributes 详解",
+    "summary": "解释 .gitattributes 文件的用途、语法和常见应用场景，包括行尾符、合并策略、差异比较、语言识别和大文件处理。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/concepts/git-hooks",
+    "path": "concepts/git-hooks",
+    "section": "concepts",
+    "tier": "extended",
+    "slug": "git-hooks",
+    "title": "Git Hooks 完全指南",
+    "summary": "详细解释 Git Hooks 的工作机制、客户端与服务端钩子、常见应用场景，以及如何使用 Husky 等工具管理 Hooks。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/concepts/git-subtree",
+    "path": "concepts/git-subtree",
+    "section": "concepts",
+    "tier": "extended",
+    "slug": "git-subtree",
+    "title": "Git Subtree 使用指南",
+    "summary": "解释 git subtree 的概念、与 submodule 的对比、添加和更新子树的操作，以及子树合并和拆分的高级用法。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/concepts/git-lfs",
+    "path": "concepts/git-lfs",
+    "section": "concepts",
+    "tier": "extended",
+    "slug": "git-lfs",
+    "title": "Git LFS 大文件存储",
+    "summary": "解释 Git LFS 的工作原理、安装配置、追踪文件类型、迁移已有大文件，以及 LFS 的常见问题和最佳实践。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/concepts/git-shallow",
+    "path": "concepts/git-shallow",
+    "section": "concepts",
+    "tier": "extended",
+    "slug": "git-shallow",
+    "title": "Git 浅克隆与浅操作",
+    "summary": "解释 git clone --depth、浅 fetch、shallow exclude 等浅操作的概念、使用场景和局限性。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/concepts/detached-head",
+    "path": "concepts/detached-head",
+    "section": "concepts",
+    "tier": "extended",
+    "slug": "detached-head",
+    "title": "Detached HEAD 状态详解",
+    "summary": "解释什么是 detached HEAD、为什么会进入该状态，以及如何安全地退出 detached HEAD 并保留工作成果。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/concepts/merge-strategies",
+    "path": "concepts/merge-strategies",
+    "section": "concepts",
+    "tier": "extended",
+    "slug": "merge-strategies",
+    "title": "Git Merge 策略详解",
+    "summary": "系统介绍 Git 的合并策略——recursive、ort、octopus、ours、subtree——它们分别解决什么问题，以及如何选择。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/concepts/worktree",
+    "path": "concepts/worktree",
+    "section": "concepts",
+    "tier": "extended",
+    "slug": "worktree",
+    "title": "Git Worktree 概念：多工作目录并行开发",
+    "summary": "系统解释 Git worktree 的概念——如何同时检出多个分支到不同目录，以及它解决的问题和适用场景。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/concepts/stash",
+    "path": "concepts/stash",
+    "section": "concepts",
+    "tier": "extended",
+    "slug": "stash",
+    "title": "Git Stash 概念：临时保存工作上下文",
+    "summary": "系统解释 git stash 的概念——它是什么、什么时候用、有什么限制，以及如何安全地管理临时保存的工作上下文。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-rerere",
+    "path": "commands/git-rerere",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-rerere",
+    "title": "git-rerere 教程",
+    "summary": "启用并重用冲突解决方案，减少重复解决相同冲突的工作量。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-difftool",
+    "path": "commands/git-difftool",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-difftool",
+    "title": "git-difftool 教程",
+    "summary": "使用外部图形化工具查看差异，提升代码审查和冲突理解效率。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-replace",
+    "path": "commands/git-replace",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-replace",
+    "title": "git-replace 教程",
+    "summary": "在不改写历史的情况下替换提交对象，用于拆分仓库或修正历史中的特定节点。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-prune",
+    "path": "commands/git-prune",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-prune",
+    "title": "git-prune 教程",
+    "summary": "清理不可达的 Git 对象，配合 gc 和 reflog 管理仓库对象生命周期。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-hash-object",
+    "path": "commands/git-hash-object",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-hash-object",
+    "title": "git-hash-object 教程",
+    "summary": "计算文件或标准输入的 Git 对象 ID（SHA-1），帮助理解 Git 的内容寻址模型。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/commands/git-interpret-trailers",
+    "path": "commands/git-interpret-trailers",
+    "section": "commands",
+    "tier": "extended",
+    "slug": "git-interpret-trailers",
+    "title": "git-interpret-trailers 教程",
+    "summary": "解析、添加或规范化提交信息中的尾部字段（trailers），如 Co-authored-by、Signed-off-by。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/signing-commits-workflow",
+    "path": "workflows/signing-commits-workflow",
+    "section": "workflows",
+    "tier": "extended",
+    "slug": "signing-commits-workflow",
+    "title": "签名提交工作流",
+    "summary": "使用 GPG 或 SSH 签名提交，建立可验证的提交身份和可信协作链。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/pre-commit-hook-workflow",
+    "path": "workflows/pre-commit-hook-workflow",
+    "section": "workflows",
+    "tier": "extended",
+    "slug": "pre-commit-hook-workflow",
+    "title": "提交前检查工作流",
+    "summary": "利用 pre-commit hook 在代码进入仓库前自动运行检查，守住代码质量第一道关。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/large-file-handling-workflow",
+    "path": "workflows/large-file-handling-workflow",
+    "section": "workflows",
+    "tier": "extended",
+    "slug": "large-file-handling-workflow",
+    "title": "大文件处理工作流",
+    "summary": "使用 Git LFS、稀疏检出和分包策略管理仓库中的大文件，保持克隆速度和历史可维护性。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/workflows/rollback-deployment-workflow",
+    "path": "workflows/rollback-deployment-workflow",
+    "section": "workflows",
+    "tier": "extended",
+    "slug": "rollback-deployment-workflow",
+    "title": "部署回滚工作流",
+    "summary": "结合 Git 标签、revert 和快速分支切换，建立安全可控的部署回滚流程。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/tagging-and-versioning",
+    "path": "best-practices/tagging-and-versioning",
+    "section": "best-practices",
+    "tier": "extended",
+    "slug": "tagging-and-versioning",
+    "title": "标签与版本管理",
+    "summary": "使用语义化版本（SemVer）和带注释标签建立清晰、可追踪的版本发布规范。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/bisect-friendly-commits",
+    "path": "best-practices/bisect-friendly-commits",
+    "section": "best-practices",
+    "tier": "extended",
+    "slug": "bisect-friendly-commits",
+    "title": "二分友好的提交",
+    "summary": "保持每次提交独立可构建、可测试，让 git bisect 能高效定位引入问题的提交。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/best-practices/backup-before-rewrite",
+    "path": "best-practices/backup-before-rewrite",
+    "section": "best-practices",
+    "tier": "extended",
+    "slug": "backup-before-rewrite",
+    "title": "改写历史前备份",
+    "summary": "在执行 rebase、filter-repo 等改写历史操作前建立安全网，确保误操作后可恢复。",
+    "suggestions": []
+  }
+]

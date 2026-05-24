@@ -1,0 +1,244 @@
+export const metadata = {
+  title: "Git Stash: Temporary Work Context Storage",
+  slug: "stash",
+  locale: "en",
+  section: "concepts",
+  summary: "A systematic explanation of git stash — what it is, when to use it, its limitations, and how to safely manage temporary work context.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-stash",
+    "https://git-scm.com/book/en/v2/Git-Tools-Stashing-and-Cleaning",
+  ],
+};
+
+# Git Stash: Temporary Work Context Storage
+
+## In One Sentence
+
+Git stash is a **temporary storage area** for changes in your working tree that aren't ready to commit, allowing you to switch context and recover your work later.
+
+## Why Stash Exists
+
+Here's a common scenario: you're working on `feature/login` when you need to switch branches to fix an urgent bug. Your changes aren't complete and shouldn't be committed yet.
+
+Your options:
+
+| Option | Pros | Cons |
+|--------|------|------|
+| Commit half-finished work | Quick | Pollutes commit history |
+| Create a temp branch | Clean structure | More steps required |
+| **git stash** | **Fast, no side effects** | **Requires understanding limitations** |
+
+`git stash` is the lowest-cost solution — it saves your working tree changes to a stack, cleans your working tree, and lets you restore changes anytime.
+
+## What Stash Actually Is
+
+A stash is actually **two special commits**:
+
+```
+stash@{0}
+├── commit of working tree content
+└── commit of index content
+    │
+    based on HEAD at stash creation time
+```
+
+When you run `git stash`, Git:
+1. Saves the current index (staging area) as a commit
+2. Saves the current working tree as a commit
+3. Records these two commits as a special stash reference
+
+Running `git stash list` shows the contents of this stack.
+
+## Core Operations
+
+### Saving to Stash
+
+```bash
+# stash tracked file changes (default)
+git stash
+
+# include untracked files
+git stash push -u
+
+# include ignored files too
+git stash push -a
+
+# add a description message
+git stash push -m "WIP: login form validation"
+```
+
+### Viewing Stash
+
+```bash
+# list all stashes
+git stash list
+
+# view changes in a specific stash
+git stash show stash@{0}
+
+# view the full diff
+git stash show -p stash@{0}
+```
+
+### Restoring Stash
+
+```bash
+# restore and remove the top stash
+git stash pop
+
+# restore without removing
+git stash apply stash@{1}
+
+# restore including staged state
+git stash apply --index
+```
+
+### Cleaning Stash
+
+```bash
+# remove the top stash
+git stash drop
+
+# remove a specific stash
+git stash drop stash@{0}
+
+# clear all stashes
+git stash clear
+```
+
+## Important Limitations
+
+### 1. Tracked Files Only by Default
+
+```bash
+# new files are NOT stashed
+git stash      # does not save new untracked files
+
+# use -u or --include-untracked
+git stash -u   # saves untracked files
+```
+
+### 2. No File Mode Tracking
+
+Git stash does not track file permission changes by default.
+
+### 3. Conflicts on Restore
+
+If stashed changes conflict with the current working tree, restoring produces conflicts that need manual resolution.
+
+### 4. Cross-Branch Restore Caution
+
+Restoring a stash on a different branch can produce unexpected results when file structures differ significantly.
+
+### 5. Not Permanent Storage
+
+Stash is stored in `.git/refs/stash`. While it doesn't expire naturally, `git stash drop` or `git stash clear` removes it with no recovery path (except reflog).
+
+## Common Usage Patterns
+
+### Pattern 1: Quick Task Switch
+
+```bash
+# save current work
+git stash push -m "WIP: login validation"
+
+# switch to fix a bug
+git switch hotfix
+# ... fix and commit ...
+
+# switch back and restore
+git switch feature/login
+git stash pop
+```
+
+### Pattern 2: Preserving Staged State
+
+```bash
+# some files are staged
+git add src/login.ts src/utils.ts
+
+# stash while preserving staged state
+git stash push --staged
+
+# or restore with --index to keep staged
+git stash apply --index
+```
+
+### Pattern 3: Splitting Messy Changes
+
+```bash
+# split a messy working tree into multiple stashes
+git stash push -m "part 1: login logic"
+
+# clean up remaining changes
+git stash push -m "part 2: test updates"
+```
+
+### Pattern 4: Create Branch from Stash
+
+When restoring produces too many conflicts:
+
+```bash
+# create a branch from stash
+git stash branch new-feature stash@{0}
+```
+
+## Stash Stack Management
+
+### Stack Behavior
+
+Stash is a LIFO stack — the latest entry is at the top:
+
+```
+stash@{0}  ← latest
+stash@{1}
+stash@{2}  ← oldest
+```
+
+An unmanaged stack leads to:
+- Lost context tracking
+- Accidental operations on old entries
+- Wasted storage
+
+### Recommended Cleanup Habits
+
+- Always add a description (`-m`) to each stash
+- Use `git stash pop` (not `apply`) to clean as you restore
+- Review and clean stashes weekly
+- Keep the stash stack under 5 entries
+
+## Advanced Tips
+
+### Selective Stashing
+
+```bash
+# interactively select hunks to stash
+git stash push -p
+
+# stash only the index (staged changes)
+git stash push --staged
+
+# restore a specific file from stash
+git checkout stash@{0} -- src/login.ts
+```
+
+### Recovering a Cleared Stash
+
+If you accidentally run `git stash clear`, the stash objects may still exist if not yet GC'd:
+
+```bash
+# immediately after clear, find unreachable commits
+git fsck --unreachable | grep commit | cut -d ' ' -f3
+
+# inspect found commits
+git show <commit-hash>
+```
+
+## Continue Learning
+
+After understanding stash concepts, continue with:
+
+1. `git stash` command reference
+2. `git stash` vs `git worktree` decision guide
+3. `recovery/recover-lost-stash` — recovering a lost stash
+4. How stash interacts with `git rebase` and `git merge`

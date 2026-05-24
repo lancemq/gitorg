@@ -222,7 +222,11 @@ export type ConceptsSlug =
   | "git-hooks"
   | "git-subtree"
   | "git-lfs"
-  | "git-shallow";
+  | "git-shallow"
+  | "detached-head"
+  | "merge-strategies"
+  | "worktree"
+  | "stash";
 
 export const learningPathSlugs = [
   "quick-start",
@@ -509,6 +513,10 @@ export const conceptSlugs = [
   "git-subtree",
   "git-lfs",
   "git-shallow",
+  "detached-head",
+  "merge-strategies",
+  "worktree",
+  "stash",
 ] as const satisfies readonly ConceptsSlug[];
 
 export const internalsSlugs = [

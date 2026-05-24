@@ -1,0 +1,219 @@
+export const metadata = {
+  title: "Git Merge Strategies Explained",
+  slug: "merge-strategies",
+  locale: "en",
+  section: "concepts",
+  summary: "A systematic introduction to Git merge strategies — recursive, ort, octopus, ours, subtree — what problems they solve and how to choose.",
+  sourceUrls: [
+    "https://git-scm.com/docs/merge-strategies",
+    "https://git-scm.com/docs/git-merge",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+  ],
+};
+
+# Git Merge Strategies Explained
+
+## In One Sentence
+
+Git's merge strategy determines the algorithm Git uses to compute the final content when integrating two branches. Choosing the right strategy avoids unnecessary conflicts and history noise.
+
+## Merge Strategy Overview
+
+Git supports these merge strategies:
+
+| Strategy | Default For | Branch Count |
+|----------|-------------|-------------|
+| `ort` (Ostensibly Recursive's Twin) | Default since Git 2.33 | 2 branches |
+| `recursive` (legacy default) | Replaced by ort | 2 branches |
+| `octopus` | Multiple branch merge | 3+ branches |
+| `ours` | Keep current branch content | Any |
+| `subtree` | Merge subproject into subdirectory | 2 branches |
+
+## ort
+
+The current default merge strategy, introduced in Git 2.33 to replace recursive.
+
+### How It Works
+
+1. Find the merge base (common ancestor) of the two branches
+2. Compute changes from both branches relative to the merge base
+3. Apply a more efficient three-way merge algorithm
+4. Detect and handle renames, permission changes, etc.
+
+### Advantages Over recursive
+
+- Much faster (rewritten in C vs the original Python/Shell logic)
+- More accurate conflict detection
+- More reliable rename detection
+- Lower memory usage
+
+### Usage
+
+```bash
+# ort is the default — no need to specify
+git merge feature/login
+
+# explicit
+git merge -s ort feature/login
+```
+
+## recursive
+
+The default before Git 2.33, now superseded by ort but still available for compatibility.
+
+### How It Works
+
+When two branches have multiple common ancestors, recursive merges them into a virtual ancestor first:
+
+```
+main:    A---B---C---D
+              \
+feature:       E---F
+```
+
+If the merge base is not unique, recursive first recursively merges the ancestors before performing the merge.
+
+### Configuration Options
+
+```bash
+# use recursive strategy explicitly
+git merge -s recursive feature/login
+
+# set rename similarity threshold
+git merge -s recursive -X find-renames=70 feature/login
+
+# ignore whitespace changes
+git merge -s recursive -X ignore-space-change feature/login
+
+# use their version on conflicts
+git merge -s recursive -X theirs feature/login
+
+# use our version on conflicts
+git merge -s recursive -X ours feature/login
+```
+
+## octopus
+
+Merges multiple branches at once.
+
+### How It Works
+
+Applies each branch sequentially onto the current branch. If any individual merge produces a conflict, octopus aborts immediately — it is not designed for conflict resolution.
+
+### Usage
+
+```bash
+# merge three feature branches at once
+git merge feature/login feature/payment feature/report
+```
+
+Git automatically selects octopus when merging more than two branches.
+
+### When to Use
+
+- Batch-merging multiple independent, conflict-free feature branches
+- Topic branch rollups
+- Release branch aggregation
+
+### When to Avoid
+
+- Branches with overlapping code changes
+- When fine-grained conflict control is needed
+
+## ours
+
+Completely ignores all changes from the merged branches — the result is exactly the current branch content. The history records that those branches were "merged."
+
+### Usage
+
+```bash
+# mark feature/experimental as merged without applying its changes
+git merge -s ours feature/experimental
+```
+
+### When to Use
+
+- Deprecating a feature branch while preserving history
+- Changes were applied through other means but you want a merge record
+- Marking that a branch has been "overridden"
+
+### ours vs -X ours
+
+Important distinction:
+- `-s ours`: the entire merge result equals current branch content
+- `-X ours` (with recursive/ort): resolves conflicts by preferring current branch, but non-conflicting changes are still applied
+
+## subtree
+
+Merges content from the target branch into a subdirectory of the current repository.
+
+### How It Works
+
+Automatically detects which subdirectory the merged content belongs in and maps changes accordingly.
+
+### Usage
+
+```bash
+# merge a library repo into the lib/ subdirectory
+git merge -s subtree lib/main
+```
+
+### When to Use
+
+- Integrating an independent library as a subtree
+- Maintaining subprojects alongside the main codebase
+
+## How to Choose
+
+### Daily Development
+
+Use the default (ort) with no special configuration:
+
+```bash
+git switch main
+git merge feature/login
+```
+
+### Batch Merging
+
+Use octopus:
+
+```bash
+git merge feature/a feature/b feature/c
+```
+
+### Special Cases
+
+```bash
+# ignore whitespace differences during merge
+git merge -X ignore-all-space feature/login
+
+# fully accept their version on conflicts
+git merge -X theirs feature/login
+
+# record merge relationship without content changes
+git merge -s ours feature/abandoned
+```
+
+## Strategy Options Reference
+
+| Option | Description | Applicable Strategy |
+|--------|-------------|-------------------|
+| `ours` | Use current branch on conflict | recursive/ort |
+| `theirs` | Use merged branch on conflict | recursive/ort |
+| `patience` | Use more precise diff algorithm | recursive/ort |
+| `ignore-space-change` | Ignore whitespace quantity changes | recursive/ort |
+| `ignore-all-space` | Ignore all whitespace differences | recursive/ort |
+| `renormalize` | Normalize line endings before merge | recursive/ort |
+| `no-renames` | Disable rename detection | recursive/ort |
+| `find-renames=<n>` | Set rename similarity threshold | recursive/ort |
+| `subtree[=<path>]` | Subtree merge variant | recursive/ort |
+
+## Continue Learning
+
+After understanding merge strategies, continue with:
+
+1. `git merge` command reference and full options
+2. Merge vs Rebase decision framework
+3. Three-way merge internals
+4. Conflict resolution strategies and tools

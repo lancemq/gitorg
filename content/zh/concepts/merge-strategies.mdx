@@ -1,0 +1,219 @@
+export const metadata = {
+  title: "Git Merge 策略详解",
+  slug: "merge-strategies",
+  locale: "zh",
+  section: "concepts",
+  summary: "系统介绍 Git 的合并策略——recursive、ort、octopus、ours、subtree——它们分别解决什么问题，以及如何选择。",
+  sourceUrls: [
+    "https://git-scm.com/docs/merge-strategies",
+    "https://git-scm.com/docs/git-merge",
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+  ],
+};
+
+# Git Merge 策略详解
+
+## 一句话理解
+
+Git 的 merge 策略决定了"当两条分支需要整合时，Git 用什么算法计算最终内容"。选择合适的策略可以避免不必要的冲突和历史混乱。
+
+## Merge 策略总览
+
+Git 支持以下几种 merge 策略：
+
+| 策略 | 默认场景 | 适用分支数 |
+|------|----------|-----------|
+| `ort`（重构后的 recursive） | 默认策略 | 2 个分支 |
+| `recursive`（旧版默认） | 已由 ort 替代 | 2 个分支 |
+| `octopus` | 同时合并多个分支 | 3+ 个分支 |
+| `ours` | 完全保留当前分支内容 | 任意数量 |
+| `subtree` | 合并子项目到子目录 | 2 个分支 |
+
+## ort（Ostensibly Recursive's Twin）
+
+当前 Git 的默认 merge 策略，在 Git 2.33 中引入并替代了 recursive。
+
+### 工作原理
+
+1. 找到两个分支的 merge base（共同祖先）
+2. 计算两个分支相对于 merge base 的变更
+3. 使用更高效的三方合并算法合并
+4. 检测并处理重命名、权限变更等
+
+### 相比 recursive 的优势
+
+- 速度更快（用 C 重写了原本的 Python/Shell 合并逻辑）
+- 冲突检测更准确
+- 重命名检测更可靠
+- 内存使用更少
+
+### 使用方式
+
+```bash
+# ort 是默认策略，无需显式指定
+git merge feature/login
+
+# 显式指定
+git merge -s ort feature/login
+```
+
+## recursive（递归策略）
+
+Git 2.33 之前的默认策略，现在已被 ort 替代，但为了兼容性仍然保留。
+
+### 工作原理
+
+当两个分支有多个共同祖先时，recursive 会先把这些祖先合并成一个虚拟祖先，再基于这个虚拟祖先进行三方合并：
+
+```
+main:    A---B---C---D
+              \
+feature:       E---F
+```
+
+如果 merge base 不唯一，recursive 会先递归合并祖先再执行合并。
+
+### 适用的配置参数
+
+```bash
+# 使用 recursive 策略
+git merge -s recursive feature/login
+
+# 设置合并时使用的相似度阈值
+git merge -s recursive -X find-renames=70 feature/login
+
+# 忽略空白差异
+git merge -s recursive -X ignore-space-change feature/login
+
+# 使用他们的版本处理冲突
+git merge -s recursive -X theirs feature/login
+
+# 使用我们的版本处理冲突
+git merge -s recursive -X ours feature/login
+```
+
+## octopus（八爪鱼策略）
+
+用于一次合并多个分支。
+
+### 工作原理
+
+把多个分支依次应用到当前分支上。如果任何一个分支的合并产生冲突，octopus 会直接中止——它不适合有冲突的场景。
+
+### 使用方式
+
+```bash
+# 同时合并三个功能分支
+git merge feature/login feature/payment feature/report
+```
+
+Git 会自动选择 octopus 策略，因为涉及的分支数超过 2 个。
+
+### 适用场景
+
+- 一次性合并多个独立、不冲突的特性分支
+- 主题分支的批量整合
+- 发布分支汇总
+
+### 不适合的场景
+
+- 分支之间有代码冲突
+- 需要精细控制冲突处理
+
+## ours（保留当前策略）
+
+完全保留当前分支的内容，忽略所有要合并进来的分支的变更。合并后的历史会显示这些分支被"合并"了，但内容不会改变。
+
+### 使用方式
+
+```bash
+# 声明 feature 已经"合并"，但不应用它的任何变更
+git merge -s ours feature/experimental
+```
+
+### 适用场景
+
+- 废弃某个功能分支但保留历史记录
+- 已经用其他方式应用了变更，只想记录合并关系
+- 需要标记某个分支已经被"覆盖"
+
+### 与其他策略的区别
+
+注意 `-X ours`（策略选项）和 `-s ours`（策略本身）的区别：
+- `-s ours`：合并结果完全等于当前分支内容
+- `-X ours`（搭配 recursive/ort）：有冲突时优先使用当前分支的版本
+
+## subtree（子树策略）
+
+把被合并分支的内容合并到当前仓库的一个子目录中。
+
+### 工作原理
+
+它会自动检测被合并分支的内容应该被放到哪个子目录中，然后把变更映射到该子目录下。
+
+### 使用方式
+
+```bash
+# 将 lib 仓库合并到当前仓库的 lib/ 目录下
+git merge -s subtree lib/main
+```
+
+### 适用场景
+
+- 将一个独立的库作为子树集成到项目中
+- 与 `git subtree` 命令配合使用维护子项目
+
+## 如何选择 Merge 策略
+
+### 日常开发
+
+默认使用 ort（即默认 merge），不需要额外配置：
+
+```bash
+git switch main
+git merge feature/login
+```
+
+### 批量合并
+
+使用 octopus：
+
+```bash
+git merge feature/a feature/b feature/c
+```
+
+### 特殊场景
+
+```bash
+# 忽略空白差异的合并
+git merge -X ignore-all-space feature/login
+
+# 完全接受对方的版本（有冲突时）
+git merge -X theirs feature/login
+
+# 只记录合并关系，不改变内容
+git merge -s ours feature/abandoned
+```
+
+## 策略选项速查
+
+| 选项 | 说明 | 适用策略 |
+|------|------|----------|
+| `ours` | 冲突时使用当前分支版本 | recursive/ort |
+| `theirs` | 冲突时使用被合并分支版本 | recursive/ort |
+| `patience` | 使用更精确的 diff 算法 | recursive/ort |
+| `ignore-space-change` | 忽略空白数量变化 | recursive/ort |
+| `ignore-all-space` | 忽略所有空白差异 | recursive/ort |
+| `renormalize` | 合并前规范化行尾 | recursive/ort |
+| `no-renames` | 关闭重命名检测 | recursive/ort |
+| `find-renames=<n>` | 设置重命名相似度阈值 | recursive/ort |
+| `subtree[=<path>]` | 子树合并的变体 | recursive/ort |
+
+## 继续学习建议
+
+理解 merge 策略后，建议继续学习：
+
+1. `git merge` 命令的完整参数
+2. Merge vs Rebase 的选择决策
+3. 三方合并（Three-way merge）的工作原理
+4. 冲突解决的策略和工具

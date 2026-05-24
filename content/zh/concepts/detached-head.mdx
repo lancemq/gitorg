@@ -1,0 +1,192 @@
+export const metadata = {
+  title: "Detached HEAD 状态详解",
+  slug: "detached-head",
+  locale: "zh",
+  section: "concepts",
+  summary: "解释什么是 detached HEAD、为什么会进入该状态，以及如何安全地退出 detached HEAD 并保留工作成果。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-switch",
+    "https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell",
+  ],
+};
+
+# Detached HEAD 状态详解
+
+## 一句话理解
+
+Detached HEAD 是 HEAD 直接指向某个提交而不是分支名的状态。它不是错误，而是 Git 提供的一种"临时浏览模式"——你可以用它查看历史、做实验，但需要知道如何安全退出。
+
+## 什么是 HEAD
+
+在理解 detached HEAD 之前，先理解正常状态下 HEAD 是什么。
+
+### 正常状态：HEAD → 分支 → 提交
+
+在一个正常的 Git 仓库里，HEAD 通常指向一个分支名，而分支名指向一个提交：
+
+```
+HEAD → main → C3（提交）
+```
+
+当你执行 `git commit` 时，Git 会：
+1. 创建新提交
+2. 将当前分支指针移动到新提交
+3. HEAD 仍然指向该分支
+
+这就是为什么正常状态下你提交后，分支会自然前进。
+
+### Detached HEAD：HEAD → 提交
+
+当你 checkout 一个具体的提交而不是分支时，HEAD 直接指向那个提交：
+
+```
+HEAD → C3（提交）
+```
+
+此时你没有在任何分支上。Git 会在终端提示你处于 detached HEAD 状态。
+
+## 如何进入 Detached HEAD
+
+以下操作会进入 detached HEAD 状态：
+
+```bash
+# checkout 一个具体的提交哈希
+git checkout <commit-hash>
+
+# checkout 标签
+git checkout v1.0.0
+
+# checkout 远程跟踪分支
+git checkout origin/main
+
+# 使用 ~ 或 ^ 等修订语法
+git checkout HEAD~3
+
+# 单独使用 switch 到提交（与 checkout 相同）
+git switch --detach <commit-hash>
+```
+
+### 为什么这些操作会进入 detached HEAD
+
+因为这些操作的目标不是一个本地分支名。标签、远程分支、提交哈希都不是可移动的分支指针，所以 Git 无法把 HEAD 附着在一个"会自动前进"的引用上。
+
+## 在 Detached HEAD 状态下工作
+
+### 你可以做的事情
+
+- **查看历史提交的内容**：这是最常见的用途
+- **做临时实验**：尝试修改后看看效果
+- **编译测试某个旧版本**：确认 bug 是在哪个版本引入的
+- **对历史提交做紧急修补**
+
+### 需要注意的事情
+
+在 detached HEAD 状态下依然可以做提交：
+
+```bash
+# 在 detached HEAD 下修改并提交
+echo "实验性修改" > test.txt
+git add test.txt
+git commit -m "实验提交"
+```
+
+此时提交图变成：
+
+```
+HEAD → C4（新提交，仅 HEAD 可到达）
+       │
+       C3 ← main
+```
+
+C4 只被 HEAD 引用。如果你切回 main 分支，HEAD 会离开 C4，C4 就变得不可达。
+
+## 如何安全退出 Detached HEAD
+
+### 方案一：不需要保留改动
+
+如果你只是查看历史，不需要保留任何改动：
+
+```bash
+# 直接切回分支
+git switch main
+
+# 或
+git checkout main
+```
+
+### 方案二：需要保留改动（创建分支）
+
+如果在 detached HEAD 状态下创建了提交，**只要在切走之前创建分支**，提交就不会丢失：
+
+```bash
+# 先基于当前 HEAD 创建分支
+git switch -c my-experiment
+
+# 或者
+git branch my-experiment
+git switch my-experiment
+```
+
+创建分支后，提交图变成：
+
+```
+HEAD → my-experiment → C4
+                        │
+                        C3 ← main
+```
+
+此时 C4 被 my-experiment 分支引用，不会丢失。
+
+### 方案三：cherry-pick 到已有分支
+
+如果你在 detached HEAD 下做了几个提交，想把它们引入已有分支：
+
+```bash
+# 先记下提交哈希
+git log --oneline -5
+
+# 切回目标分支
+git switch main
+
+# 把需要的提交 cherry-pick 过来
+git cherry-pick <commit-hash>
+```
+
+## Detached HEAD 的风险边界
+
+| 场景 | 风险 |
+|------|------|
+| 只看不改 | 无风险，直接切走 |
+| 改了但没提交 | 未跟踪修改会保留，切分支时会带过去或提示冲突 |
+| 提交了但没建分支 | 切走后提交可能被 GC 回收 |
+| 提交了且创建了分支 | 安全，等同于正常分支工作 |
+| 做了多个提交但没建分支 | 全部提交不可达，但 reflog 可找回 |
+
+## 常见场景最佳实践
+
+### bisect 时自然进入 detached HEAD
+
+`git bisect` 全程在 detached HEAD 中运行，这是正常的。bisect 结束时会自动切回原分支。
+
+### 审查旧版本代码
+
+```bash
+# 查看 v2.0.0 标签的代码
+git checkout v2.0.0
+
+# 查看完毕后切回
+git switch main
+```
+
+### 在 CI 或脚本中
+
+CI 环境中 checkout 特定提交是常见操作。一般会用 `git checkout --detach` 显式表明意图。
+
+## 继续学习建议
+
+理解了 detached HEAD 后，建议继续学习：
+
+1. `git switch` 和 `git checkout` 的区别
+2. `git reflog` 用于找回 detached HEAD 中丢失的提交
+3. `git bisect` 如何利用 detached HEAD 进行二分查找
+4. `git branch` 如何创建新分支来保留实验性提交

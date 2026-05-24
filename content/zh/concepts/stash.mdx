@@ -1,0 +1,246 @@
+export const metadata = {
+  title: "Git Stash 概念：临时保存工作上下文",
+  slug: "stash",
+  locale: "zh",
+  section: "concepts",
+  summary: "系统解释 git stash 的概念——它是什么、什么时候用、有什么限制，以及如何安全地管理临时保存的工作上下文。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-stash",
+    "https://git-scm.com/book/en/v2/Git-Tools-Stashing-and-Cleaning",
+  ],
+};
+
+# Git Stash 概念：临时保存工作上下文
+
+## 一句话理解
+
+Git stash 是一个**临时存储区**，用来暂存当前工作区中还没准备好提交的改动，让你可以切换去做其他事情，之后再回来恢复。
+
+## 为什么需要 Stash
+
+在日常开发中，经常遇到这样的场景：
+
+你在 `feature/login` 分支上写代码，写到一半突然需要切到另一个分支修一个紧急 bug。但你的改动还没完成，不适合提交。
+
+此时你有几个选择：
+
+| 方案 | 优点 | 缺点 |
+|------|------|------|
+| 直接提交半成品 | 快速 | 污染提交历史 |
+| 创建一个临时分支 | 结构清晰 | 操作步骤多 |
+| **git stash** | **快速、无副作用** | **需理解其限制** |
+
+`git stash` 是最低成本的方案——它把你的工作区改动暂存到栈里，让工作区恢复干净，以后随时可以恢复。
+
+## Stash 的本质
+
+Stash 实际上是**两个特殊的提交**：
+
+```
+stash@{0}
+├── 工作区内容的提交（worktree commit）
+└── 暂存区内容的提交（index commit）
+    │
+    基于 stash 创建时的 HEAD
+```
+
+当你执行 `git stash` 时，Git 会：
+1. 把当前的暂存区内容保存为一个 commit（index commit）
+2. 把当前的工作区内容保存为一个 commit（worktree commit）
+3. 把这两个 commit 作为一个特殊的 stash 引用
+
+使用 `git stash list` 看到的就是这个栈的内容。
+
+## 核心操作
+
+### 保存到 stash
+
+```bash
+# 暂存已跟踪文件的改动（默认）
+git stash
+
+# 包含未跟踪文件
+git stash push -u
+
+# 包含忽略文件
+git stash push -a
+
+# 添加描述信息
+git stash push -m "WIP: login form validation"
+```
+
+### 查看 stash
+
+```bash
+# 列出所有 stash
+git stash list
+
+# 查看某个 stash 的改动
+git stash show stash@{0}
+
+# 查看某个 stash 的详细 diff
+git stash show -p stash@{0}
+```
+
+### 恢复 stash
+
+```bash
+# 恢复并移除栈顶 stash（pop）
+git stash pop
+
+# 恢复但不移除（apply）
+git stash apply stash@{1}
+
+# 恢复并恢复暂存区状态
+git stash apply --index
+```
+
+### 清理 stash
+
+```bash
+# 移除栈顶
+git stash drop
+
+# 移除指定 stash
+git stash drop stash@{0}
+
+# 清空所有 stash
+git stash clear
+```
+
+## Stash 的重要限制
+
+### 1. 默认只跟踪已跟踪文件
+
+```bash
+# 新文件不会被 stash 保存
+git stash      # 不会保存新创建的 untracked 文件
+
+# 需要用 -u 或 --include-untracked
+git stash -u   # 会保存 untracked 文件
+```
+
+### 2. 不跟踪文件模式变化
+
+Git stash 在默认配置下不保存文件的可执行权限变化。
+
+### 3. 恢复时可能产生冲突
+
+当 stash 中的改动和当前工作区冲突时，恢复 stash 会产生冲突，需要手动解决。
+
+### 4. 跨分支恢复需谨慎
+
+跨分支恢复 stash 时，如果文件结构差异较大，恢复结果可能出乎意料。
+
+### 5. 不是永久存储
+
+Stash 存储在 `.git/refs/stash` 中。虽然不会主动过期，但如果通过 `git stash drop` 或 `git stash clear` 删除，就没有恢复途径。
+
+## 常见使用模式
+
+### 模式一：快速切任务
+
+```bash
+# 保存当前工作
+git stash push -m "WIP: login validation"
+
+# 切到其他分支修 bug
+git switch hotfix
+# ... 修复并提交 ...
+
+# 切回来恢复工作
+git switch feature/login
+git stash pop
+```
+
+### 模式二：保留暂存区状态
+
+```bash
+# 暂存了一些文件，想保留暂存状态
+git add src/login.ts src/utils.ts
+
+# 保存时保留暂存区
+git stash push --staged
+
+# 或者使用 --index 保持恢复后的暂存状态
+git stash apply --index
+```
+
+### 模式三：拆分混乱的改动
+
+```bash
+# 想把当前的混乱改动拆成多个 stash
+git stash push -m "part 1: login logic"
+
+# 恢复前先清理工作区
+git stash push -m "part 2: test updates"
+```
+
+### 模式四：创建分支从 stash 恢复
+
+当 stash 冲突太多难以恢复时：
+
+```bash
+# 从 stash 创建新分支
+git stash branch new-feature stash@{0}
+```
+
+## Stash 栈管理
+
+### 控制栈大小
+
+Stash 是一个栈结构（LIFO），新的 stash 在栈顶：
+
+```
+stash@{0}  ← 最新
+stash@{1}
+stash@{2}  ← 最旧
+```
+
+长时间不清理会堆积大量 stash，导致：
+- 上下文难以追踪
+- 容易误操作旧 stash
+- 占用不必要的存储空间
+
+### 建议的清理策略
+
+- 每个 stash 都加描述信息（`-m`）
+- 恢复后立即删除（使用 `pop` 而不是 `apply`）
+- 每周清理一次无用 stash
+- stash 数量控制在 5 个以内
+
+## 高级技巧
+
+### 使用场景指定 stash
+
+```bash
+# 只暂存工作区中已跟踪文件的某部分
+git stash push -p
+
+# 在 stash 中只暂存暂存区
+git stash push --staged
+
+# 从 stash 中恢复特定文件
+git checkout stash@{0} -- src/login.ts
+```
+
+### 使用 reflog 找回误删的 stash
+
+如果不小心 `git stash clear`，只要对象还没被 GC 回收，可以用 reflog 找回：
+
+```bash
+# 在 clear 后立即查找
+git fsck --unreachable | grep commit | cut -d ' ' -f3
+
+# 检查找到的提交
+git show <commit-hash>
+```
+
+## 继续学习建议
+
+理解 stash 概念后，建议继续学习：
+
+1. `git stash` 命令的完整参数
+2. `git stash` vs `git worktree` 的选择
+3. `recovery/recover-lost-stash` —— 丢失 stash 后如何恢复
+4. `stash` 在 `git rebase` 和 `git merge` 中的交互
