@@ -50,22 +50,14 @@ Each worktree has its own:
 
 ### Structure
 
-```
-my-repo/
-├── .git/                # shared storage
-│   ├── objects/         # object database (shared)
-│   ├── refs/            # references (shared)
-│   └── config           # configuration (shared)
-├── main/                # main worktree (main branch)
-│   ├── src/
-│   └── index            # independent staging area
-├── hotfix/              # additional worktree (hotfix branch)
-│   ├── src/
-│   └── index            # independent staging area
-└── feature-login/       # additional worktree (feature/login branch)
-    ├── src/
-    └── index            # independent staging area
-```
+<RepositoryLayoutFigure
+  title="Worktree Directory Structure"
+  caption="A single repository can have multiple worktrees simultaneously, each with its own working tree and index, while sharing the object database and references."
+  worktreeLabel="Primary Worktree"
+  gitdirLabel=".git Directory"
+  sharedLabel="Shared Worktrees"
+  bareLabel="Bare Repository"
+/>
 
 ## Core Operations
 
@@ -113,6 +105,10 @@ Prevents accidental removal (e.g., for worktrees on removable media):
 ```bash
 git worktree lock ../hotfix --reason "USB drive"
 ```
+
+<WarningBox title="Worktree Is Not a Silver Bullet">
+  The same branch cannot be checked out in multiple worktrees; worktrees cannot be nested; and you must remove a worktree before deleting the branch it has checked out. Also, while worktrees share the object database to save disk space, each worktree's working tree files are independent — for large repositories (especially monorepos), multiple worktrees can still consume significant disk space.
+</WarningBox>
 
 ## Key Constraints
 

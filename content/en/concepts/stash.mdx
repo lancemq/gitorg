@@ -32,15 +32,17 @@ Your options:
 
 ## What Stash Actually Is
 
-A stash is actually **two special commits**:
+A stash is actually **two special commits** — a commit of working tree content and a commit of index content, both based on HEAD at stash creation time.
 
-```
-stash@{0}
-├── commit of working tree content
-└── commit of index content
-    │
-    based on HEAD at stash creation time
-```
+<StashFigure
+  title="Stash Workflow"
+  caption="Working tree changes are saved to the stash stack via git stash, then restored via git stash pop/apply. Each stash entry can preserve both working tree and index state."
+  workingLabel="Working Tree"
+  stashLabel="Stash Stack"
+  restoreLabel="Restored Work Tree"
+  saveLabel="git stash save"
+  applyLabel="git stash pop"
+/>
 
 When you run `git stash`, Git:
 1. Saves the current index (staging area) as a commit
@@ -105,6 +107,10 @@ git stash drop stash@{0}
 # clear all stashes
 git stash clear
 ```
+
+<WarningBox title="Stash Is Not a Backup">
+  By default, stash only saves tracked file changes — untracked files require the `-u` flag. Stash is not permanent storage: `git stash drop` and `git stash clear` permanently remove entries. Cross-branch stash restoration can also produce conflicts. Always add a description (`-m`) to each stash and prefer `git stash pop` over `apply` to keep the stack clean.
+</WarningBox>
 
 ## Important Limitations
 

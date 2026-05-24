@@ -16,34 +16,27 @@ export const metadata = {
 
 Detached HEAD 是 HEAD 直接指向某个提交而不是分支名的状态。它不是错误，而是 Git 提供的一种"临时浏览模式"——你可以用它查看历史、做实验，但需要知道如何安全退出。
 
+<RefsHeadFigure
+  title="正常状态 vs Detached HEAD"
+  caption="上：HEAD 通过分支名间接指向提交（正常）。下：HEAD 直接指向提交（detached）。"
+  headLabel="HEAD 指向"
+  branchLabel="分支"
+  tagLabel="标签"
+  remoteLabel="远程引用"
+  detachedLabel="Detached HEAD"
+/>
+
 ## 什么是 HEAD
 
 在理解 detached HEAD 之前，先理解正常状态下 HEAD 是什么。
 
 ### 正常状态：HEAD → 分支 → 提交
 
-在一个正常的 Git 仓库里，HEAD 通常指向一个分支名，而分支名指向一个提交：
-
-```
-HEAD → main → C3（提交）
-```
-
-当你执行 `git commit` 时，Git 会：
-1. 创建新提交
-2. 将当前分支指针移动到新提交
-3. HEAD 仍然指向该分支
-
-这就是为什么正常状态下你提交后，分支会自然前进。
+在一个正常的 Git 仓库里，HEAD 通常指向一个分支名，而分支名指向一个提交。当你执行 `git commit` 时，Git 会创建新提交、将当前分支指针移动到新提交，而 HEAD 仍然指向该分支。这就是为什么正常状态下你提交后，分支会自然前进。
 
 ### Detached HEAD：HEAD → 提交
 
-当你 checkout 一个具体的提交而不是分支时，HEAD 直接指向那个提交：
-
-```
-HEAD → C3（提交）
-```
-
-此时你没有在任何分支上。Git 会在终端提示你处于 detached HEAD 状态。
+当你 checkout 一个具体的提交而不是分支时，HEAD 直接指向那个提交。此时你没有在任何分支上。Git 会在终端提示你处于 detached HEAD 状态。
 
 ## 如何进入 Detached HEAD
 
@@ -153,6 +146,10 @@ git cherry-pick <commit-hash>
 ```
 
 ## Detached HEAD 的风险边界
+
+<WarningBox title="核心原则：切走前先确保提交被引用">
+  detached HEAD 状态下做了提交后，如果在切回分支前没有创建分支引用它，这些提交就会变成不可达对象，最终可能被垃圾回收。任何时候只要先 `git branch <name>` 再接住提交，就不存在丢失风险。
+</WarningBox>
 
 | 场景 | 风险 |
 |------|------|

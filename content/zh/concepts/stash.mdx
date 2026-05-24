@@ -34,15 +34,17 @@ Git stash 是一个**临时存储区**，用来暂存当前工作区中还没准
 
 ## Stash 的本质
 
-Stash 实际上是**两个特殊的提交**：
+Stash 实际上是**两个特殊的提交**——工作区内容的提交和暂存区内容的提交，都基于 stash 创建时的 HEAD。
 
-```
-stash@{0}
-├── 工作区内容的提交（worktree commit）
-└── 暂存区内容的提交（index commit）
-    │
-    基于 stash 创建时的 HEAD
-```
+<StashFigure
+  title="Stash 的工作流程"
+  caption="工作区改动通过 git stash 保存到 stash 栈，之后通过 git stash pop/apply 恢复。stash 实例可同时保存工作区和暂存区的状态。"
+  workingLabel="工作区"
+  stashLabel="Stash 栈"
+  restoreLabel="恢复的工作区"
+  saveLabel="git stash save"
+  applyLabel="git stash pop"
+/>
 
 当你执行 `git stash` 时，Git 会：
 1. 把当前的暂存区内容保存为一个 commit（index commit）
@@ -107,6 +109,10 @@ git stash drop stash@{0}
 # 清空所有 stash
 git stash clear
 ```
+
+<WarningBox title="Stash 不等于备份">
+  Stash 默认只保存已跟踪文件的改动，未跟踪文件需要用 `-u` 参数。它不是永久存储——`git stash drop` 或 `git stash clear` 会彻底删除条目。跨分支恢复 stash 也可能产生冲突。建议每个 stash 都加描述信息（`-m`），恢复时优先用 `pop` 而不是 `apply`，避免栈堆积。
+</WarningBox>
 
 ## Stash 的重要限制
 

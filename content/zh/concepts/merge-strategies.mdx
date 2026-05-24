@@ -17,6 +17,14 @@ export const metadata = {
 
 Git 的 merge 策略决定了"当两条分支需要整合时，Git 用什么算法计算最终内容"。选择合适的策略可以避免不必要的冲突和历史混乱。
 
+<MergeFigure
+  title="合并前后对比"
+  caption="左：合并前两条分支各自演进；右：合并后产生 merge commit，历史结构被保留。"
+  beforeLabel="合并前"
+  afterLabel="合并后"
+  modeLabel="git merge"
+/>
+
 ## Merge 策略总览
 
 Git 支持以下几种 merge 策略：
@@ -194,6 +202,10 @@ git merge -X theirs feature/login
 # 只记录合并关系，不改变内容
 git merge -s ours feature/abandoned
 ```
+
+<WarningBox title="不要对共享分支随意变更 merge 策略">
+  日常开发推荐使用默认策略（ort）。除非你明确知道 `-s ours`、`-X theirs` 等选项的副作用，否则不建议在生产共享分支上使用非默认策略。特别要注意 `-s ours` 会完全忽略对方分支的所有变更——它更适合废弃分支，而非日常合并。
+</WarningBox>
 
 ## 策略选项速查
 

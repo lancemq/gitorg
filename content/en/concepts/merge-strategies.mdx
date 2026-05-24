@@ -17,6 +17,14 @@ export const metadata = {
 
 Git's merge strategy determines the algorithm Git uses to compute the final content when integrating two branches. Choosing the right strategy avoids unnecessary conflicts and history noise.
 
+<MergeFigure
+  title="Before and After Merge"
+  caption="Left: two branches evolving independently before the merge. Right: a merge commit is created, preserving the branch structure."
+  beforeLabel="Before"
+  afterLabel="After"
+  modeLabel="git merge"
+/>
+
 ## Merge Strategy Overview
 
 Git supports these merge strategies:
@@ -194,6 +202,10 @@ git merge -X theirs feature/login
 # record merge relationship without content changes
 git merge -s ours feature/abandoned
 ```
+
+<WarningBox title="Don't Change Merge Strategies on Shared Branches Without Thought">
+  Use the default strategy (ort) for daily development. Avoid non-default strategies like `-s ours` or `-X theirs` on shared production branches unless you fully understand the side effects. In particular, `-s ours` completely ignores all changes from the merged branch — it's meant for deprecating branches, not daily work.
+</WarningBox>
 
 ## Strategy Options Reference
 

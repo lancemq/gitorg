@@ -50,22 +50,14 @@ Worktree 提供了第四种方案：**在同一个仓库中，同时在多个目
 
 ### 结构示意
 
-```
-my-repo/
-├── .git/                # 共享存储
-│   ├── objects/         # 对象数据库（共享）
-│   ├── refs/            # 引用（共享）
-│   └── config           # 配置（共享）
-├── main/                # 主 worktree（main 分支）
-│   ├── src/
-│   └── index            # 独立暂存区
-├── hotfix/              # 额外 worktree（hotfix 分支）
-│   ├── src/
-│   └── index            # 独立暂存区
-└── feature-login/       # 额外 worktree（feature/login 分支）
-    ├── src/
-    └── index            # 独立暂存区
-```
+<RepositoryLayoutFigure
+  title="Worktree 目录结构"
+  caption="一个仓库可以同时拥有多个 worktree，每个 worktree 有独立的工作区和暂存区，但共享对象库和引用。"
+  worktreeLabel="主 Worktree"
+  gitdirLabel=".git 目录"
+  sharedLabel="多 Worktree 共享"
+  bareLabel="裸仓库"
+/>
 
 ## 核心操作
 
@@ -113,6 +105,10 @@ git worktree remove --force ../hotfix
 ```bash
 git worktree lock ../hotfix --reason "USB 磁盘"
 ```
+
+<WarningBox title="Worktree 不是万能方案">
+  同一分支不能同时在多个 worktree 中被检出；worktree 不能嵌套；删除 worktree 之前无法删除其检出的分支。此外，虽然 worktree 共享对象库节省磁盘，但每个 worktree 的工作区文件是独立占用的——大仓库（如 monorepo）下多个 worktree 的磁盘占用仍然可观。
+</WarningBox>
 
 ## 核心限制
 
