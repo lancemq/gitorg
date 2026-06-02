@@ -1705,13 +1705,6 @@ const representativeSectionPaths = {
   ],
 } as const satisfies Partial<Record<DocSection, readonly DocPath[]>>;
 
-const latestHomeDocPaths = [
-  "workflows/gitflow-workflow",
-  "workflows/ai-agent-worktree-mode",
-  "recovery/undo-after-pull",
-  "commands/git-worktree",
-] as const satisfies readonly DocPath[];
-
 export async function getRelatedDocs(
   locale: Locale,
   docPath: DocPath,
@@ -1782,8 +1775,53 @@ export async function getRepresentativeSectionDocs(
 }
 
 export async function getLatestHomeDocs(locale: Locale, limit = 4): Promise<DocCard[]> {
+  const candidatePaths: DocPath[] = [
+    "workflows/gitflow-workflow",
+    "workflows/ai-agent-worktree-mode",
+    "workflows/stacked-pull-requests-workflow",
+    "workflows/bisect-regression-triage-workflow",
+    "workflows/merge-queue-workflow",
+    "workflows/trunk-based-development-workflow",
+    "workflows/revert-first-stabilization-workflow",
+    "recovery/undo-after-pull",
+    "recovery/recover-after-rebase",
+    "recovery/recover-deleted-branch",
+    "recovery/detached-head-rescue",
+    "commands/git-worktree",
+    "commands/git-sparse-checkout",
+    "commands/git-range-diff",
+    "commands/git-bisect",
+    "commands/git-switch",
+    "ci-cd/jenkins-integration",
+    "ci-cd/ci-security-basics",
+    "ide/github-desktop",
+    "ide/terminal-git-ui",
+    "security/credential-helper",
+    "security/signing-advanced",
+    "performance/shallow-clone-deep",
+    "performance/gc-repack-strategies",
+    "migration/git-p4-perforce",
+    "migration/platform-migration",
+    "hosting/github-deep-dive",
+    "hosting/gitea-setup",
+    "learning-path/view-history-and-changes",
+    "learning-path/undo-local-basics",
+  ];
+
+  const modifiedTimes = await Promise.all(
+    candidatePaths.map(async (docPath) => ({
+      path: docPath,
+      mtime: await getDocLastModified(locale, docPath),
+    })),
+  );
+
+  const latestPaths = modifiedTimes
+    .sort((a, b) => b.mtime.getTime() - a.mtime.getTime())
+    .slice(0, limit)
+    .map((entry) => entry.path);
+
   const docs = await Promise.all(
-    latestHomeDocPaths.slice(0, limit).map((docPath) => getDocByPath(locale, docPath)),
+    latestPaths.map((docPath) => getDocByPath(locale, docPath)),
   );
 
   return docs.map((doc) => toDocCard(locale, doc));
