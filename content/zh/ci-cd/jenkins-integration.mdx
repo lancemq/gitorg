@@ -1,0 +1,132 @@
+export const metadata = {
+  title: "Jenkins 与 Git 集成",
+  slug: "jenkins-integration",
+  locale: "zh",
+  section: "ci-cd",
+  summary: "学会在 Jenkins 中配置 Git 集成，包括 Webhook 触发、Multibranch Pipeline、凭据管理与安全实践。",
+  sourceUrls: [
+    "https://www.jenkins.io/doc/book/pipeline/",
+    "https://www.jenkins.io/doc/book/pipeline/multibranch/",
+  ],
+};
+
+# Jenkins 与 Git 集成
+
+## 概述
+
+Jenkins 是最流行的开源 CI/CD 工具之一。通过 Git 集成，你可以实现代码提交自动触发构建、测试和部署。
+
+## 核心集成方式
+
+### 1. 配置 Git 插件
+
+Jenkins 默认自带 Git 插件，但建议确认版本：
+
+1. 进入 **Manage Jenkins → Plugins → Installed plugins**
+2. 搜索 "Git" 确认已安装
+3. 如未安装，在 **Available plugins** 中搜索安装
+
+### 2. 配置全局凭据
+
+```groovy
+// 在 Jenkins 凭据管理中添加入下类型：
+// - Username with password（HTTPS）
+// - SSH key（SSH）
+```
+
+建议为每个仓库使用独立的凭据 ID，便于审计和轮换。
+
+### 3. Webhook 触发
+
+在 GitHub/GitLab 仓库设置中添加 Jenkins 的 Webhook URL：
+
+```
+http://your-jenkins:8080/github-webhook/
+http://your-jenkins:8080/gitlab-webhook/
+```
+
+Webhook 配置要点：
+
+| 配置项 | 推荐值 |
+|--------|--------|
+| 触发事件 | Push / PR merge |
+| 内容类型 | application/json |
+| Secret | 建议设置 Secret token |
+
+### 4. Multibranch Pipeline
+
+Multibranch Pipeline 自动扫描仓库分支，为每个包含 `Jenkinsfile` 的分支创建流水线。
+
+```groovy
+// Jenkinsfile
+pipeline {
+  agent any
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+    stage('Build') {
+      steps {
+        sh 'make build'
+      }
+    }
+    stage('Test') {
+      steps {
+        sh 'make test'
+      }
+    }
+  }
+}
+```
+
+## 最佳实践
+
+### 浅克隆优化
+
+```groovy
+checkout([
+  $class: 'GitSCM',
+  branches: [[name: '*/main']],
+  extensions: [
+    [$class: 'CloneOption', depth: 1, shallow: true]
+  ]
+])
+```
+
+### 凭据安全
+
+```groovy
+// 避免在 Jenkinsfile 中硬编码凭据
+withCredentials([gitUsernamePassword(credentialsId: 'github-creds')]) {
+  sh 'git push origin main'
+}
+```
+
+### 分支策略
+
+- `main` 分支：自动构建 + 部署到生产
+- `develop` 分支：自动构建 + 部署到测试环境
+- 功能分支：仅构建和单元测试
+
+## 常见问题
+
+### Webhook 不触发
+
+1. 检查 Jenkins 日志是否有 403 错误
+2. 确认 Webhook URL 可访问
+3. 检查 Secret token 是否匹配
+
+### 凭据验证失败
+
+```bash
+# 在 Jenkins 节点上测试 SSH 连接
+ssh -T git@github.com
+```
+
+## 继续学习
+
+1. `ci-cd/ci-security-basics` — CI/CD 中的 Git 安全基础
+2. `ci-cd/github-actions-basics` — GitHub Actions 集成
+3. `ci-cd/gitlab-ci-basics` — GitLab CI 集成

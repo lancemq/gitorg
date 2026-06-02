@@ -1,0 +1,117 @@
+export const metadata = {
+  title: "Git 托管平台间迁移",
+  slug: "platform-migration",
+  locale: "zh",
+  section: "migration",
+  summary: "在 GitHub、GitLab、Bitbucket 等 Git 托管平台之间迁移仓库，保留完整提交历史和所有引用。",
+  sourceUrls: [
+    "https://docs.github.com/en/migrations",
+    "https://docs.gitlab.com/ee/user/project/import/",
+  ],
+};
+
+# Git 托管平台间迁移
+
+## 概述
+
+在不同 Git 托管平台之间迁移仓库的核心原理是一样的——因为底层都是 Git。迁移的关键在于完整搬运所有引用（分支、标签、PR/MR 元数据）。
+
+## 核心迁移方式
+
+### 方式一：裸仓库镜像（推荐）
+
+```bash
+# 1. 从源平台制作裸镜像
+git clone --mirror https://github.com/old-org/repo.git
+cd repo.git
+
+# 2. 推送到目标平台
+git remote set-url origin https://gitlab.com/new-org/repo.git
+git push --mirror origin
+
+# 3. 验证
+git log --oneline --all  # 确认所有引用都在
+```
+
+`--mirror` 会克隆所有引用（包括分支、标签、notes 等），是保留最完整的方式。
+
+### 方式二：直接推送
+
+```bash
+# 如果已有完整的本地仓库，直接推送
+git remote add new-origin https://gitlab.com/new-org/repo.git
+git push --all new-origin       # 推送所有分支
+git push --tags new-origin      # 推送所有标签
+```
+
+### 方式三：多平台同步（长期）
+
+```bash
+# 配置多 remote 实现自动同步
+git remote add github https://github.com/org/repo.git
+git remote add gitlab https://gitlab.com/org/repo.git
+git remote add bitbucket https://bitbucket.org/org/repo.git
+
+# 推送到所有远端
+git push --all github
+git push --all gitlab
+git push --all bitbucket
+```
+
+## 迁移 PR / Merge Request
+
+PR/MR 是平台级的元数据，**不属于 Git 对象**，不能通过 `git push --mirror` 搬运。
+
+### GitHub → GitHub
+
+```bash
+# 使用 GitHub 官方迁移工具
+gh repo migrate <source-repo> --target-owner <target-org>
+```
+
+### GitHub → GitLab
+
+1. 在 GitLab 创建新项目
+2. 选择 **Import project → GitHub**
+3. 授权 GitLab 访问 GitHub
+4. 选择要导入的仓库
+
+### GitLab → GitHub
+
+1. 在 GitHub 导入仓库：**+ → Import repository**
+2. 输入 GitLab 仓库的 Git URL
+3. GitHub 会自动导入历史
+
+## 元数据迁移对照
+
+| 元数据 | GitHub | GitLab | 迁移方式 |
+|--------|--------|--------|---------|
+| 提交历史 | ✅ | ✅ | `git push --mirror` |
+| 分支 | ✅ | ✅ | `git push --mirror` |
+| 标签 | ✅ | ✅ | `git push --mirror` |
+| PR/MR | ✅ | ✅ | 平台工具（不支持跨平台） |
+| Issue | ✅ | ✅ | API 迁移脚本 |
+| Wiki | ✅ | ✅ | 独立仓库迁移 |
+| CI 配置 | ❌ | ❌ | 需手动重建 |
+
+## 迁移后检查清单
+
+```bash
+# 1. 验证引用完整性
+git for-each-ref --format='%(refname)' | sort
+
+# 2. 检查关键分支
+git branch -a
+
+# 3. 验证标签
+git tag -l
+
+# 4. 确认本地仓库已关联新的远端
+git remote -v
+```
+
+## 继续学习
+
+1. `migration/svn-to-git` — SVN 迁移到 Git
+2. `migration/hg-to-git` — Mercurial 迁移到 Git
+3. `hosting/platform-comparison` — 托管平台对比

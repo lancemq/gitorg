@@ -1,0 +1,127 @@
+export const metadata = {
+  title: "浅克隆深入",
+  slug: "shallow-clone-deep",
+  locale: "zh",
+  section: "performance",
+  summary: "深入理解 git clone --depth 和 --shallow-since 的工作原理、适用场景以及浅克隆的局限性与风险。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-clone#Documentation/git-clone.txt---depthltdepthgt",
+    "https://git-scm.com/docs/git-fetch#Documentation/git-fetch.txt---depthltdepthgt",
+  ],
+};
+
+# 浅克隆深入
+
+## 概述
+
+浅克隆（shallow clone）通过限制下载的历史深度来加速克隆操作。在 CI/CD、大型仓库和快速原型开发中非常实用。
+
+## 基本用法
+
+### --depth
+
+```bash
+# 只克隆最近 1 次提交
+git clone --depth 1 https://github.com/user/repo.git
+
+# 克隆最近 10 次提交
+git clone --depth 10 https://github.com/user/repo.git
+```
+
+每个 `--depth N` 会下载最近 N 次提交及其对应的文件快照。
+
+### --shallow-since
+
+```bash
+# 克隆指定日期之后的所有提交
+git clone --shallow-since="2025-01-01" https://github.com/user/repo.git
+
+# 与 --depth 结合使用
+git clone --depth 100 --shallow-since="2025-01-01" https://github.com/user/repo.git
+```
+
+### --shallow-exclude
+
+```bash
+# 克隆除特定提交及其祖先之外的部分
+git clone --shallow-exclude="v1.0" https://github.com/user/repo.git
+```
+
+## 适用场景对比
+
+| 场景 | 推荐方式 | 原因 |
+|------|---------|------|
+| CI 构建 | `--depth 1` | 只需最新代码 |
+| 快速查看项目 | `--depth 1` | 最小传输 |
+| 最近版本开发 | `--depth 50` 或 `--shallow-since` | 需要近期历史 |
+| Monorepo 部分工作 | partial clone + shallow | 组合使用效果更好 |
+
+## 局限性
+
+### 1. 无法完整访问历史
+
+```bash
+# 浅克隆中无法访问超出 --depth 的提交
+git log --oneline
+# 只显示浅层的历史
+```
+
+### 2. 无法推送
+
+```bash
+# 默认浅克隆不能 push 到远端
+git push origin main
+# 错误: failed to push some refs
+# 需要先 unshallow
+```
+
+### 3. 无法从浅层创建新分支（部分场景）
+
+### 4. 某些 Git 操作受限
+
+```bash
+git merge
+git log --all  # 不完整
+git bisect     # 不完整
+```
+
+## 转换为完整克隆
+
+```bash
+# 通过 fetch 补全历史
+git fetch --unshallow
+
+# 或指定深度
+git fetch --depth=500
+
+# 完成后即变为完整克隆
+```
+
+## 与 partial clone 的组合
+
+```bash
+# 同时使用 shallow + blobless partial clone
+git clone --depth 1 --filter=blob:none https://github.com/user/repo.git
+
+# 按需获取 blob
+git checkout feature-branch  # 自动下载需要的 blob
+```
+
+## CI 最佳实践
+
+```yaml
+# GitHub Actions - 默认已经是 shallow clone
+- uses: actions/checkout@v4
+  with:
+    fetch-depth: 0  # 需要完整历史时设为 0
+
+# GitLab CI
+variables:
+  GIT_DEPTH: 1
+```
+
+## 继续学习
+
+1. `performance/partial-clone` — Partial clone 详解
+2. `performance/gc-repack-strategies` — gc/repack 策略
+3. `performance/large-repo-optimization` — 大型仓库优化

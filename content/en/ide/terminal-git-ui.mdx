@@ -1,0 +1,120 @@
+export const metadata = {
+  title: "Terminal Git UI Tools Guide",
+  slug: "terminal-git-ui",
+  locale: "en",
+  section: "ide",
+  summary: "Explore terminal-based Git UI tools like lazygit and tig that bring visual Git operations right into your terminal.",
+  sourceUrls: [
+    "https://github.com/jesseduffield/lazygit",
+    "https://jonas.github.io/tig/",
+  ],
+};
+
+# Terminal Git UI Tools Guide
+
+## Overview
+
+Terminal Git UI tools bring visual Git operations into your terminal without switching to a separate GUI application. They combine terminal speed with visual convenience.
+
+## lazygit
+
+[lazygit](https://github.com/jesseduffield/lazygit) is one of the most popular terminal Git UIs, written in Go and available on all major platforms.
+
+### Installation
+
+```bash
+# macOS
+brew install lazygit
+
+# Linux (Debian/Ubuntu)
+sudo add-apt-repository ppa:lazygit-team/release
+sudo apt-get update
+sudo apt-get install lazygit
+
+# Launch
+lazygit
+```
+
+### Core Features
+
+| Feature | Key | Description |
+|---------|-----|-------------|
+| Stage/Unstage | `Space` | Toggle file stage state |
+| Commit | `c` | Create commit |
+| Switch branch | `b` | View and switch branches |
+| Merge | `m` | Merge into current branch |
+| Rebase | `r` | Interactive rebase |
+| Stash | `s` | Stash changes |
+| Push | `P` | Push to remote |
+| Log | `l` | View commit log |
+| Diff | `Enter` | View file diff |
+
+### Typical Workflow
+
+```bash
+cd my-project
+lazygit
+
+# Main panels (navigate with left/right arrows):
+# - Status
+# - Files
+# - Branches
+# - Commits
+# - Stash
+```
+
+## tig
+
+[tig](https://jonas.github.io/tig/) is an ncurses-based text-mode interface for Git, focused on efficient log viewing and diff browsing.
+
+### Installation
+
+```bash
+# macOS
+brew install tig
+
+# Linux
+apt-get install tig
+```
+
+### Core Commands
+
+```bash
+tig                  # Commit log view
+tig log --oneline    # Compact log
+tig diff             # Diff view
+tig blame file.js    # Blame view
+tig status           # Status view
+```
+
+### Shortcuts
+
+| Key | Function |
+|-----|----------|
+| `j`/`k` | Move up/down |
+| `Enter` | View selected commit |
+| `/` | Search |
+| `m` | View branch refs |
+| `t` | Toggle tree view |
+
+## Choosing a Tool
+
+| Need | Recommended |
+|------|-------------|
+| Daily commit and stage | lazygit |
+| Browsing history and diff | tig |
+| Interactive rebase | lazygit |
+| Blame tracking | tig |
+| Full GUI experience | lazygit |
+
+## Notes
+
+1. Terminal UI tools invoke Git commands under the hood — **they don't change Git's behavior**
+2. Understanding the underlying commands is recommended before relying on UI tools
+3. Conflict resolution still requires understanding Git's merge mechanism
+
+## Continue Learning
+
+1. `ide/github-desktop` — GitHub Desktop guide
+2. `ide/vscode-git` — Git in VS Code
+3. `commands/git-log` — git log command reference

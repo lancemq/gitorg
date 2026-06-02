@@ -1,0 +1,134 @@
+export const metadata = {
+  title: "Gitea Self-Hosted Git Service",
+  slug: "gitea-setup",
+  locale: "en",
+  section: "hosting",
+  summary: "Set up a lightweight self-hosted Git service with Gitea, including installation, configuration, backup, and daily administration.",
+  sourceUrls: [
+    "https://docs.gitea.com/",
+    "https://github.com/go-gitea/gitea",
+  ],
+};
+
+# Gitea Self-Hosted Git Service
+
+## Overview
+
+Gitea is a lightweight self-hosted Git service written in Go. Compared to GitLab CE, Gitea has minimal resource requirements (128MB RAM is enough), making it ideal for small teams or personal use.
+
+## Installation
+
+### Method 1: Binary Install (Recommended)
+
+```bash
+# Download the latest binary
+wget -O gitea https://dl.gitea.com/gitea/1.22/gitea-1.22-linux-amd64
+chmod +x gitea
+
+# Create the git user
+sudo adduser --system --group --disabled-password --shell /bin/bash --home /home/git git
+
+# Create required directories
+sudo mkdir -p /var/lib/gitea/{custom,data,log}
+sudo chown -R git:git /var/lib/gitea
+sudo chmod -R 750 /var/lib/gitea
+
+# Start
+sudo -u git ./gitea web
+```
+
+### Method 2: Docker Deployment
+
+```yaml
+# docker-compose.yml
+version: "3"
+services:
+  gitea:
+    image: gitea/gitea:1.22
+    ports:
+      - "3000:3000"
+      - "222:22"
+    volumes:
+      - ./gitea-data:/data
+    restart: always
+```
+
+```bash
+docker compose up -d
+```
+
+## Initial Configuration
+
+Visit `http://localhost:3000` in your browser — the installation page appears:
+
+| Setting | Recommended |
+|---------|-------------|
+| Database | SQLite (small team) or PostgreSQL |
+| Domain | Custom domain or IP |
+| SSH port | 222 (if using Docker port mapping) |
+| HTTP port | 3000 |
+| Admin account | Create immediately |
+
+## Daily Administration
+
+### Backup
+
+```bash
+# Built-in backup command
+sudo -u git ./gitea dump -c /etc/gitea/app.ini
+
+# Backup includes: database, repos, config, logs
+# Output to /var/lib/gitea/data/
+```
+
+### Upgrade
+
+```bash
+# 1. Stop service
+sudo systemctl stop gitea
+
+# 2. Backup
+sudo -u git ./gitea dump
+
+# 3. Replace binary
+cp gitea-old gitea-new
+
+# 4. Restart
+sudo systemctl start gitea
+```
+
+### Configuration
+
+```INI
+# /etc/gitea/app.ini
+[server]
+DOMAIN = git.example.com
+ROOT_URL = https://git.example.com/
+HTTP_PORT = 3000
+SSH_DOMAIN = git.example.com
+
+[database]
+DB_TYPE = sqlite3
+PATH = /var/lib/gitea/data/gitea.db
+
+[mailer]
+ENABLED = true
+SMTP_ADDR = smtp.example.com
+```
+
+## Comparison
+
+| Feature | Gitea | GitLab CE | GitHub |
+|---------|-------|-----------|--------|
+| Memory | ~128MB | ~4GB | SaaS |
+| Setup complexity | Low | High | None |
+| CI/CD | Built-in Actions | Built-in CI | Actions |
+| Code review | Yes | Yes | Yes |
+| Team management | Basic | Rich | Rich |
+| Migration tools | Yes | Yes | Yes |
+
+## Continue Learning
+
+1. `hosting/self-hosted-git` — Self-hosted Git overview
+2. `hosting/platform-comparison` — Platform comparison
+3. `hosting/github-deep-dive` — GitHub advanced features

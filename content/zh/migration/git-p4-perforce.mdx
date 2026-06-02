@@ -1,0 +1,128 @@
+export const metadata = {
+  title: "Perforce 迁移到 Git",
+  slug: "git-p4-perforce",
+  locale: "zh",
+  section: "migration",
+  summary: "使用 git-p4 将 Perforce 仓库完整迁移到 Git，保留分支结构、提交历史和作者信息。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-p4",
+    "https://www.perforce.com/manuals/git-fusion/",
+  ],
+};
+
+# Perforce 迁移到 Git
+
+## 概述
+
+Perforce（Helix Core）是大型企业中常用的版本控制系统。`git-p4` 是 Git 官方提供的双向桥接工具，支持从 Perforce 迁移到 Git。
+
+## 前置检查
+
+```bash
+# 确认已安装 git-p4
+git p4 help
+
+# 确保有 Perforce 仓库的访问权限
+p4 info
+
+# 检查 Perforce 客户端配置
+p4 client -o
+```
+
+## 准备工作
+
+### 1. 创建 Perforce 映射
+
+```bash
+# 定义要迁移的 Perforce 仓库路径
+P4_PATH="//depot/main/..."
+```
+
+### 2. 配置作者映射
+
+创建从 Perforce 用户到 Git 作者信息的映射文件 `authors.txt`：
+
+```
+perforce_user1 = Alice <alice@example.com>
+perforce_user2 = Bob <bob@example.com>
+```
+
+## 迁移流程
+
+### 方法一：完整迁移（保留全部历史）
+
+```bash
+# 完整克隆 Perforce 仓库到 Git
+git p4 clone //depot/main/... --destination=my-repo
+
+# 使用作者映射
+git p4 clone --authors-file=authors.txt //depot/main/... my-repo
+```
+
+### 方法二：增量迁移（适合大型仓库）
+
+```bash
+# 先迁移最近的部分历史
+git p4 clone --max-changes=1000 //depot/main/... my-repo
+
+# 再增量获取更多
+cd my-repo
+git p4 sync
+```
+
+### 方法三：迁移指定标签
+
+```bash
+# 迁移时包含标签
+git p4 clone --use-client-spec --detect-labels //depot/main/... my-repo
+```
+
+## 分支迁移
+
+Perforce 的分支模型与 Git 不同。Perforce 分支通常是目录级别的副本。
+
+```bash
+# 手动映射 Perforce 分支到 Git 分支
+git p4 clone //depot/main/... main-repo
+
+# 迁移特性分支
+git p4 clone //depot/feature/... --ref=refs/heads/feature feature-repo
+```
+
+## 迁移后检查
+
+```bash
+# 验证提交历史
+git log --oneline --graph --all
+
+# 检查作者信息
+git shortlog -sne
+
+# 验证文件完整性
+git fsck
+
+# 统计迁移数据
+git count-objects -v
+```
+
+## 常见问题
+
+### 大文件处理
+
+```bash
+# 迁移前清理大型二进制文件
+# 考虑使用 Git LFS 管理
+git lfs track "*.psd" "*.bin"
+```
+
+### 权限信息丢失
+
+Perforce 的文件权限模型（-w 等）无法映射到 Git。建议：
+1. 迁移后复查敏感文件的权限
+2. 使用 `.gitattributes` 配置必要的权限
+
+## 继续学习
+
+1. `migration/svn-to-git` — SVN 迁移到 Git
+2. `migration/hg-to-git` — Mercurial 迁移到 Git
+3. `migration/platform-migration` — Git 托管平台间迁移

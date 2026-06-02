@@ -2160,6 +2160,26 @@
     "suggestions": []
   },
   {
+    "href": "/en/ci-cd/jenkins-integration",
+    "path": "ci-cd/jenkins-integration",
+    "section": "ci-cd",
+    "tier": "recommended",
+    "slug": "jenkins-integration",
+    "title": "Jenkins Git Integration",
+    "summary": "Set up Git integration with Jenkins including webhook triggers, Multibranch Pipeline, credential management, and security best practices.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/ci-cd/ci-security-basics",
+    "path": "ci-cd/ci-security-basics",
+    "section": "ci-cd",
+    "tier": "recommended",
+    "slug": "ci-security-basics",
+    "title": "Git Security Basics in CI/CD",
+    "summary": "Learn the security risks and protections for Git operations in CI/CD pipelines, including credential management, branch protection, signature verification, and auditing.",
+    "suggestions": []
+  },
+  {
     "href": "/en/ide/vscode-git",
     "path": "ide/vscode-git",
     "section": "ide",
@@ -2177,6 +2197,26 @@
     "slug": "jetbrains-git",
     "title": "JetBrains IDE Git Integration",
     "summary": "Master Git operations in JetBrains IDEs including the Commit tool window, Annotate, Log, interactive rebase, and conflict resolution.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/ide/github-desktop",
+    "path": "ide/github-desktop",
+    "section": "ide",
+    "tier": "recommended",
+    "slug": "github-desktop",
+    "title": "GitHub Desktop Guide",
+    "summary": "Learn to use GitHub Desktop's graphical interface for common Git operations — a great fit for developers who prefer visual tools over the command line.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/ide/terminal-git-ui",
+    "path": "ide/terminal-git-ui",
+    "section": "ide",
+    "tier": "recommended",
+    "slug": "terminal-git-ui",
+    "title": "Terminal Git UI Tools Guide",
+    "summary": "Explore terminal-based Git UI tools like lazygit and tig that bring visual Git operations right into your terminal.",
     "suggestions": []
   },
   {
@@ -2200,6 +2240,26 @@
     "suggestions": []
   },
   {
+    "href": "/en/security/credential-helper",
+    "path": "security/credential-helper",
+    "section": "security",
+    "tier": "recommended",
+    "slug": "credential-helper",
+    "title": "Git Credential Helper Setup",
+    "summary": "Configure Git credential helpers to avoid typing usernames and passwords repeatedly while keeping credentials secure.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/security/signing-advanced",
+    "path": "security/signing-advanced",
+    "section": "security",
+    "tier": "recommended",
+    "slug": "signing-advanced",
+    "title": "Advanced Commit Signing",
+    "summary": "Deep dive into Git commit signing techniques including SSH signing, auto-signing configuration, verification policies, and team signing conventions.",
+    "suggestions": []
+  },
+  {
     "href": "/en/performance/large-repo-optimization",
     "path": "performance/large-repo-optimization",
     "section": "performance",
@@ -2217,6 +2277,26 @@
     "slug": "partial-clone",
     "title": "Partial Clone: On-Demand Git Object Fetching",
     "summary": "An in-depth look at Git partial clone — how filters and promisor remotes work, and how to speed up clone and fetch in large repositories.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/performance/shallow-clone-deep",
+    "path": "performance/shallow-clone-deep",
+    "section": "performance",
+    "tier": "recommended",
+    "slug": "shallow-clone-deep",
+    "title": "Deep Dive into Shallow Clone",
+    "summary": "Understand how git clone --depth and --shallow-since work, their use cases, limitations, and how to convert a shallow clone to a full one.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/performance/gc-repack-strategies",
+    "path": "performance/gc-repack-strategies",
+    "section": "performance",
+    "tier": "recommended",
+    "slug": "gc-repack-strategies",
+    "title": "Git gc and repack Strategies",
+    "summary": "Master git gc, git repack, and git maintenance to keep your repository healthy and performant through proper object management.",
     "suggestions": []
   },
   {
@@ -2240,6 +2320,26 @@
     "suggestions": []
   },
   {
+    "href": "/en/migration/git-p4-perforce",
+    "path": "migration/git-p4-perforce",
+    "section": "migration",
+    "tier": "recommended",
+    "slug": "git-p4-perforce",
+    "title": "Perforce to Git Migration",
+    "summary": "Migrate Perforce repositories to Git using git-p4, preserving branch structure, commit history, and author information.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/migration/platform-migration",
+    "path": "migration/platform-migration",
+    "section": "migration",
+    "tier": "recommended",
+    "slug": "platform-migration",
+    "title": "Cross-Platform Git Migration",
+    "summary": "Migrate repositories between GitHub, GitLab, Bitbucket, and other Git hosting platforms while preserving full commit history and all refs.",
+    "suggestions": []
+  },
+  {
     "href": "/en/hosting/platform-comparison",
     "path": "hosting/platform-comparison",
     "section": "hosting",
@@ -2257,6 +2357,26 @@
     "slug": "self-hosted-git",
     "title": "Self-Hosted Git Service Comparison",
     "summary": "A comparison of self-hosted Git solutions including GitLab CE, Gitea, Gogs, and others — covering features, deployment, and maintenance.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/hosting/github-deep-dive",
+    "path": "hosting/github-deep-dive",
+    "section": "hosting",
+    "tier": "recommended",
+    "slug": "github-deep-dive",
+    "title": "GitHub Advanced Features Guide",
+    "summary": "Explore GitHub's advanced features including Actions, Pages, Projects, Wiki, and repository management beyond basic Git hosting.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/hosting/gitea-setup",
+    "path": "hosting/gitea-setup",
+    "section": "hosting",
+    "tier": "recommended",
+    "slug": "gitea-setup",
+    "title": "Gitea Self-Hosted Git Service",
+    "summary": "Set up a lightweight self-hosted Git service with Gitea, including installation, configuration, backup, and daily administration.",
     "suggestions": []
   }
 ]

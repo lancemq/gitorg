@@ -1,0 +1,140 @@
+export const metadata = {
+  title: "GitHub Advanced Features Guide",
+  slug: "github-deep-dive",
+  locale: "en",
+  section: "hosting",
+  summary: "Explore GitHub's advanced features including Actions, Pages, Projects, Wiki, and repository management beyond basic Git hosting.",
+  sourceUrls: [
+    "https://docs.github.com/en",
+    "https://docs.github.com/en/actions",
+  ],
+};
+
+# GitHub Advanced Features Guide
+
+## Overview
+
+GitHub is more than just a Git hosting platform. This guide explores advanced features to help you manage projects and team collaboration more effectively.
+
+## Actions Advanced
+
+### Custom Action
+
+```yaml
+# .github/actions/my-action/action.yml
+name: "My Custom Action"
+description: "A reusable custom action"
+inputs:
+  who-to-greet:
+    description: "Who to greet"
+    required: true
+    default: "World"
+outputs:
+  time:
+    description: "The time we greeted"
+runs:
+  using: "node20"
+  main: "index.js"
+```
+
+### Matrix Builds
+
+```yaml
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: [18, 20, 22]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm test
+```
+
+### Environments with Approvals
+
+```yaml
+jobs:
+  deploy:
+    environment: production
+    steps:
+      - run: ./deploy.sh
+```
+
+Production environments can require manual approval before deployment.
+
+## GitHub Pages
+
+### Deploy Static Sites
+
+```yaml
+# .github/workflows/deploy.yml
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm run build
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./out
+```
+
+### Custom Domain
+
+```bash
+# Configure in project Pages settings:
+# Custom domain: docs.yourdomain.com
+# Add CNAME or A record to GitHub Pages
+```
+
+## GitHub Projects
+
+Projects provide Jira-like project management:
+
+1. **Table view**: Spreadsheet-like view
+2. **Board view**: Kanban board
+3. **Roadmap view**: Timeline view
+4. **Automation rules**: Auto-move cards by Issue/PR state
+
+## Advanced Repository Management
+
+### CODEOWNERS
+
+```bash
+# .github/CODEOWNERS
+* @team-core
+/src/api/ @team-api
+/docs/ @team-docs
+*.md @docs-maintainer
+```
+
+Auto-assign reviewers based on file changes.
+
+### Rulesets
+
+Rulesets are more flexible than branch protection, applying rules across branches and tags.
+
+- Lock repository configuration
+- Require linear history
+- Restrict create/delete permissions per user
+
+### Security Features
+
+| Feature | Description |
+|---------|-------------|
+| Dependabot | Auto-detect dependency vulnerabilities and create PRs |
+| Secret scanning | Auto-detect secrets in repositories |
+| Code scanning | CodeQL-based code analysis |
+| Private vulnerability reporting | Secure channel for security researchers |
+
+## Continue Learning
+
+1. `hosting/platform-comparison` — Platform comparison
+2. `hosting/gitea-setup` — Gitea self-hosted setup
+3. `github/github-flow-basics` — GitHub Flow basics

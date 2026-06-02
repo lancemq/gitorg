@@ -1,0 +1,168 @@
+export const metadata = {
+  title: "Git gc and repack Strategies",
+  slug: "gc-repack-strategies",
+  locale: "en",
+  section: "performance",
+  summary: "Master git gc, git repack, and git maintenance to keep your repository healthy and performant through proper object management.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-gc",
+    "https://git-scm.com/docs/git-repack",
+    "https://git-scm.com/docs/git-maintenance",
+  ],
+};
+
+# Git gc and repack Strategies
+
+## Overview
+
+As commits accumulate, Git's object store becomes fragmented. `git gc` (Garbage Collection) and `git repack` are essential tools for reclaiming space and improving performance.
+
+## git gc
+
+### Basic Usage
+
+```bash
+# Run garbage collection
+git gc
+
+# More aggressive (thorough compression)
+git gc --aggressive
+
+# Lightweight cleanup only
+git gc --auto
+```
+
+`git gc` performs these operations:
+1. Compress loose objects into pack files
+2. Remove unreachable objects
+3. Update reference logs
+4. Optimize repository storage
+
+### Auto-Trigger
+
+```bash
+# Git runs git gc --auto after certain operations:
+# - git commit (when loose objects exceed threshold)
+# - git fetch
+# - git merge
+
+# View gc config
+git config --global --list | grep gc
+
+# Common settings
+git config --global gc.auto 6700           # Trigger threshold
+git config --global gc.autoPackLimit 50    # Pack file limit
+git config --global gc.bigPackThreshold 2G # Skip packs over 2G
+```
+
+## git repack
+
+`git repack` is the core operation behind `git gc`, managing pack files directly.
+
+```bash
+# Pack all loose objects
+git repack -a -d
+
+# Incremental repack (new objects only)
+git repack
+
+# With delta compression (recommended)
+git repack -a -d --window=250 --depth=50
+```
+
+### Key Options
+
+| Option | Effect |
+|--------|--------|
+| `-a` | Pack all objects into a single pack |
+| `-d` | Delete redundant objects |
+| `--window=<n>` | Delta search window (higher = better compression) |
+| `--depth=<n>` | Maximum delta chain depth |
+| `-F` | Recompute deltas from scratch |
+
+### Optimization Example
+
+```bash
+# Recommended periodic maintenance
+git repack -a -d --window=250 --depth=50 --threads=4
+
+# For large repos, use a larger window
+git repack -a -d --window=500 --depth=100 --threads=0
+# --threads=0 means use all CPU cores
+```
+
+## git maintenance
+
+Git 2.31+ introduced `git maintenance` for smarter automatic maintenance.
+
+```bash
+# Register current repo for auto-maintenance
+git maintenance start
+
+# Run maintenance immediately
+git maintenance run
+
+# Run specific tasks only
+git maintenance run --task=gc
+git maintenance run --task=loose-objects
+git maintenance run --task=incremental-repack
+```
+
+### Maintenance Tasks
+
+| Task | Frequency | Description |
+|------|-----------|-------------|
+| `gc` | Daily | Full garbage collection |
+| `loose-objects` | Hourly | Pack loose objects |
+| `incremental-repack` | Hourly | Incremental pack optimization |
+| `pack-refs` | Hourly | Compress ref files |
+| `prefetch` | Hourly | Pre-fetch remote refs |
+
+### Scheduled Maintenance
+
+```bash
+# Enable scheduled maintenance
+git maintenance start  # Configures system scheduler
+
+# On macOS/Linux, uses launchd/systemd
+# Manual cron example (every Sunday 3 AM)
+0 3 * * 0 cd /path/to/repo && git maintenance run
+```
+
+## Strategy Recommendations
+
+### Personal Repos
+
+```bash
+# Default config is usually fine
+git config --global gc.auto 6700
+```
+
+### Large Repos
+
+```bash
+# More frequent, deeper maintenance
+git config --global gc.auto 10000
+git maintenance start
+```
+
+### CI Environment
+
+```bash
+# Avoid gc/repack in CI
+# Use shallow clone instead
+git clone --depth 1 ...
+```
+
+## Safety Notes
+
+1. `git gc` won't delete reflog entries that haven't expired
+2. `git repack -a -d` can be slow — don't run on shared repos in use
+3. GC'd objects can still be recovered via reflog for a time
+4. Avoid frequent `--aggressive` on bare repos
+
+## Continue Learning
+
+1. `performance/shallow-clone-deep` — Deep dive into shallow clone
+2. `performance/partial-clone` — Partial clone guide
+3. `internals/packfiles-and-storage` — Pack file internals

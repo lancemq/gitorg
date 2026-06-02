@@ -1,0 +1,125 @@
+export const metadata = {
+  title: "Deep Dive into Shallow Clone",
+  slug: "shallow-clone-deep",
+  locale: "en",
+  section: "performance",
+  summary: "Understand how git clone --depth and --shallow-since work, their use cases, limitations, and how to convert a shallow clone to a full one.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-clone#Documentation/git-clone.txt---depthltdepthgt",
+    "https://git-scm.com/docs/git-fetch#Documentation/git-fetch.txt---depthltdepthgt",
+  ],
+};
+
+# Deep Dive into Shallow Clone
+
+## Overview
+
+Shallow clone speeds up cloning by limiting how much history is downloaded. It's useful for CI/CD, large repositories, and quick prototyping.
+
+## Basic Usage
+
+### --depth
+
+```bash
+# Only the latest commit
+git clone --depth 1 https://github.com/user/repo.git
+
+# Last 10 commits
+git clone --depth 10 https://github.com/user/repo.git
+```
+
+Each `--depth N` downloads the N most recent commits and their file snapshots.
+
+### --shallow-since
+
+```bash
+# All commits since a date
+git clone --shallow-since="2025-01-01" https://github.com/user/repo.git
+
+# Combine with --depth
+git clone --depth 100 --shallow-since="2025-01-01" https://github.com/user/repo.git
+```
+
+### --shallow-exclude
+
+```bash
+# Exclude a specific tag and its ancestors
+git clone --shallow-exclude="v1.0" https://github.com/user/repo.git
+```
+
+## Use Case Comparison
+
+| Scenario | Recommended | Reason |
+|----------|-------------|--------|
+| CI builds | `--depth 1` | Latest code only |
+| Quick project preview | `--depth 1` | Minimal transfer |
+| Recent version dev | `--depth 50` or `--shallow-since` | Recent history needed |
+| Monorepo partial work | partial + shallow | Best combined |
+
+## Limitations
+
+### 1. Incomplete History Access
+
+```bash
+# Commits beyond --depth are invisible
+git log --oneline
+# Only shallow history shown
+```
+
+### 2. Cannot Push
+
+```bash
+# Shallow clone can't push by default
+git push origin main
+# Error: failed to push some refs
+# Need to unshallow first
+```
+
+### 3. Some Git Operations Restricted
+
+```bash
+git merge
+git log --all   # Incomplete
+git bisect      # Incomplete
+```
+
+## Converting to Full Clone
+
+```bash
+# Fetch remaining history
+git fetch --unshallow
+
+# Or specify a depth
+git fetch --depth=500
+
+# Now a full clone
+```
+
+## Combining with Partial Clone
+
+```bash
+# Shallow + blobless partial clone
+git clone --depth 1 --filter=blob:none https://github.com/user/repo.git
+
+# Blobs are fetched on demand
+git checkout feature-branch  # Auto-downloads needed blobs
+```
+
+## CI Best Practices
+
+```yaml
+# GitHub Actions - shallow by default
+- uses: actions/checkout@v4
+  with:
+    fetch-depth: 0  # Set to 0 for full history
+
+# GitLab CI
+variables:
+  GIT_DEPTH: 1
+```
+
+## Continue Learning
+
+1. `performance/partial-clone` — Partial clone guide
+2. `performance/gc-repack-strategies` — gc/repack strategies
+3. `performance/large-repo-optimization` — Large repo optimization

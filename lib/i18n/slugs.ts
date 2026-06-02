@@ -525,56 +525,80 @@ export const conceptSlugs = [
 
 export type CiCdSlug =
   | "github-actions-basics"
-  | "gitlab-ci-basics";
+  | "gitlab-ci-basics"
+  | "jenkins-integration"
+  | "ci-security-basics";
 
 export type IdeSlug =
   | "vscode-git"
-  | "jetbrains-git";
+  | "jetbrains-git"
+  | "github-desktop"
+  | "terminal-git-ui";
 
 export type SecuritySlug =
   | "ssh-key-management"
-  | "gpg-signing";
+  | "gpg-signing"
+  | "credential-helper"
+  | "signing-advanced";
 
 export type PerformanceSlug =
   | "large-repo-optimization"
-  | "partial-clone";
+  | "partial-clone"
+  | "shallow-clone-deep"
+  | "gc-repack-strategies";
 
 export type MigrationSlug =
   | "svn-to-git"
-  | "hg-to-git";
+  | "hg-to-git"
+  | "git-p4-perforce"
+  | "platform-migration";
 
 export type HostingSlug =
   | "platform-comparison"
-  | "self-hosted-git";
+  | "self-hosted-git"
+  | "github-deep-dive"
+  | "gitea-setup";
 
 export const ciCdSlugs = [
   "github-actions-basics",
   "gitlab-ci-basics",
+  "jenkins-integration",
+  "ci-security-basics",
 ] as const satisfies readonly CiCdSlug[];
 
 export const ideSlugs = [
   "vscode-git",
   "jetbrains-git",
+  "github-desktop",
+  "terminal-git-ui",
 ] as const satisfies readonly IdeSlug[];
 
 export const securitySlugs = [
   "ssh-key-management",
   "gpg-signing",
+  "credential-helper",
+  "signing-advanced",
 ] as const satisfies readonly SecuritySlug[];
 
 export const performanceSlugs = [
   "large-repo-optimization",
   "partial-clone",
+  "shallow-clone-deep",
+  "gc-repack-strategies",
 ] as const satisfies readonly PerformanceSlug[];
 
 export const migrationSlugs = [
   "svn-to-git",
   "hg-to-git",
+  "git-p4-perforce",
+  "platform-migration",
 ] as const satisfies readonly MigrationSlug[];
 
 export const hostingSlugs = [
   "platform-comparison",
   "self-hosted-git",
+  "github-deep-dive",
+  "gitea-setup",
 ] as const satisfies readonly HostingSlug[];
 
 export const internalsSlugs = [

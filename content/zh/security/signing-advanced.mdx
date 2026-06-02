@@ -1,0 +1,140 @@
+export const metadata = {
+  title: "提交签名进阶",
+  slug: "signing-advanced",
+  locale: "zh",
+  section: "security",
+  summary: "深入 Git 提交签名技术，包括 SSH 签名、自动签名配置、签名验证策略以及多人团队的签名规范。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-commit#Documentation/git-commit.txt--S",
+    "https://docs.github.com/en/authentication/managing-commit-signature-verification",
+  ],
+};
+
+# 提交签名进阶
+
+## 概述
+
+GPG 是传统的提交签名方式，但 SSH 签名和配置签名策略现在提供了更多选择。本文覆盖 Git 2.34+ 引入的 SSH 签名支持，以及团队级的签名验证策略。
+
+## 签名方式对比
+
+| 方式 | 优点 | 缺点 | Git 版本要求 |
+|------|------|------|-------------|
+| GPG | 最广泛支持 | 配置复杂，密钥管理不便 | 1.7.9+ |
+| SSH | 复用 SSH 密钥，配置简单 | 相对较新 | 2.34+ |
+| S/MIME | 企业 PKI 集成 | 证书昂贵，配置复杂 | 2.19+ |
+
+## SSH 签名
+
+Git 2.34+ 支持使用 SSH 密钥直接签名提交和标签。
+
+### 配置
+
+```bash
+# 使用现有的 SSH 密钥签名
+git config --global gpg.format ssh
+git config --global user.signingkey ~/.ssh/id_ed25519.pub
+
+# 开启自动签名
+git config --global commit.gpgsign true
+git config --global tag.gpgsign true
+```
+
+### 添加公钥到托管平台
+
+将你的 SSH 公钥（`.pub` 文件内容）添加到 GitHub/GitLab 的 **Signing keys** / **SSH keys** 设置中。
+
+### 验证签名
+
+```bash
+# 验证最近提交的签名
+git log --show-signature -1
+
+# 配置 GitHub 将 SSH 签名标记为 Verified
+# 在 SSH keys 设置中勾选 "Sign commits and tags"
+```
+
+## 自动签名配置
+
+### macOS 配置
+
+```bash
+# gpg-agent 配置（GPG 方式）
+echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
+gpgconf --kill gpg-agent
+
+# SSH 方式（无需额外配置，使用 ssh-agent）
+```
+
+### 在 CI 中签名
+
+```yaml
+# GitHub Actions 中使用 GPG 签名
+jobs:
+  commit:
+    steps:
+      - uses: actions/checkout@v4
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+      - name: Commit
+        run: |
+          git config user.signingkey ${{ steps.import-gpg.outputs.fingerprint }}
+          git commit -S -m "ci: update generated files"
+```
+
+## 团队签名策略
+
+### 强制签名验证
+
+```bash
+# 本地：拒绝未签名的提交
+git config --global commit.gpgsign true
+
+# 仓库层面（GitHub）：启用 Branch protection → Require signed commits
+```
+
+### 签名规范
+
+```markdown
+1. 所有提交必须签名
+2. 使用 SSH 签名（推荐）或 GPG
+3. 每个开发者需要独立签名密钥
+4. 密钥丢失时及时撤销并更新
+```
+
+### 审计签名
+
+```bash
+# 检查哪些提交未签名
+git log --pretty="%H %aN <%aE>%n  signed: %G?%n"
+
+# 输出：
+# abc1234 Alice <alice@example.com>
+#   signed: G       # 良好签名
+# def5678 Bob <bob@example.com>
+#   signed: N       # 未签名
+```
+
+## 常见问题
+
+### SSH 签名未显示 Verified
+
+1. 确认公钥已添加到托管平台的 Signing keys
+2. SSH 密钥必须加载到 ssh-agent
+3. 检查 Git 版本（需要 2.34+）
+
+### 多密钥管理
+
+```bash
+# 为不同仓库使用不同签名密钥
+git config --local user.signingkey ~/.ssh/work.pub
+```
+
+## 继续学习
+
+1. `security/gpg-signing` — GPG 签名基础
+2. `security/ssh-key-management` — SSH 密钥管理
+3. `security/credential-helper` — 凭据助手配置

@@ -1,0 +1,117 @@
+export const metadata = {
+  title: "Cross-Platform Git Migration",
+  slug: "platform-migration",
+  locale: "en",
+  section: "migration",
+  summary: "Migrate repositories between GitHub, GitLab, Bitbucket, and other Git hosting platforms while preserving full commit history and all refs.",
+  sourceUrls: [
+    "https://docs.github.com/en/migrations",
+    "https://docs.gitlab.com/ee/user/project/import/",
+  ],
+};
+
+# Cross-Platform Git Migration
+
+## Overview
+
+Migrating between Git hosting platforms is straightforward at the Git level — the underlying protocol is the same. The key is transferring all refs (branches, tags, PR/MR metadata).
+
+## Core Migration Methods
+
+### Method 1: Bare Mirror (Recommended)
+
+```bash
+# 1. Create a mirror clone from the source
+git clone --mirror https://github.com/old-org/repo.git
+cd repo.git
+
+# 2. Push to the target platform
+git remote set-url origin https://gitlab.com/new-org/repo.git
+git push --mirror origin
+
+# 3. Verify
+git log --oneline --all
+```
+
+`--mirror` clones all refs including branches, tags, and notes — the most complete transfer.
+
+### Method 2: Direct Push
+
+```bash
+# If you already have a full local clone
+git remote add new-origin https://gitlab.com/new-org/repo.git
+git push --all new-origin       # All branches
+git push --tags new-origin      # All tags
+```
+
+### Method 3: Multi-Platform Sync (Ongoing)
+
+```bash
+# Configure multiple remotes
+git remote add github https://github.com/org/repo.git
+git remote add gitlab https://gitlab.com/org/repo.git
+git remote add bitbucket https://bitbucket.org/org/repo.git
+
+# Push to all remotes
+git push --all github
+git push --all gitlab
+git push --all bitbucket
+```
+
+## Migrating PRs / Merge Requests
+
+PRs/MRs are platform-level metadata, **not Git objects** — they can't be transferred with `git push --mirror`.
+
+### GitHub → GitHub
+
+```bash
+# Use GitHub's official migration tool
+gh repo migrate <source-repo> --target-owner <target-org>
+```
+
+### GitHub → GitLab
+
+1. Create a new project in GitLab
+2. Select **Import project → GitHub**
+3. Authorize GitLab to access GitHub
+4. Choose the repository to import
+
+### GitLab → GitHub
+
+1. Click **+ → Import repository** on GitHub
+2. Enter the GitLab repo's Git URL
+3. GitHub imports the history automatically
+
+## Metadata Migration Map
+
+| Metadata | GitHub | GitLab | Migration |
+|----------|--------|--------|-----------|
+| Commit history | ✅ | ✅ | `git push --mirror` |
+| Branches | ✅ | ✅ | `git push --mirror` |
+| Tags | ✅ | ✅ | `git push --mirror` |
+| PRs/MRs | ✅ | ✅ | Platform tools (cross-platform not supported) |
+| Issues | ✅ | ✅ | API migration scripts |
+| Wiki | ✅ | ✅ | Separate repo migration |
+| CI config | ❌ | ❌ | Must rebuild manually |
+
+## Post-Migration Checklist
+
+```bash
+# 1. Verify ref integrity
+git for-each-ref --format='%(refname)' | sort
+
+# 2. Check key branches
+git branch -a
+
+# 3. Verify tags
+git tag -l
+
+# 4. Confirm remote association
+git remote -v
+```
+
+## Continue Learning
+
+1. `migration/svn-to-git` — SVN to Git migration
+2. `migration/hg-to-git` — Mercurial to Git migration
+3. `hosting/platform-comparison` — Platform comparison

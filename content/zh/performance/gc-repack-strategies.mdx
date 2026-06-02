@@ -1,0 +1,168 @@
+export const metadata = {
+  title: "Git gc 与 repack 策略",
+  slug: "gc-repack-strategies",
+  locale: "zh",
+  section: "performance",
+  summary: "掌握 git gc、git repack 和 git maintenance 的工作原理与配置策略，保持仓库健康并提升性能。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-gc",
+    "https://git-scm.com/docs/git-repack",
+    "https://git-scm.com/docs/git-maintenance",
+  ],
+};
+
+# Git gc 与 repack 策略
+
+## 概述
+
+随着提交增多，Git 仓库中的对象文件会逐渐碎片化。`git gc`（Garbage Collection）和 `git repack` 是整理仓库、回收空间、提升性能的关键工具。
+
+## git gc
+
+### 基本用法
+
+```bash
+# 运行垃圾回收
+git gc
+
+# 更积极的回收（更彻底的压缩）
+git gc --aggressive
+
+# 只做轻量级整理
+git gc --auto
+```
+
+`git gc` 会自动执行以下操作：
+1. 压缩松散对象为 pack 文件
+2. 移除不可达对象
+3. 更新引用日志
+4. 优化仓库存储
+
+### 自动触发
+
+```bash
+# Git 在某些操作后会自动执行 git gc --auto：
+# - git commit（松散对象数量超过阈值）
+# - git fetch
+# - git merge
+
+# 查看 gc 配置
+git config --global --list | grep gc
+
+# 常用配置
+git config --global gc.auto 6700           # 触发阈值
+git config --global gc.autoPackLimit 50    # pack 文件数量阈值
+git config --global gc.bigPackThreshold 2G # 大 pack 跳过阈值
+```
+
+## git repack
+
+`git repack` 是 `git gc` 底层的核心操作，直接管理 pack 文件。
+
+```bash
+# 将所有松散对象打包
+git repack -a -d
+
+# 增量打包（只处理新对象）
+git repack
+
+# 使用增量压缩（推荐）
+git repack -a -d --window=250 --depth=50
+```
+
+### 关键参数
+
+| 参数 | 作用 |
+|------|------|
+| `-a` | 将所有对象打包到一个 pack 文件 |
+| `-d` | 删除冗余的对象 |
+| `--window=<n>` | Delta 搜索窗口大小，越大压缩比越高 |
+| `--depth=<n>` | Delta 链最大深度 |
+| `-F` | 不保留 delta，重新计算 |
+
+### GPU 优化示例
+
+```bash
+# 定期维护的推荐配置
+git repack -a -d --window=250 --depth=50 --threads=4
+
+# 对大型仓库可以使用更大窗口
+git repack -a -d --window=500 --depth=100 --threads=0
+# --threads=0 表示使用所有 CPU 核心
+```
+
+## git maintenance
+
+Git 2.31+ 引入了 `git maintenance`，提供更智能的自动维护机制。
+
+```bash
+# 注册当前仓库进行自动维护
+git maintenance start
+
+# 立即运行维护
+git maintenance run
+
+# 仅执行特定任务
+git maintenance run --task=gc
+git maintenance run --task=loose-objects
+git maintenance run --task=incremental-repack
+```
+
+### 维护任务列表
+
+| 任务 | 频率 | 说明 |
+|------|------|------|
+| `gc` | 每日 | 完整的垃圾回收 |
+| `loose-objects` | 每小时 | 打包松散对象 |
+| `incremental-repack` | 每小时 | 增量整理 pack 文件 |
+| `pack-refs` | 每小时 | 压缩引用文件 |
+| `prefetch` | 每小时 | 预获取远端引用 |
+
+### 定时维护配置
+
+```bash
+# 查看当前维护计划
+git maintenance start  # 启用后自动配置定时任务
+
+# 在 macOS/Linux 上通过 launchd/systemd 实现
+# 手动配置定时维护（每周日凌晨 3 点）
+0 3 * * 0 cd /path/to/repo && git maintenance run
+```
+
+## 策略建议
+
+### 个人仓库
+
+```bash
+# 默认配置通常已经足够
+git config --global gc.auto 6700
+```
+
+### 大型仓库
+
+```bash
+# 更频繁、更深度的维护
+git config --global gc.auto 10000
+git maintenance start  # 启用自动维护
+```
+
+### CI 环境
+
+```bash
+# CI 中不建议运行 gc/repack
+# 可以使用 shallow clone 避免仓库膨胀
+git clone --depth 1 ...
+```
+
+## 安全注意事项
+
+1. `git gc` 不删除还未过期的 reflog 条目
+2. `git repack -a -d` 可能耗时较长，不要在共享仓库运行时执行
+3. GC 后的对象在一定时间内可通过 reflog 找回
+4. 不要对裸仓库（bare repo）频繁执行 `--aggressive`
+
+## 继续学习
+
+1. `performance/shallow-clone-deep` — 浅克隆深入
+2. `performance/partial-clone` — Partial clone 详解
+3. `internals/packfiles-and-storage` — Pack 文件存储原理

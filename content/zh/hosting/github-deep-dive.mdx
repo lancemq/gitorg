@@ -1,0 +1,140 @@
+export const metadata = {
+  title: "GitHub 深度功能指南",
+  slug: "github-deep-dive",
+  locale: "zh",
+  section: "hosting",
+  summary: "深入探索 GitHub 的高级功能，包括 Actions、Pages、Projects、Wiki 与仓库管理的进阶配置。",
+  sourceUrls: [
+    "https://docs.github.com/en",
+    "https://docs.github.com/en/actions",
+  ],
+};
+
+# GitHub 深度功能指南
+
+## 概述
+
+GitHub 不仅仅是一个 Git 托管平台。本文深入介绍 GitHub 的高级功能，帮助你更高效地管理项目和团队协作。
+
+## Actions 进阶
+
+### 自定义 Action
+
+```yaml
+# .github/actions/my-action/action.yml
+name: "My Custom Action"
+description: "A reusable custom action"
+inputs:
+  who-to-greet:
+    description: "Who to greet"
+    required: true
+    default: "World"
+outputs:
+  time:
+    description: "The time we greeted"
+runs:
+  using: "node20"
+  main: "index.js"
+```
+
+### 矩阵构建
+
+```yaml
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: [18, 20, 22]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm test
+```
+
+### 环境与审批
+
+```yaml
+jobs:
+  deploy:
+    environment: production
+    steps:
+      - run: ./deploy.sh
+```
+
+生产环境可配置审批人，确保部署前有人审核。
+
+## GitHub Pages
+
+### 部署静态站点
+
+```yaml
+# .github/workflows/deploy.yml
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm run build
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./out
+```
+
+### 自定义域名
+
+```bash
+# 在项目设置 Pages 中配置：
+# Custom domain: docs.yourdomain.com
+# 同时在 DNS 中添加 CNAME 或 A 记录指向 GitHub Pages
+```
+
+## GitHub Projects
+
+Projects 提供项目级的看板视图（类似 Jira）：
+
+1. **Table view**：类电子表格的视图
+2. **Board view**：看板视图
+3. **Roadmap view**：时间线视图
+4. **自动化规则**：根据 Issue/PR 状态自动移动卡片
+
+## 仓库管理高级功能
+
+### CODEOWNERS
+
+```bash
+# .github/CODEOWNERS
+* @team-core
+/src/api/ @team-api
+/docs/ @team-docs
+*.md @docs-maintainer
+```
+
+自动为文件变更分配审核人。
+
+### 规则集 (Rulesets)
+
+规则集比 Branch protection 更灵活，可以跨多个分支和标签应用规则。
+
+- 可锁定仓库配置
+- 可要求线性历史
+- 可限制特定用户的创建/删除权限
+
+### 安全特性
+
+| 功能 | 说明 |
+|------|------|
+| Dependabot | 自动检测依赖漏洞并创建 PR |
+| Secret scanning | 自动检测仓库中的密钥 |
+| Code scanning | 基于 CodeQL 的代码分析 |
+| Private vulnerability reporting | 安全研究人员私密报告漏洞 |
+
+## 继续学习
+
+1. `hosting/platform-comparison` — 托管平台对比
+2. `hosting/gitea-setup` — Gitea 自建方案
+3. `github/github-flow-basics` — GitHub Flow 基础

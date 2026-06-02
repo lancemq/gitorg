@@ -1,0 +1,139 @@
+export const metadata = {
+  title: "Advanced Commit Signing",
+  slug: "signing-advanced",
+  locale: "en",
+  section: "security",
+  summary: "Deep dive into Git commit signing techniques including SSH signing, auto-signing configuration, verification policies, and team signing conventions.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-commit#Documentation/git-commit.txt--S",
+    "https://docs.github.com/en/authentication/managing-commit-signature-verification",
+  ],
+};
+
+# Advanced Commit Signing
+
+## Overview
+
+GPG is the traditional commit signing method, but SSH signing and signature policies now offer more options. This guide covers SSH signing (introduced in Git 2.34+) and team-level verification strategies.
+
+## Signing Method Comparison
+
+| Method | Pros | Cons | Git Version |
+|--------|------|------|-------------|
+| GPG | Widest support | Complex setup, key management | 1.7.9+ |
+| SSH | Reuses SSH keys, simple setup | Relatively new | 2.34+ |
+| S/MIME | Enterprise PKI integration | Expensive certs, complex | 2.19+ |
+
+## SSH Signing
+
+Git 2.34+ supports signing commits and tags directly with SSH keys.
+
+### Configuration
+
+```bash
+# Use existing SSH key
+git config --global gpg.format ssh
+git config --global user.signingkey ~/.ssh/id_ed25519.pub
+
+# Enable auto-signing
+git config --global commit.gpgsign true
+git config --global tag.gpgsign true
+```
+
+### Add Public Key to Hosting Platform
+
+Add your SSH public key (`.pub` file contents) to GitHub/GitLab's **Signing keys** or **SSH keys** settings.
+
+### Verify Signatures
+
+```bash
+# Check the latest commit's signature
+git log --show-signature -1
+
+# On GitHub: configure SSH key with "Sign commits and tags" enabled
+```
+
+## Auto-Signing Setup
+
+### macOS Configuration
+
+```bash
+# gpg-agent (GPG method)
+echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
+gpgconf --kill gpg-agent
+
+# SSH method (no extra setup needed, uses ssh-agent)
+```
+
+### Signing in CI
+
+```yaml
+# GitHub Actions with GPG signing
+jobs:
+  commit:
+    steps:
+      - uses: actions/checkout@v4
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+      - name: Commit
+        run: |
+          git config user.signingkey ${{ steps.import-gpg.outputs.fingerprint }}
+          git commit -S -m "ci: update generated files"
+```
+
+## Team Signing Policy
+
+### Enforcing Signatures
+
+```bash
+# Local: reject unsigned commits
+git config --global commit.gpgsign true
+
+# Repository (GitHub): Enable Branch protection → Require signed commits
+```
+
+### Signing Convention
+
+```markdown
+1. Every commit must be signed
+2. SSH signing recommended (or GPG)
+3. Each developer needs their own signing key
+4. Revoke and replace keys when compromised
+```
+
+### Audit Signatures
+
+```bash
+# Check which commits are unsigned
+git log --pretty="%H %aN <%aE>%n  signed: %G?%n"
+
+# Output:
+# abc1234 Alice <alice@example.com>
+#   signed: G       # Good signature
+# def5678 Bob <bob@example.com>
+#   signed: N       # Not signed
+```
+
+## Troubleshooting
+
+### SSH Signature Not Showing as Verified
+
+1. Confirm public key is added to the hosting platform's Signing keys
+2. SSH key must be loaded into ssh-agent
+3. Check Git version (needs 2.34+)
+
+### Multiple Key Management
+
+```bash
+# Use different signing keys per repository
+git config --local user.signingkey ~/.ssh/work.pub
+```
+
+## Continue Learning
+
+1. `security/gpg-signing` — GPG signing basics
+2. `security/ssh-key-management` — SSH key management
+3. `security/credential-helper` — Credential helper setup

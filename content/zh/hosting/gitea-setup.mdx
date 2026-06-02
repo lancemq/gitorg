@@ -1,0 +1,134 @@
+export const metadata = {
+  title: "Gitea 自建 Git 服务",
+  slug: "gitea-setup",
+  locale: "zh",
+  section: "hosting",
+  summary: "使用 Gitea 搭建轻量级自托管 Git 服务，包括安装、配置、备份与日常管理。",
+  sourceUrls: [
+    "https://docs.gitea.com/",
+    "https://github.com/go-gitea/gitea",
+  ],
+};
+
+# Gitea 自建 Git 服务
+
+## 概述
+
+Gitea 是一个用 Go 编写的轻量级自托管 Git 服务。相比 GitLab CE，Gitea 资源占用极低（128MB 内存即可运行），适合小团队或个人使用。
+
+## 安装
+
+### 方式一：二进制安装（推荐）
+
+```bash
+# 下载最新二进制文件
+wget -O gitea https://dl.gitea.com/gitea/1.22/gitea-1.22-linux-amd64
+chmod +x gitea
+
+# 创建运行用户
+sudo adduser --system --group --disabled-password --shell /bin/bash --home /home/git git
+
+# 创建必要目录
+sudo mkdir -p /var/lib/gitea/{custom,data,log}
+sudo chown -R git:git /var/lib/gitea
+sudo chmod -R 750 /var/lib/gitea
+
+# 启动
+sudo -u git ./gitea web
+```
+
+### 方式二：Docker 部署
+
+```yaml
+# docker-compose.yml
+version: "3"
+services:
+  gitea:
+    image: gitea/gitea:1.22
+    ports:
+      - "3000:3000"
+      - "222:22"
+    volumes:
+      - ./gitea-data:/data
+    restart: always
+```
+
+```bash
+docker compose up -d
+```
+
+## 初始配置
+
+浏览器访问 `http://localhost:3000`，首次访问进入安装页面：
+
+| 配置项 | 推荐值 |
+|--------|--------|
+| 数据库 | SQLite（小团队）或 PostgreSQL |
+| 域名 | 自定义域名或 IP |
+| SSH 端口 | 222（如果使用 Docker 端口映射） |
+| HTTP 端口 | 3000 |
+| 管理员账号 | 立即创建 |
+
+## 日常管理
+
+### 备份
+
+```bash
+# Gitea 内置备份命令
+sudo -u git ./gitea dump -c /etc/gitea/app.ini
+
+# 备份文件包含：数据库、仓库数据、配置、日志
+# 输出在 /var/lib/gitea/data/
+```
+
+### 升级
+
+```bash
+# 1. 停止服务
+sudo systemctl stop gitea
+
+# 2. 备份
+sudo -u git ./gitea dump
+
+# 3. 替换二进制文件
+cp gitea-old gitea-new
+
+# 4. 重启
+sudo systemctl start gitea
+```
+
+### 配置
+
+```INI
+# /etc/gitea/app.ini
+[server]
+DOMAIN = git.example.com
+ROOT_URL = https://git.example.com/
+HTTP_PORT = 3000
+SSH_DOMAIN = git.example.com
+
+[database]
+DB_TYPE = sqlite3
+PATH = /var/lib/gitea/data/gitea.db
+
+[mailer]
+ENABLED = true
+SMTP_ADDR = smtp.example.com
+```
+
+## 与其他方案对比
+
+| 特性 | Gitea | GitLab CE | GitHub |
+|------|-------|-----------|--------|
+| 内存要求 | ~128MB | ~4GB | SaaS |
+| 安装复杂度 | 低 | 高 | 无需安装 |
+| CI/CD | 内置 Actions | 内置 CI | Actions |
+| 代码审查 | 支持 | 支持 | 支持 |
+| 团队管理 | 基础 | 丰富 | 丰富 |
+| 迁移工具 | 有 | 有 | 有 |
+
+## 继续学习
+
+1. `hosting/self-hosted-git` — 自建 Git 服务概览
+2. `hosting/platform-comparison` — 托管平台对比
+3. `hosting/github-deep-dive` — GitHub 深度功能

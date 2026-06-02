@@ -1,0 +1,132 @@
+export const metadata = {
+  title: "Jenkins Git Integration",
+  slug: "jenkins-integration",
+  locale: "en",
+  section: "ci-cd",
+  summary: "Set up Git integration with Jenkins including webhook triggers, Multibranch Pipeline, credential management, and security best practices.",
+  sourceUrls: [
+    "https://www.jenkins.io/doc/book/pipeline/",
+    "https://www.jenkins.io/doc/book/pipeline/multibranch/",
+  ],
+};
+
+# Jenkins Git Integration
+
+## Overview
+
+Jenkins is one of the most popular open-source CI/CD tools. With Git integration, you can automatically trigger builds, tests, and deployments on every code push.
+
+## Core Integration Methods
+
+### 1. Git Plugin Setup
+
+Jenkins includes a built-in Git plugin, but verify it's installed:
+
+1. Go to **Manage Jenkins → Plugins → Installed plugins**
+2. Search for "Git" to confirm
+3. If missing, install from **Available plugins**
+
+### 2. Credential Configuration
+
+```groovy
+// In Jenkins credential manager, add:
+// - Username with password (HTTPS)
+// - SSH key (SSH)
+```
+
+Use a unique credential ID per repository for better audit and rotation.
+
+### 3. Webhook Triggers
+
+Add the Jenkins webhook URL in your GitHub/GitLab repository settings:
+
+```
+http://your-jenkins:8080/github-webhook/
+http://your-jenkins:8080/gitlab-webhook/
+```
+
+Webhook configuration:
+
+| Setting | Recommended |
+|---------|-------------|
+| Trigger event | Push / PR merge |
+| Content type | application/json |
+| Secret | Recommended |
+
+### 4. Multibranch Pipeline
+
+Multibranch Pipeline scans your repository and creates pipelines for every branch containing a `Jenkinsfile`.
+
+```groovy
+// Jenkinsfile
+pipeline {
+  agent any
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+    stage('Build') {
+      steps {
+        sh 'make build'
+      }
+    }
+    stage('Test') {
+      steps {
+        sh 'make test'
+      }
+    }
+  }
+}
+```
+
+## Best Practices
+
+### Shallow Clone
+
+```groovy
+checkout([
+  $class: 'GitSCM',
+  branches: [[name: '*/main']],
+  extensions: [
+    [$class: 'CloneOption', depth: 1, shallow: true]
+  ]
+])
+```
+
+### Credential Security
+
+```groovy
+// Never hardcode credentials in Jenkinsfile
+withCredentials([gitUsernamePassword(credentialsId: 'github-creds')]) {
+  sh 'git push origin main'
+}
+```
+
+### Branch Strategy
+
+- `main`: Auto-build + production deploy
+- `develop`: Auto-build + test environment deploy
+- Feature branches: Build and unit tests only
+
+## Troubleshooting
+
+### Webhook Not Firing
+
+1. Check Jenkins logs for 403 errors
+2. Verify webhook URL is reachable
+3. Confirm Secret token matches
+
+### Credential Failures
+
+```bash
+# Test SSH connection from Jenkins node
+ssh -T git@github.com
+```
+
+## Continue Learning
+
+1. `ci-cd/ci-security-basics` — Git security in CI/CD pipelines
+2. `ci-cd/github-actions-basics` — GitHub Actions integration
+3. `ci-cd/gitlab-ci-basics` — GitLab CI integration
