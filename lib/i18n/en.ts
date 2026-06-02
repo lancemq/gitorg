@@ -235,6 +235,46 @@ export const enDictionary: Dictionary = {
           },
         ],
       },
+      {
+        id: "workflows",
+        eyebrow: "Workflows",
+        title: "Common Workflows",
+        description: "Turn collaboration routines into repeatable patterns.",
+        items: [
+          {
+            title: "Fetch first, decide second",
+            description: "Separate observation from integration for fewer surprises.",
+          },
+          {
+            title: "Feature branch collaboration",
+            description: "Isolate work on topic branches to keep main stable.",
+          },
+          {
+            title: "Hotfix workflow",
+            description: "Full lifecycle for urgent fixes: branch, patch, merge, and rollback.",
+          },
+        ],
+      },
+      {
+        id: "recovery",
+        eyebrow: "Recovery",
+        title: "Mistake Recovery",
+        description: "Find, assess, and recover from Git mishaps.",
+        items: [
+          {
+            title: "Reflog-first recovery habit",
+            description: "Always check reflog before reset, rebase, or branch deletion.",
+          },
+          {
+            title: "Reset recovery by mode",
+            description: "Know the risk and recovery path for --soft, --mixed, and --hard.",
+          },
+          {
+            title: "Handling detached HEAD",
+            description: "How to recognize and safely exit a detached HEAD state.",
+          },
+        ],
+      },
     ],
     reference: {
       eyebrow: "Reference",

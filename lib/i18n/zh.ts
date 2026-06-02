@@ -235,6 +235,46 @@ export const zhDictionary: Dictionary = {
           },
         ],
       },
+      {
+        id: "workflows",
+        eyebrow: "Workflows",
+        title: "常见工作流",
+        description: "把日常协作流程拆成可复用的模式。",
+        items: [
+          {
+            title: "先 fetch 再决定",
+            description: "把观察和整合拆成两步，比默认 pull 更可控。",
+          },
+          {
+            title: "功能分支协作",
+            description: "通过主题分支隔离开发，降低主分支的不稳定风险。",
+          },
+          {
+            title: "紧急修复流程",
+            description: "hotfix 分支的创建、修复、合并与回滚全流程。",
+          },
+        ],
+      },
+      {
+        id: "recovery",
+        eyebrow: "Recovery",
+        title: "误操作恢复",
+        description: "误操作后的定位、判断与恢复路径。",
+        items: [
+          {
+            title: "先查 reflog 再操作",
+            description: "reset、rebase、删分支前确认可恢复位置。",
+          },
+          {
+            title: "reset 自救分级",
+            description: "--soft、--mixed、--hard 三级的风险与适用场景。",
+          },
+          {
+            title: "detached HEAD 处理",
+            description: "进入 detached HEAD 后如何安全回到正常状态。",
+          },
+        ],
+      },
     ],
     reference: {
       eyebrow: "Reference",
