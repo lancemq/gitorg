@@ -207,6 +207,8 @@ export type LearningPathSlug =
   | "quick-start"
   | "setup-and-clone"
   | "stage-and-commit"
+  | "view-history-and-changes"
+  | "undo-local-basics"
   | "sync-with-remote"
   | "first-feature-branch"
   | "open-first-pull-request"
@@ -232,6 +234,8 @@ export const learningPathSlugs = [
   "quick-start",
   "setup-and-clone",
   "stage-and-commit",
+  "view-history-and-changes",
+  "undo-local-basics",
   "sync-with-remote",
   "first-feature-branch",
   "open-first-pull-request",

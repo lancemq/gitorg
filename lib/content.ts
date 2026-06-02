@@ -55,6 +55,8 @@ export const docPathRegistry = [
   "learning-path/quick-start",
   "learning-path/setup-and-clone",
   "learning-path/stage-and-commit",
+  "learning-path/view-history-and-changes",
+  "learning-path/undo-local-basics",
   "learning-path/sync-with-remote",
   "learning-path/first-feature-branch",
   "learning-path/open-first-pull-request",
@@ -333,6 +335,8 @@ const coreDocPaths = new Set<DocPath>([
   "learning-path/quick-start",
   "learning-path/setup-and-clone",
   "learning-path/stage-and-commit",
+  "learning-path/view-history-and-changes",
+  "learning-path/undo-local-basics",
   "learning-path/sync-with-remote",
   "learning-path/first-feature-branch",
   "learning-path/open-first-pull-request",
@@ -1150,8 +1154,10 @@ export async function getDocNeighbors(locale: Locale, docPath: DocPath): Promise
 const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
   "learning-path/quick-start": [
     "learning-path/setup-and-clone",
-    "learning-path/stage-and-commit",
-    "learning-path/sync-with-remote",
+  "learning-path/stage-and-commit",
+  "learning-path/view-history-and-changes",
+  "learning-path/undo-local-basics",
+  "learning-path/sync-with-remote",
   ],
   "learning-path/setup-and-clone": [
     "commands/git-clone",
@@ -1162,6 +1168,16 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
     "commands/git-add",
     "commands/git-commit",
     "learning-path/sync-with-remote",
+  ],
+  "learning-path/view-history-and-changes": [
+    "commands/git-status",
+    "commands/git-diff",
+    "commands/git-log",
+  ],
+  "learning-path/undo-local-basics": [
+    "commands/git-restore",
+    "commands/git-reset",
+    "recovery/reflog-recovery",
   ],
   "learning-path/sync-with-remote": [
     "commands/git-fetch",

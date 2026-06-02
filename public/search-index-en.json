@@ -30,6 +30,26 @@
     "suggestions": []
   },
   {
+    "href": "/en/docs/learning-path/view-history-and-changes",
+    "path": "learning-path/view-history-and-changes",
+    "section": "learning-path",
+    "tier": "core",
+    "slug": "view-history-and-changes",
+    "title": "Viewing History and Changes",
+    "summary": "Learn how to use git status, git diff, and git log to inspect your working tree state, file differences, and commit history — the three most essential inspection tools for every Git user.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/docs/learning-path/undo-local-basics",
+    "path": "learning-path/undo-local-basics",
+    "section": "learning-path",
+    "tier": "core",
+    "slug": "undo-local-basics",
+    "title": "Safe Ways to Undo Local Changes",
+    "summary": "Learn how to safely undo local changes before pushing — including unstage, discard working tree modifications, amend the last commit, and restore deleted files.",
+    "suggestions": []
+  },
+  {
     "href": "/en/docs/learning-path/sync-with-remote",
     "path": "learning-path/sync-with-remote",
     "section": "learning-path",

@@ -1,0 +1,197 @@
+export const metadata = {
+  title: "查看历史与变更",
+  slug: "view-history-and-changes",
+  locale: "zh",
+  section: "learning-path",
+  summary: "学会用 git status、git diff 和 git log 查看工作区状态、文件差异和提交历史，这是每个 Git 用户最常用的检视技能。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+    "https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History",
+  ],
+};
+
+# 查看历史与变更
+
+## 一句话理解
+
+提交之后，你需要三个基本工具来查看仓库发生了什么、现在是什么状态、以及文件之间有什么差异：`git status`、`git diff` 和 `git log`。
+
+## git status：查看当前状态
+
+`git status` 是最常用的 Git 命令。它告诉你工作区、暂存区和当前分支的状态。
+
+### 基本用法
+
+```bash
+# 查看完整状态
+git status
+
+# 简洁模式（每行一个文件）
+git status --short
+# 或
+git status -s
+```
+
+### 读懂状态输出
+
+```bash
+$ git status
+On branch main
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        new file:   README.md
+        modified:   index.js
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   src/app.js
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        notes.txt
+```
+
+三个区域一目了然：
+
+| 区域 | 含义 | 常见操作 |
+|------|------|---------|
+| Changes to be committed | 已暂存，下次 commit 会包含 | 用 `git restore --staged` 取消暂存 |
+| Changes not staged | 已修改但未暂存 | 用 `git add` 暂存，用 `git restore` 丢弃 |
+| Untracked files | 新文件，Git 还没跟踪 | 用 `git add` 开始跟踪 |
+
+### 短模式
+
+```bash
+$ git status -s
+ M README.md        # 工作区有修改（空格 + M）
+M  index.js         # 暂存区有修改（M + 空格）
+MM src/app.js       # 工作区和暂存区都有修改
+?? notes.txt        # 未跟踪（??）
+```
+
+## git diff：查看具体差异
+
+`git status` 告诉你"哪些文件变了"，`git diff` 告诉你"具体变了什么"。
+
+### 三种常用比较
+
+```bash
+# 工作区 vs 暂存区（未暂存的改动）
+git diff
+
+# 暂存区 vs 上次提交（下次 commit 会包含的改动）
+git diff --staged
+# 或
+git diff --cached
+
+# 工作区 vs 上次提交（所有未提交的改动）
+git diff HEAD
+```
+
+### 读懂 diff 输出
+
+```diff
+$ git diff
+diff --git a/src/app.js b/src/app.js
+index e69de29..3b18e51 100644
+--- a/src/app.js
++++ b/src/app.js
+@@ -0,0 +1,3 @@
++const greeting = "Hello";
++console.log(greeting);
+```
+
+关键部分：
+- `--- a/file` = 旧版本
+- `+++ b/file` = 新版本
+- `@@ -0,0 +1,3 @@` = 变更位置（旧文件第 0 行开始，新文件第 1 行开始，3 行）
+- `+` 开头表示新增的行
+- `-` 开头表示删除的行
+
+### 只看文件名
+
+```bash
+git diff --name-only
+git diff --name-status   # 显示文件 + 变更类型
+```
+
+## git log：查看提交历史
+
+`git log` 显示仓库的提交历史。
+
+### 基本用法
+
+```bash
+# 完整历史
+git log
+
+# 简洁模式（推荐日常使用）
+git log --oneline
+
+# 图形模式（显示分支结构）
+git log --oneline --graph --all
+```
+
+### 常用参数
+
+```bash
+# 最近 N 条提交
+git log -5
+
+# 按日期
+git log --since="2025-01-01"
+git log --until="2025-06-01"
+
+# 按作者
+git log --author="maqi"
+
+# 按文件
+git log -- src/app.js
+
+# 自定义格式
+git log --pretty=format:"%h - %an, %ar : %s"
+```
+
+常见格式占位符：
+
+| 占位符 | 含义 |
+|--------|------|
+| `%h` | 短哈希 |
+| `%H` | 完整哈希 |
+| `%an` | 作者名 |
+| `%ar` | 相对时间（2 days ago） |
+| `%s` | 提交说明 |
+| `%d` | 引用名称（分支、标签） |
+
+### 查看单个提交详情
+
+```bash
+# 显示最新提交的详细信息
+git show
+
+# 显示指定提交
+git show abc1234
+
+# 只看统计信息
+git show --stat
+```
+
+## 常用组合
+
+```bash
+# 日常检视三步走
+git status          # 1. 当前状态
+git diff            # 2. 未暂存的改动
+git log --oneline -5 # 3. 最近提交
+
+# 在 commit 之前做 final check
+git status && git diff --staged
+```
+
+## 继续学习建议
+
+1. `learning-path/undo-local-basics` — 撤销本地改动的安全方法
+2. `commands/git-log` — git log 高级用法
+3. `commands/git-diff` — git diff 高级用法
+4. `commands/git-show` — git show 详解

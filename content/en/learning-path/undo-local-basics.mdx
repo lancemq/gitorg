@@ -1,0 +1,174 @@
+export const metadata = {
+  title: "Safe Ways to Undo Local Changes",
+  slug: "undo-local-basics",
+  locale: "en",
+  section: "learning-path",
+  summary: "Learn how to safely undo local changes before pushing — including unstage, discard working tree modifications, amend the last commit, and restore deleted files.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Basics-Undoing-Things",
+    "https://git-scm.com/docs/git-restore",
+  ],
+};
+
+# Safe Ways to Undo Local Changes
+
+## One-Sentence Understanding
+
+Before you push, almost any local change can be undone. The key is knowing which undo operations are safe (data preserved) and which are destructive (changes lost forever).
+
+## Safe Undo Overview
+
+| Scenario | Command | Risk Level |
+|----------|---------|-----------|
+| Unstage a file | `git restore --staged <file>` | Safe |
+| Discard working tree changes | `git restore <file>` | ⚠️ Irreversible |
+| Amend the last commit | `git commit --amend` | Safe (local only) |
+| Restore a deleted file | `git restore <file>` | Safe (if not committed) |
+
+## Unstaging Files
+
+### Scenario
+
+You ran `git add` and staged a file, but realized it shouldn't be in the next commit.
+
+```bash
+# Move file from staging area back to working tree
+git restore --staged <file>
+
+# Unstage everything
+git restore --staged .
+```
+
+### Traditional Way
+
+```bash
+# Older syntax, same result
+git reset HEAD <file>
+```
+
+Both work the same. `git restore` is the newer, more intuitive command (introduced in Git 2.23+).
+
+### Example
+
+```bash
+$ git status -s
+M  README.md     # Staged
+
+$ git restore --staged README.md
+
+$ git status -s
+ M README.md     # Back in working tree, changes preserved
+```
+
+Note: the file content is not lost — it just moves from staging back to the working tree.
+
+## Discarding Working Tree Changes
+
+### Scenario
+
+You modified a file and want to revert it to the last committed state.
+
+```bash
+# Discard all working tree changes (⚠️ Irreversible!)
+git restore <file>
+
+# Discard changes in all files
+git restore .
+```
+
+### ⚠️ Risk Warning
+
+```bash
+$ git status -s
+ M important.js
+
+$ git restore important.js   # Changes are gone forever!
+```
+
+**This cannot be recovered with reflog** — the changes were never committed, so Git has no copy. Always double-check before running `git restore <file>`.
+
+### Safe Alternative
+
+If you're unsure, stash first:
+
+```bash
+git stash push -m "temp save before discard"
+# Later, if you need it back
+git stash pop
+```
+
+## Amending the Last Commit
+
+### Scenario
+
+You just committed, but found:
+- A typo in the commit message
+- A file was left out
+- An extra file was included
+
+```bash
+# Change commit message only
+git commit --amend -m "Correct message"
+
+# Add a missing file to the last commit
+git add forgotten-file.js
+git commit --amend --no-edit   # Keep the same message
+```
+
+### Workflow Example
+
+```bash
+git add file1.js file2.js
+git commit -m "Add login feature"
+# Oops, forgot file3.js
+git add file3.js
+git commit --amend --no-edit
+# Now the last commit includes file1.js, file2.js, and file3.js
+```
+
+### Important Note
+
+```bash
+# Change the author of the last commit
+git commit --amend --author="New Author <email@example.com>"
+```
+
+**Safety boundary**: Only use `--amend` on commits that have **not been pushed yet**. Once pushed, `--amend` creates a new commit hash, and pushing it requires force push — which affects anyone else working on the same branch.
+
+## Restoring Deleted Files
+
+### Scenario
+
+You accidentally deleted a tracked file.
+
+```bash
+# Restore from Git (working tree changes also restored)
+git restore <deleted-file>
+```
+
+If the deletion was already staged:
+
+```bash
+# First unstage
+git restore --staged <deleted-file>
+# Then restore the file
+git restore <deleted-file>
+```
+
+## Quick Reference
+
+| What You Want | Command |
+|---------------|---------|
+| Unstage a file, keep changes | `git restore --staged <file>` |
+| Discard unstaged changes completely | `git restore <file>` |
+| Change the last commit message | `git commit --amend -m "new message"` |
+| Add files to the last commit | `git add <file> && git commit --amend --no-edit` |
+| Restore a deleted file | `git restore <file>` |
+| Not sure if you want to discard | `git stash` first, then decide |
+
+## Continue Learning
+
+1. `recovery/reflog-recovery` — Recovering lost commits with reflog
+2. `recovery/recover-after-reset` — Recovery after reset
+3. `commands/git-restore` — Git restore reference
+4. `commands/git-reset` — Git reset reference

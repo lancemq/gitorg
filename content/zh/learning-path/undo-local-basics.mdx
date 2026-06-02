@@ -1,0 +1,175 @@
+export const metadata = {
+  title: "撤销本地改动的安全方法",
+  slug: "undo-local-basics",
+  locale: "zh",
+  section: "learning-path",
+  summary: "学会在提交之前安全地撤销本地改动，包括取消暂存、丢弃工作区修改、修改最近提交和恢复已删除文件。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Basics-Undoing-Things",
+    "https://git-scm.com/docs/git-restore",
+  ],
+};
+
+# 撤销本地改动的安全方法
+
+## 一句话理解
+
+在推送之前，几乎所有本地改动都可以撤销。关键在于区分"安全撤销"（不会丢失数据）和"危险撤销"（会永久删除改动）。
+
+## 安全撤销总览
+
+| 场景 | 命令 | 风险等级 |
+|------|------|---------|
+| 取消暂存文件 | `git restore --staged <file>` | 安全 |
+| 丢弃工作区修改 | `git restore <file>` | ⚠️ 不可恢复 |
+| 修改最近提交 | `git commit --amend` | 安全 |
+| 从暂存区取消部分内容 | `git reset HEAD <file>` | 安全 |
+| 恢复已删除文件 | `git restore <file>` | 安全（未提交时） |
+
+## 取消暂存（Unstage）
+
+### 场景
+
+你执行了 `git add` 把文件加入了暂存区，但突然意识到这个文件不应该包含在下次提交中。
+
+```bash
+# 把文件从暂存区移回工作区
+git restore --staged <file>
+
+# 也支持取消所有暂存
+git restore --staged .
+```
+
+### 传统方式
+
+```bash
+# 旧式写法，功能相同
+git reset HEAD <file>
+```
+
+两种方式效果一样，`git restore` 是 Git 2.23+ 引入的更直观的新命令。
+
+### 实际操作示例
+
+```bash
+$ git status -s
+M  README.md     # 已暂存
+
+$ git restore --staged README.md
+
+$ git status -s
+ M README.md     # 回到工作区，修改还在
+```
+
+注意文件内容没有丢失——它只是从暂存区回到了工作区。
+
+## 丢弃工作区修改
+
+### 场景
+
+你修改了一个文件但后悔了，想让它回到上次提交时的样子。
+
+```bash
+# 丢弃工作区的所有修改（⚠️ 不可恢复！）
+git restore <file>
+
+# 丢弃所有文件的修改
+git restore .
+```
+
+### ⚠️ 风险提示
+
+```bash
+$ git status -s
+ M important.js
+
+$ git restore important.js   # 修改永久丢失！
+```
+
+**这不是一个可以用 reflog 恢复的操作**——修改从未被提交过，Git 没有保存它们的副本。执行 `git restore <file>` 前，一定要确认这些改动不需要了。
+
+### 安全替代方案
+
+如果不确定是否需要保留改动，先 stash：
+
+```bash
+git stash push -m "temp save before discard"
+# 如果之后需要，可以找回
+git stash pop
+```
+
+## 修改最近提交（--amend）
+
+### 场景
+
+你刚刚提交了，但发现：
+- 提交信息有 typo
+- 漏了一个文件
+- 多了一个不该提交的文件
+
+```bash
+# 只修改提交信息
+git commit --amend -m "正确的提交信息"
+
+# 补充文件到上次提交
+git add forgotten-file.js
+git commit --amend --no-edit   # 不修改提交信息
+```
+
+### 实际工作流
+
+```bash
+git add file1.js file2.js
+git commit -m "Add login feature"
+# 发现忘了加 file3.js
+git add file3.js
+git commit --amend --no-edit
+# 现在上次提交包含了 file1.js、file2.js 和 file3.js
+```
+
+### 注意事项
+
+```bash
+# 修改提交的作者信息
+git commit --amend --author="New Author <email@example.com>"
+```
+
+**安全边界**：`--amend` 只在**还没有推送**的提交上使用。如果已经推送了，`--amend` 会创建一个新的提交哈希，此时推送给被拒绝——需要 force push，这会影响到其他人。
+
+## 恢复已删除文件
+
+### 场景
+
+你不小心删除了一个已跟踪的文件。
+
+```bash
+# 从 Git 仓库恢复（工作区修改也会被恢复）
+git restore <deleted-file>
+```
+
+如果删除已经暂存了：
+
+```bash
+# 先从暂存区取消
+git restore --staged <deleted-file>
+# 再从 Git 恢复文件
+git restore <deleted-file>
+```
+
+## 撤销与恢复选择指南
+
+| 你想做什么 | 命令 |
+|-----------|------|
+| 把文件移出暂存区，保留修改 | `git restore --staged <file>` |
+| 完全丢弃未暂存的修改 | `git restore <file>` |
+| 修改上次提交的信息 | `git commit --amend -m "新信息"` |
+| 补充文件到上次提交 | `git add <file> && git commit --amend --no-edit` |
+| 恢复误删的文件 | `git restore <file>` |
+| 不确定是否要丢弃 | 先 `git stash` 再决定 |
+
+## 继续学习建议
+
+1. `recovery/reflog-recovery` — 用 reflog 恢复丢失的提交
+2. `recovery/recover-after-reset` — reset 后的恢复
+3. `commands/git-restore` — git restore 命令详解
+4. `commands/git-reset` — git reset 命令详解

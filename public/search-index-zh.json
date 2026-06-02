@@ -30,6 +30,26 @@
     "suggestions": []
   },
   {
+    "href": "/zh/docs/learning-path/view-history-and-changes",
+    "path": "learning-path/view-history-and-changes",
+    "section": "learning-path",
+    "tier": "core",
+    "slug": "view-history-and-changes",
+    "title": "查看历史与变更",
+    "summary": "学会用 git status、git diff 和 git log 查看工作区状态、文件差异和提交历史，这是每个 Git 用户最常用的检视技能。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/learning-path/undo-local-basics",
+    "path": "learning-path/undo-local-basics",
+    "section": "learning-path",
+    "tier": "core",
+    "slug": "undo-local-basics",
+    "title": "撤销本地改动的安全方法",
+    "summary": "学会在提交之前安全地撤销本地改动，包括取消暂存、丢弃工作区修改、修改最近提交和恢复已删除文件。",
+    "suggestions": []
+  },
+  {
     "href": "/zh/docs/learning-path/sync-with-remote",
     "path": "learning-path/sync-with-remote",
     "section": "learning-path",

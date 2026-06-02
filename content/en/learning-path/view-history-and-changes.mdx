@@ -1,0 +1,197 @@
+export const metadata = {
+  title: "Viewing History and Changes",
+  slug: "view-history-and-changes",
+  locale: "en",
+  section: "learning-path",
+  summary: "Learn how to use git status, git diff, and git log to inspect your working tree state, file differences, and commit history — the three most essential inspection tools for every Git user.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+    "https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History",
+  ],
+};
+
+# Viewing History and Changes
+
+## One-Sentence Understanding
+
+After making commits, you need three tools to inspect what's happening: `git status` for the current state, `git diff` for file differences, and `git log` for commit history.
+
+## git status: Current State
+
+`git status` is the most frequently used Git command. It shows the state of your working tree, staging area, and current branch.
+
+### Basic Usage
+
+```bash
+# Full status
+git status
+
+# Compact mode (one file per line)
+git status --short
+# or
+git status -s
+```
+
+### Reading the Output
+
+```bash
+$ git status
+On branch main
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        new file:   README.md
+        modified:   index.js
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   src/app.js
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        notes.txt
+```
+
+Three sections at a glance:
+
+| Section | Meaning | Common Action |
+|---------|---------|---------------|
+| Changes to be committed | Staged, will be in next commit | `git restore --staged` to unstage |
+| Changes not staged | Modified but not staged | `git add` to stage, `git restore` to discard |
+| Untracked files | New files Git doesn't track yet | `git add` to start tracking |
+
+### Short Mode
+
+```bash
+$ git status -s
+ M README.md        # Modified in working tree (space + M)
+M  index.js         # Modified in staging area (M + space)
+MM src/app.js       # Modified in both working tree and index
+?? notes.txt        # Untracked (??)
+```
+
+## git diff: File Differences
+
+`git status` tells you *which files changed*; `git diff` tells you *what exactly changed*.
+
+### Three Common Comparisons
+
+```bash
+# Working tree vs staging area (unstaged changes)
+git diff
+
+# Staging area vs last commit (what the next commit will include)
+git diff --staged
+# or
+git diff --cached
+
+# Working tree vs last commit (all uncommitted changes)
+git diff HEAD
+```
+
+### Reading Diff Output
+
+```diff
+$ git diff
+diff --git a/src/app.js b/src/app.js
+index e69de29..3b18e51 100644
+--- a/src/app.js
++++ b/src/app.js
+@@ -0,0 +1,3 @@
++const greeting = "Hello";
++console.log(greeting);
+```
+
+Key parts:
+- `--- a/file` = old version
+- `+++ b/file` = new version
+- `@@ -0,0 +1,3 @@` = change location (old line 0, new line 1, 3 lines)
+- Lines starting with `+` are additions
+- Lines starting with `-` are deletions
+
+### File Names Only
+
+```bash
+git diff --name-only
+git diff --name-status   # Shows files + change type
+```
+
+## git log: Commit History
+
+`git log` displays the commit history of your repository.
+
+### Basic Usage
+
+```bash
+# Full history
+git log
+
+# Compact (recommended for daily use)
+git log --oneline
+
+# Graphical (shows branch structure)
+git log --oneline --graph --all
+```
+
+### Useful Filters
+
+```bash
+# Last N commits
+git log -5
+
+# By date
+git log --since="2025-01-01"
+git log --until="2025-06-01"
+
+# By author
+git log --author="john"
+
+# By file
+git log -- src/app.js
+
+# Custom format
+git log --pretty=format:"%h - %an, %ar : %s"
+```
+
+Common format placeholders:
+
+| Placeholder | Meaning |
+|-------------|---------|
+| `%h` | Abbreviated hash |
+| `%H` | Full hash |
+| `%an` | Author name |
+| `%ar` | Relative time (2 days ago) |
+| `%s` | Subject (commit message) |
+| `%d` | Ref names (branches, tags) |
+
+### Single Commit Details
+
+```bash
+# Show latest commit details
+git show
+
+# Show a specific commit
+git show abc1234
+
+# Show statistics only
+git show --stat
+```
+
+## Daily Inspection Routine
+
+```bash
+# Three-step daily check
+git status          # 1. Current state
+git diff            # 2. Unstaged changes
+git log --oneline -5 # 3. Recent commits
+
+# Final check before committing
+git status && git diff --staged
+```
+
+## Continue Learning
+
+1. `learning-path/undo-local-basics` — Safe ways to undo local changes
+2. `commands/git-log` — Advanced git log usage
+3. `commands/git-diff` — Advanced git diff usage
+4. `commands/git-show` — Git show reference
