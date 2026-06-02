@@ -17,6 +17,7 @@ import {
   performanceSlugs,
   migrationSlugs,
   hostingSlugs,
+  conceptSlugs,
   type CommandSlug,
   type InternalsSlug,
   type Locale,
@@ -503,6 +504,10 @@ const sectionSearchSuggestionDefaults: Partial<
     prerequisite: "learning-path/sync-with-remote",
     risk: "best-practices/shared-history-boundaries",
   },
+  concepts: {
+    prerequisite: "learning-path/stage-and-commit",
+    risk: "recovery/reflog-recovery",
+  },
 };
 
 const searchSuggestionOverrides: Partial<
@@ -900,7 +905,7 @@ function getOrderedPathSeries(section: DocSection): DocPath[] {
     case "recovery":
       return recoverySlugs.map((slug) => `recovery/${slug}` as DocPath);
     case "concepts":
-      return [];
+      return conceptSlugs.map((slug) => `concepts/${slug}` as DocPath);
     case "ci-cd":
       return ciCdSlugs.map((slug) => `ci-cd/${slug}` as DocPath);
     case "ide":
@@ -1025,6 +1030,11 @@ export async function getHostingDocs(locale: Locale) {
   return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("hosting/")));
 }
 
+export async function getConceptsDocs(locale: Locale) {
+  const docs = await getIndexedDocs(locale);
+  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("concepts/")));
+}
+
 export function getDocHref(locale: Locale, docPath: DocPath) {
   if (docPath.startsWith("commands/")) {
     return `/${locale}/commands/${docPath.replace("commands/", "")}`;
@@ -1032,6 +1042,10 @@ export function getDocHref(locale: Locale, docPath: DocPath) {
 
   if (docPath === "concepts/git-history") {
     return `/${locale}/history`;
+  }
+
+  if (docPath.startsWith("concepts/")) {
+    return `/${locale}/concepts/${docPath.replace("concepts/", "")}`;
   }
 
   if (docPath.startsWith("best-practices/")) {
@@ -1581,6 +1595,11 @@ const representativeSectionPaths = {
     "ci-cd/github-actions-basics",
     "ci-cd/gitlab-ci-basics",
   ],
+  concepts: [
+    "concepts/three-layers",
+    "concepts/git-history",
+    "concepts/detached-head",
+  ],
   ide: [
     "ide/vscode-git",
     "ide/jetbrains-git",
@@ -1631,7 +1650,7 @@ export async function getRelatedDocs(
 
 export async function getFeaturedSectionDocs(
   locale: Locale,
-  section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "github" | "gitlab" | "internals" | "recovery" | "ci-cd" | "ide" | "security" | "performance" | "migration" | "hosting">,
+  section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "github" | "gitlab" | "internals" | "recovery" | "ci-cd" | "ide" | "security" | "performance" | "migration" | "hosting" | "concepts">,
   limit = 3,
 ): Promise<DocCard[]> {
    const docs =
@@ -1660,15 +1679,17 @@ export async function getFeaturedSectionDocs(
                       : section === "performance"
                         ? await getPerformanceDocs(locale)
                         : section === "migration"
-                          ? await getMigrationDocs(locale)
-                          : await getHostingDocs(locale);
+                    ? await getMigrationDocs(locale)
+                    : section === "hosting"
+                      ? await getHostingDocs(locale)
+                      : await getConceptsDocs(locale);
 
   return sortByTierAndSeriesOrder(docs).slice(0, limit).map((doc) => toIndexedDocCard(locale, doc));
 }
 
 export async function getRepresentativeSectionDocs(
   locale: Locale,
-  section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "github" | "gitlab" | "internals" | "recovery" | "ci-cd" | "ide" | "security" | "performance" | "migration" | "hosting">,
+  section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "github" | "gitlab" | "internals" | "recovery" | "ci-cd" | "ide" | "security" | "performance" | "migration" | "hosting" | "concepts">,
   limit = 3,
 ): Promise<DocCard[]> {
   const paths = representativeSectionPaths[section] ?? [];

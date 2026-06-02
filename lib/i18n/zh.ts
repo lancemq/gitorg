@@ -15,6 +15,7 @@ import {
   buildPerformanceNavItem,
   buildMigrationNavItem,
   buildHostingNavItem,
+  buildConceptsNavItem,
 } from "./index";
 import { commandSlugs } from "./slugs";
 
@@ -47,6 +48,7 @@ export const zhDictionary: Dictionary = {
             buildPerformanceNavItem("zh", activePath),
             buildMigrationNavItem("zh", activePath),
             buildHostingNavItem("zh", activePath),
+            buildConceptsNavItem("zh", activePath),
             buildRecoveryNavItem("zh", activePath),
           ],
         },
@@ -141,6 +143,11 @@ export const zhDictionary: Dictionary = {
     eyebrow: "Hosting",
     title: "托管方案",
     description: "对比 GitHub、GitLab、Bitbucket 等托管平台，以及 GitLab CE、Gitea 等自建方案的选择与部署。",
+  },
+  conceptsIndex: {
+    eyebrow: "Concepts",
+    title: "概念基础",
+    description: "理解 Git 的核心概念，包括三层结构、历史模型、忽略文件、detached HEAD 等关键知识点。",
   },
   home: {
     hero: {
@@ -520,6 +527,12 @@ export const zhDictionary: Dictionary = {
         eyebrow: "Hosting",
         title: "托管方案",
         description: "托管平台与自建方案。",
+      },
+      {
+        id: "concepts",
+        eyebrow: "Concepts",
+        title: "概念基础",
+        description: "理解 Git 的对象、引用和 HEAD。",
       },
     ],
   },

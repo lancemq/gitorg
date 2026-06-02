@@ -15,6 +15,7 @@ import {
   buildPerformanceNavItem,
   buildMigrationNavItem,
   buildHostingNavItem,
+  buildConceptsNavItem,
 } from "./index";
 import { commandSlugs } from "./slugs";
 
@@ -47,6 +48,7 @@ export const enDictionary: Dictionary = {
             buildPerformanceNavItem("en", activePath),
             buildMigrationNavItem("en", activePath),
             buildHostingNavItem("en", activePath),
+            buildConceptsNavItem("en", activePath),
             buildRecoveryNavItem("en", activePath),
           ],
         },
@@ -141,6 +143,11 @@ export const enDictionary: Dictionary = {
     eyebrow: "Hosting",
     title: "Hosting",
     description: "Compare GitHub, GitLab, Bitbucket, and self-hosted solutions like GitLab CE and Gitea for your team's needs.",
+  },
+  conceptsIndex: {
+    eyebrow: "Concepts",
+    title: "Concepts",
+    description: "Understand Git's core concepts including the three-layer model, history model, .gitignore, detached HEAD, and more.",
   },
   home: {
     hero: {
@@ -520,6 +527,12 @@ export const enDictionary: Dictionary = {
         eyebrow: "Hosting",
         title: "Hosting",
         description: "Platforms and self-hosted solutions.",
+      },
+      {
+        id: "concepts",
+        eyebrow: "Concepts",
+        title: "Concepts",
+        description: "Learn the foundations behind refs, HEAD, and history.",
       },
     ],
   },

@@ -198,6 +198,11 @@ export type Dictionary = {
     title: string;
     description: string;
   };
+  conceptsIndex: {
+    eyebrow: string;
+    title: string;
+    description: string;
+  };
   home: {
     hero: {
       eyebrow: string;
@@ -480,6 +485,19 @@ export function buildHostingNavItem(locale: Locale, activePath?: string): NavIte
   return {
     label: locale === "zh" ? "托管方案" : "Hosting",
     href: `/${locale}/hosting`,
+    active: parentActive,
+  };
+}
+
+export function buildConceptsNavItem(locale: Locale, activePath?: string): NavItem {
+  const parentActive =
+    activePath === "concepts-index" ||
+    conceptSlugs.some((slug) => activePath === `concepts/${slug}`) ||
+    activePath === "concepts/git-history";
+
+  return {
+    label: locale === "zh" ? "概念基础" : "Concepts",
+    href: `/${locale}/concepts`,
     active: parentActive,
   };
 }
