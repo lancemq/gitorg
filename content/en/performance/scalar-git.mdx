@@ -1,0 +1,248 @@
+export const metadata = {
+  title: "Scalar Git Deep Dive",
+  slug: "scalar-git",
+  locale: "en",
+  section: "performance",
+  summary: "Understand Scalar (formerly GVFS): Microsoft's virtual filesystem and background sync for massive repos, enabling on-demand downloads with standard Git compatibility.",
+  sourceUrls: [
+    "https://github.com/scalar/scalar",
+    "https://github.com/microsoft/VFSForGit",
+  ],
+};
+
+# Scalar Git Deep Dive
+
+## Overview
+
+**Scalar** (formerly GVFS — Git Virtual File System) is Microsoft's toolkit for **massive repositories** (Windows kernel, Office, Azure DevOps — millions of files, hundreds of GBs). It makes Git viable at scale with:
+- **Virtual filesystem**: On-demand file downloads (placeholders)
+- **Background sync**: Prefetch, GC, commit-graph maintenance
+- **Standard Git compatibility**: No toolchain changes needed
+
+## Architecture
+
+### Core Components
+
+```mermaid
+flowchart LR
+  A[Scalar Daemon] --> B[VFS Driver/Placeholders]
+  A --> C[Background Syncer]
+  A --> D[Git Config Manager]
+  B --> E[FS Interception]
+  C --> F[Prefetch/GC/Commit-Graph]
+  D --> G[Standard Git Commands]
+```
+
+### Operating Modes
+
+| Mode | Description | Best For |
+|------|-------------|----------|
+| **Full Clone** | Download all objects | Small/medium repos, CI |
+| **Scalar Clone** | Metadata only + on-demand files | Massive repos, daily dev |
+| **Partial Clone** | `--filter=blob:none` | Bandwidth-limited, no full history needed |
+
+## Installation & Setup
+
+### Install
+
+```bash
+# Windows (recommended)
+winget install Microsoft.Scalar
+
+# macOS
+brew install scalar
+
+# Linux
+# Download .deb/.rpm or build from source
+```
+
+### Register Repo
+
+```bash
+# Scalar clone (recommended for large repos)
+scalar clone https://github.com/microsoft/Windows.git
+
+# Or register existing repo
+cd existing-repo
+scalar register
+```
+
+### Auto-configuration
+
+```bash
+# Scalar auto-configures:
+git config core.fsmonitor true           # FS monitor
+git config core.untrackedCache true      # Untracked cache
+git config feature.manyFiles true        # Many files optimization
+git config index.threads true            # Multi-threaded index
+git config pack.threads true             # Multi-threaded pack
+git config maintenance.auto true         # Auto maintenance
+```
+
+## On-Demand Download (Placeholder Mechanism)
+
+### How It Works
+
+```mermaid
+flowchart TD
+  A[User accesses file] --> B{File downloaded?}
+  B -->|Yes| C[Read directly]
+  B -->|No| D[Placeholder intercepts]
+  D --> E[Background blob download]
+  E --> F[Replace with real file]
+  F --> C
+```
+
+- **Placeholder**: Tiny stub file (bytes) marking content not downloaded
+- **Trigger**: First read/execute/edit of file
+- **Transparent**: Apps see normal files, zero awareness
+
+### Control Downloads
+
+```bash
+# Prefetch directory
+scalar prefetch --path=src/
+
+# Prefetch specific commit
+scalar prefetch --commit=<sha>
+
+# View download status
+scalar diagnose
+```
+
+## Background Sync & Maintenance
+
+### Auto Maintenance Tasks
+
+```bash
+# Scalar daemon periodically:
+# 1. Prefetches remote updates
+# 2. Runs git maintenance (GC, commit-graph, pack-refs)
+# 3. Cleans expired placeholders
+# 4. Updates remote tracking branches
+```
+
+### Manual Triggers
+
+```bash
+# Full sync
+scalar fetch
+
+# Prefetch only
+scalar prefetch
+
+# Run maintenance
+scalar maintain
+
+# Health check
+scalar diagnose
+```
+
+## Standard Git Compatibility
+
+### Transparent Usage
+
+```bash
+# All standard Git commands work
+git status
+git add .
+git commit -m "msg"
+git push
+git pull
+git log
+git blame
+git diff
+```
+
+### Known Limitations
+
+| Operation | Status | Notes |
+|-----------|--------|-------|
+| `git grep` | Limited | Undownloaded files not searched |
+| `git diff` | Normal | Compares downloaded content |
+| `git blame` | Normal | Requires file download |
+| `git stash` | Normal | |
+| Submodules | Partial | Need separate registration |
+
+## Best Practices for Large Repos
+
+### 1. Use Scalar Clone
+
+```bash
+# Instead of git clone
+scalar clone https://github.com/large/repo.git
+```
+
+### 2. Configure Prefetch Strategy
+
+```bash
+# Only prefetch recent commits' files
+git config scalar.maxPrefetchCommits 100
+
+# Exclude large dirs
+git config scalar.excludePaths "vendor/,third_party/,bin/"
+```
+
+### 3. CI/CD Integration
+
+```yaml
+# GitHub Actions
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: microsoft/Windows
+      - name: Setup Scalar
+        run: |
+          scalar register
+          scalar prefetch --commit=${{ github.sha }}
+      - name: Build
+        run: msbuild ...
+```
+
+## Troubleshooting
+
+### Common Issues
+
+```bash
+# Placeholder stuck
+scalar diagnose --verbose
+
+# Sync failed
+scalar fetch --verbose
+
+# Daemon not running
+scalar service start
+
+# Reset repo state
+scalar unregister
+scalar register
+```
+
+### Log Locations
+
+```bash
+# Windows
+%LOCALAPPDATA%\Scalar\log\scalar.log
+
+# macOS/Linux
+~/.scalar/log/scalar.log
+```
+
+## Alternatives Comparison
+
+| Solution | Pros | Cons | Best For |
+|----------|------|------|----------|
+| **Scalar** | Full compat, on-demand, bg maintenance | Requires install on Win/macOS/Linux | Massive monorepos |
+| **Partial Clone** | Native Git, no extra tools | No virtualization, needs network | Medium-large repos |
+| **Sparse Checkout** | Native, dir-level filter | Still downloads object metadata | Monorepo partial dev |
+| **Submodules** | Native, modular | Complex mgmt, weak atomicity | Multi-repo architectures |
+
+## Continue Learning
+
+1. `performance/partial-clone` — Partial clone
+2. `performance/git-maintenance` — Maintenance framework
+3. `internals/transfer-protocols-and-negotiation` — Transfer protocols
+4. `performance/large-repo-optimization` — Large repo optimization

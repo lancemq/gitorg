@@ -1,0 +1,199 @@
+export const metadata = {
+  title: "Bundle URI Deep Dive",
+  slug: "bundle-uri",
+  locale: "en",
+  section: "performance",
+  summary: "Master Git Bundle URI: pre-packed objects for fast clones and incremental sync in offline/bandwidth-constrained environments.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-bundle",
+    "https://github.com/git/git/blob/master/Documentation/technical/bundle-uri.txt",
+  ],
+};
+
+# Bundle URI Deep Dive
+
+## Overview
+
+**Bundle URI** (Git 2.37+) lets clients download objects from pre-generated `.bundle` files instead of negotiating one-by-one. Ideal for:
+- Offline/semi-offline environments
+- Bandwidth-constrained/high-latency networks
+- Large repo initial clone acceleration
+- Air-gapped network sync
+
+## Core Concepts
+
+### Bundle Files
+
+```bash
+# Create full bundle (all objects)
+git bundle create repo.bundle --all
+
+# Create incremental bundle (since known commit)
+git bundle create inc.bundle ^v1.0 --all
+```
+
+### Bundle URI Protocol
+
+```bash
+# Configure remote bundle URI
+git config remote.origin.bundleUri "https://cdn.example.com/repo.bundle"
+
+# Clone automatically uses it
+git clone --bundle-uri=https://cdn.example.com/repo.bundle https://github.com/user/repo.git
+```
+
+## Workflow
+
+### 1. Server Generates Bundle
+
+```bash
+# Full bundle (for initial clones)
+git bundle create repo-full.bundle --all
+
+# Periodic incremental bundles
+git bundle create repo-inc-$(date +%Y%m%d).bundle ^v2.0 --all
+```
+
+### 2. Publish to CDN/Object Storage
+
+```bash
+aws s3 cp repo-full.bundle s3://my-bucket/bundles/
+aws s3 cp repo-inc-*.bundle s3://my-bucket/bundles/
+
+# Optional index file
+cat > bundles.json << EOF
+{
+  "bundles": [
+    {"url": "https://cdn.example.com/repo-full.bundle", "creationToken": "full-20240101"},
+    {"url": "https://cdn.example.com/repo-inc-20240115.bundle", "creationToken": "inc-20240115"}
+  ]
+}
+EOF
+```
+
+### 3. Client Usage
+
+```bash
+# Clone with bundle URI
+git clone --bundle-uri=https://cdn.example.com/repo-full.bundle https://github.com/user/repo.git
+
+# Or configure after clone
+git clone https://github.com/user/repo.git
+cd repo
+git config remote.origin.bundleUri "https://cdn.example.com/repo-full.bundle"
+git fetch  # Auto-downloads from bundle
+```
+
+## Configuration
+
+### Client Config
+
+```bash
+# Enable bundle URI (default on)
+git config --global fetch.bundleUri true
+
+# Per-remote bundle URI
+git config remote.origin.bundleUri "https://cdn.example.com/repo.bundle"
+
+# Max bundle size (bytes)
+git config --global fetch.bundleCreationTokenMaxSize 100000000
+```
+
+### Server Recommendations
+
+```bash
+# Bundle with creation token
+git bundle create repo.bundle --all --creation-token="full-20240101"
+
+# Verify
+git bundle verify repo.bundle
+git bundle list-heads repo.bundle
+```
+
+## Incremental Sync
+
+### Creation Token
+
+Each bundle can carry a **creation token**; client tracks applied tokens, downloads only new bundles.
+
+```bash
+# Client tokens stored in
+.git/bundle-creation-tokens
+```
+
+### Auto Incremental Fetch
+
+```bash
+# On fetch:
+# 1. Read local tokens
+# 2. Request server bundle list
+# 3. Download missing bundles
+# 4. Unpack objects from bundles
+# 5. Normal negotiation for remainder
+git fetch
+```
+
+## Offline / Air-gapped Workflow
+
+### Export
+
+```bash
+# Full export
+git bundle create airgapped.bundle --all
+
+# Transfer via physical media (USB, DVD)
+```
+
+### Import
+
+```bash
+# Target env clones
+git clone airgapped.bundle my-repo
+cd my-repo
+
+# Later incremental import
+git bundle verify update.bundle
+git fetch ../update.bundle
+```
+
+## Performance Comparison
+
+| Scenario | Traditional Clone | Bundle URI Clone |
+|----------|------------------|------------------|
+| Large repo (5GB) | 30-60 min | 5-10 min (CDN) |
+| High latency | Frequent timeouts | Single download, resumable |
+| Offline | Impossible | Fully supported |
+| Incremental sync | Negotiate each object | Bulk bundle download |
+
+## Best Practices
+
+1. **Distribute bundles via CDN** — near-client download, high bandwidth utilization
+2. **Generate incremental bundles regularly** — daily/weekly, smaller increments
+3. **Use creation tokens** — avoid re-downloads
+4. **Verify bundle integrity** — `git bundle verify` mandatory
+5. **Configure sensible expiry** — purge old bundles periodically
+
+## Troubleshooting
+
+```bash
+# Bundle incomplete
+git bundle verify repo.bundle
+
+# Token conflict
+rm .git/bundle-creation-tokens
+git fetch
+
+# Force disable bundle
+git fetch --no-bundle-uri
+
+# Inspect bundle
+git bundle list-heads repo.bundle
+git bundle unbundle repo.bundle  # Unpack to current repo
+```
+
+## Continue Learning
+
+1. `commands/git-bundle` — git bundle reference
+2. `performance/partial-clone` — Partial clone
+3. `performance/git-maintenance` — Auto maintenance
+4. `internals/transfer-protocols-and-negotiation` — Transfer protocols

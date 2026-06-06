@@ -1,0 +1,172 @@
+export const metadata = {
+  title: "Git Rebase 深入",
+  slug: "git-rebase-deep",
+  locale: "zh",
+  section: "concepts",
+  summary: "深入理解 Git Rebase 的内部机制、交互式变基、冲突解决策略与最佳实践。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rebase",
+    "https://git-scm.com/book/en/v2/Git-Branching-Rebasing",
+  ],
+};
+
+# Git Rebase 深入
+
+## 概述
+
+`git rebase` 是 Git 中最强大也最危险的命令之一。它通过**重放提交**来改变历史，常用于：
+- 线性化历史
+- 修改提交信息、拆分/合并提交
+- 将特性分支同步到最新的上游
+
+## 内部机制
+
+### 底层实现
+
+```mermaid
+flowchart LR
+  A[原分支] --> B[计算差异]
+  B --> C[创建临时区域]
+  C --> D[逐个应用补丁]
+  D --> E[生成新提交]
+  E --> F[更新分支指针]
+```
+
+Rebase 实际上是：
+1. 找到分叉点（merge-base）
+2. 将当前分支的提交保存为补丁序列
+3. 切换到目标分支
+4. 逐个应用补丁（`git am` 或内部 sequencer）
+5. 更新分支引用指向新提交链
+
+### Sequencer（`git-rebase--sequencer`）
+
+Git 2.30+ 使用 C 语言重写的 sequencer，性能显著提升：
+- 原生处理合并冲突
+- 支持 `--autosquash`、`--fixup`、`--squash`
+- 更好的进度报告
+
+## 交互式变基
+
+```bash
+git rebase -i HEAD~5
+# 或指定目标分支
+git rebase -i main
+```
+
+### 常用操作指令
+
+| 指令 | 缩写 | 作用 |
+|------|------|------|
+| `pick` | p | 保留提交 |
+| `reword` | r | 修改提交信息 |
+| `edit` | e | 暂停，修改内容 |
+| `squash` | s | 合并到上一个提交 |
+| `fixup` | f | 合并，丢弃提交信息 |
+| `drop` | d | 丢弃提交 |
+| `exec` | x | 运行 shell 命令 |
+| `break` | b | 此处暂停 |
+| `label` | l | 给当前位置打标签 |
+| `reset` | - | 重置到标签 |
+| `merge` | m | 创建合并提交 |
+
+### 实用模式
+
+```bash
+# 自动压缩 fixup! / squash! 提交
+git rebase -i --autosquash main
+
+# 保留合并提交（不展平）
+git rebase -i --rebase-merges main
+
+# 仅重写提交信息
+git rebase -i --rebase-merges --committer-date-is-author-date HEAD~3
+```
+
+## 冲突解决
+
+### 变基时的冲突
+
+```bash
+# 冲突时暂停
+# 解决冲突后
+git add <resolved-files>
+git rebase --continue
+
+# 放弃变基
+git rebase --abort
+
+# 跳过当前提交（危险）
+git rebase --skip
+```
+
+### 冲突解决策略
+
+```bash
+# 使用合并工具
+git mergetool
+
+# 策略：保留当前分支版本
+git checkout --ours <file>
+
+# 策略：保留上游版本
+git checkout --theirs <file>
+
+# 显示冲突标记
+git diff --check
+```
+
+## 高级用法
+
+### --rebase-merges 保留拓扑结构
+
+```bash
+# 保留合并提交的拓扑结构
+git rebase -i --rebase-merges main
+```
+
+生成的 todo 列表包含 `label`、`reset`、`merge` 指令，可精确控制合并拓扑。
+
+### 变基包含合并提交的分支
+
+```bash
+# 默认会展平合并提交
+git rebase main
+
+# 保留合并结构
+git rebase --rebase-merges main
+```
+
+### 签名与日期
+
+```bash
+# 保留原作者日期，使用提交者日期为现在
+git rebase --committer-date-is-author-date
+
+# 重新签名所有提交
+git rebase --signoff main
+```
+
+## 最佳实践
+
+1. **只变基本地未推送的提交**——已推送的提交变基会破坏他人历史
+2. **使用 `--autosquash` 配合 `fixup!`/`squash!`**——提交时标记，变基时自动压缩
+3. **大型变基前创建备份分支**——`git branch backup-before-rebase`
+4. **使用 `--rebase-merges` 保留合并拓扑**——避免展平复杂的合并历史
+5. **频繁小步变基**——比一次性大变基更容易解决冲突
+
+## 常见陷阱
+
+| 陷阱 | 后果 | 避免方法 |
+|------|------|----------|
+| 变基已推送分支 | 团队成员历史分叉 | 仅变基本地分支 |
+| 变基中途 `git rebase --skip` | 丢失提交 | 仔细解决冲突，不要跳过 |
+| 忘记 `--rebase-merges` | 丢失合并拓扑 | 复杂分支结构时加上此参数 |
+| 在脏工作区变基 | 变基失败或污染 | 先 `git stash` 或提交 |
+
+## 继续学习
+
+1. `commands/git-rebase` — git rebase 命令参考
+2. `internals/rebase-internals-and-sequencer` — Rebase 内部实现
+3. `concepts/git-merge-deep` — Git Merge 深入
+4. `workflows/prepare-commits-before-pull-request` — PR 前整理提交

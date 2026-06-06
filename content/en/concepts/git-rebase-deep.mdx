@@ -1,0 +1,172 @@
+export const metadata = {
+  title: "Git Rebase Deep Dive",
+  slug: "git-rebase-deep",
+  locale: "en",
+  section: "concepts",
+  summary: "Understand Git Rebase internals, interactive rebasing, conflict resolution strategies, and best practices.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rebase",
+    "https://git-scm.com/book/en/v2/Git-Branching-Rebasing",
+  ],
+};
+
+# Git Rebase Deep Dive
+
+## Overview
+
+`git rebase` is one of Git's most powerful—and dangerous—commands. It rewrites history by **replaying commits**, commonly used to:
+- Linearize history
+- Edit commit messages, split/squash commits
+- Sync feature branches with latest upstream
+
+## Internal Mechanics
+
+### How It Works
+
+```mermaid
+flowchart LR
+  A[Original branch] --> B[Compute diff]
+  B --> C[Create temp area]
+  C --> D[Apply patches one by one]
+  D --> E[Generate new commits]
+  E --> F[Update branch pointer]
+```
+
+Rebase actually:
+1. Finds the fork point (merge-base)
+2. Saves current branch commits as patch sequence
+3. Switches to target branch
+4. Applies patches one by one (via `git am` or internal sequencer)
+5. Updates branch ref to new commit chain
+
+### Sequencer (git-rebase--sequencer)
+
+Git 2.30+ uses a C-rewritten sequencer with major performance gains:
+- Native merge conflict handling
+- Supports `--autosquash`, `--fixup`, `--squash`
+- Better progress reporting
+
+## Interactive Rebase
+
+```bash
+git rebase -i HEAD~5
+# Or target a branch
+git rebase -i main
+```
+
+### Common Commands
+
+| Command | Short | Effect |
+|---------|-------|--------|
+| `pick` | p | Keep commit |
+| `reword` | r | Edit commit message |
+| `edit` | e | Pause, amend content |
+| `squash` | s | Meld into previous commit |
+| `fixup` | f | Meld, discard message |
+| `drop` | d | Discard commit |
+| `exec` | x | Run shell command |
+| `break` | b | Pause here |
+| `label` | l | Label current position |
+| `reset` | - | Reset to label |
+| `merge` | m | Create merge commit |
+
+### Practical Patterns
+
+```bash
+# Auto-squash fixup!/squash! commits
+git rebase -i --autosquash main
+
+# Preserve merge commits (don't flatten)
+git rebase -i --rebase-merges main
+
+# Only rewrite commit messages
+git rebase -i --rebase-merges --committer-date-is-author-date HEAD~3
+```
+
+## Conflict Resolution
+
+### During Rebase
+
+```bash
+# Rebase pauses on conflict
+# After resolving:
+git add <resolved-files>
+git rebase --continue
+
+# Abort entirely
+git rebase --abort
+
+# Skip current commit (dangerous)
+git rebase --skip
+```
+
+### Strategies
+
+```bash
+# Use merge tool
+git mergetool
+
+# Keep our version
+git checkout --ours <file>
+
+# Keep their version
+git checkout --theirs <file>
+
+# Show conflict markers
+git diff --check
+```
+
+## Advanced Usage
+
+### --rebase-merges Preserves Topology
+
+```bash
+# Preserve merge commit topology
+git rebase -i --rebase-merges main
+```
+
+The generated todo list uses `label`, `reset`, `merge` for precise merge topology control.
+
+### Rebasing Branches with Merges
+
+```bash
+# Default: flattens merges
+git rebase main
+
+# Preserve merge structure
+git rebase --rebase-merges main
+```
+
+### Signatures & Dates
+
+```bash
+# Keep author date, use now as committer date
+git rebase --committer-date-is-author-date
+
+# Re-sign all commits
+git rebase --signoff main
+```
+
+## Best Practices
+
+1. **Only rebase local unpushed commits** — rebasing pushed breaks others' history
+2. **Use `--autosquash` with `fixup!`/`squash!`** — mark at commit time, auto-squash on rebase
+3. **Create backup branch before large rebase** — `git branch backup-before-rebase`
+4. **Use `--rebase-merges` to preserve merge topology** — avoids flattening complex merges
+5. **Small frequent rebases** — easier conflict resolution than one big rebase
+
+## Common Pitfalls
+
+| Pitfall | Consequence | Avoidance |
+|---------|-------------|-----------|
+| Rebase pushed branch | Team history divergence | Only rebase local branches |
+| `git rebase --skip` mid-rebase | Lost commits | Resolve conflicts carefully, don't skip |
+| Forget `--rebase-merges` | Lost merge topology | Add flag for complex branch structures |
+| Rebase with dirty worktree | Failure or pollution | `git stash` or commit first |
+
+## Continue Learning
+
+1. `commands/git-rebase` — git rebase command reference
+2. `internals/rebase-internals-and-sequencer` — Rebase internals
+3. `concepts/git-merge-deep` — Git Merge Deep Dive
+4. `workflows/prepare-commits-before-pull-request` — Pre-PR commit cleanup

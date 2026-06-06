@@ -1,0 +1,268 @@
+export const metadata = {
+  title: "Git Rerere Deep Dive",
+  slug: "git-rerere-deep",
+  locale: "en",
+  section: "concepts",
+  summary: "Master Git Rerere (reuse recorded resolution): config, workflow integration, storage, and team sharing.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-rerere",
+    "https://git-scm.com/book/en/v2/Git-Tools-Rerere",
+  ],
+};
+
+# Git Rerere Deep Dive
+
+## Overview
+
+**Rerere = Reuse Recorded Resolution**. It makes Git remember how you resolved conflicts, then **automatically reuses** the resolution next time the same conflict appears.
+
+## Enable & Configure
+
+```bash
+# Global (recommended)
+git config --global rerere.enabled true
+
+# Per-repo
+git config rerere.enabled true
+
+# Memory cache size (default 1000)
+git config --global rerere.maxMemory 1000
+
+# Disk expiry days (default 60)
+git config --global rerere.autoupdate true
+```
+
+### Key Settings
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `rerere.enabled` | false | Enable rerere |
+| `rerere.autoupdate` | false | Auto-stage resolved conflicts |
+| `rerere.maxMemory` | 1000 | In-memory cache entries |
+| `rerere.maxDiskUsage` | 0 (unlimited) | Max disk bytes |
+
+## How It Works
+
+### Recording Resolutions
+
+```mermaid
+flowchart LR
+  A[Merge/rebase conflict] --> B[Manual resolve]
+  B --> C[git add marks resolved]
+  C --> D[Rerere records: conflict fingerprint -> resolution]
+  D --> E[Stored in .git/rr-cache/]
+```
+
+### Conflict Fingerprint
+
+Git generates a unique fingerprint from:
+- 3 lines context before/after conflict markers
+- Hash of both sides' content
+- File path
+
+Same fingerprint = same conflict = reusable resolution.
+
+## Basic Workflows
+
+### Scenario 1: Long-lived Feature Branch Merging Main
+
+```bash
+# After enable, work normally
+git merge main
+# Conflict -> resolve -> git add -> git commit
+# Rerere records automatically
+
+# Two weeks later merge again
+git merge main
+# Same conflicts AUTO-RESOLVED! No manual work.
+```
+
+### Scenario 2: Repeated Rebases
+
+```bash
+git rebase main
+# Conflict -> resolve -> git rebase --continue
+# Resolution recorded
+
+# Later rebase same branch
+git rebase main
+# Previous resolutions auto-applied
+```
+
+### Scenario 3: Cross-branch Cherry-pick
+
+```bash
+git cherry-pick feature-commit
+# Conflict resolved, recorded
+
+# Another branch cherry-picks same commit
+git checkout other-branch
+git cherry-pick feature-commit
+# Auto-reuses resolution
+```
+
+## Command Reference
+
+### View Records
+
+```bash
+# List all recorded conflicts
+git rerere
+
+# Show resolution for specific file
+git rerere diff <file>
+
+# Cache status
+git rerere status
+```
+
+### Manage Records
+
+```bash
+# Forget specific file
+git rerere forget <file>
+
+# Clear all
+git rerere clear
+
+# Show unresolved conflicts
+git rerere remaining
+```
+
+### Manual Apply/Save
+
+```bash
+# Manually record (after resolving)
+git rerere
+
+# Manually apply (during conflict)
+git rerere apply <file>
+```
+
+## Team Sharing Rerere Cache
+
+### Method 1: Commit to Repo (Not Recommended)
+
+```bash
+# .git/rr-cache/ should NOT be committed
+# Binary cache, not cross-platform/version compatible
+```
+
+### Method 2: Shared Init Script (Recommended)
+
+```bash
+# Repo includes preset resolutions
+# scripts/setup-rerere.sh
+#!/bin/bash
+git config rerere.enabled true
+# Restore from shared storage (object store, NFS)
+rsync -a shared-rerere-cache/ .git/rr-cache/
+```
+
+### Method 3: CI Auto-collection
+
+```yaml
+# .github/workflows/rerere.yml
+jobs:
+  collect-rerere:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Merge main to collect rerere
+        run: |
+          git config rerere.enabled true
+          git merge origin/main --no-commit || true
+          # Conflict resolutions auto-saved
+      - name: Upload rerere cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: rerere-cache
+          path: .git/rr-cache/
+```
+
+## Storage Structure
+
+```
+.git/rr-cache/
+├── <hash1>/
+│   ├── preimage     # Pre-conflict state
+│   ├── postimage    # Resolved state
+│   └── thisimage    # Current worktree (for matching)
+├── <hash2>/
+│   └── ...
+└── MERGE_RR        # Current merge's conflict list
+```
+
+### Matching Flow
+
+1. Conflict occurs → compute fingerprint
+2. Look up in `rr-cache/`
+3. Found → apply `postimage` to worktree
+4. `autoupdate=true` → auto `git add` marks resolved
+
+## Advanced Usage
+
+### Pre-training Rerere
+
+```bash
+# Create test conflict scenario
+git checkout -b test-conflict main
+echo "conflict content" > file.txt
+git commit -am "base"
+
+git checkout -b other main
+echo "other content" > file.txt
+git commit -am "other"
+
+# Force conflict & resolve
+git merge test-conflict
+# Resolve conflict
+git add file.txt
+git commit
+# Resolution now recorded, shareable with team
+```
+
+### With `git merge --no-commit`
+
+```bash
+# Preview merge, auto-apply rerere
+git merge --no-commit feature
+# rerere auto-resolves known conflicts
+git status  # See remaining conflicts
+git commit
+```
+
+### Debug Resolutions
+
+```bash
+# Show current conflict fingerprint
+git rerere diff
+
+# View preimage/postimage
+cat .git/rr-cache/<hash>/preimage
+cat .git/rr-cache/<hash>/postimage
+```
+
+## Best Practices
+
+1. **Enable `rerere.enabled=true` globally** — zero cost, huge payoff
+2. **Enable `autoupdate`** — auto-stage resolutions, fewer `git add`
+3. **Essential for long-lived branches** — weekly main merges auto-resolve 90%+ conflicts
+4. **Team-share preset cache** — CI collects, distributes common resolutions
+5. **Periodic cleanup** — `git rerere clear` prevents cache bloat
+
+## Common Issues
+
+| Issue | Cause | Fix |
+|-------|-------|-----|
+| Conflict not auto-resolved | Fingerprint mismatch (context changed) | Resolve manually once, records |
+| Recorded wrong resolution | Committed without review | `git rerere forget <file>` to delete |
+| Cache too large | Long-term accumulation | Set `rerere.maxDiskUsage` |
+| Cross-platform fails | Line ending/encoding diff | Standardize via `.gitattributes` |
+
+## Continue Learning
+
+1. `commands/git-rerere` — git rerere reference
+2. `workflows/rerere-for-recurring-conflicts` — Recurring conflict workflow
+3. `concepts/git-merge-deep` — Git Merge Deep Dive
+4. `concepts/git-rebase-deep` — Git Rebase Deep Dive

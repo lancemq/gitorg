@@ -1,0 +1,200 @@
+export const metadata = {
+  title: "Bundle URI 深入",
+  slug: "bundle-uri",
+  locale: "zh",
+  section: "performance",
+  summary: "掌握 Git Bundle URI 机制：通过预打包对象实现离线/带宽受限环境下的快速克隆与增量同步。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-bundle",
+    "https://github.com/git/git/blob/master/Documentation/technical/bundle-uri.txt",
+  ],
+};
+
+# Bundle URI 深入
+
+## 概述
+
+**Bundle URI** (Git 2.37+) 允许从预生成的 `.bundle` 文件下载对象，而非逐个协商。适用于：
+- 离线/半离线环境
+- 带宽受限/高延迟网络
+- 大型仓库初始克隆加速
+- 气隙网络同步
+
+## 核心概念
+
+### Bundle 文件
+
+```bash
+# 创建包含所有对象的 bundle
+git bundle create repo.bundle --all
+
+# 创建增量 bundle（基于已知提交）
+git bundle create inc.bundle ^v1.0 --all
+```
+
+### Bundle URI 协议
+
+```bash
+# 远程配置 bundle URI
+git config remote.origin.bundleUri "https://cdn.example.com/repo.bundle"
+
+# 克隆时自动使用
+git clone --bundle-uri=https://cdn.example.com/repo.bundle https://github.com/user/repo.git
+```
+
+## 工作流程
+
+### 1. 服务端生成 Bundle
+
+```bash
+# 完整 bundle（首次克隆用）
+git bundle create repo-full.bundle --all
+
+# 定期生成增量 bundle
+git bundle create repo-inc-$(date +%Y%m%d).bundle ^v2.0 --all
+```
+
+### 2. 发布到 CDN/对象存储
+
+```bash
+# 上传到 CDN
+aws s3 cp repo-full.bundle s3://my-bucket/bundles/
+aws s3 cp repo-inc-*.bundle s3://my-bucket/bundles/
+
+# 生成索引文件（可选）
+cat > bundles.json << EOF
+{
+  "bundles": [
+    {"url": "https://cdn.example.com/repo-full.bundle", "creationToken": "full-20240101"},
+    {"url": "https://cdn.example.com/repo-inc-20240115.bundle", "creationToken": "inc-20240115"}
+  ]
+}
+EOF
+```
+
+### 3. 客户端使用
+
+```bash
+# 克隆时指定 bundle URI
+git clone --bundle-uri=https://cdn.example.com/repo-full.bundle https://github.com/user/repo.git
+
+# 或配置远程后使用
+git clone https://github.com/user/repo.git
+cd repo
+git config remote.origin.bundleUri "https://cdn.example.com/repo-full.bundle"
+git fetch  # 自动从 bundle 下载对象
+```
+
+## 配置选项
+
+### 客户端配置
+
+```bash
+# 启用 bundle URI（默认开启）
+git config --global fetch.bundleUri true
+
+# 设置默认 bundle URI（针对特定远程）
+git config remote.origin.bundleUri "https://cdn.example.com/repo.bundle"
+
+# 最大 bundle 大小限制（字节）
+git config --global fetch.bundleCreationTokenMaxSize 100000000
+```
+
+### 服务端建议
+
+```bash
+# 生成包含 creation token 的 bundle
+git bundle create repo.bundle --all --creation-token="full-20240101"
+
+# 验证 bundle
+git bundle verify repo.bundle
+git bundle list-heads repo.bundle
+```
+
+## 增量同步机制
+
+### Creation Token
+
+每个 bundle 可包含 **creation token**（创建标识），客户端记录已应用的 token，仅下载新增 bundle。
+
+```bash
+# 客户端记录的 token 存储在
+.git/bundle-creation-tokens
+```
+
+### 自动增量获取
+
+```bash
+# fetch 时自动：
+# 1. 读取本地已有 token
+# 2. 请求服务端 bundle 列表
+# 3. 下载缺失的 bundle
+# 4. 从 bundle 解包对象
+# 5. 正常协商剩余对象（如有）
+git fetch
+```
+
+## 离线/气隙环境工作流
+
+### 导出
+
+```bash
+# 完整导出
+git bundle create airgapped.bundle --all
+
+# 通过物理介质传输（U盘、光盘）
+```
+
+### 导入
+
+```bash
+# 目标环境克隆
+git clone airgapped.bundle my-repo
+cd my-repo
+
+# 后续增量导入
+git bundle verify update.bundle
+git fetch ../update.bundle
+```
+
+## 性能对比
+
+| 场景 | 传统 clone | Bundle URI clone |
+|------|-----------|------------------|
+| 大型仓库 (5GB) | 30-60 分钟 | 5-10 分钟 (CDN) |
+| 高延迟网络 | 频繁超时 | 单次下载，可断点续传 |
+| 离线环境 | 不可能 | 完全支持 |
+| 增量同步 | 协商每个对象 | 批量下载 bundle |
+
+## 最佳实践
+
+1. **CDN 分发 bundle**——就近下载，带宽利用率高
+2. **定期生成增量 bundle**——每日/每周，减少增量大小
+3. **使用 creation token**——避免重复下载
+4. **验证 bundle 完整性**——`git bundle verify` 必做
+5. **配置合理的过期策略**——旧 bundle 定期清理
+
+## 故障排查
+
+```bash
+# Bundle 不完整
+git bundle verify repo.bundle
+
+# Token 冲突
+rm .git/bundle-creation-tokens
+git fetch
+
+# 强制不使用 bundle
+git fetch --no-bundle-uri
+
+# 查看 bundle 内容
+git bundle list-heads repo.bundle
+git bundle unbundle repo.bundle  # 解包到当前仓库
+```
+
+## 继续学习
+
+1. `commands/git-bundle` — git bundle 命令参考
+2. `performance/partial-clone` — 部分克隆
+3. `performance/git-maintenance` — 自动维护
+4. `internals/transfer-protocols-and-negotiation` — 传输协议

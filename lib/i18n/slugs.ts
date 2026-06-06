@@ -230,7 +230,11 @@ export type ConceptsSlug =
   | "worktree"
   | "stash"
   | "git-lfs-deep"
-  | "git-hooks-deep";
+  | "git-hooks-deep"
+  | "git-rebase-deep"
+  | "git-merge-deep"
+  | "git-bisect-deep"
+  | "git-rerere-deep";
 
 export const learningPathSlugs = [
   "quick-start",
@@ -525,50 +529,75 @@ export const conceptSlugs = [
   "stash",
   "git-lfs-deep",
   "git-hooks-deep",
+  "git-rebase-deep",
+  "git-merge-deep",
+  "git-bisect-deep",
+  "git-rerere-deep",
 ] as const satisfies readonly ConceptsSlug[];
 
 export type CiCdSlug =
   | "github-actions-basics"
   | "gitlab-ci-basics"
   | "jenkins-integration"
-  | "ci-security-basics";
+  | "ci-security-basics"
+  | "circleci-git"
+  | "ci-cd-testing-strategies"
+  | "ci-cd-deployment-strategies";
 
 export type IdeSlug =
   | "vscode-git"
   | "jetbrains-git"
   | "github-desktop"
-  | "terminal-git-ui";
+  | "terminal-git-ui"
+  | "vim-neovim-git"
+  | "intellij-git-deep"
+  | "terminal-git-productivity";
 
 export type SecuritySlug =
   | "ssh-key-management"
   | "gpg-signing"
   | "credential-helper"
-  | "signing-advanced";
+  | "signing-advanced"
+  | "secret-scanning"
+  | "secure-git-workflows"
+  | "git-security-audit";
 
 export type PerformanceSlug =
   | "large-repo-optimization"
   | "partial-clone"
   | "shallow-clone-deep"
   | "gc-repack-strategies"
-  | "git-maintenance";
+  | "git-maintenance"
+  | "commit-graph-deep"
+  | "bundle-uri"
+  | "scalar-git";
 
 export type MigrationSlug =
   | "svn-to-git"
   | "hg-to-git"
   | "git-p4-perforce"
-  | "platform-migration";
+  | "platform-migration"
+  | "azure-devops-migration"
+  | "git-filter-repo"
+  | "migration-strategy-guide";
 
 export type HostingSlug =
   | "platform-comparison"
   | "self-hosted-git"
   | "github-deep-dive"
-  | "gitea-setup";
+  | "gitea-setup"
+  | "aws-codecommit"
+  | "gerrit-code-review"
+  | "chinese-hosting-platforms";
 
 export const ciCdSlugs = [
   "github-actions-basics",
   "gitlab-ci-basics",
   "jenkins-integration",
   "ci-security-basics",
+  "circleci-git",
+  "ci-cd-testing-strategies",
+  "ci-cd-deployment-strategies",
 ] as const satisfies readonly CiCdSlug[];
 
 export const ideSlugs = [
@@ -576,6 +605,9 @@ export const ideSlugs = [
   "jetbrains-git",
   "github-desktop",
   "terminal-git-ui",
+  "vim-neovim-git",
+  "intellij-git-deep",
+  "terminal-git-productivity",
 ] as const satisfies readonly IdeSlug[];
 
 export const securitySlugs = [
@@ -583,6 +615,9 @@ export const securitySlugs = [
   "gpg-signing",
   "credential-helper",
   "signing-advanced",
+  "secret-scanning",
+  "secure-git-workflows",
+  "git-security-audit",
 ] as const satisfies readonly SecuritySlug[];
 
 export const performanceSlugs = [
@@ -591,6 +626,9 @@ export const performanceSlugs = [
   "shallow-clone-deep",
   "gc-repack-strategies",
   "git-maintenance",
+  "commit-graph-deep",
+  "bundle-uri",
+  "scalar-git",
 ] as const satisfies readonly PerformanceSlug[];
 
 export const migrationSlugs = [
@@ -598,6 +636,9 @@ export const migrationSlugs = [
   "hg-to-git",
   "git-p4-perforce",
   "platform-migration",
+  "azure-devops-migration",
+  "git-filter-repo",
+  "migration-strategy-guide",
 ] as const satisfies readonly MigrationSlug[];
 
 export const hostingSlugs = [
@@ -605,6 +646,9 @@ export const hostingSlugs = [
   "self-hosted-git",
   "github-deep-dive",
   "gitea-setup",
+  "aws-codecommit",
+  "gerrit-code-review",
+  "chinese-hosting-platforms",
 ] as const satisfies readonly HostingSlug[];
 
 export const internalsSlugs = [
