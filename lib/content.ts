@@ -254,6 +254,8 @@ export const docPathRegistry = [
   "concepts/merge-strategies",
   "concepts/worktree",
   "concepts/stash",
+  "concepts/git-lfs-deep",
+  "concepts/git-hooks-deep",
   "commands/git-rerere",
   "commands/git-difftool",
   "commands/git-replace",
@@ -283,6 +285,7 @@ export const docPathRegistry = [
   "performance/partial-clone",
   "performance/shallow-clone-deep",
   "performance/gc-repack-strategies",
+  "performance/git-maintenance",
   "migration/svn-to-git",
   "migration/hg-to-git",
   "migration/git-p4-perforce",
@@ -463,10 +466,13 @@ const recommendedDocPaths = new Set<DocPath>([
   "security/signing-advanced",
   "performance/shallow-clone-deep",
   "performance/gc-repack-strategies",
+  "performance/git-maintenance",
   "migration/git-p4-perforce",
   "migration/platform-migration",
   "hosting/github-deep-dive",
   "hosting/gitea-setup",
+  "concepts/git-lfs-deep",
+  "concepts/git-hooks-deep",
   "recovery/recover-deleted-branch",
   "recovery/assess-force-push-impact",
 ]);
@@ -1632,6 +1638,21 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
     "hosting/github-deep-dive",
     "hosting/platform-comparison",
   ],
+  "concepts/git-lfs-deep": [
+    "concepts/git-lfs",
+    "concepts/git-hooks-deep",
+    "performance/large-repo-optimization",
+  ],
+  "concepts/git-hooks-deep": [
+    "concepts/git-hooks",
+    "concepts/git-lfs-deep",
+    "workflows/pre-commit-hook-workflow",
+  ],
+  "performance/git-maintenance": [
+    "performance/gc-repack-strategies",
+    "internals/packfiles-and-storage",
+    "performance/large-repo-optimization",
+  ],
 };
 
 const representativeSectionPaths = {
@@ -1806,6 +1827,9 @@ export async function getLatestHomeDocs(locale: Locale, limit = 4): Promise<DocC
     "hosting/gitea-setup",
     "learning-path/view-history-and-changes",
     "learning-path/undo-local-basics",
+    "concepts/git-lfs-deep",
+    "concepts/git-hooks-deep",
+    "performance/git-maintenance",
   ];
 
   const modifiedTimes = await Promise.all(

@@ -1,0 +1,181 @@
+export const metadata = {
+  title: "Git Maintenance 深入",
+  slug: "git-maintenance",
+  locale: "zh",
+  section: "performance",
+  summary: "掌握 git maintenance 命令的自动化仓库维护机制，包括任务调度、增量打包与多仓库管理。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-maintenance",
+  ],
+};
+
+# Git Maintenance 深入
+
+## 概述
+
+`git maintenance`（Git 2.31+）是 Git 提供的自动化仓库维护框架。它比手动运行 `git gc` 更智能——在后台增量执行维护任务，避免一次性 GC 带来的性能抖动。
+
+## 与 gc 的区别
+
+| 维度 | `git gc` | `git maintenance` |
+|------|---------|-------------------|
+| 执行方式 | 一次性全量 | 增量、按计划 |
+| 性能影响 | 可能卡住终端 | 后台平滑执行 |
+| 任务粒度 | 整体打包 | 分任务增量执行 |
+| 适用场景 | 手动触发 | 长期自动维护 |
+
+## 基础用法
+
+### 注册仓库
+
+```bash
+# 为当前仓库启用自动维护
+git maintenance start
+
+# 查看已注册的仓库
+git maintenance list
+```
+
+### 手动触发
+
+```bash
+# 运行所有维护任务
+git maintenance run
+
+# 只运行特定任务
+git maintenance run --task=loose-objects
+git maintenance run --task=incremental-repack
+git maintenance run --task=gc
+git maintenance run --task=pack-refs
+```
+
+### 停止维护
+
+```bash
+# 停止当前仓库的自动维护
+git maintenance stop
+```
+
+## 维护任务详解
+
+### 1. loose-objects（松散对象打包）
+
+```bash
+# 将松散对象打包，减少对象数量
+# 频率：每小时
+# 影响：低，仅处理少量对象
+git maintenance run --task=loose-objects
+```
+
+工作方式：扫描 `.git/objects/` 目录中的松散对象，将旧对象（超过修改时间阈值）打包。
+
+### 2. incremental-repack（增量 repack）
+
+```bash
+# 使用多 pack 文件策略增量整理
+# 频率：每小时
+# 影响：低，只操作增量 pack
+git maintenance run --task=incremental-repack
+```
+
+工作方式：维护 2-4 个增量 pack 文件 + 一个完整 pack，避免大范围重打包。
+
+### 3. gc（完整垃圾回收）
+
+```bash
+# 完整的 gc 操作
+# 频率：每日
+# 影响：中等，在 idle 时执行
+git maintenance run --task=gc
+
+# 配置触发阈值
+git config --global gc.auto 6700
+git config --global gc.autoPackLimit 50
+```
+
+### 4. pack-refs（引用压缩）
+
+```bash
+# 将松散引用打包到 packed-refs
+# 频率：每小时
+# 影响：极低
+git maintenance run --task=pack-refs
+```
+
+### 5. prefetch（预获取）
+
+```bash
+# 提前获取远端引用，优化后续 fetch 速度
+# 频率：每小时
+# 影响：无（只读操作）
+git maintenance run --task=prefetch
+```
+
+## 多仓库管理
+
+### 批量注册
+
+```bash
+# 为多个仓库注册维护
+for repo in ~/projects/*/; do
+  cd "$repo"
+  git maintenance start
+done
+```
+
+### 注册表管理
+
+```bash
+# Git 将注册信息存储在以下位置：
+# macOS: ~/Library/Application Support/git/maintenance
+# Linux: ~/.config/git/maintenance
+
+# 直接查看注册表
+cat ~/.config/git/maintenance
+```
+
+## 调度方式
+
+### macOS（launchd）
+
+```bash
+# git maintenance start 会自动配置 launchd 定时任务
+# 查看注册的定时任务
+launchctl list | grep git
+
+# 任务 plist 位于：
+# ~/Library/LaunchAgents/org.git-scm.git.daemon.plist
+```
+
+### Linux（systemd）
+
+```bash
+# 需要确保 systemd 用户服务可用
+systemctl --user enable --now git-maintenance.timer
+systemctl --user list-timers | grep git
+```
+
+### Windows（Task Scheduler）
+
+`git maintenance start` 自动创建计划任务，无需手动配置。
+
+## 最佳实践
+
+```bash
+# 个人开发机推荐配置
+git config --global maintenance.auto.detach true
+git maintenance start
+
+# 大型仓库额外配置
+git config maintenance.gc.timer.hourly true
+```
+
+1. 所有活跃仓库都应注册 `git maintenance start`
+2. 不要手动运行 `git gc --aggressive`——让 `maintenance` 在后台增量执行
+3. 在 CI 环境中继续保持 shallow clone，不需要维护
+
+## 继续学习
+
+1. `performance/gc-repack-strategies` — gc/repack 策略
+2. `performance/large-repo-optimization` — 大型仓库优化
+3. `internals/packfiles-and-storage` — Pack 文件原理

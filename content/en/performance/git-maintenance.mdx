@@ -1,0 +1,168 @@
+export const metadata = {
+  title: "Git Maintenance Deep Dive",
+  slug: "git-maintenance",
+  locale: "en",
+  section: "performance",
+  summary: "Master git maintenance's automated repository upkeep, including task scheduling, incremental repacking, and multi-repo management.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-maintenance",
+  ],
+};
+
+# Git Maintenance Deep Dive
+
+## Overview
+
+`git maintenance` (Git 2.31+) is Git's automated repository maintenance framework. It's smarter than manual `git gc` — running incremental tasks in the background to avoid the performance jitter of a one-time full GC.
+
+## Compared to gc
+
+| Aspect | `git gc` | `git maintenance` |
+|--------|---------|-------------------|
+| Execution | One-time full | Incremental, scheduled |
+| Performance impact | Can block terminal | Background, smooth |
+| Task granularity | All-in-one | Per-task incremental |
+| Best for | Manual trigger | Ongoing automatic care |
+
+## Basic Usage
+
+### Register a Repository
+
+```bash
+git maintenance start
+git maintenance list
+```
+
+### Manual Run
+
+```bash
+# Run all tasks
+git maintenance run
+
+# Specific tasks only
+git maintenance run --task=loose-objects
+git maintenance run --task=incremental-repack
+git maintenance run --task=gc
+git maintenance run --task=pack-refs
+```
+
+### Stop Maintenance
+
+```bash
+git maintenance stop
+```
+
+## Maintenance Tasks
+
+### 1. loose-objects
+
+```bash
+# Pack loose objects to reduce object count
+# Frequency: hourly
+# Impact: low, small batches only
+git maintenance run --task=loose-objects
+```
+
+Scans `.git/objects/` for loose objects and packs those older than a modification threshold.
+
+### 2. incremental-repack
+
+```bash
+# Incremental multi-pack strategy
+# Frequency: hourly
+# Impact: low, incremental packs only
+git maintenance run --task=incremental-repack
+```
+
+Maintains 2-4 incremental pack files plus one full pack, avoiding large-scale repacking.
+
+### 3. gc
+
+```bash
+# Full garbage collection
+# Frequency: daily
+# Impact: medium, runs when idle
+git maintenance run --task=gc
+```
+
+### 4. pack-refs
+
+```bash
+# Pack loose refs into packed-refs
+# Frequency: hourly
+# Impact: minimal
+git maintenance run --task=pack-refs
+```
+
+### 5. prefetch
+
+```bash
+# Pre-fetch remote refs for faster future fetches
+# Frequency: hourly
+# Impact: read-only
+git maintenance run --task=prefetch
+```
+
+## Multi-Repo Management
+
+### Batch Registration
+
+```bash
+for repo in ~/projects/*/; do
+  cd "$repo"
+  git maintenance start
+done
+```
+
+### Registry Location
+
+```bash
+# macOS: ~/Library/Application Support/git/maintenance
+# Linux: ~/.config/git/maintenance
+
+cat ~/.config/git/maintenance
+```
+
+## Scheduling
+
+### macOS (launchd)
+
+```bash
+# git maintenance start auto-configures launchd
+launchctl list | grep git
+
+# Plist located at:
+# ~/Library/LaunchAgents/org.git-scm.git.daemon.plist
+```
+
+### Linux (systemd)
+
+```bash
+systemctl --user enable --now git-maintenance.timer
+systemctl --user list-timers | grep git
+```
+
+### Windows (Task Scheduler)
+
+Automatically created by `git maintenance start`.
+
+## Best Practices
+
+```bash
+# Recommended config for dev machines
+git config --global maintenance.auto.detach true
+git maintenance start
+
+# Large repos
+git config maintenance.gc.timer.hourly true
+```
+
+1. Register all active repos with `git maintenance start`
+2. Avoid manual `git gc --aggressive` — let maintenance handle it incrementally
+3. CI environments should keep using shallow clones instead of maintenance
+
+## Continue Learning
+
+1. `performance/gc-repack-strategies` — gc/repack strategies
+2. `performance/large-repo-optimization` — Large repo optimization
+3. `internals/packfiles-and-storage` — Pack file internals

@@ -228,7 +228,9 @@ export type ConceptsSlug =
   | "detached-head"
   | "merge-strategies"
   | "worktree"
-  | "stash";
+  | "stash"
+  | "git-lfs-deep"
+  | "git-hooks-deep";
 
 export const learningPathSlugs = [
   "quick-start",
@@ -521,6 +523,8 @@ export const conceptSlugs = [
   "merge-strategies",
   "worktree",
   "stash",
+  "git-lfs-deep",
+  "git-hooks-deep",
 ] as const satisfies readonly ConceptsSlug[];
 
 export type CiCdSlug =
@@ -545,7 +549,8 @@ export type PerformanceSlug =
   | "large-repo-optimization"
   | "partial-clone"
   | "shallow-clone-deep"
-  | "gc-repack-strategies";
+  | "gc-repack-strategies"
+  | "git-maintenance";
 
 export type MigrationSlug =
   | "svn-to-git"
@@ -585,6 +590,7 @@ export const performanceSlugs = [
   "partial-clone",
   "shallow-clone-deep",
   "gc-repack-strategies",
+  "git-maintenance",
 ] as const satisfies readonly PerformanceSlug[];
 
 export const migrationSlugs = [
