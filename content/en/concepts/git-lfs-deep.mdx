@@ -12,6 +12,20 @@ export const metadata = {
 
 # Git LFS Deep Dive
 
+## What you will learn
+
+- Understand the core purpose of Git LFS Deep Dive
+- Master the basic usage and common options of Git LFS Deep Dive
+- Understand Git LFS architecture, performance tuning, server configuration, and large-scale migration strategies.
+- Understand key concepts: Architecture
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+You've encountered a conceptual question while using Git — you roughly know what it means, but you're not entirely sure about its precise definition and boundaries.
+
 ## Architecture
 
 Git LFS (Large File Storage) replaces large files with **pointer files**, storing the actual content in a separate object store. Pointer files are only a few dozen bytes, while large files are downloaded on demand.
@@ -155,6 +169,12 @@ done
 3. **Regular pruning**: Run `git lfs prune` to remove local unneeded objects
 4. **CI optimization**: Use `GIT_LFS_SKIP_SMUDGE=1` in CI to avoid unnecessary downloads
 5. **Backup LFS storage**: LFS object store needs its own backup strategy
+
+## Try it yourself
+
+1. Practice the git-lfs-deep command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 
 ## Continue Learning
 

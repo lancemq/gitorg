@@ -11,6 +11,19 @@ export const metadata = {
 
 # git-ls-files Tutorial
 
+## What you will learn
+
+- Understand the core purpose of git-ls-files Tutorial
+- Master the basic usage and common options of git-ls-files Tutorial
+- Explains how to use git-ls-files to list tracked paths from the index and working tree.
+- Understand key concepts: When it is a good fit
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
 ## The short version
 
 git-ls-files is used to list tracked paths from the index and working tree.
@@ -76,4 +89,10 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 - Output paths are relative to the repository root, regardless of the current working directory.
 - Unlike `git status`, `ls-files` does not compare the working tree against the index — it only shows what the index contains.
 - When used in scripts, prefer `-z` for null-delimited output to avoid parsing errors from filenames with spaces or special characters.
+
+## Try it yourself
+
+1. Practice the git-ls-files command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

@@ -11,6 +11,19 @@ export const metadata = {
 
 # git-ls-tree Tutorial
 
+## What you will learn
+
+- Understand the core purpose of git-ls-tree Tutorial
+- Master the basic usage and common options of git-ls-tree Tutorial
+- Explains how to use git-ls-tree to list entries inside a tree object.
+- Understand key concepts: When it is a good fit
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
 ## The short version
 
 git-ls-tree is used to list entries inside a tree object.
@@ -76,4 +89,10 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 - You can use the `TREE:PATH` syntax to see contents under a specific path, such as `git ls-tree HEAD:src/`.
 - Output includes file modes (e.g., 100644 for regular files, 100755 for executables, 040000 for directories).
 - It shows the tree structure from the object database, independent of the working tree state — even if the working tree has uncommitted changes, ls-tree still shows the tree object's contents.
+
+## Try it yourself
+
+1. Practice the git-ls-tree command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

@@ -13,6 +13,20 @@ export const metadata = {
 
 # Assess the impact after a force push
 
+## What you will learn
+
+- Understand the core purpose of Assess the impact after a force push
+- Master the basic usage and common options of Assess the impact after a force push
+- After a force push, the urgent task is not another push. First identify which refs were replaced, who may still depend on the old history, and what recovery window still exists.
+- Understand key concepts: The first move is not “force push again”
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+You just ran a Git command and the result wasn't what you expected — maybe you even lost some commits. This has happened before, and you want a reliable set of recovery techniques.
+
 ## The first move is not “force push again”
 
 The real questions are:
@@ -93,3 +107,10 @@ Communication should usually come first when:
 
 The expensive part of a bad force push is often not recovering the commits.  
 It is recovering the team’s shared mental model of the branch.
+
+## Try it yourself
+
+1. Practice the assess-force-push-impact command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

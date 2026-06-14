@@ -12,12 +12,26 @@ export const metadata = {
 
 # Revision Selection and Commit Ranges
 
+## What you will learn
+
+- Understand the core purpose of Revision Selection and Commit Ranges
+- Master the basic usage and common options of Revision Selection and Commit Ranges
+- Many advanced Git commands are really working over sets of commits expressed through revision syntax, not just single named commits.
+- Understand key concepts: Why revision syntax matters
+- Know when to use this feature and when to avoid it
+
+
 Many people experience `git log`, `git diff`, and `git show` syntax as a pile of unrelated tricks.  
 But Git is actually sharing a common language across many commands:
 
 **revision selection syntax**
 
 That language is not only about naming one commit. It is often about describing a set of commits, a range, or even trees and blobs reachable from revisions.
+
+
+## Start with a problem
+
+You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
 
 ## Why revision syntax matters
 
@@ -118,3 +132,10 @@ That makes the syntax feel less arbitrary and more like a common substrate.
 ## A conclusion worth keeping
 
 **Many advanced Git commands operate on sets of commits and objects described by revision syntax, not only on single named revisions.**
+
+## Try it yourself
+
+1. Practice the revision-selection-and-ranges command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

@@ -12,6 +12,21 @@ export const metadata = {
 
 # Git Merge 深入
 
+## 学完这篇你会掌握什么
+
+- 理解 Git Merge 深入 的核心作用和适用场景
+- 掌握 Git Merge 深入 的基本用法和常用参数
+- 深入理解 Git Merge 策略、递归合并、Ours/Theirs、Octopus 合并与冲突解决机制。
+- 理解 概述 相关的概念
+- 掌握 合并策略 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+
+## 先想一个问题
+
+你在使用 Git 的过程中遇到了一个概念问题——你大概知道它是什么意思，但不太确定它的确切含义和边界，也不太确定自己理解得对不对。
+
 ## 概述
 
 `git merge` 是将两个或多个开发历史合并的核心命令。Git 支持多种合并策略，默认使用 **recursive（递归）** 策略。
@@ -203,3 +218,10 @@ git merge --abort  # 取消
 2. `internals/three-way-merge-mechanics` — 三方合并原理
 3. `concepts/merge-strategies` — 合并策略对比
 4. `concepts/git-rebase-deep` — Git Rebase 深入
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+

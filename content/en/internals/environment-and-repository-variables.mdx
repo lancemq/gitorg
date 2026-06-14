@@ -12,10 +12,24 @@ export const metadata = {
 
 # Environment Variables and Repository Context
 
+## What you will learn
+
+- Understand the core purpose of Environment Variables and Repository Context
+- Master the basic usage and common options of Environment Variables and Repository Context
+- Variables like GIT_DIR, GIT_WORK_TREE, and GIT_INDEX_FILE help explain how Git decides what repository context it is actually operating in.
+- Understand key concepts: The most important variables
+- Know when to use this feature and when to avoid it
+
+
 Most people use Git as if it always “just knows” which repository it is in.  
 That is usually fine for ordinary work, but Git actually allows many parts of its runtime context to be overridden explicitly.
 
 That tells you something important: Git is not relying only on “is there a `.git` directory here?” It can work from a more flexible context model.
+
+
+## Start with a problem
+
+You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
 
 ## The most important variables
 
@@ -89,3 +103,10 @@ That helps make sense of questions like:
 ## A conclusion worth keeping
 
 **Environment variables are not fringe Git trivia. They expose how Git decides what repository context a command is really running inside.**
+
+## Try it yourself
+
+1. Practice the environment-and-repository-variables command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

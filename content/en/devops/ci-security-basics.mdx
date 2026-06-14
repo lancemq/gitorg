@@ -1,0 +1,128 @@
+export const metadata = {
+  title: "Git Security Basics in CI/CD",
+  slug: "ci-security-basics",
+  locale: "en",
+  section: "devops",
+  summary: "Learn the security risks and protections for Git operations in CI/CD pipelines, including credential management, branch protection, signature verification, and auditing.",
+  sourceUrls: [
+    "https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions",
+    "https://docs.gitlab.com/ee/ci/secrets/",
+  ],
+};
+
+# Git Security Basics in CI/CD
+
+## What you will learn
+
+- Understand the core purpose of Git Security Basics in CI/CD
+- Master the basic usage and common options of Git Security Basics in CI/CD
+- Learn the security risks and protections for Git operations in CI/CD pipelines, including credential management, branch protection, signature verification, and auditing.
+- Understand key concepts: Overview
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+Your team is adopting CI/CD pipelines, or you're configuring Git integration in your IDE — but you're unsure how Git behaves differently in automated environments compared to local manual operations.
+
+## Overview
+
+Git operations in CI/CD pipelines face different security risks than local development: automated execution, credential injection, and third-party dependencies all introduce new attack surfaces.
+
+## Core Risks
+
+| Risk | Description | Impact |
+|------|-------------|--------|
+| Credential leak | Token or key written to logs | Malicious push to repo |
+| Branch injection | Attackers modify CI config via PR | Pipeline executes malicious code |
+| Dependency confusion | Third-party Action/Plugin steals data | Credentials stolen |
+| History tampering | Force push overwrites shared history | Code loss or injection |
+
+## Credential Management
+
+### GitHub Actions
+
+```yaml
+# Use Secrets, never hardcode
+jobs:
+  deploy:
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Deploy
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+        run: ./deploy.sh
+```
+
+### GitLab CI
+
+```yaml
+# Use CI/CD Variables
+deploy:
+  script:
+    - echo "$DEPLOY_KEY" | base64 -d > deploy_key
+    - chmod 600 deploy_key
+    - ssh -i deploy_key user@server "deploy"
+```
+
+### Principle of Least Privilege
+
+- Use dedicated credentials per pipeline
+- Scope credentials to the smallest set of repos
+- Rotate credentials regularly
+- Never output credentials to logs
+
+## Branch Protection
+
+### Prevent Direct Push to Main
+
+```yaml
+# GitHub branch protection rules
+# - Require PR before merging
+# - Require status checks to pass
+# - Require signed commits
+```
+
+### Restrict CI Triggers
+
+```yaml
+# GitHub Actions - only trusted PRs
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+```
+
+## Signature Verification
+
+```yaml
+# Verify commit signatures in CI
+jobs:
+  verify:
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify commits
+        run: |
+          git log --show-signature -1
+```
+
+## Audit Trail
+
+- Enable Git operation audit logs (supported by GitHub/GitLab)
+- Log all Git operations triggered by CI
+- Review CI config modification permissions regularly
+
+## Try it yourself
+
+1. Practice the ci-security-basics command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+
+## Continue Learning
+
+1. `ci-cd/jenkins-integration` — Jenkins Git integration
+2. `security/ssh-key-management` — SSH key management
+3. `security/credential-helper` — Git credential helpers

@@ -13,6 +13,15 @@ export const metadata = {
 
 # Canary Release Workflow
 
+## What you will learn
+
+- Understand the core purpose of Canary Release Workflow
+- Master the basic usage and common options of Canary Release Workflow
+- Validate new versions on a small slice of real production traffic before broad rollout to reduce blast radius.
+- Understand key concepts: Best-fit scenarios
+- Know when to use this feature and when to avoid it
+
+
 Canary releases let a small percentage of real users validate a new version before full rollout.
 
 <CommandFlowFigure
@@ -25,6 +34,11 @@ Canary releases let a small percentage of real users validate a new version befo
   outputs="earlier risk detection|controlled blast radius|higher release confidence"
   note="Canary is effective only when it is observable and abortable."
 />
+
+
+## Start with a problem
+
+Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
 
 ## Best-fit scenarios
 
@@ -84,4 +98,10 @@ Canary controls version exposure; flags control behavior exposure.
 1. `Feature flag rollout workflow`
 2. `Code freeze and release candidate workflow`
 3. `Revert-first stabilization workflow`
+
+## Try it yourself
+
+1. Practice the canary-release-workflow command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

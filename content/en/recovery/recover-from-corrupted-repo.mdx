@@ -14,6 +14,19 @@ export const metadata = {
 
 # Recovering from a corrupted repository
 
+## What you will learn
+
+- Understand the core purpose of Recovering from a corrupted repository
+- Master the basic usage and common options of Recovering from a corrupted repository
+- Diagnosis and recovery strategies for repository corruption: damaged pack files, missing objects, and disk failures. Covers git fsck, remote re-clone, pack recovery, backup restoration, and prevention.
+- Understand key concepts: What causes repository corruption
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You just ran a Git command and the result wasn't what you expected — maybe you even lost some commits. This has happened before, and you want a reliable set of recovery techniques.
+
 ## The short version
 
 <CommandFlowFigure
@@ -334,3 +347,10 @@ git update-ref refs/heads/main <valid-commit-hash>
 | No remote available | Bundle restore / object rebuild | High |
 
 Remember: Git's design principle is "data is immutable." Most corruption affects the reference layer rather than the object layer, making recovery easier than you might think.
+
+## Try it yourself
+
+1. Practice the recover-from-corrupted-repo command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

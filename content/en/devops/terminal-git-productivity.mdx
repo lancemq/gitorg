@@ -1,0 +1,158 @@
+export const metadata = {
+  title: "Terminal Git Productivity",
+  slug: "terminal-git-productivity",
+  locale: "en",
+  section: "devops",
+  summary: "Supercharge your terminal Git workflow with aliases, shell completion, lazygit, tig, delta diff viewer, git-prompt customization, and git-branchless.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases",
+    "https://github.com/jesseduffield/lazygit",
+    "https://github.com/dandavison/delta",
+  ],
+};
+
+# Terminal Git Productivity
+
+## What you will learn
+
+- Understand the core purpose of Terminal Git Productivity
+- Master the basic usage and common options of Terminal Git Productivity
+- Supercharge your terminal Git workflow with aliases, shell completion, lazygit, tig, delta diff viewer, git-prompt customization, and git-branchless.
+- Understand key concepts: Git Aliases
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+Your team is adopting CI/CD pipelines, or you're configuring Git integration in your IDE — but you're unsure how Git behaves differently in automated environments compared to local manual operations.
+
+## One-Sentence Understanding
+
+The terminal is Git's native habitat — with aliases, dedicated tools, and a customized prompt, you can accomplish in one keystroke what takes five commands in a GUI.
+
+## Git Aliases
+
+```ini
+[alias]
+  st = status
+  co = checkout
+  br = branch
+  ci = commit
+  di = diff
+  lg = log --oneline --graph --all --decorate
+  aa = add --all
+  unstage = reset HEAD --
+  undo = reset --soft HEAD~1
+  ri = rebase -i
+  tree = log --all --graph --oneline --decorate
+  cleanup = !git branch --merged main | grep -v \" main\" | xargs -r git branch -d
+  lines = !git log --author=\"$(git config user.name)\" --pretty=tformat: --numstat | awk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf \"added: %s, removed: %s, total: %s\", add, subs, loc }'
+```
+
+## Shell Completion
+
+**Bash**:
+```bash
+source /usr/share/bash-completion/completions/git
+export GIT_PS1_SHOWDIRTYSTATE=true
+```
+
+**Zsh** (oh-my-zsh):
+```zsh
+plugins=(git gitfast)
+```
+
+**Fish** (built-in):
+```fish
+abbr -a gst 'git status'
+abbr -a gco 'git checkout'
+abbr -a glg 'git log --oneline --graph --all --decorate'
+```
+
+## lazygit
+
+```bash
+brew install lazygit
+cd my-project && lazygit
+```
+
+| Panel | Key | Action |
+|-------|-----|--------|
+| Files | `Space` | Stage/unstage |
+| Files | `c` | Commit |
+| Branches | `b` | Switch branch |
+| Commits | `s` | Squash |
+
+Set delta as pager: `git.paging.pager: delta`.
+
+## tig
+
+```bash
+brew install tig
+tig            # Commit history
+tig status     # Status view
+tig blame file # Blame
+```
+
+## delta — Enhanced Diff
+
+```ini
+[core]
+  pager = delta
+[delta]
+  side-by-side = true
+  line-numbers = true
+  syntax-theme = Dracula
+```
+
+Features: syntax highlighting, side-by-side view, line numbers, navigation.
+
+## git-prompt
+
+```bash
+export GIT_PS1_SHOWDIRTYSTATE=1
+export GIT_PS1_SHOWSTASHSTATE=1
+export GIT_PS1_SHOWUPSTREAM="auto"
+PS1='\w$(__git_ps1 " (%s)")\$ '
+```
+
+Or use starship:
+
+```toml
+[git_branch]
+format = "on [$symbol$branch]($style) "
+[git_status]
+staged = "+\${count}"
+modified = "!\${count}"
+```
+
+## git-branchless
+
+```bash
+brew install git-branchless
+git sl       # Smart commit graph
+git undo     # Undo last operation
+git restack  # Fix broken dependencies
+git record   # Interactive stage & commit
+```
+
+## Other Tools
+
+| Tool | Purpose |
+|------|---------|
+| git-extras | Extra Git commands |
+| gh (GitHub CLI) | GitHub from CLI |
+| forgit | fzf Git integration |
+| gita | Multi-repo management |
+
+## Try it yourself
+
+1. Practice the terminal-git-productivity command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+
+## Continue Learning
+
+1. `commands/git-config` — Git configuration reference
+2. `commands/git-log` — Advanced git log usage
+3. `best-practices/git-aliases` — Git alias best practices

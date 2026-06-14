@@ -1,0 +1,151 @@
+export const metadata = {
+  title: "Azure DevOps (TFS) 到 Git 迁移",
+  slug: "azure-devops-migration",
+  locale: "zh",
+  section: "migration",
+  summary: "从 Team Foundation Server (TFS/TFVC) 迁移到 Git 的完整指南，涵盖工具选型、历史迁移、分支映射和团队过渡策略。",
+  sourceUrls: ["https://learn.microsoft.com/en-us/azure/devops/learn/git/centralized-to-git"],
+};
+
+## 先想一个问题
+
+你的团队正在从其他版本控制系统迁移到 Git，或者需要在不同 Git 平台之间迁移代码和历史。你担心迁移过程中会不会丢失提交记录或作者信息。
+
+## 一句话理解
+
+将代码仓库从 TFVC 迁移到 Git 不仅是工具切换，更是从集中式版本控制向分布式版本控制的思维模式转变。
+
+## TFVC 与 Git 的核心差异
+
+TFVC (Team Foundation Version Control) 是集中式版本控制系统，服务器保存单一真实来源，开发者获取工作区副本。Git 是分布式系统，每个开发者拥有完整的仓库副本，支持离线操作和灵活的分支模型。
+
+| 维度 | TFVC | Git |
+|------|------|-----|
+| 架构 | 集中式，依赖服务器 | 分布式，本地完整副本 |
+| 分支 | 基于路径的分支（昂贵） | 轻量指针（廉价） |
+| 提交 | 按文件签入，自动变更集 | 暂存区 + 本地提交 |
+| 权限 | 文件级别权限控制 | 仓库级别权限控制 |
+| 离线 | 必须连接服务器 | 完全支持离线工作 |
+
+## 使用 git-tfs 进行历史迁移
+
+[git-tfs](https://github.com/git-tfs/git-tfs) 是目前最成熟的 TFVC 到 Git 迁移工具。基本工作流程：
+
+```bash
+# 克隆 TFVC 分支到 Git 仓库（包含完整历史）
+
+## 学完这篇你会掌握什么
+
+- 理解 克隆 TFVC 分支到 Git 仓库（包含完整历史） 的核心作用和适用场景
+- 掌握 克隆 TFVC 分支到 Git 仓库（包含完整历史） 的基本用法和常用参数
+- 从 Team Foundation Server (TFS/TFVC) 迁移到 Git 的完整指南，涵盖工具选型、历史迁移、分支映射和团队过渡策略。
+- 理解 TFVC 与 Git 的核心差异 相关的概念
+- 掌握 使用 git-tfs 进行历史迁移 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+git tfs clone https://tfs.company.com/tfs/collection $/project/trunk --branches
+
+# 提取所有变更集并转换为 Git 提交
+git tfs pull
+
+# 清理并优化本地仓库
+git gc --aggressive
+```
+
+关键参数说明：`--branches` 会尝试自动识别 TFVC 分支结构并映射为 Git 分支；`--changeset=1234` 可从指定变更集开始增量克隆。
+
+## 工作项链接的处理
+
+TFVC 变更集通常关联工作项（Work Items）。迁移后，Git 提交中的关联信息会丢失。解决方案：
+
+1. 在提交信息中保留工作项引用：`git-tfs` 默认将工作项 ID 写入提交信息
+2. 使用 Azure DevOps 的 `Commit Fix` 功能手动关联
+3. 编写脚本读取 git-tfs 元数据，通过 Azure DevOps REST API 重建关联
+
+## TFVC 分支结构映射策略
+
+TFVC 使用基于路径的文件夹分支（如 `$/project/main`、`$/project/release/v1.0`），Git 使用轻量指针分支。
+
+典型的映射规则：
+
+| TFVC 路径 | Git 分支 |
+|-----------|----------|
+| `$/project/trunk` | `main` 或 `master` |
+| `$/project/branches/release/v1.0` | `release/v1.0` |
+| `$/project/branches/feature/new-ui` | `feature/new-ui` |
+| `$/project/tags/v1.0` | `tags/v1.0` |
+
+```bash
+# 手动映射标记 git-tfs 克隆的分支
+git tfs clone https://server/tfs $/project/trunk --branches
+git branch -m trunk main  # 将 trunk 重命名为 main
+```
+
+## 团队培训注意事项
+
+迁移成功的关键在于团队对新工作流的掌握。推荐培训计划：
+
+1. **基础概念**（半天）：Git 的核心概念——提交、分支、远程仓库
+2. **日常工作流**（半天）：clone、commit、push、pull、merge 与 rebase
+3. **分支策略**（半天）：GitFlow、GitHub Flow 或 Trunk-Based Development
+4. **高级主题**（半天）：交互式 rebase、cherry-pick、bisect、子模块
+
+常见误区：开发者试图用 Git 模拟 TFVC 的 "独占签出" 模式。应引导团队拥抱 Git 的合并驱动工作流。
+
+## 迁移规划清单
+
+完整的迁移计划应包含以下阶段：
+
+```
+□ 评估阶段：分析现有仓库大小、分支结构、历史深度
+□ 工具选型：评估 git-tfs / Azure DevOps 迁移器 / 自定义脚本
+□ 试迁移：在隔离环境中执行完整迁移，验证结果
+□ UAT 验证：团队验证迁移后的仓库，检查历史完整性
+□ 冻结期：通知团队停止签入，执行最终迁移
+□ 切换：更新 CI/CD 配置，指向新 Git 仓库
+□ 遗留仓库归档：将 TFVC 仓库设为只读，留存参考
+```
+
+```bash
+# 验证迁移完整性：比较变更集数量
+git log --oneline | wc -l
+
+# 验证提交信息是否包含原始变更集 ID
+git log --format="%an %s %b" | grep "git-tfs-id:"
+
+# 列出所有分支，确保映射完整
+git branch -a
+```
+
+## 大文件和二进制的处理
+
+TFVC 仓库中常包含大量二进制文件（NuGet 包、编译产物、设计稿等）。迁移前应：
+
+1. 使用 `.gitignore` 排除非必要二进制文件
+2. 对必要的大文件使用 [Git LFS](https://git-lfs.com)
+3. 通过 git-tfs 的 `--ignore` 参数跳过指定路径
+
+```bash
+# 创建 .gitignore 排除构建产物
+echo "bin/
+obj/
+*.dll
+*.exe
+packages/" >> .gitignore
+
+# 使用 Git LFS 跟踪必要的大文件
+git lfs track "*.psd"
+git lfs track "*.zip"
+```
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+
+## 继续学习建议
+
+- 查看 [迁移策略指南](./migration-strategy-guide) 了解完整的迁移框架
+- 阅读 [git filter-repo 仓库重写深入](./git-filter-repo) 学习迁移后的历史清理技术
+- 推荐阅读：微软官方文档 [Centralized to Git](https://learn.microsoft.com/en-us/azure/devops/learn/git/centralized-to-git)

@@ -12,6 +12,20 @@ export const metadata = {
 
 # Git Rerere Deep Dive
 
+## What you will learn
+
+- Understand the core purpose of Git Rerere Deep Dive
+- Master the basic usage and common options of Git Rerere Deep Dive
+- Master Git Rerere (reuse recorded resolution): config, workflow integration, storage, and team sharing.
+- Understand key concepts: Overview
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+You've encountered a conceptual question while using Git — you roughly know what it means, but you're not entirely sure about its precise definition and boundaries.
+
 ## Overview
 
 **Rerere = Reuse Recorded Resolution**. It makes Git remember how you resolved conflicts, then **automatically reuses** the resolution next time the same conflict appears.
@@ -259,6 +273,12 @@ cat .git/rr-cache/<hash>/postimage
 | Recorded wrong resolution | Committed without review | `git rerere forget <file>` to delete |
 | Cache too large | Long-term accumulation | Set `rerere.maxDiskUsage` |
 | Cross-platform fails | Line ending/encoding diff | Standardize via `.gitattributes` |
+
+## Try it yourself
+
+1. Practice the git-rerere-deep command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 
 ## Continue Learning
 

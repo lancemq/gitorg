@@ -1,0 +1,248 @@
+export const metadata = {
+  title: "Git 安全协作工作流",
+  slug: "secure-git-workflows",
+  locale: "zh",
+  section: "security",
+  summary: "GPG/SSH 签名提交、GitHub/GitLab 验证标记、分支保护规则、必需状态检查、签名标签及安全供应链实践。",
+  sourceUrls: [
+    "https://docs.github.com/en/authentication/managing-commit-signature-verification",
+    "https://docs.gitlab.com/ee/user/project/protected_branches.html",
+    "https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work",
+  ],
+};
+
+# Git 安全协作工作流
+
+## 学完这篇你会掌握什么
+
+- 理解 Git 安全协作工作流 的核心作用和适用场景
+- 掌握 Git 安全协作工作流 的基本用法和常用参数
+- GPG/SSH 签名提交、GitHub/GitLab 验证标记、分支保护规则、必需状态检查、签名标签及安全供应链实践。
+- 理解 签名提交（GPG/SSH） 相关的概念
+- 掌握 已验证提交 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+## 先想一个问题
+
+你担心 Git 仓库的安全——可能是密钥管理不到位，也可能是提交没有签名验证。你不确定自己的安全配置是否足够，也不清楚从哪里开始加固。
+
+## 一句话理解
+
+Git 安全协作依赖可验证的身份（签名提交）、强制策略（分支保护）和审查关卡，防止未授权或恶意代码进入生产环境。
+
+## 签名提交（GPG/SSH）
+
+### GPG 签名
+
+```bash
+# 生成 GPG 密钥
+gpg --full-generate-key
+gpg --list-secret-keys --keyid-format LONG
+
+# 配置 Git
+git config --global user.signingkey KEY_ID
+git config --global commit.gpgsign true
+
+# 签名提交
+git commit -S -m "signed commit message"
+git log --show-signature -1
+```
+
+### SSH 签名（Git 2.34+）
+
+```bash
+# 配置签名密钥
+git config --global user.signingkey ~/.ssh/id_ed25519.pub
+git config --global gpg.format ssh
+git config --global commit.gpgsign true
+
+# 添加允许的签名者
+cat > ~/.ssh/allowed_signers << EOF
+* $(cat ~/.ssh/id_ed25519.pub)
+EOF
+git config --global gpg.ssh.allowedSignersFile ~/.ssh/allowed_signers
+
+# 签名与验证
+git commit -S -m "ssh signed commit"
+git log --show-signature -1
+```
+
+### 上传公钥到平台
+
+```bash
+# GPG
+gpg --armor --export KEY_ID
+# 粘贴到 GitHub：Settings → SSH and GPG keys → GPG keys
+
+# SSH（用于签名）
+cat ~/.ssh/id_ed25519.pub
+# 粘贴到 GitHub：Settings → SSH and GPG keys → SSH signing keys
+```
+
+## 已验证提交
+
+上传公钥后，提交会显示 **Verified** 标记，证明：
+
+- 提交作者与密钥所有者一致
+- 提交内容未被篡改
+- 提交来自可信身份
+
+## 分支保护规则
+
+### GitHub
+
+```
+Settings → Branches → Add branch protection rule
+```
+
+关键设置：
+
+| 设置 | 作用 |
+|------|------|
+| 合并前要求拉取请求 | 防止直接推送 |
+| 需要审批（1-8人） | 强制代码审查 |
+| 忽略过时的审批 | 确保最新变更被审查 |
+| 需要状态检查 | 阻止 CI 失败的提交 |
+| 需要签名提交 | 强制身份验证 |
+| 需要线性历史 | 防止合并提交 |
+| 管理员也适用 | 管理员无特例 |
+| 锁定分支 | 指定用户只读 |
+
+### GitLab
+
+```
+Settings → Repository → Protected Branches
+```
+
+类似控制：允许合并、推送和代码所有者审批。
+
+## 必需状态检查
+
+强制 CI 流水线通过后才能合并：
+
+```yaml
+# 常见检查项：
+# - continuous-integration（测试通过）
+# - lint / typecheck（代码质量）
+# - security-scan（漏洞扫描）
+# - dependency-review（许可/合规）
+```
+
+### CI 配置示例
+
+```yaml
+name: CI
+on: [pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci && npm test
+      - run: npm run lint
+      - run: npm audit --audit-level=high
+```
+
+## 签名标签
+
+标签也可以签名以验证发布版本的真实性。
+
+```bash
+# 创建签名标签
+git tag -s v1.0.0 -m "Release v1.0.0"
+
+# 验证标签
+git tag -v v1.0.0
+
+# 列出所有签名标签并验证
+git tag -v $(git tag)
+```
+
+签名标签防止攻击者创建包含恶意代码的虚假发布版本。
+
+## 强制签名策略
+
+### 服务端强制
+
+GitHub：Settings → Branches → Require signed commits
+
+GitLab：Settings → Repository → Protected branches → Require signature on commits
+
+### CI 验证
+
+```yaml
+- name: Verify signed commits
+  run: |
+    git verify-commit HEAD
+    if [ $? -ne 0 ]; then
+      echo "提交未签名！"
+      exit 1
+    fi
+```
+
+## 代码审查安全关卡
+
+### 必需审查人员
+
+```yaml
+# .github/CODEOWNERS
+*.js         @frontend-team
+*.go         @backend-team
+Dockerfile   @devops-team
+security/*   @security-team
+```
+
+### 合并队列
+
+GitHub 合并队列在合并前自动测试 PR 批次，确保主分支始终通过。
+
+## 安全供应链实践
+
+### 依赖来源验证
+
+```bash
+# 验证 npm 包签名
+npm audit signatures
+
+# 在 CI 中检查提交签名
+git verify-commit HEAD
+```
+
+### SLSA 框架
+
+- **Level 1**: 存在构建脚本
+- **Level 2**: 使用构建服务
+- **Level 3**: 构建可审计且封闭
+- **Level 4**: 两人审查构建
+
+### 签名发布
+
+```bash
+# 创建签名发布元数据
+gpg --sign -o release-v1.0.0.sig release-v1.0.0.txt
+
+# 与发布产物一起分发
+gsutil cp release-v1.0.0.* gs://my-releases/
+```
+
+## 关键要点
+
+1. **签名提交防止身份冒充**——Git 身份信任的基石
+2. **分支保护强制执行流程**——没有例外，没有捷径
+3. **状态检查拦截低质量代码**——人工审查前的自动化门禁
+4. **签名标签保证发布完整性**——部署前必须验证
+5. **审查关卡捕捉自动化遗漏**——与 CI 配合纵深防御
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+
+## 继续学习建议
+
+1. `security/gpg-signing` — GPG 提交签名深入讲解
+2. `security/signing-advanced` — 高级签名场景与密钥轮换
+3. `ci-cd/github-actions-basics` — 状态检查与 CI 流水线
+4. `best-practices/pull-request-review-readiness` — PR 审查最佳实践

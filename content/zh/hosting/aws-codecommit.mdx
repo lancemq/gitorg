@@ -1,0 +1,184 @@
+export const metadata = {
+  title: "AWS CodeCommit 集成指南",
+  slug: "aws-codecommit",
+  locale: "zh",
+  section: "hosting",
+  summary: "AWS CodeCommit 是 AWS 提供的全托管 Git 仓库服务。本文介绍其配置、认证、CI/CD 集成及与其他平台的对比。",
+  sourceUrls: [
+    "https://docs.aws.amazon.com/codecommit",
+    "https://docs.aws.amazon.com/codecommit/latest/userguide/auth-and-access-control.html",
+  ],
+};
+
+# AWS CodeCommit 集成指南
+
+## 学完这篇你会掌握什么
+
+- 理解 AWS CodeCommit 集成指南 的核心作用和适用场景
+- 掌握 AWS CodeCommit 集成指南 的基本用法和常用参数
+- AWS CodeCommit 是 AWS 提供的全托管 Git 仓库服务。本文介绍其配置、认证、CI/CD 集成及与其他平台的对比。
+- 理解 CodeCommit 仓库设置 相关的概念
+- 掌握 CodePipeline 集成 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+## 先想一个问题
+
+你在选择或配置 Git 托管方案——可能是要自建 Gitea，也可能是在对比 GitHub、GitLab、Gitee 的功能差异和成本。你不确定哪个方案最适合你的团队。
+
+## 一句话理解
+
+AWS CodeCommit 是 AWS 云原生的全托管 Git 服务，与你使用过的 GitHub/GitLab 最大的不同在于它没有 Web UI 的 PR 界面，所有交互通过 AWS 生态和 CLI 完成。
+
+## CodeCommit 仓库设置
+
+### 创建仓库
+
+```bash
+aws codecommit create-repository --repository-name my-repo --repository-description "My project"
+```
+
+克隆空仓库：
+
+```bash
+git clone codecommit::ap-northeast-1://my-repo
+cd my-repo && git add . && git commit -m "Initial commit" && git push
+```
+
+### IAM 认证 vs SSH
+
+| 认证方式 | 优点 | 缺点 |
+|---------|------|------|
+| IAM 用户 + HTTPS | 细粒度权限控制，适合团队 | 需要配置 IAM policy |
+| SSH 密钥 | 使用方便，类似 GitHub | 密钥管理较繁琐 |
+| Git 凭证 (HTTPS) | 临时凭证，无需 IAM 用户 | 凭证每小时过期 |
+
+IAM policy 示例：
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "codecommit:GitPull",
+        "codecommit:GitPush"
+      ],
+      "Resource": "arn:aws:codecommit:ap-northeast-1:123456789012:my-repo"
+    }
+  ]
+}
+```
+
+### HTTPS Git 凭证
+
+在 IAM 控制台中为用户生成 Git 凭证，然后：
+
+```bash
+git config --global credential.helper '!aws codecommit credential-helper $@'
+git config --global credential.UseHttpPath true
+```
+
+之后使用 HTTPS URL 克隆即可自动签名。
+
+## CodePipeline 集成
+
+将 CodeCommit 作为 CodePipeline 的源阶段：
+
+```yaml
+# buildspec.yml
+version: 0.2
+phases:
+  install:
+    commands:
+      - npm install
+  build:
+    commands:
+      - npm run build
+artifacts:
+  files:
+    - 'dist/**/*'
+```
+
+在 CodePipeline 中配置：
+1. **Source**: CodeCommit 仓库 + 分支
+2. **Build**: CodeBuild（使用 buildspec.yml）
+3. **Deploy**: ECS / Lambda / S3
+
+### 触发器与通知
+
+```bash
+aws codecommit create-trigger \
+  --repository-name my-repo \
+  --trigger-configuration name=my-trigger,events=all,destinationArn=arn:aws:sns:ap-northeast-1:123456789012:my-topic
+```
+
+## 跨账号访问
+
+通过 AWS RAM（Resource Access Manager）共享 CodeCommit 仓库：
+
+```
+Account A (Owner) → 创建仓库 → 共享给 Account B
+Account B (Collaborator) → 接受共享 → git clone 跨账号
+```
+
+也可以使用 IAM 角色跨账号 AssumeRole 拉取代码。
+
+## 仓库镜像与迁移
+
+### 从 GitHub 镜像到 CodeCommit
+
+```bash
+git clone --mirror https://github.com/user/repo.git
+cd repo.git
+git remote add codecommit codecommit::ap-northeast-1://my-repo
+git push --mirror codecommit
+```
+
+设置定期同步（使用 CodeBuild + EventBridge）自动保持镜像最新。
+
+### 从其他平台迁移
+
+```bash
+git clone --mirror <source-url>
+cd repo.git
+git remote add target <codecommit-url>
+git push --mirror target
+git lfs fetch --all && git lfs push --all target  # 如有 LFS
+```
+
+## Git LFS 支持与限制
+
+CodeCommit 支持 Git LFS，但有如下限制：
+
+| 特性 | 限制 |
+|------|------|
+| 最大文件大小 | 5 GB（LFS 文件） |
+| 仓库大小 | 推荐 < 10 GB |
+| LFS 存储 | 额外收费（按 GB/月） |
+| 推送并发 | 最多 30 并发推送 |
+
+> CodeCommit 的 LFS 基于 S3 实现，延迟比 GitHub 高，建议仅对构建产物等大文件使用。
+
+## 与 GitHub/GitLab 对比
+
+| 维度 | CodeCommit | GitHub | GitLab |
+|------|-----------|--------|--------|
+| Web UI (PR/MR) | ❌ 无 | ✅ 完善 | ✅ 完善 |
+| CI/CD 集成 | CodePipeline | Actions | GitLab CI |
+| 权限模型 | IAM policy | 组织/团队 | 角色/组 |
+| 自建选项 | ❌ 仅托管 | ❌ 仅托管 | ✅ 社区版 |
+| 计费 | 按用量付费 | 按席位 + 套餐 | 按席位 + 套餐 |
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+
+## 继续学习建议
+
+1. `hosting/platform-comparison` — 托管平台全面对比
+2. `hosting/gerrit-code-review` — Gerrit 代码审查系统
+3. `github/github-flow-basics` — GitHub Flow 工作流程

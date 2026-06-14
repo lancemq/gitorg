@@ -13,6 +13,20 @@ export const metadata = {
 
 # Git gc and repack Strategies
 
+## What you will learn
+
+- Understand the core purpose of Git gc and repack Strategies
+- Master the basic usage and common options of Git gc and repack Strategies
+- Master git gc, git repack, and git maintenance to keep your repository healthy and performant through proper object management.
+- Understand key concepts: Overview
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+Your Git repository keeps growing, clones are getting slower, and everyday operations are starting to feel sluggish. You want to know what optimization techniques are available and which ones fit your project.
+
 ## Overview
 
 As commits accumulate, Git's object store becomes fragmented. `git gc` (Garbage Collection) and `git repack` are essential tools for reclaiming space and improving performance.
@@ -160,6 +174,12 @@ git clone --depth 1 ...
 2. `git repack -a -d` can be slow — don't run on shared repos in use
 3. GC'd objects can still be recovered via reflog for a time
 4. Avoid frequent `--aggressive` on bare repos
+
+## Try it yourself
+
+1. Practice the gc-repack-strategies command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 
 ## Continue Learning
 

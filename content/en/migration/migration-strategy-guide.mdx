@@ -1,0 +1,131 @@
+export const metadata = {
+  title: "Repository Migration Strategy Guide",
+  slug: "migration-strategy-guide",
+  locale: "en",
+  section: "migration",
+  summary: "A complete migration framework covering assessment, trial, cutover, and transition phases, plus tool selection matrix, author mapping, history tradeoffs, and team communication plans.",
+  sourceUrls: ["https://git-scm.com/book/en/v2/Git-Tools-Migrating-to-Git"],
+};
+
+## Start with a problem
+
+Your team is migrating from another version control system to Git, or moving code and history between different Git platforms. You're worried about losing commit history or author information during the process.
+
+## One-Sentence Understanding
+
+A successful repository migration is not a one-time technical operation but a repeatable, phased engineering process requiring coordination of tools, processes, and people.
+
+## Four-Phase Migration Framework
+
+### Phase 1: Assessment
+
+Goal: Understand the source repository's scale and complexity.
+
+```
+□ Repository size, history depth, branch structure
+□ File composition (large files / binaries)
+□ Team size, commit frequency, external dependencies
+```
+
+```bash
+git count-objects -vH && git rev-list --count HEAD
+```
+
+### Phase 2: Trial
+
+Goal: Run a full migration in isolation and validate correctness.
+
+1. Select representative branches for trial
+2. Verify commit history completeness (counts, file changes)
+3. Check author mapping and CI/CD behavior
+4. Record duration and issues
+
+```bash
+echo "Source: $(svn log -q | grep -c '^r')" && echo "Target: $(git log --oneline | wc -l)"
+```
+
+### Phase 3: Cutover
+
+Notify → Final sync → Update CI/CD and docs → Notify completion → Set source to read-only
+
+### Phase 4: Transition
+
+Parallel run (2-4 weeks), Git expert support, collect feedback, build FAQ.
+
+## Tool Selection Matrix
+
+| Source | Recommended Tool | History | Limitations |
+|--------|-----------------|---------|-------------|
+| SVN | git-svn, svn2git | Full | One-way sync |
+| TFVC | git-tfs, Azure DevOps Migrator | Full (+work items) | Windows only |
+| Mercurial | hg-fast-export | Full | Bookmark conversion |
+| Perforce | git-p4 | Limited | Partial feature support |
+| CVS | cvs2git | Full | Slow |
+| Git cleanup | git filter-repo | N/A | Git-to-Git only |
+
+## Author Mapping
+
+Map source usernames to `Name <email>` format:
+
+```bash
+git svn clone --authors-file=authors.txt
+# Find unmapped authors
+
+## What you will learn
+
+- Understand the core purpose of Find unmapped authors
+- Master the basic usage and common options of Find unmapped authors
+- A complete migration framework covering assessment, trial, cutover, and transition phases, plus tool selection matrix, author mapping, history tradeoffs, and team communication plans.
+- Understand key concepts: Four-Phase Migration Framework
+- Know when to use this feature and when to avoid it
+
+git log --format="%an <%ae>" | sort -u
+# Batch-fill
+git log --format="%an" | sort -u | while read a; do echo "${a} = ${a} <${a}@company.com>"; done >> authors.txt
+```
+
+## History Preservation vs Cleanup Tradeoffs
+
+| Strategy | Pros | Cons | When to Use |
+|----------|------|------|-------------|
+| Full history | All traceable | Large repo, slow | Strict compliance |
+| Truncated N years | Small, fast | Loses early context | Legacy code |
+| Squash old commits | Balanced | Loses granular history | Pragmatic |
+| Current snapshot | Minimal | No history | Fresh start |
+
+```bash
+# Truncate by date
+git filter-repo --refs HEAD \
+  --commit-callback 'if commit.author_date < b"2020-01-01": return False'
+```
+
+## Migration Validation Checklist
+
+```
+□ Commit count matches (<1%)    □ All branches and tags migrated
+□ Author info fully mapped      □ First/last commit dates match
+□ Code content zero diff        □ CI/CD pipelines pass
+□ Team can clone and build
+```
+
+## Rollback Planning
+
+```bash
+# Plan A: Point back to old repo  # Plan B: Restore from backup
+git push --force origin main:refs/heads/main-restored
+# Plan C: Fix and re-migrate
+```
+
+Rollback triggers: CI/CD failing, core functionality broken, dev blocked >1 day.
+
+## Try it yourself
+
+1. Practice the migration-strategy-guide command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+
+## Continue Learning
+
+- See [Azure DevOps (TFS) to Git Migration](./azure-devops-migration) for TFVC migration details
+- Read [git filter-repo Repository Rewriting Deep Dive](./git-filter-repo) for post-migration cleanup
+- Recommended reading: Git Book [Migrating to Git](https://git-scm.com/book/en/v2/Git-Tools-Migrating-to-Git)

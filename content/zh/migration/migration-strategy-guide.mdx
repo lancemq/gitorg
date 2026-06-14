@@ -1,0 +1,132 @@
+export const metadata = {
+  title: "代码仓库迁移策略指南",
+  slug: "migration-strategy-guide",
+  locale: "zh",
+  section: "migration",
+  summary: "完整的仓库迁移框架，涵盖评估、试迁移、切换和过渡四阶段，工具选型矩阵、作者映射、历史取舍和团队沟通策略。",
+  sourceUrls: ["https://git-scm.com/book/en/v2/Git-Tools-Migrating-to-Git"],
+};
+
+## 先想一个问题
+
+你的团队正在从其他版本控制系统迁移到 Git，或者需要在不同 Git 平台之间迁移代码和历史。你担心迁移过程中会不会丢失提交记录或作者信息。
+
+## 一句话理解
+
+成功的仓库迁移不是一次性的技术操作，而是一个可重复的、分阶段的工程过程，需要工具、流程和人员的协同配合。
+
+## 迁移规划四阶段框架
+
+### 第一阶段：评估 (Assessment)
+
+目标：全面了解源仓库规模和复杂性。
+
+```
+□ 仓库大小、历史深度、分支结构
+□ 文件构成（大文件/二进制占比）
+□ 团队规模、提交频率、外部依赖
+```
+
+```bash
+git count-objects -vH && git rev-list --count HEAD
+```
+
+### 第二阶段：试迁移 (Trial)
+
+目标：在隔离环境中执行完整迁移，验证正确性。
+
+1. 选择代表性分支执行试迁移
+2. 验证提交历史完整性（提交数、文件变更）
+3. 检查作者映射和 CI/CD 流程
+4. 记录耗时和问题
+
+```bash
+echo "源: $(svn log -q | grep -c '^r')" && echo "目标: $(git log --oneline | wc -l)"
+```
+
+### 第三阶段：切换 (Cutover)
+
+通知 → 最终同步 → 更新 CI/CD 和文档 → 通知完成 → 源仓库设只读
+
+### 第四阶段：过渡 (Transition)
+
+新仓库并行运行 2-4 周，安排 Git 专家支持，建立 FAQ。
+
+## 工具选型矩阵
+
+| 源系统 | 推荐工具 | 历史保留 | 限制 |
+|--------|----------|----------|------|
+| SVN | git-svn, svn2git | 完整 | 单向同步 |
+| TFVC | git-tfs, Azure DevOps Migrator | 完整（含工作项） | 仅 Windows |
+| Mercurial | hg-fast-export | 完整 | 需转换 bookmark |
+| Perforce | git-p4 | 有限 | 不支持全部特性 |
+| CVS | cvs2git | 完整 | 速度慢 |
+| Git 清理 | git filter-repo | N/A | 仅 Git 内部重写 |
+
+## 作者映射
+
+将源系统用户名映射为 `姓名 <邮箱>` 格式：
+
+```bash
+git svn clone --authors-file=authors.txt
+# 查找未映射的作者
+
+## 学完这篇你会掌握什么
+
+- 理解 查找未映射的作者 的核心作用和适用场景
+- 掌握 查找未映射的作者 的基本用法和常用参数
+- 完整的仓库迁移框架，涵盖评估、试迁移、切换和过渡四阶段，工具选型矩阵、作者映射、历史取舍和团队沟通策略。
+- 理解 迁移规划四阶段框架 相关的概念
+- 掌握 工具选型矩阵 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+git log --format="%an <%ae>" | sort -u
+# 批量补全
+git log --format="%an" | sort -u | while read a; do echo "${a} = ${a} <${a}@company.com>"; done >> authors.txt
+```
+
+## 历史保留 vs 清理的权衡
+
+| 策略 | 优点 | 缺点 | 适用场景 |
+|------|------|------|----------|
+| 完整历史 | 可追溯所有变更 | 仓库大、迁移慢 | 合规严格 |
+| 截断最近 N 年 | 仓库小、迁移快 | 丢失早期上下文 | 遗留代码 |
+| Squash 旧提交 | 平衡体积和追溯 | 丢失细粒度历史 | 折衷方案 |
+| 仅保留当前快照 | 最小体积 | 无历史 | 全新开始 |
+
+```bash
+# 按日期截断历史
+git filter-repo --refs HEAD \
+  --commit-callback 'if commit.author_date < b"2020-01-01": return False'
+```
+
+## 迁移验证检查清单
+
+```
+□ 提交数匹配（误差 <1%）  □ 所有分支和标签已迁移
+□ 作者信息完整映射           □ 首末次提交日期一致
+□ 代码内容无差异             □ CI/CD 流程通过
+□ 团队成员可 clone 和构建
+```
+
+## 回滚计划
+
+```bash
+# 方案 A：切换指向旧仓库  # 方案 B：从备份恢复
+git push --force origin main:refs/heads/main-restored
+# 方案 C：修复后重新迁移
+```
+
+回滚触发条件：CI/CD 长时间失败、核心功能损坏、开发受阻超 1 天。
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+
+## 继续学习建议
+
+- 查看 [Azure DevOps (TFS) 到 Git 迁移](./azure-devops-migration) 了解 TFVC 迁移细节
+- 阅读 [git filter-repo 仓库重写深入](./git-filter-repo) 学习迁移后的历史清理
+- 推荐阅读：Git 官方迁移文档 [Migrating to Git](https://git-scm.com/book/en/v2/Git-Tools-Migrating-to-Git)

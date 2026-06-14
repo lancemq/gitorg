@@ -11,6 +11,19 @@ export const metadata = {
 
 # git-fsck Tutorial
 
+## What you will learn
+
+- Understand the core purpose of git-fsck Tutorial
+- Master the basic usage and common options of git-fsck Tutorial
+- Explains how to use git-fsck to verify the integrity of objects and refs.
+- Understand key concepts: When it is a good fit
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
 ## The short version
 
 git-fsck is used to verify the integrity of objects and refs.
@@ -74,4 +87,10 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 - This is a read-only integrity check command — running it at any time will never affect repository state.
 - The `--lost-found` flag writes the content of dangling objects into `.git/lost-found/`, making them easier to inspect later.
 - Dangling objects themselves are not errors — they may be unreferenced commits, old blobs, etc., and need to be evaluated in context to determine whether action is needed.
+
+## Try it yourself
+
+1. Practice the git-fsck command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

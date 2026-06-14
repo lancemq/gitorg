@@ -3,7 +3,7 @@ export const metadata = {
   slug: "merge-and-close-task",
   locale: "zh",
   section: "learning-path",
-  summary: "完成一次完整协作闭环：选择合并策略、确认主线状态、清理分支并更新任务状态，避免“代码已合并但流程未收口”。",
+  summary: "完成一次完整协作闭环：选择合并策略、确认主线状态、清理分支并更新任务状态，避免\u201c代码已合并但流程未收口\u201d。",
   sourceUrls: [
     "https://git-scm.com/docs/git-merge",
     "https://git-scm.com/docs/git-branch",
@@ -13,15 +13,28 @@ export const metadata = {
 
 # 合并并关闭任务闭环
 
-PR 被批准只是中间节点，真正结束是“主线已稳定 + 分支已清理 + 任务状态已更新”。
+## 学完这篇你会掌握什么
 
-## 合并前检查
+- 知道 PR 被批准后还要做哪些收尾工作
+- 合并前核对 check 状态、审批规则和目标分支
+- 合并后切换到主分支、拉取最新、清理本地和远端分支
+- 理解分支不清理会让协作噪声增加
 
-1. required checks 全绿
-2. 审批状态满足规则
-3. 目标分支仍是最新
+## 先想一个问题
 
-## 合并后动作
+你的 PR 已经被批准了，接下来呢？很多人以为 PR 被合并后任务就结束了——但如果不做收尾：不切回主分支、不拉取最新代码、不删除已合并的分支，下次切分支就很容易陷入混乱。
+
+## 合并前确认三件事
+
+在点击合并按钮之前，先确认：
+
+1. **required checks 全绿**——CI 测试、lint、构建都已通过
+2. **审批状态满足规则**——至少有一个 reviewer 批准
+3. **目标分支仍是最新**——如果 main 在你发起 PR 后又有了新提交，建议先同步再合并
+
+这三条缺任何一条，合并后都可能有隐患。
+
+## 合并后必须做的三件事
 
 ```bash
 git switch main
@@ -30,17 +43,31 @@ git branch -d feature/first-pr
 git push origin --delete feature/first-pr
 ```
 
+每行的作用：
+
+- `git switch main`：离开功能分支，回到主分支
+- `git pull --ff-only`：把合并后的最新 main 拉到本地
+- `git branch -d`：删除本地功能分支（-d 会检查是否已合并，安全）
+- `git push origin --delete`：删除远端分支，保持仓库整洁
+
 ## 为什么要清理分支
 
-分支不清理会让后续协作噪声增加，也会掩盖真正活跃任务。
+分支不清理会让后续协作噪声增加。想象一下：仓库里同时存在 30 个分支，其中 15 个已经合并——每次切换分支都要在一堆死分支里找活分支。
+
+**一个实用的参考标准**：每次合并后立即清理，比每周集中清理一次更容易坚持。你的目标是让远端分支列表始终反映"当前在做的任务"。
 
 <WarningBox title="不要合并后就离开">
-  若不更新任务状态与回归验证结果，团队会出现“代码合了但没人确认上线效果”的盲区。
+  若不更新任务状态与回归验证结果，团队会出现"代码合了但没人确认上线效果"的盲区。
 </WarningBox>
+
+## 给你的练习
+
+1. 在你的第一个 PR 合并后，依次执行 git switch main、git pull --ff-only、git branch -d 和 git push origin --delete
+2. 故意不删除分支，一周后观察远端分支列表的混乱程度
+3. 在团队中约定一条规则：合并后立即删除源分支，持续执行一周
 
 ## 接下来建议继续学什么
 
-1. `first safe hotfix`
-2. `pr merge strategy and platform settings`
-3. `release hygiene`
-
+1. `first safe hotfix` — 紧急修复场景的快速响应流程
+2. `pr merge strategy and platform settings` — 合并策略与平台配置
+3. `release hygiene` — 发布规范与版本管理

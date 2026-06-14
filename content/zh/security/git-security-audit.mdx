@@ -1,0 +1,276 @@
+export const metadata = {
+  title: "Git 仓库安全审计",
+  slug: "git-security-audit",
+  locale: "zh",
+  section: "security",
+  summary: "审查 Git 仓库访问、git-fsck 完整性检查、扫描历史中的泄露密钥、GitHub/GitLab 审计日志、验证作者身份与合规性考量。",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-fsck",
+    "https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs",
+    "https://docs.gitlab.com/ee/administration/audit_events.html",
+  ],
+};
+
+# Git 仓库安全审计
+
+## 学完这篇你会掌握什么
+
+- 理解 Git 仓库安全审计 的核心作用和适用场景
+- 掌握 Git 仓库安全审计 的基本用法和常用参数
+- 审查 Git 仓库访问、git-fsck 完整性检查、扫描历史中的泄露密钥、GitHub/GitLab 审计日志、验证作者身份与合规性考量。
+- 理解 审计 Git 仓库访问 相关的概念
+- 掌握 git-fsck 仓库完整性检查 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+## 先想一个问题
+
+你担心 Git 仓库的安全——可能是密钥管理不到位，也可能是提交没有签名验证。你不确定自己的安全配置是否足够，也不清楚从哪里开始加固。
+
+## 一句话理解
+
+Git 安全审计系统性地检查仓库历史、访问日志、提交完整性和作者身份，以发现入侵、泄露密钥和策略违规。
+
+## 审计 Git 仓库访问
+
+### GitHub 审计日志
+
+```
+Settings → Audit log → Filter events
+```
+
+需要关注的关键事件：
+
+| 事件 | 含义 |
+|------|------|
+| `repo.push` | 代码推送到仓库 |
+| `repo.access` | 仓库可见性变更 |
+| `protected_branch.update` | 分支保护规则修改 |
+| `protected_branch.destroy` | 分支保护规则删除 |
+| `repo.transfer` | 仓库所有权转移 |
+| `git.clone` | 仓库被克隆 |
+| `collaborator.add` | 添加了新协作者 |
+| `integration_installation_add` | 安装了新应用 |
+
+### GitLab 审计事件
+
+```
+Admin Area → Monitoring → Audit Events
+```
+
+追踪事件：项目变更、用户访问、部署密钥、受保护分支、CI/CD 设置。
+
+## git-fsck 仓库完整性检查
+
+`git fsck` 检查对象数据库的完整性和悬挂对象。
+
+```bash
+# 基本完整性检查
+git fsck
+
+# 检查所有对象（包括不可达的）
+git fsck --full
+
+# 详细输出
+git fsck --full --verbose
+
+# 显示悬挂对象（可能包含泄露的密钥）
+git fsck --lost-found
+
+# 恢复悬挂对象
+git fsck --lost-found
+git checkout git fsck | grep dangling | awk '{print $3}' | xargs git show
+```
+
+### git-fsck 检测内容
+
+- 缺失对象（数据损坏）
+- 悬挂 blob（已删除但仍在对象存储中的文件）
+- 悬挂 commit（历史重写残留）
+- 无效对象类型
+- 对象间的链接断开
+
+## 检查泄露密钥
+
+### 历史扫描命令
+
+```bash
+# 在所有提交的提交信息中搜索关键词
+git log --all --oneline --grep="password\|secret\|api_key"
+
+# 搜索提交内容中的特定字符串
+git log --all -p -S "AKIAIOSFODNN7" -- .  # AWS 密钥示例
+
+# 搜索历史中的文件名
+git log --all --diff-filter=A --name-only --pretty=format: | sort -u
+
+# 检查大文件（可能为密钥导出文件）
+git rev-list --all --objects | \
+  git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' | \
+  awk '/^blob/ {print $3, $4}' | sort -rn | head -20
+```
+
+### 自动化审计工具
+
+```bash
+# 使用 truffleHog 审计
+trufflehog git https://github.com/user/repo.git \
+  --json > audit-report.json
+
+# 使用 Gitleaks 扫描全部历史
+gitleaks detect --source . --log-opts="--all" \
+  --report-format json --report audit.json
+
+# git-secrets 历史扫描
+git secrets --scan-history
+```
+
+## 分析提交历史中的敏感数据
+
+### 定位泄露源头
+
+```bash
+# Git blame 特定行
+git blame -L 5,10 config.js
+
+# 查找引入特定字符串的提交
+git log --all -S "password123" --pretty=format:"%H %an %ae %ai"
+git log --all -p --full-history -S "password123"
+
+# 列出所有贡献者及邮箱
+git log --all --format="%an <%ae>" | sort -u
+```
+
+### 检测异常模式
+
+```bash
+# 突然出现的大型二进制 blob
+git rev-list --all --objects --size | \
+  awk '{if ($2 > 100000) print $2, $1}' | sort -rn
+
+# 非正常时间提交（深夜、周末）
+git log --all --format="%H %ai %an" | grep -E "(00:|01:|02:|03:|04:)"
+```
+
+## GitHub/GitLab 审计日志
+
+### GitHub
+
+通过 API 导出审计日志：
+
+```bash
+# 使用 GitHub CLI
+gh api /orgs/{org}/audit-log -q '.[] | select(.action=="repo.push")'
+
+# 使用 REST API
+curl -H "Authorization: token $TOKEN" \
+  https://api.github.com/orgs/{org}/audit-log
+```
+
+### GitLab
+
+```bash
+# 通过 API 查询审计事件
+curl --header "PRIVATE-TOKEN: $TOKEN" \
+  https://gitlab.com/api/v4/audit_events
+
+# 项目级事件
+curl --header "PRIVATE-TOKEN: $TOKEN" \
+  https://gitlab.com/api/v4/projects/{id}/audit_events
+```
+
+### 自托管
+
+对于自托管 Git 服务器，解析服务端日志：
+
+```bash
+# SSH 访问日志
+grep "git-receive-pack\|git-upload-pack" /var/log/auth.log
+
+# Apache/Nginx 日志
+grep "info/refs\|git-upload-pack" /var/log/nginx/access.log
+```
+
+## 验证作者身份
+
+### 交叉验证邮箱
+
+```bash
+# 列出所有唯一作者
+git log --all --format="%an,%ae" | sort -u
+
+# 检查可疑的姓名/邮箱组合
+git log --all --format="%an <%ae>" | grep -vi "@company.com"
+
+# 查找同一邮箱下的不同用户名
+git log --all --format="%an,%ae" | sort -u | awk -F, '{print $2}' | uniq -d
+```
+
+### 批量验证 GPG 签名
+
+```bash
+# 列出所有未签名提交（策略审计）
+git log --all --format="%H %GS" | grep " $"
+
+# 统计签名与未签名数量
+git log --all --format="%G?" | sort | uniq -c
+
+# 显示签名无效的提交
+git log --all --format="%H %an %ae %G?" | grep " B$"
+```
+
+## 合规性考量
+
+### 标准与框架
+
+| 标准 | Git 审计要求 |
+|------|-------------|
+| SOC 2 | 访问日志、变更管理、代码审查 |
+| PCI DSS | 追踪所有访问，监控卡数据泄露 |
+| GDPR | 识别提交中的个人数据，擦除权 |
+| ISO 27001 | 版本控制审计轨迹，访问审查 |
+
+### 审计检查清单
+
+1. **访问**：审查所有协作者、团队和令牌权限
+2. **历史**：扫描所有分支和标签中的密钥
+3. **完整性**：对所有仓库运行 `git fsck --full`
+4. **签名**：验证提交签名合规率
+5. **CI/CD**：审查流水线定义中的凭据暴露
+6. **依赖**：检查上游依赖提交是否被篡改
+7. **备份**：确保审计日志保留且不可篡改
+
+### 生成审计报告
+
+```bash
+#!/bin/bash
+# audit-report.sh
+echo "=== 仓库：$(basename $(pwd)) ==="
+echo "提交总数：$(git rev-list --all --count)"
+echo "作者数：$(git log --all --format='%an' | sort -u | wc -l)"
+echo "未签名提交：$(git log --all --format='%G?' | grep 'N' | wc -l)"
+echo "悬挂对象数：$(git fsck --lost-found 2>&1 | wc -l)"
+echo "贡献者列表："
+git log --all --format='%an <%ae>' | sort -u
+```
+
+## 关键要点
+
+1. **git-fsck 揭示隐藏数据**——悬挂 blob 可能包含泄露的密钥
+2. **自动化扫描必不可少**——手动审查历史在规模上不可行
+3. **平台审计日志追踪谁做了什么**——事件响应的关键
+4. **作者身份验证检测冒充**——交叉验证姓名、邮箱和 GPG 密钥
+5. **合规要求定期审计**——将检查纳入季度或月度轮换
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+
+## 继续学习建议
+
+1. `commands/git-fsck` — git-fsck 完整参考
+2. `security/secret-scanning` — 密钥检测的工具与工作流
+3. `security/gpg-signing` — 提交签名验证
+4. `best-practices/security-with-git` — Git 安全概览

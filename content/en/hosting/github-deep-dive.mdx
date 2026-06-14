@@ -12,13 +12,42 @@ export const metadata = {
 
 # GitHub Advanced Features Guide
 
-## Overview
+## What you will learn
 
-GitHub is more than just a Git hosting platform. This guide explores advanced features to help you manage projects and team collaboration more effectively.
+- When to use custom Actions, matrix builds, and environment approvals
+- How to deploy documentation or static sites with GitHub Pages
+- How CODEOWNERS, Rulesets, and security features work
+- What GitHub Projects can do for team planning
 
-## Actions Advanced
 
-### Custom Action
+## Start with a problem
+
+You're choosing or configuring a Git hosting solution — whether self-hosting Gitea or comparing GitHub, GitLab, and Gitee features. You're not sure which option best fits your team's needs.
+
+## Start with a question
+
+You are already using GitHub to host code. But you may have run into these situations:
+
+- A CI step needs to be reused across multiple repositories — copying YAML each time is tedious
+- You want documentation to auto-deploy to `docs.yourcompany.com`
+- Specific directories need reviews from specific team members
+- The main branch needs protection from accidental force pushes
+
+GitHub has built-in features for all of these — but many teams stop at "push code" and never explore them.
+
+## One-sentence understanding
+
+GitHub is more than Git hosting. It provides Actions (automation), Pages (hosting), Projects (planning), security scanning, and more — forming a complete collaboration loop around your repository.
+
+## Scenario 1: Reusing CI logic across projects
+
+### The problem
+
+You have a build step that 10 projects need. Copying the same YAML everywhere means 10 places to update when something changes.
+
+### Solution: Custom Actions
+
+A custom Action is a reusable building block, not a complete workflow:
 
 ```yaml
 # .github/actions/my-action/action.yml
@@ -37,7 +66,9 @@ runs:
   main: "index.js"
 ```
 
-### Matrix Builds
+The key insight: **this lives in one repository and is referenced by many workflows**. Update it in one place, and all consumers pick up the change.
+
+### Matrix builds: test across environments in parallel
 
 ```yaml
 jobs:
@@ -55,7 +86,9 @@ jobs:
       - run: npm test
 ```
 
-### Environments with Approvals
+This runs the same test suite 9 times (3 OS × 3 Node versions) in parallel. If one combination fails, you see it immediately.
+
+### Environment approvals: require a human before production
 
 ```yaml
 jobs:
@@ -65,11 +98,13 @@ jobs:
       - run: ./deploy.sh
 ```
 
-Production environments can require manual approval before deployment.
+With `environment: production`, you can require manual approval before deployment. This prevents accidental or unauthorized production releases.
 
-## GitHub Pages
+## Scenario 2: Deploying documentation as a website
 
-### Deploy Static Sites
+### Solution: GitHub Pages
+
+GitHub Pages hosts static websites directly from your repository. Once configured, every push to main triggers a redeploy.
 
 ```yaml
 # .github/workflows/deploy.yml
@@ -85,26 +120,31 @@ jobs:
           publish_dir: ./out
 ```
 
-### Custom Domain
+### Custom domain
 
-```bash
-# Configure in project Pages settings:
-# Custom domain: docs.yourdomain.com
-# Add CNAME or A record to GitHub Pages
-```
+To use your own domain instead of `your-org.github.io`:
 
-## GitHub Projects
+1. In repo Settings → Pages, enter your custom domain (e.g., `docs.yourcompany.com`)
+2. Add a CNAME record pointing to `your-org.github.io` in your DNS provider
 
-Projects provide Jira-like project management:
+## Scenario 3: Tracking work beyond issue lists
 
-1. **Table view**: Spreadsheet-like view
-2. **Board view**: Kanban board
-3. **Roadmap view**: Timeline view
-4. **Automation rules**: Auto-move cards by Issue/PR state
+### Solution: GitHub Projects
 
-## Advanced Repository Management
+Projects give you kanban-style boards for tracking issues and PRs. Four views are available:
 
-### CODEOWNERS
+1. **Table view**: spreadsheet-like, good for batch editing
+2. **Board view**: kanban columns (To Do, In Progress, Done)
+3. **Roadmap view**: timeline for cross-project planning
+4. **Automation rules**: auto-move cards when issue/PR state changes
+
+A real example: a team's PRs move from "In Review" → "Approved" → "Done" automatically, no dragging required.
+
+## Scenario 4: Code changes keep missing the right reviewer
+
+### Solution: CODEOWNERS
+
+Create a `.github/CODEOWNERS` file in your repository root:
 
 ```bash
 # .github/CODEOWNERS
@@ -114,24 +154,30 @@ Projects provide Jira-like project management:
 *.md @docs-maintainer
 ```
 
-Auto-assign reviewers based on file changes.
+Now any PR that changes files under `src/api/` automatically requests a review from `@team-api`. No manual reviewer assignment needed.
 
-### Rulesets
+### Rulesets: more flexible branch protection
 
-Rulesets are more flexible than branch protection, applying rules across branches and tags.
+Rulesets extend branch protection rules across multiple branches and tags:
 
-- Lock repository configuration
-- Require linear history
-- Restrict create/delete permissions per user
+- Lock repository configuration from being changed
+- Require linear history (no merge commits)
+- Restrict who can create or delete branches
 
-### Security Features
+### Security features overview
 
-| Feature | Description |
-|---------|-------------|
-| Dependabot | Auto-detect dependency vulnerabilities and create PRs |
-| Secret scanning | Auto-detect secrets in repositories |
-| Code scanning | CodeQL-based code analysis |
-| Private vulnerability reporting | Secure channel for security researchers |
+| Feature | What it does | When you need it |
+|---------|-------------|-----------------|
+| Dependabot | Detects vulnerable dependencies and opens fix PRs | Any project with third-party deps |
+| Secret scanning | Scans repos for accidentally committed secrets | All projects |
+| Code scanning | CodeQL-based security analysis | Security-sensitive projects |
+| Private vulnerability reporting | Lets researchers privately report issues | Open source projects |
+
+## Try it yourself
+
+1. Extract a commonly used CI step into a custom Action in a separate repository, then reference it from your project workflow
+2. Deploy your project documentation with GitHub Pages (start with the default `your-org.github.io/repo` domain)
+3. Create a CODEOWNERS file and assign reviewers for different directories
 
 ## Continue Learning
 

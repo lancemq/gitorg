@@ -12,6 +12,20 @@ export const metadata = {
 
 # Shallow Clones and CI Optimization
 
+## What you will learn
+
+- Understand the core purpose of Shallow Clones and CI Optimization
+- Master the basic usage and common options of Shallow Clones and CI Optimization
+- Understanding shallow clones, single-branch clones, and how to optimize Git operations for CI/CD and large repositories.
+- Understand key concepts: What is a Shallow Clone?
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+You've encountered a conceptual question while using Git — you roughly know what it means, but you're not entirely sure about its precise definition and boundaries.
+
 ## What is a Shallow Clone?
 
 A **shallow clone** is a Git clone that downloads only a limited number of commits from the repository history, rather than the complete history. This is controlled by the `--depth` flag:
@@ -435,3 +449,10 @@ git clone --depth 1 --recurse-submodules --shallow-submodules \
 | `--deepen N` | Fetch N more commits in a shallow clone |
 
 Shallow clones and partial clones are essential tools for optimizing Git operations in CI/CD pipelines and when working with large repositories. Choose the right combination of depth, filtering, and sparse checkout based on what your workflow actually needs. For most CI/CD jobs, `--depth 1` provides the best balance of speed and functionality.
+
+## Try it yourself
+
+1. Practice the git-shallow command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

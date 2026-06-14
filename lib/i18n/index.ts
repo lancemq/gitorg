@@ -2,21 +2,18 @@ import {
   type CommandSlug,
   type BestPracticeSlug,
   type WorkflowSlug,
-  type GithubSlug,
-  type GitlabSlug,
+  type PlatformsSlug,
   type InternalsSlug,
   type RecoverySlug,
   type LearningPathSlug,
   type ConceptsSlug,
-  type CiCdSlug,
-  type IdeSlug,
+  type DevopsSlug,
   type SecuritySlug,
   type PerformanceSlug,
   type MigrationSlug,
   type HostingSlug,
   learningPathSlugs,
-  githubSlugs,
-  gitlabSlugs,
+  platformsSlugs,
   commandSlugs,
   basicCommandSlugs,
   advancedCommandSlugs,
@@ -25,8 +22,7 @@ import {
   recoverySlugs,
   conceptSlugs,
   internalsSlugs,
-  ciCdSlugs,
-  ideSlugs,
+  devopsSlugs,
   securitySlugs,
   performanceSlugs,
   migrationSlugs,
@@ -37,21 +33,18 @@ export {
   type CommandSlug,
   type BestPracticeSlug,
   type WorkflowSlug,
-  type GithubSlug,
-  type GitlabSlug,
+  type PlatformsSlug,
   type InternalsSlug,
   type RecoverySlug,
   type LearningPathSlug,
   type ConceptsSlug,
-  type CiCdSlug,
-  type IdeSlug,
+  type DevopsSlug,
   type SecuritySlug,
   type PerformanceSlug,
   type MigrationSlug,
   type HostingSlug,
   learningPathSlugs,
-  githubSlugs,
-  gitlabSlugs,
+  platformsSlugs,
   commandSlugs,
   basicCommandSlugs,
   advancedCommandSlugs,
@@ -60,8 +53,7 @@ export {
   recoverySlugs,
   conceptSlugs,
   internalsSlugs,
-  ciCdSlugs,
-  ideSlugs,
+  devopsSlugs,
   securitySlugs,
   performanceSlugs,
   migrationSlugs,
@@ -117,8 +109,8 @@ export type DocsSectionId =
   | "internals"
   | "recovery"
   | "concepts"
-  | "ci-cd"
-  | "ide"
+  | "platforms"
+  | "devops"
   | "security"
   | "performance"
   | "migration"
@@ -148,12 +140,7 @@ export type Dictionary = {
     title: string;
     description: string;
   };
-  githubIndex: {
-    eyebrow: string;
-    title: string;
-    description: string;
-  };
-  gitlabIndex: {
+  platformsIndex: {
     eyebrow: string;
     title: string;
     description: string;
@@ -168,12 +155,7 @@ export type Dictionary = {
     title: string;
     description: string;
   };
-  ciCdIndex: {
-    eyebrow: string;
-    title: string;
-    description: string;
-  };
-  ideIndex: {
+  devopsIndex: {
     eyebrow: string;
     title: string;
     description: string;
@@ -309,15 +291,13 @@ export type Dictionary = {
       commands: string;
       bestPractices: string;
       workflows: string;
-      github: string;
-      gitlab: string;
+      platforms: string;
       internals: string;
       concepts: string;
       faq: string;
       learningPath: string;
       recovery: string;
-      "ci-cd": string;
-      ide: string;
+      devops: string;
       security: string;
       performance: string;
       migration: string;
@@ -393,50 +373,26 @@ export function buildInternalsNavItem(locale: Locale, activePath?: string): NavI
   };
 }
 
-export function buildGithubNavItem(locale: Locale, activePath?: string): NavItem {
+export function buildPlatformsNavItem(locale: Locale, activePath?: string): NavItem {
   const parentActive =
-    activePath === "github-index" ||
-    githubSlugs.some((slug) => activePath === `github/${slug}`);
+    activePath === "platforms-index" ||
+    platformsSlugs.some((slug) => activePath === `platforms/${slug}`);
 
   return {
-    label: locale === "zh" ? "GitHub 专题" : "GitHub",
-    href: `/${locale}/github`,
-    active: parentActive || activePath === "github",
+    label: locale === "zh" ? "平台协作" : "Platforms",
+    href: `/${locale}/platforms`,
+    active: parentActive || activePath === "platforms",
   };
 }
 
-export function buildGitlabNavItem(locale: Locale, activePath?: string): NavItem {
+export function buildDevopsNavItem(locale: Locale, activePath?: string): NavItem {
   const parentActive =
-    activePath === "gitlab-index" ||
-    gitlabSlugs.some((slug) => activePath === `gitlab/${slug}`);
+    activePath === "devops-index" ||
+    devopsSlugs.some((slug) => activePath === `devops/${slug}`);
 
   return {
-    label: locale === "zh" ? "GitLab 专题" : "GitLab",
-    href: `/${locale}/gitlab`,
-    active: parentActive || activePath === "gitlab",
-  };
-}
-
-export function buildCicdNavItem(locale: Locale, activePath?: string): NavItem {
-  const parentActive =
-    activePath === "ci-cd-index" ||
-    ciCdSlugs.some((slug) => activePath === `ci-cd/${slug}`);
-
-  return {
-    label: locale === "zh" ? "CI/CD 集成" : "CI/CD",
-    href: `/${locale}/ci-cd`,
-    active: parentActive,
-  };
-}
-
-export function buildIdeNavItem(locale: Locale, activePath?: string): NavItem {
-  const parentActive =
-    activePath === "ide-index" ||
-    ideSlugs.some((slug) => activePath === `ide/${slug}`);
-
-  return {
-    label: locale === "zh" ? "IDE 集成" : "IDE Integration",
-    href: `/${locale}/ide`,
+    label: locale === "zh" ? "DevOps 工具链" : "DevOps Tooling",
+    href: `/${locale}/devops`,
     active: parentActive,
   };
 }

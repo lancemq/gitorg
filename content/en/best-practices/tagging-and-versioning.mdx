@@ -12,6 +12,19 @@ export const metadata = {
 
 # Tagging and Versioning
 
+## What you will learn
+
+- Understand the core purpose of Tagging and Versioning
+- Master the basic usage and common options of Tagging and Versioning
+- Use Semantic Versioning (SemVer) and annotated tags to establish clear, traceable release conventions.
+- Understand key concepts: Semantic Versioning (SemVer)
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+Your team has developed some Git habits over time, but you're not sure if they are optimal — or you've just been through an incident caused by a Git mistake and want to avoid repeating it.
+
 ## The short version
 
 Tags are **immutable references** pointing to specific commits in Git, making them ideal for marking release points. Combined with **Semantic Versioning (SemVer)**, version numbers themselves communicate the nature and impact of changes.
@@ -284,3 +297,10 @@ What changed since the last release?
 3. Tags are not branches; you cannot commit directly on them. You must create a branch from the commit the tag points to in order to continue development
 4. Some automation tools depend on tags to trigger; tag names must match tool configurations
 5. In a monorepo, consider using prefixed tags (e.g., `@app/v1.0.0`) to distinguish different packages
+
+## Try it yourself
+
+1. Practice the tagging-and-versioning command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

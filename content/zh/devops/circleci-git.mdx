@@ -1,0 +1,225 @@
+export const metadata = {
+  title: "CircleCI 与 Git 集成",
+  slug: "circleci-git",
+  locale: "zh",
+  section: "devops",
+  summary: "深入介绍 CircleCI 如何与 Git 仓库协同工作，包括流水线配置、Git 触发策略、检出优化、缓存机制以及基于 Git Tag 的参数化构建。",
+  sourceUrls: [
+    "https://circleci.com/docs/",
+    "https://circleci.com/docs/using-git/",
+  ],
+};
+
+# CircleCI 与 Git 集成
+
+## 学完这篇你会掌握什么
+
+- 理解 CircleCI 与 Git 集成 的核心作用和适用场景
+- 掌握 CircleCI 与 Git 集成 的基本用法和常用参数
+- 深入介绍 CircleCI 如何与 Git 仓库协同工作，包括流水线配置、Git 触发策略、检出优化、缓存机制以及基于 Git Tag 的参数化构建。
+- 理解 触发策略 相关的概念
+- 掌握 检出策略 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+## 先想一个问题
+
+你的团队正在引入 CI/CD，或者你正在配置 IDE 中的 Git 集成——但你不确定在自动化的场景下，Git 的行为和本地手动操作有什么不同，需要注意什么安全问题。
+
+## 一句话理解
+
+CircleCI 通过监听 Git 事件（Push、PR、Tag）自动触发流水线，利用 `.circleci/config.yml` 定义构建、测试和发布流程。
+
+## 触发策略
+
+### Push 触发
+
+```yaml
+version: 2.1
+workflows:
+  build:
+    jobs:
+      - build
+    triggers:
+      - schedule:
+          cron: "0 8 * * *"
+          filters:
+            branches:
+              only:
+                - main
+```
+
+### 基于分支和标签的过滤
+
+```yaml
+workflows:
+  ci-pipeline:
+    jobs:
+      - test:
+          filters:
+            branches:
+              only: /^(feature|fix|main)\/.*$/
+      - deploy:
+          filters:
+            branches:
+              only: main
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
+```
+
+### PR 验证
+
+CircleCI 会自动检测 PR 事件。通过 `CIRCLE_PULL_REQUEST` 环境变量可以判断当前运行是否来自 PR。
+
+## 检出策略
+
+### 默认检出
+
+```yaml
+jobs:
+  build:
+    docker:
+      - image: cimg/node:20.0
+    steps:
+      - checkout
+```
+
+`checkout` 是 CircleCI 内置步骤，默认检出触发流水线的提交。
+
+### 深度检出
+
+```yaml
+- checkout:
+    depth: 0  # 获取全部 Git 历史
+```
+
+### 多仓库检出
+
+```yaml
+- checkout:
+    path: ~/project/main-repo
+- run: git clone git@github.com:org/shared-lib.git ~/project/shared-lib
+```
+
+## 缓存与 Git
+
+### 依赖缓存基于 `package-lock.json`
+
+```yaml
+- restore_cache:
+    keys:
+      - v1-deps-{{ checksum "package-lock.json" }}
+      - v1-deps-
+- run: npm ci
+- save_cache:
+    key: v1-deps-{{ checksum "package-lock.json" }}
+    paths:
+      - node_modules
+```
+
+Git 的 checksum 功能确保了缓存键的精确匹配。
+
+### Git 工作区缓存
+
+```yaml
+- restore_cache:
+    keys:
+      - v1-repo-{{ .Branch }}-{{ .Revision }}
+      - v1-repo-{{ .Branch }}
+- checkout
+- save_cache:
+    key: v1-repo-{{ .Branch }}-{{ .Revision }}
+    paths:
+      - .git
+```
+
+## 基于 Git Tag 的参数化构建
+
+### 从 Tag 提取版本号
+
+```yaml
+jobs:
+  build:
+    steps:
+      - checkout
+      - run: |
+          TAG=${CIRCLE_TAG:-$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")}
+          VERSION=${TAG#v}
+          echo "Building version: $VERSION"
+          echo "export VERSION=$VERSION" >> $BASH_ENV
+```
+
+### Tag 触发发布流水线
+
+```yaml
+workflows:
+  release:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /^v.*/
+      - publish:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+```
+
+## CircleCI Orbs 与 Git 操作
+
+### 使用 Slack Orb 通知 Git 事件
+
+```yaml
+orbs:
+  slack: circleci/slack@4.1
+jobs:
+  notify:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - slack/notify:
+          message: "Deploy succeeded for commit ${CIRCLE_SHA1} on branch ${CIRCLE_BRANCH}"
+          webhook: "${SLACK_WEBHOOK}"
+```
+
+### GitHub Release Orb
+
+```yaml
+orbs:
+  gh: circleci/github-cli@2.1
+jobs:
+  release:
+    steps:
+      - gh/release:
+          tag: ${CIRCLE_TAG}
+          title: "Release ${CIRCLE_TAG}"
+```
+
+## 环境变量与 Git 信息
+
+CircleCI 提供丰富的 Git 相关环境变量：
+
+| 变量 | 说明 |
+|------|------|
+| `CIRCLE_BRANCH` | 当前分支 |
+| `CIRCLE_TAG` | 当前标签（如由 Tag 触发） |
+| `CIRCLE_SHA1` | 当前提交的完整 SHA |
+| `CIRCLE_REPOSITORY_URL` | 仓库 URL |
+| `CIRCLE_COMPARE_URL` | GitHub 比较 URL |
+| `CIRCLE_PULL_REQUEST` | PR 的 URL（如来自 PR） |
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+
+## 继续学习建议
+
+1. `ci-cd/github-actions-basics` — GitHub Actions 与 Git 协同
+2. `ci-cd/gitlab-ci-basics` — GitLab CI/CD 与 Git 协同
+3. `ci-cd/ci-security-basics` — CI/CD 中的 Git 安全基础

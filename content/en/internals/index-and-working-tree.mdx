@@ -12,6 +12,15 @@ export const metadata = {
 
 # Working Tree, Index, and Object Store
 
+## What you will learn
+
+- Understand the core purpose of Working Tree, Index, and Object Store
+- Master the basic usage and common options of Working Tree, Index, and Object Store
+- Separating the working tree, index, and object database is the clearest way to understand add, commit, restore, and reset.
+- Understand key concepts: Why this matters
+- Know when to use this feature and when to avoid it
+
+
 Many Git problems become easier once these three layers are separated:
 
 - working tree: files you are editing now
@@ -28,6 +37,11 @@ Many Git problems become easier once these three layers are separated:
   commitLabel="git commit"
   restoreLabel="git restore / reset"
 />
+
+
+## Start with a problem
+
+You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
 
 ## Why this matters
 
@@ -159,3 +173,10 @@ It pairs especially well with:
 - `git restore`
 - `git reset`
 - `git commit`
+
+## Try it yourself
+
+1. Practice the index-and-working-tree command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

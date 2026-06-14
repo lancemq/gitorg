@@ -1,0 +1,59 @@
+export const metadata = {
+  title: "GitLab protected branches and approval rules",
+  slug: "gitlab-protected-branches-and-approval-rules",
+  locale: "en",
+  section: "platforms",
+  summary: "Combine protected branches with merge-request approval rules to reduce risky direct writes and improve merge accountability.",
+  sourceUrls: [
+    "https://docs.gitlab.com/ee/user/project/protected_branches.html",
+    "https://docs.gitlab.com/ee/user/project/merge_requests/approvals/",
+  ],
+};
+
+# GitLab protected branches and approval rules
+
+## What you will learn
+
+- Understand the core purpose of GitLab protected branches and approval rules
+- Master the basic usage and common options of GitLab protected branches and approval rules
+- Combine protected branches with merge-request approval rules to reduce risky direct writes and improve merge accountability.
+- Understand key concepts: Suggested baseline policy
+- Know when to use this feature and when to avoid it
+
+
+In GitLab governance, protected branches control write access and approval rules control merge quality thresholds.
+
+
+## Start with a problem
+
+You're already using GitHub or GitLab to host code, but beyond push and pull, you're not fully familiar with the collaboration features these platforms offer — PR workflows, code review, and permission management.
+
+## Suggested baseline policy
+
+1. mainline changes only through merge requests
+2. protected branches block direct developer push
+3. one or more required approvals
+4. required CI checks before merge
+
+## Operational benefits
+
+- fewer accidental pushes
+- stronger review accountability
+- clearer audit trail for high-risk merges
+
+<WarningBox title="Permission policy must evolve with team structure">
+  Outdated branch permissions create hidden governance gaps after org changes.
+</WarningBox>
+
+## Good follow-up reads
+
+1. `gitlab flow and merge requests`
+2. `pr merge strategy and platform settings`
+3. `shared history boundaries`
+
+## Try it yourself
+
+1. Practice the gitlab-protected-branches-and-approval-rules command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

@@ -55,14 +55,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.8,
       }))(),
       (async () => ({
-        pathname: `/${locale}/github`,
-        lastModified: await getLatestDocLastModified(locale, "github"),
-        changeFrequency: "monthly" as const,
-        priority: 0.78,
-      }))(),
-      (async () => ({
-        pathname: `/${locale}/gitlab`,
-        lastModified: await getLatestDocLastModified(locale, "gitlab"),
+        pathname: `/${locale}/platforms`,
+        lastModified: await getLatestDocLastModified(locale, "platforms"),
         changeFrequency: "monthly" as const,
         priority: 0.78,
       }))(),

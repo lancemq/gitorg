@@ -13,6 +13,21 @@ export const metadata = {
 
 # AI Coding Agent 下的 git worktree 模式
 
+## 学完这篇你会掌握什么
+
+- 理解 AI Coding Agent 下的 git worktree 模式 的核心作用和适用场景
+- 掌握 AI Coding Agent 下的 git worktree 模式 的基本用法和常用参数
+- 把 git worktree 变成 AI coding agent 的默认并行工作模式，减少上下文污染、提升回滚安全性，并让多任务协作更清晰。
+- 理解 这个专题解决什么问题 相关的概念
+- 掌握 为什么 worktree 特别适合 AI agent 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+
+## 先想一个问题
+
+你和团队正在协作一个项目，分支越来越多，合并越来越频繁，但缺少一个稳定的协作节奏——每个人都在用自己的方式同步代码，冲突越来越频繁。
+
 ## 这个专题解决什么问题
 
 当你开始用 AI coding agent 真正写代码时，问题往往不再是“会不会切分支”，而是：
@@ -225,6 +240,12 @@ git worktree remove ../repo-agent-review
   mistakesLabel="常见错误判断"
   mistakes="不要把多个不相关任务继续塞进同一个 worktree。|不要忘记任务完成后清理不用的 worktree。|如果一个高风险历史整理动作会影响当前主目录，把它放到单独 worktree 更稳。"
 />
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
 
 ## 继续学习建议
 

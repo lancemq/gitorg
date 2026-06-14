@@ -12,6 +12,19 @@ export const metadata = {
 
 # git-request-pull Tutorial
 
+## What you will learn
+
+- Understand the core purpose of git-request-pull Tutorial
+- Master the basic usage and common options of git-request-pull Tutorial
+- Generate a pull summary that tells maintainers what to fetch from which base and branch, useful in email-driven or traditional maintainer workflows.
+- Understand key concepts: Best-fit scenarios
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
 ## The short version
 
 `git request-pull` creates a text summary describing what maintainers should pull and from which base.
@@ -89,4 +102,10 @@ Small metadata mistakes create large review friction.
 - The URL you provide should point to a repository the maintainer can actually fetch from; otherwise the summary is not actionable.
 - If the base ref does not exist in the target repository, the summary may describe changes the maintainer cannot apply cleanly.
 - `request-pull` verifies that the specified commits are reachable from your repository before generating the summary, catching mismatches early.
+
+## Try it yourself
+
+1. Practice the git-request-pull command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

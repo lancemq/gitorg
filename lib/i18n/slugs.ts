@@ -142,16 +142,14 @@ export type WorkflowSlug =
   | "large-file-handling-workflow"
   | "rollback-deployment-workflow";
 
-export type GithubSlug =
+export type PlatformsSlug =
   | "github-flow-basics"
   | "pull-requests-and-reviews"
   | "forks-and-open-source-contribution"
   | "issues-projects-and-discussions"
   | "github-actions-and-skills"
   | "github-branch-protection-and-rulesets"
-  | "github-codeowners-and-review-ownership";
-
-export type GitlabSlug =
+  | "github-codeowners-and-review-ownership"
   | "gitlab-flow-and-merge-requests"
   | "gitlab-forks-and-contributions"
   | "gitlab-issues-boards-and-milestones"
@@ -250,7 +248,7 @@ export const learningPathSlugs = [
   "first-safe-hotfix",
 ] as const satisfies readonly LearningPathSlug[];
 
-export const githubSlugs = [
+export const platformsSlugs = [
   "github-flow-basics",
   "pull-requests-and-reviews",
   "forks-and-open-source-contribution",
@@ -258,9 +256,6 @@ export const githubSlugs = [
   "github-actions-and-skills",
   "github-branch-protection-and-rulesets",
   "github-codeowners-and-review-ownership",
-] as const satisfies readonly GithubSlug[];
-
-export const gitlabSlugs = [
   "gitlab-flow-and-merge-requests",
   "gitlab-forks-and-contributions",
   "gitlab-issues-boards-and-milestones",
@@ -268,7 +263,7 @@ export const gitlabSlugs = [
   "gitlab-ci-and-runners",
   "gitlab-protected-branches-and-approval-rules",
   "gitlab-merge-trains-and-merge-result-pipelines",
-] as const satisfies readonly GitlabSlug[];
+] as const satisfies readonly PlatformsSlug[];
 
 export const commandSlugs = [
   "git-init",
@@ -535,16 +530,14 @@ export const conceptSlugs = [
   "git-rerere-deep",
 ] as const satisfies readonly ConceptsSlug[];
 
-export type CiCdSlug =
+export type DevopsSlug =
   | "github-actions-basics"
   | "gitlab-ci-basics"
   | "jenkins-integration"
   | "ci-security-basics"
   | "circleci-git"
   | "ci-cd-testing-strategies"
-  | "ci-cd-deployment-strategies";
-
-export type IdeSlug =
+  | "ci-cd-deployment-strategies"
   | "vscode-git"
   | "jetbrains-git"
   | "github-desktop"
@@ -590,7 +583,7 @@ export type HostingSlug =
   | "gerrit-code-review"
   | "chinese-hosting-platforms";
 
-export const ciCdSlugs = [
+export const devopsSlugs = [
   "github-actions-basics",
   "gitlab-ci-basics",
   "jenkins-integration",
@@ -598,9 +591,6 @@ export const ciCdSlugs = [
   "circleci-git",
   "ci-cd-testing-strategies",
   "ci-cd-deployment-strategies",
-] as const satisfies readonly CiCdSlug[];
-
-export const ideSlugs = [
   "vscode-git",
   "jetbrains-git",
   "github-desktop",
@@ -608,7 +598,7 @@ export const ideSlugs = [
   "vim-neovim-git",
   "intellij-git-deep",
   "terminal-git-productivity",
-] as const satisfies readonly IdeSlug[];
+] as const satisfies readonly DevopsSlug[];
 
 export const securitySlugs = [
   "ssh-key-management",

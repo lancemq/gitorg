@@ -9,6 +9,20 @@ export const metadata = {
 
 # The Complete Guide to .gitignore
 
+## What you will learn
+
+- Understand the core purpose of The Complete Guide to .gitignore
+- Master the basic usage and common options of The Complete Guide to .gitignore
+- A comprehensive explanation of .gitignore rule syntax, precedence, glob patterns, global configuration, and how to exclude files that should not be committed.
+- Understand key concepts: What is .gitignore?
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+You've encountered a conceptual question while using Git — you roughly know what it means, but you're not entirely sure about its precise definition and boundaries.
+
 ## What is .gitignore?
 
 At its core, `.gitignore` is a plain text file that tells Git which files or directories to **ignore** — meaning Git will not track them, will not stage them, and will not include them in commits. This is essential for keeping repositories clean, avoiding the accidental commit of sensitive data, and reducing repository size.
@@ -408,3 +422,10 @@ git add logs/.gitkeep
 | Debugging | `git check-ignore -v` is your best friend |
 
 A well-maintained `.gitignore` keeps your repository clean, prevents sensitive data leaks, and reduces noise in `git status` output. Make it a habit to update your `.gitignore` whenever new build tools, IDEs, or dependency managers are introduced to your project.
+
+## Try it yourself
+
+1. Practice the git-ignore command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

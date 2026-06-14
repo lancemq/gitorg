@@ -1,0 +1,249 @@
+export const metadata = {
+  title: "Secure Git Collaboration Workflows",
+  slug: "secure-git-workflows",
+  locale: "en",
+  section: "security",
+  summary: "Signed commits with GPG/SSH, verified commits on GitHub/GitLab, branch protection rules, required status checks, signed tags, and secure supply chain practices.",
+  sourceUrls: [
+    "https://docs.github.com/en/authentication/managing-commit-signature-verification",
+    "https://docs.gitlab.com/ee/user/project/protected_branches.html",
+    "https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work",
+  ],
+};
+
+# Secure Git Collaboration Workflows
+
+## What you will learn
+
+- Understand the core purpose of Secure Git Collaboration Workflows
+- Master the basic usage and common options of Secure Git Collaboration Workflows
+- Signed commits with GPG/SSH, verified commits on GitHub/GitLab, branch protection rules, required status checks, signed tags, and secure supply chain practices.
+- Understand key concepts: Signed Commits (GPG/SSH)
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're concerned about Git repository security — maybe key management isn't ideal, or commits aren't signed. You're not sure if your security setup is sufficient or where to start hardening it.
+
+## One-Sentence Understanding
+
+Secure collaboration in Git relies on verified identities (signed commits), enforced policies (branch protection), and review gates that prevent unauthorized or malicious code from reaching production.
+
+## Signed Commits (GPG/SSH)
+
+### GPG Signing
+
+```bash
+# Generate GPG key
+gpg --full-generate-key
+gpg --list-secret-keys --keyid-format LONG
+
+# Configure Git
+git config --global user.signingkey KEY_ID
+git config --global commit.gpgsign true
+
+# Sign commits
+git commit -S -m "signed commit message"
+git log --show-signature -1
+```
+
+### SSH Signing (Git 2.34+)
+
+```bash
+# Configure signing key
+git config --global user.signingkey ~/.ssh/id_ed25519.pub
+git config --global gpg.format ssh
+git config --global commit.gpgsign true
+
+# Add to allowed signers
+cat > ~/.ssh/allowed_signers << EOF
+* $(cat ~/.ssh/id_ed25519.pub)
+EOF
+git config --global gpg.ssh.allowedSignersFile ~/.ssh/allowed_signers
+
+# Sign and verify
+git commit -S -m "ssh signed commit"
+git log --show-signature -1
+```
+
+### Add Public Key to Platform
+
+```bash
+# GPG
+gpg --armor --export KEY_ID
+# Paste at GitHub: Settings → SSH and GPG keys → GPG keys
+
+# SSH (for signing)
+cat ~/.ssh/id_ed25519.pub
+# Paste at GitHub: Settings → SSH and GPG keys → SSH signing keys
+```
+
+## Verified Commits on GitHub/GitLab
+
+Once the public key is uploaded, commits display a **Verified** badge. This confirms:
+
+- The commit author matches the key owner
+- The commit content has not been tampered with
+- The commit originates from a trusted identity
+
+## Branch Protection Rules
+
+### GitHub
+
+```
+Settings → Branches → Add branch protection rule
+```
+
+Key settings:
+
+| Setting | Purpose |
+|---------|---------|
+| Require pull request before merging | Prevents direct pushes |
+| Require approvals (1-8) | Mandatory code review |
+| Dismiss stale reviews | Ensures latest changes reviewed |
+| Require status checks | Blocks failing CI |
+| Require signed commits | Enforces identity verification |
+| Require linear history | Prevents merge commits |
+| Include administrators | No exceptions for admins |
+| Lock branch | Read-only for specified users |
+
+### GitLab
+
+```
+Settings → Repository → Protected Branches
+```
+
+Similar controls: allowed to merge, push, and code owner approval.
+
+## Required Status Checks
+
+Enforce CI pipelines before merge:
+
+```yaml
+# GitHub branch protection → Require status checks to pass
+# Common checks:
+# - continuous-integration (tests pass)
+# - lint / typecheck (code quality)
+# - security-scan (vulnerability scan)
+# - dependency-review (license/compliance)
+```
+
+### GitHub Actions status check example
+
+```yaml
+name: CI
+on: [pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci && npm test
+      - run: npm run lint
+      - run: npm audit --audit-level=high
+```
+
+## Signed Tags
+
+Tags can also be signed to verify release authenticity.
+
+```bash
+# Create signed tag
+git tag -s v1.0.0 -m "Release v1.0.0"
+
+# Verify tag
+git tag -v v1.0.0
+
+# List signed tags with verification
+git tag -v $(git tag)
+```
+
+Signed tags prevent attackers from creating fake releases with malicious code.
+
+## Enforcing Commit Signatures
+
+### Server-Side Enforcement
+
+GitHub: Settings → Branches → Require signed commits
+
+GitLab: Settings → Repository → Protected branches → Require signature on commits
+
+### CI Verification
+
+```yaml
+# GitHub Actions
+- name: Verify signed commits
+  run: |
+    git verify-commit HEAD
+    if [ $? -ne 0 ]; then
+      echo "Commit is not signed!"
+      exit 1
+    fi
+```
+
+## Code Review Security Gates
+
+### Required Reviewers
+
+```yaml
+# .github/CODEOWNERS
+*.js         @frontend-team
+*.go         @backend-team
+Dockerfile   @devops-team
+security/*   @security-team
+```
+
+### Merge Queue
+
+GitHub merge queues automatically test PR batches before merging, ensuring master is always green.
+
+## Secure Supply Chain Practices
+
+### Dependency Provenance
+
+```bash
+# Verify npm package signatures
+npm audit signatures
+
+# Check commit signatures in CI
+git verify-commit HEAD
+```
+
+### SLSA Framework
+
+- **Level 1**: Build scripts exist
+- **Level 2**: Build service is used
+- **Level 3**: Builds are auditable and hermetic
+- **Level 4**: Build is two-person reviewed
+
+### Signed Releases
+
+```bash
+# Create signed release metadata
+gpg --sign -o release-v1.0.0.sig release-v1.0.0.txt
+
+# Distribute alongside release artifact
+gsutil cp release-v1.0.0.* gs://my-releases/
+```
+
+## Key Takeaways
+
+1. **Signed commits prevent impersonation** — the bedrock of Git identity trust
+2. **Branch protection enforces process** — no bypasses, no shortcuts
+3. **Required status checks block bad code** — automated gate before human review
+4. **Signed tags ensure release integrity** — verify before deploying
+5. **Review gates catch what automation misses** — pair with CI for defense in depth
+
+## Try it yourself
+
+1. Practice the secure-git-workflows command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+
+## Continue Learning
+
+1. `security/gpg-signing` — Deep dive on GPG commit signing
+2. `security/signing-advanced` — Advanced signing scenarios and key rotation
+3. `ci-cd/github-actions-basics` — Status checks and CI pipelines
+4. `best-practices/pull-request-review-readiness` — PR review best practices

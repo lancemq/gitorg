@@ -12,6 +12,19 @@ export const metadata = {
 
 # Large File Handling Workflow
 
+## What you will learn
+
+- Understand the core purpose of Large File Handling Workflow
+- Master the basic usage and common options of Large File Handling Workflow
+- Use Git LFS, sparse checkout, and repository-splitting strategies to manage large files while keeping clone speed and history maintainable.
+- Understand key concepts: Why large files should not go directly into Git
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
+
 ## The short version
 
 Git is not designed to directly manage large files (binaries, videos, datasets, etc.). This workflow uses **Git LFS**, **sparse checkout**, and **repository-splitting strategies** to let repositories include large file resources while maintaining clone speed, history maintainability, and team collaboration efficiency.
@@ -248,3 +261,10 @@ done
 3. Migrating history to LFS requires rewriting history (force push), affecting all collaborators
 4. Git hosting platforms vary in LFS support; verify platform compatibility
 5. Forked repositories need separate LFS configuration; they do not automatically inherit the parent's LFS objects
+
+## Try it yourself
+
+1. Practice the large-file-handling-workflow command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

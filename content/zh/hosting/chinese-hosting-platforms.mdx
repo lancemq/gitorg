@@ -1,0 +1,189 @@
+export const metadata = {
+  title: "国内 Git 托管平台指南",
+  slug: "chinese-hosting-platforms",
+  locale: "zh",
+  section: "hosting",
+  summary: "国内主流 Git 托管平台（Gitee、CODING、腾讯云 Code、阿里云 Code）的功能对比、迁移指南与合规性考量。",
+  sourceUrls: [
+    "https://gitee.com",
+    "https://coding.net",
+    "https://cloud.tencent.com/product/tcdev",
+    "https://code.aliyun.com",
+  ],
+};
+
+# 国内 Git 托管平台指南
+
+## 学完这篇你会掌握什么
+
+- 理解 国内 Git 托管平台指南 的核心作用和适用场景
+- 掌握 国内 Git 托管平台指南 的基本用法和常用参数
+- 国内主流 Git 托管平台（Gitee、CODING、腾讯云 Code、阿里云 Code）的功能对比、迁移指南与合规性考量。
+- 理解 Gitee（码云） 相关的概念
+- 掌握 CODING DevOps 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+## 先想一个问题
+
+你在选择或配置 Git 托管方案——可能是要自建 Gitea，也可能是在对比 GitHub、GitLab、Gitee 的功能差异和成本。你不确定哪个方案最适合你的团队。
+
+## 一句话理解
+
+国内 Git 托管平台主要解决两大需求：**访问加速**（免翻墙操作 GitHub）和**数据合规**（满足网络安全法的数据本地化要求），但功能成熟度和生态与 GitHub 仍有差距。
+
+## Gitee（码云）
+
+### 功能与限制
+
+Gitee 是国内最大的 Git 托管平台，由开源中国（OSChina）运营。
+
+| 功能 | 免费版 | 企业版 |
+|------|--------|--------|
+| 协作者数 | 无限（公开仓库） | 按席位 |
+| 仓库大小 | 500 MB | 5 GB+ |
+| 单文件大小 | 50 MB | 200 MB |
+| CI/CD | Gitee Go（有限免费） | Gitee Go（更多配额） |
+| 代码审查 | Pull Request | 支持自定义审查规则 |
+
+### 已知限制
+
+```bash
+# Gitee 不支持 git push --mirror（存在 Gitee->外部镜像 bug）
+# 迁移时需用 --force 替代
+git clone --bare https://gitee.com/user/repo.git
+cd repo.git
+git push --force --mirror https://github.com/user/repo.git
+```
+
+- 不支持 Git LFS（企业版部分支持）
+- API 限流较严格（每分钟 60 次未认证请求）
+- Pages 服务不稳定
+
+## CODING DevOps
+
+CODING 是腾讯云旗下的 DevOps 平台，提供从代码托管到部署的全链条服务。
+
+### 核心功能
+
+```
+代码托管 → CI/CD (Jenkins 内置) → 制品库 → 部署
+```
+
+- 原生支持 Git LFS
+- 内置 CI/CD（Jenkins + CODING CI）
+- 支持 Docker 镜像仓库
+- 与腾讯云服务深度集成
+
+```yaml
+# CODING CI 配置文件 (Jenkinsfile)
+pipeline {
+  agent any
+  stages {
+    stage('Build') {
+      steps {
+        sh 'npm install && npm run build'
+      }
+    }
+    stage('Deploy') {
+      steps {
+        sh 'tcloud deploy --env production'
+      }
+    }
+  }
+}
+```
+
+### 与 Gitee 对比
+
+| 维度 | CODING | Gitee |
+|------|--------|-------|
+| CI/CD | 完善（Jenkins + 内置） | 基础（Gitee Go） |
+| 云集成 | 腾讯云原生 | 独立平台 |
+| 定价 | 按团队规模 | 免费 + 企业版 |
+| 国际访问 | 有海外节点 | 国内为主 |
+
+## 腾讯云 Code
+
+原腾讯云 DevOps（TCDev），主要面向企业客户，提供代码托管 + 持续集成 + 自动化部署。
+
+特点：
+- 与腾讯云 COS、SCF 等产品深度集成
+- 支持内网 Git 访问（免公网带宽）
+- 提供代码扫描（基于 SonarQube）
+- 企业级 SLA 保障
+
+## 阿里云 Code
+
+原阿里云 Code，现已演进为云效（CloudEffect）平台。
+
+```bash
+# 云效代码托管基本操作
+git remote add origin https://code.aliyun.com/user/repo.git
+git push -u origin main
+```
+
+- 与阿里云 DevOps 工具链集成（云效流水线、测试管理）
+- 支持 Git LFS
+- 内置代码扫描 + 安全检测
+- 与钉钉深度集成（代码评审通知、CI 结果推送）
+
+## 平台对比总览
+
+| 维度 | Gitee | CODING | 腾讯云 Code | 阿里云 Code |
+|------|-------|--------|------------|------------|
+| PR/MR | ✅ | ✅ | ✅ | ✅ |
+| CI/CD | 有限 | ✅ 完善 | ✅ 完善 | ✅ 完善 |
+| 团队管理 | 基础 | 完善 (RBAC) | 完善 | 完善 |
+| 自建 runner | ❌ | ✅ | ✅ | ✅ |
+| Git LFS | ❌ | ✅ | ✅ | ✅ |
+| 开放 API | 有限 | 完善 | 完善 | 完善 |
+| 国际访问 | 一般 | 较好 | 较好 | 一般 |
+
+## 迁移指南
+
+### 从 GitHub 迁移到国内平台
+
+```bash
+git clone --bare https://github.com/user/repo.git
+cd repo.git
+git remote add china https://gitee.com/user/repo.git  # 或其他平台
+git push --mirror china
+```
+
+注意 Issues、Wiki、Actions 配置需要手动迁移，git 不包含这些元数据。
+
+### 国内平台互迁
+
+使用 git remote 或者迁移工具：
+
+```bash
+# Gitee → CODING
+git clone --bare https://gitee.com/user/repo.git
+cd repo.git
+git remote add coding https://e.coding.net/user/repo.git
+git push --mirror coding
+```
+
+## 合规与数据驻留
+
+根据《网络安全法》《数据安全法》《个人信息保护法》：
+
+- **数据本地化**：重要数据应存储在中国境内
+- **等级保护**：企业平台通常通过等保三级认证
+- **代码审计**：敏感代码（金融、政务）应使用国内平台
+- **数据出境**：涉及个人信息的代码仓库需申报数据出境安全评估
+
+> 绝大多数国内 Git 平台的数据中心位于北京、上海、深圳等城市。
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+
+## 继续学习建议
+
+1. `hosting/platform-comparison` — 托管平台全面对比
+2. `hosting/gitea-setup` — 自建 Gitea 方案
+3. `hosting/self-hosted-git` — 完全自建 Git 服务

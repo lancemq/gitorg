@@ -11,6 +11,19 @@ export const metadata = {
 
 # Bisect-Friendly Commits
 
+## What you will learn
+
+- Understand the core purpose of Bisect-Friendly Commits
+- Master the basic usage and common options of Bisect-Friendly Commits
+- Keep every commit independently buildable and testable so git bisect can efficiently locate the commit that introduced a problem.
+- Understand key concepts: Why bisect-friendly commits matter
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+Your team has developed some Git habits over time, but you're not sure if they are optimal — or you've just been through an incident caused by a Git mistake and want to avoid repeating it.
+
 ## The short version
 
 `git bisect` quickly locates the commit that introduced a bug through binary search, but this requires **every commit in history to be independently buildable and testable**. If an intermediate commit is broken, bisect produces incorrect results.
@@ -203,3 +216,10 @@ git bisect skip
 3. If history is already messy, define a "bisect-trusted range" — e.g., only guarantee the last 3 months
 4. Some changes (such as database migrations) are inherently difficult to make usable at every intermediate step; `git bisect skip` is a reasonable choice in these cases
 5. Bisect-friendly commits also benefit `git cherry-pick` and `git revert`, giving you multiple advantages
+
+## Try it yourself
+
+1. Practice the bisect-friendly-commits command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

@@ -13,6 +13,16 @@ export const metadata = {
 
 # Feature Flag 渐进发布工作流
 
+## 学完这篇你会掌握什么
+
+- 理解 Feature Flag 渐进发布工作流 的核心作用和适用场景
+- 掌握 Feature Flag 渐进发布工作流 的基本用法和常用参数
+- 把代码合并与功能放量解耦，利用 feature flag 分阶段上线与回滚，降低大功能一次性发布风险。
+- 理解 适用场景 相关的概念
+- 掌握 推荐流程 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
 Feature flag 的价值在于把“代码进入主线”与“功能对用户生效”拆开。这样可以在主线持续集成的同时，保留发布节奏控制权。
 
 <CommandFlowFigure
@@ -25,6 +35,11 @@ Feature flag 的价值在于把“代码进入主线”与“功能对用户生�
   outputs="发布更平滑|事故半径更小|回滚速度更快"
   note="flag 是运行时控制，不应替代代码质量门禁。"
 />
+
+
+## 先想一个问题
+
+你和团队正在协作一个项目，分支越来越多，合并越来越频繁，但缺少一个稳定的协作节奏——每个人都在用自己的方式同步代码，冲突越来越频繁。
 
 ## 适用场景
 
@@ -87,4 +102,10 @@ git commit -m "add new checkout flow behind flag"
 1. `Trunk-based development workflow`
 2. `Code freeze and release candidate workflow`
 3. `Revert-first stabilization workflow`
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
 

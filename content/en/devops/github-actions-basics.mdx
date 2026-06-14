@@ -1,0 +1,285 @@
+export const metadata = {
+  title: "Git Actions & CI/CD Basics",
+  slug: "github-actions-basics",
+  locale: "en",
+  section: "devops",
+  summary: "An introduction to using Git with GitHub Actions for CI/CD pipelines, including trigger strategies, checkout action, Git context, and secure token management.",
+  sourceUrls: [
+    "https://docs.github.com/en/actions",
+    "https://github.com/marketplace/actions/checkout",
+  ],
+};
+
+# Git Actions & CI/CD Basics
+
+## What you will learn
+
+- How Git events trigger CI/CD pipelines
+- How to configure `actions/checkout` wisely (shallow vs full clone)
+- Common CI/CD patterns you can copy into your own projects
+- Security boundaries when running Git commands in CI
+
+## Start with a question
+
+Imagine you just pushed a feature branch to GitHub. Now you want to automatically run tests, lint the code, and deploy if everything passes. Doing this manually every time is tedious.
+
+The question is: **can GitHub automatically run these tasks when I push?**
+
+That is exactly what GitHub Actions does — it ties automation to Git events. When you push, open a PR, or create a tag, Actions can kick off any task you define.
+
+
+
+## Start with a problem
+
+Your team is adopting CI/CD pipelines, or you're configuring Git integration in your IDE — but you're unsure how Git behaves differently in automated environments compared to local manual operations.
+## One-Sentence Understanding
+
+GitHub Actions is GitHub's built-in CI/CD platform. The core idea is simple: **bind Git events (push, PR, release) to automated workflows**. Every time you run `git push`, Actions can start your predefined pipeline.
+
+## How Git Events Trigger Workflows
+
+### The three most common triggers
+
+```yaml
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  release:
+    types: [published]
+```
+
+This means:
+- Any push to `main` triggers the workflow
+- Any PR targeting `main` triggers the workflow
+- Publishing a release triggers the workflow
+
+### Push triggers: the most common pattern
+
+Every push to a matching branch fires the workflow. A useful refinement is `paths` — filter by which files changed:
+
+```yaml
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "src/**"
+      - "package.json"
+```
+
+Why add `paths`? If someone only edits the README, you probably don't want to run the full CI pipeline.
+
+### Pull request triggers: quality gate before merge
+
+```yaml
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+```
+
+You may wonder: why both push and PR triggers? They serve different roles:
+
+- **Push trigger**: guarantee code quality after every commit
+- **PR trigger**: enforce CI checks before any merge
+
+### Other Git events
+
+- `create` / `delete` — branch or tag creation / deletion
+- `workflow_dispatch` — manual trigger (adds a "run now" button)
+- `schedule` — cron-based scheduling (nightly tests, weekly cleanup)
+
+## Understanding Checkout in CI
+
+### The key question: how much history does CI need?
+
+When a workflow runs, it needs the repository code. The `actions/checkout` action handles this. But there is an important detail: **how much Git history should it download?**
+
+```yaml
+- name: Checkout code
+  uses: actions/checkout@v4
+  with:
+    fetch-depth: 0
+    fetch-tags: true
+    ref: ${{ github.ref }}
+```
+
+### When to change fetch-depth
+
+```yaml
+- uses: actions/checkout@v4
+  with:
+    fetch-depth: 0
+```
+
+This is one of the most commonly customized parameters. Here is why it matters:
+
+| `fetch-depth` | What it does | When to use it |
+|---------------|-------------|----------------|
+| `1` (default) | Shallow clone, only latest commit | Simple build and test only |
+| `0` | Full history | Linting that compares diffs, versioning, SonarQube |
+| `50` | Recent history | Balanced approach |
+| `2` | Base + HEAD commit | Basic PR comparisons |
+
+**The rule of thumb**: if your CI only needs to compile and run tests, `fetch-depth: 1` is fine. If you need `git diff` or change-based analysis, set it to `0`.
+
+## Common CI/CD Patterns
+
+### Pattern 1: PR validation (most common starting point)
+
+```yaml
+name: PR Check
+on: pull_request
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm run lint
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm test
+```
+
+One design detail worth noticing: lint and test are **separate jobs**. This way, even if lint fails, the test job still runs — and you see all results in one CI run.
+
+### Pattern 2: Deploy on push to main
+
+```yaml
+name: Deploy
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci && npm run build
+      - run: npm run deploy
+```
+
+### Pattern 3: Release on tag
+
+```yaml
+name: Release
+on:
+  push:
+    tags: ["v*"]
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci && npm run build
+      - uses: softprops/action-gh-release@v1
+```
+
+## Using Git in CI
+
+### Reading Git information
+
+GitHub Actions provides a context object with useful Git data:
+
+```yaml
+- name: Display Git info
+  run: |
+    echo "Commit: ${{ github.sha }}"
+    echo "Branch: ${{ github.ref_name }}"
+    echo "Actor: ${{ github.actor }}"
+```
+
+### Running Git commands
+
+```yaml
+- name: Git operations in CI
+  run: |
+    git fetch --tags origin
+    git log --oneline -5
+    VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+    echo "VERSION=$VERSION" >> $GITHUB_ENV
+```
+
+### Conditional checks based on file changes
+
+```yaml
+- name: Check if specific files changed
+  uses: dorny/paths-filter@v2
+  id: filter
+  with:
+    filters: |
+      frontend:
+        - 'frontend/**'
+      backend:
+        - 'backend/**'
+
+- name: Frontend checks
+  if: steps.filter.outputs.frontend == 'true'
+  run: cd frontend && npm run lint
+```
+
+## Security Boundaries in CI
+
+### The automatic GITHUB_TOKEN
+
+Every workflow gets a token automatically, but it has limitations:
+
+```yaml
+- name: Push with GITHUB_TOKEN
+  run: |
+    git config user.name "github-actions"
+    git config user.email "actions@github.com"
+    git add package.json
+    git commit -m "Bump version [skip ci]"
+    git push
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+**Limitations to remember:**
+- Cannot trigger other workflows (preventing infinite loops)
+- Repository-scoped only — not usable for cross-repo operations
+- For cross-repo tasks, use a Personal Access Token (PAT)
+
+### Best practice: avoid force push in CI
+
+Running `git push --force` in CI is dangerous — if it corrupts history, there is no local reflog to recover. Prefer GitHub API calls for creating refs.
+
+### Best practice: verify signed commits
+
+```yaml
+- name: Verify signed commits
+  run: |
+    git verify-commit HEAD
+    git log --show-signature -1
+```
+
+## Common Misconceptions
+
+### Misconception 1: CI has the same Git state as your local machine
+
+No. By default, CI only sees the latest commit (`fetch-depth: 1`). If you need branch comparison or change analysis, you must adjust `fetch-depth`.
+
+### Misconception 2: you must write the perfect workflow in one shot
+
+Not at all. You can push changes to `.github/workflows/` and GitHub Actions will use the latest version automatically. Start simple, then add steps incrementally.
+
+### Misconception 3: CI failure always means a code bug
+
+Not necessarily. Failures can come from network issues, cache expiry, or dependency changes. Always check the logs first.
+
+## Try it yourself
+
+1. Create `.github/workflows/pr-check.yml` in one of your projects that runs lint and test on every PR
+2. Change `fetch-depth` from `1` to `0` and observe the difference in CI time
+3. Add a matrix configuration to test across Node.js 18, 20, and 22
+
+## Continue Learning
+
+1. `security/ssh-key-management` — SSH keys & deploy keys
+2. `best-practices/security-with-git` — Git security practices
+3. GitHub Actions official documentation

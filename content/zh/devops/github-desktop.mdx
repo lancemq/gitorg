@@ -1,0 +1,107 @@
+export const metadata = {
+  title: "GitHub Desktop 使用指南",
+  slug: "github-desktop",
+  locale: "zh",
+  section: "devops",
+  summary: "学会使用 GitHub Desktop 图形界面完成常见的 Git 操作，适合不习惯命令行的开发者快速上手。",
+  sourceUrls: [
+    "https://docs.github.com/en/desktop",
+  ],
+};
+
+# GitHub Desktop 使用指南
+
+## 学完这篇你会掌握什么
+
+- 理解 GitHub Desktop 使用指南 的核心作用和适用场景
+- 掌握 GitHub Desktop 使用指南 的基本用法和常用参数
+- 学会使用 GitHub Desktop 图形界面完成常见的 Git 操作，适合不习惯命令行的开发者快速上手。
+- 理解 概述 相关的概念
+- 掌握 核心功能 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+
+## 先想一个问题
+
+你的团队正在引入 CI/CD，或者你正在配置 IDE 中的 Git 集成——但你不确定在自动化的场景下，Git 的行为和本地手动操作有什么不同，需要注意什么安全问题。
+
+## 概述
+
+GitHub Desktop 是 GitHub 官方提供的图形化 Git 客户端，适合偏好可视化操作的用户。它覆盖了从 clone、commit、push 到 PR 管理的完整工作流。
+
+## 核心功能
+
+### 1. 仓库管理
+
+- **Clone 仓库**：File → Clone Repository，输入 URL 或选择 GitHub 上的仓库
+- **创建仓库**：File → New Repository，选择本地路径
+- **切换仓库**：左上角下拉菜单选择
+
+### 2. 暂存与提交
+
+GitHub Desktop 自动检测文件变更：
+
+1. 左侧列表显示变更文件
+2. 勾选要提交的文件（等价于 `git add`）
+3. 填写提交信息
+4. 点击 **Commit to branch**
+
+**差异对比**：点击文件即可查看行级别 diff，绿色为新增、红色为删除。
+
+### 3. 同步远端
+
+```text
+Fetch origin  → 获取远端更新（不动本地文件）
+Pull          → 拉取并合并远端变更
+Push          → 推送本地提交到远端
+```
+
+右上角的 **Fetch origin / Push / Pull** 按钮对应不同的同步操作。
+
+### 4. 分支操作
+
+- **新建分支**：Branch → New Branch，或点击顶部分支名
+- **切换分支**：点击分支名选择
+- **合并分支**：Branch → Merge into Current Branch
+- **创建 PR**：Branch → Create Pull Request（在浏览器中打开）
+
+### 5. 历史查看
+
+点击 **History** 标签查看分支的提交历史，包括：
+
+- 提交信息与时间
+- 变更文件列表
+- 文件级 diff
+
+## 适用场景
+
+| 场景 | 推荐度 |
+|------|--------|
+| Git 初学者 | ★★★★★ |
+| 非频繁命令行用户 | ★★★★ |
+| 需要可视化 diff | ★★★★ |
+| 仅 GitHub 平台 | ★★★★★ |
+| 多平台（GitLab/Gitea） | ★★★ |
+
+## 注意事项
+
+1. GitHub Desktop 不支持的复杂操作：
+   - Interactive rebase（需用命令行）
+   - Cherry-pick（需用命令行）
+   - Stash 管理能力有限
+
+2. 建议配合基本命令行知识使用，在 GUI 操作遇到冲突时仍需要用命令行解决
+
+## 继续学习
+
+1. `ide/vscode-git` — VS Code 中的 Git 集成
+2. `ide/jetbrains-git` — JetBrains IDE 中的 Git 集成
+3. `ide/terminal-git-ui` — 终端 Git UI 工具（lazygit / tig）
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+

@@ -11,6 +11,19 @@ export const metadata = {
 
 # git-update-index Tutorial
 
+## What you will learn
+
+- Understand the core purpose of git-update-index Tutorial
+- Master the basic usage and common options of git-update-index Tutorial
+- Explains how to use git-update-index to update index entries and attributes directly.
+- Understand key concepts: When it is a good fit
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
 ## The short version
 
 git-update-index is used to update index entries and attributes directly.
@@ -76,4 +89,10 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 - `--skip-worktree` differs from `--assume-unchanged`: the former means "I don't want Git to touch this file", suitable for local config files; the latter means "this file is large, I don't want to check if it changed".
 - When manually adding entries with `--cacheinfo`, you must correctly specify the mode, blob hash, and path — incorrect data can corrupt the index.
 - Before manipulating the index, it is recommended to first run `git ls-files --stage` to see the current index state and confirm the existing attributes of the target entry.
+
+## Try it yourself
+
+1. Practice the git-update-index command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

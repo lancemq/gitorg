@@ -11,6 +11,19 @@ export const metadata = {
 
 # git-prune Tutorial
 
+## What you will learn
+
+- Understand the core purpose of git-prune Tutorial
+- Master the basic usage and common options of git-prune Tutorial
+- Clean up unreachable Git objects, working with gc and reflog to manage repository object lifecycle.
+- Understand key concepts: When it is a good fit
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
 ## The short version
 
 git-prune deletes objects in the object database that are **no longer pointed to by any reference** (unreachable objects). It is a core component of Git garbage collection.
@@ -90,3 +103,10 @@ Git's object database only grows (under normal operations). Rebase, reset, amend
 ## Related reading
 
 Read it alongside `git gc`, `git fsck`, `git count-objects`, and `git reflog` to understand the complete mechanism of object lifecycle, reachability, and garbage collection.
+
+## Try it yourself
+
+1. Practice the git-prune command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

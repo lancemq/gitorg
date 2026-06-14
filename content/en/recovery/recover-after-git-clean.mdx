@@ -13,7 +13,21 @@ export const metadata = {
 
 # Recover after an accidental git clean
 
+## What you will learn
+
+- Understand the core purpose of Recover after an accidental git clean
+- Master the basic usage and common options of Recover after an accidental git clean
+- After `git clean` removes untracked files, recovery usually depends on external history sources; prevent recurrence with dry-run and stash -u safeguards.
+- Understand key concepts: What to verify first
+- Know when to use this feature and when to avoid it
+
+
 `git clean` removes untracked files. Git often has no commit history for those files, so recovery is typically external.
+
+
+## Start with a problem
+
+You just ran a Git command and the result wasn't what you expected — maybe you even lost some commits. This has happened before, and you want a reliable set of recovery techniques.
 
 ## What to verify first
 
@@ -67,4 +81,10 @@ Preview scope first, then create a safety stash for untracked files.
 1. `recover lost stash`
 2. `git-clean`
 3. `reflog recovery`
+
+## Try it yourself
+
+1. Practice the recover-after-git-clean command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

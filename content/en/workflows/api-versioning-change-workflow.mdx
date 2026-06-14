@@ -13,6 +13,15 @@ export const metadata = {
 
 # API Versioning Change Workflow
 
+## What you will learn
+
+- Understand the core purpose of API Versioning Change Workflow
+- Master the basic usage and common options of API Versioning Change Workflow
+- Handle breaking API changes with parallel version support, migration windows, and controlled deprecation to avoid client outages.
+- Understand key concepts: Recommended sequence
+- Know when to use this feature and when to avoid it
+
+
 The hard part of API versioning is not shipping v2. The hard part is migrating clients safely without large compatibility incidents.
 
 <CommandFlowFigure
@@ -25,6 +34,11 @@ The hard part of API versioning is not shipping v2. The hard part is migrating c
   outputs="reduced compatibility incidents|predictable migration cadence|enforceable deprecation"
   note="Versioning is governance and migration discipline, not just URL design."
 />
+
+
+## Start with a problem
+
+Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
 
 ## Recommended sequence
 
@@ -78,4 +92,10 @@ Long-lived legacy versions accumulate maintenance and security debt.
 1. `Cross-repository integration workflow`
 2. `Release train workflow`
 3. `Feature flag rollout workflow`
+
+## Try it yourself
+
+1. Practice the api-versioning-change-workflow command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

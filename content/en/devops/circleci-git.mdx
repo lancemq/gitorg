@@ -1,0 +1,224 @@
+export const metadata = {
+  title: "CircleCI with Git Integration",
+  slug: "circleci-git",
+  locale: "en",
+  section: "devops",
+  summary: "A comprehensive guide to integrating CircleCI with Git, including configuration, trigger strategies, checkout optimization, dependency caching, pipeline parameterization with Git tags, and orb usage for Git operations.",
+  sourceUrls: [
+    "https://circleci.com/docs/",
+    "https://circleci.com/docs/using-git/",
+  ],
+};
+
+# CircleCI with Git Integration
+
+## What you will learn
+
+- Understand the core purpose of CircleCI with Git Integration
+- Master the basic usage and common options of CircleCI with Git Integration
+- A comprehensive guide to integrating CircleCI with Git, including configuration, trigger strategies, checkout optimization, dependency caching, pipeline parameterization with Git tags, and orb usage for Git operations.
+- Understand key concepts: Trigger Strategies
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+Your team is adopting CI/CD pipelines, or you're configuring Git integration in your IDE — but you're unsure how Git behaves differently in automated environments compared to local manual operations.
+
+## One-Sentence Understanding
+
+CircleCI automatically triggers pipelines by listening to Git events (push, PR, tag), using `.circleci/config.yml` to define build, test, and release workflows.
+
+## Trigger Strategies
+
+### Push Triggers
+
+```yaml
+version: 2.1
+workflows:
+  build:
+    jobs:
+      - build
+    triggers:
+      - schedule:
+          cron: "0 8 * * *"
+          filters:
+            branches:
+              only:
+                - main
+```
+
+### Branch and Tag Filtering
+
+```yaml
+workflows:
+  ci-pipeline:
+    jobs:
+      - test:
+          filters:
+            branches:
+              only: /^(feature|fix|main)\/.*$/
+      - deploy:
+          filters:
+            branches:
+              only: main
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
+```
+
+### PR Validation
+
+CircleCI detects PR events automatically. Use the `CIRCLE_PULL_REQUEST` environment variable to check if the current run originates from a PR.
+
+## Checkout Strategies
+
+### Default Checkout
+
+```yaml
+jobs:
+  build:
+    docker:
+      - image: cimg/node:20.0
+    steps:
+      - checkout
+```
+
+The `checkout` step is built into CircleCI and checks out the commit that triggered the pipeline.
+
+### Deep Checkout
+
+```yaml
+- checkout:
+    depth: 0  # Fetch full Git history
+```
+
+### Multi-Repository Checkout
+
+```yaml
+- checkout:
+    path: ~/project/main-repo
+- run: git clone git@github.com:org/shared-lib.git ~/project/shared-lib
+```
+
+## Caching with Git
+
+### Dependency Cache Based on Checksum
+
+```yaml
+- restore_cache:
+    keys:
+      - v1-deps-{{ checksum "package-lock.json" }}
+      - v1-deps-
+- run: npm ci
+- save_cache:
+    key: v1-deps-{{ checksum "package-lock.json" }}
+    paths:
+      - node_modules
+```
+
+Git's checksum capability ensures precise cache key matching.
+
+### Git Workspace Caching
+
+```yaml
+- restore_cache:
+    keys:
+      - v1-repo-{{ .Branch }}-{{ .Revision }}
+      - v1-repo-{{ .Branch }}
+- checkout
+- save_cache:
+    key: v1-repo-{{ .Branch }}-{{ .Revision }}
+    paths:
+      - .git
+```
+
+## Pipeline Parameterization with Git Tags
+
+### Extract Version from Tag
+
+```yaml
+jobs:
+  build:
+    steps:
+      - checkout
+      - run: |
+          TAG=${CIRCLE_TAG:-$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")}
+          VERSION=${TAG#v}
+          echo "Building version: $VERSION"
+          echo "export VERSION=$VERSION" >> $BASH_ENV
+```
+
+### Tag-Triggered Release Pipeline
+
+```yaml
+workflows:
+  release:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /^v.*/
+      - publish:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+```
+
+## CircleCI Orbs for Git Operations
+
+### Slack Orb for Git Event Notifications
+
+```yaml
+orbs:
+  slack: circleci/slack@4.1
+jobs:
+  notify:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - slack/notify:
+          message: "Deploy succeeded for commit ${CIRCLE_SHA1} on branch ${CIRCLE_BRANCH}"
+          webhook: "${SLACK_WEBHOOK}"
+```
+
+### GitHub Release Orb
+
+```yaml
+orbs:
+  gh: circleci/github-cli@2.1
+jobs:
+  release:
+    steps:
+      - gh/release:
+          tag: ${CIRCLE_TAG}
+          title: "Release ${CIRCLE_TAG}"
+```
+
+## Environment Variables from Git
+
+CircleCI provides rich Git-related environment variables:
+
+| Variable | Description |
+|----------|-------------|
+| `CIRCLE_BRANCH` | Current branch name |
+| `CIRCLE_TAG` | Current tag (if triggered by a tag) |
+| `CIRCLE_SHA1` | Full commit SHA |
+| `CIRCLE_REPOSITORY_URL` | Repository URL |
+| `CIRCLE_COMPARE_URL` | GitHub compare URL |
+| `CIRCLE_PULL_REQUEST` | PR URL (if triggered by a PR) |
+
+## Try it yourself
+
+1. Practice the circleci-git command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+
+## Continue Learning
+
+1. `ci-cd/github-actions-basics` — GitHub Actions Git integration
+2. `ci-cd/gitlab-ci-basics` — GitLab CI Git integration
+3. `ci-cd/ci-security-basics` — Git security in CI/CD

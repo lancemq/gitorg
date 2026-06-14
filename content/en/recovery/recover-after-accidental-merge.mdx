@@ -13,7 +13,21 @@ export const metadata = {
 
 # Recover after an accidental merge
 
+## What you will learn
+
+- Understand the core purpose of Recover after an accidental merge
+- Master the basic usage and common options of Recover after an accidental merge
+- When the wrong branch was merged, decide between reset and revert -m based on sharing state, and undo the merge safely without damaging collaboration history.
+- Understand key concepts: Key checks
+- Know when to use this feature and when to avoid it
+
+
 Most merge-recovery mistakes happen when teams use `reset` where `revert -m` is required.
+
+
+## Start with a problem
+
+You just ran a Git command and the result wasn't what you expected — maybe you even lost some commits. This has happened before, and you want a reliable set of recovery techniques.
 
 ## Key checks
 
@@ -65,4 +79,10 @@ git revert -m 1 <merge-commit>
 1. `undo after pull`
 2. `assess force-push impact`
 3. `git-merge`
+
+## Try it yourself
+
+1. Practice the recover-after-accidental-merge command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

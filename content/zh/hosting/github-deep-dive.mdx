@@ -12,13 +12,37 @@ export const metadata = {
 
 # GitHub 深度功能指南
 
-## 概述
+## 学完这篇你会掌握什么
 
-GitHub 不仅仅是一个 Git 托管平台。本文深入介绍 GitHub 的高级功能，帮助你更高效地管理项目和团队协作。
+- 知道 GitHub 除了托管代码外还有哪些核心高级功能
+- 理解什么时候需要用自定义 Action、矩阵构建、环境审批
+- 会用 GitHub Pages 部署文档或静态站点
+- 了解 CODEOWNERS、规则集和安全特性的作用
 
-## Actions 进阶
+## 先想一个问题
 
-### 自定义 Action
+你已经在用 GitHub 托管代码仓库，但你可能遇到这些场景：
+
+- CI 工作流中有一段逻辑需要在多个项目里复用，每次复制粘贴很麻烦
+- 希望自动把文档部署到 `docs.yourdomain.com`
+- 想让特定目录的文件必须由特定团队成员审核
+- 需要确保 main 分支不能被随意 force push
+
+这些需求 GitHub 本身就能满足，只是很多人在"会 push 代码"之后就停下来了，没有继续探索平台提供的能力。
+
+## 一句话理解
+
+GitHub 不只是 Git 托管平台——它提供了 Actions（自动化）、Pages（托管）、Projects（项目管理）、安全扫描等能力，围绕着你的仓库形成一个协作闭环。
+
+## 场景一：你的 CI 逻辑需要在多个项目复用
+
+### 问题
+
+你有一个步骤需要在多个工作流中使用（比如构建 Docker 镜像）。每次都写同样的 YAML 片段很冗余，而且一处更新需要在所有仓库同步。
+
+### 解决方案：自定义 Action
+
+你可以写一个可复用的 Action，把它放到独立的仓库里，然后在工作流中引用：
 
 ```yaml
 # .github/actions/my-action/action.yml
@@ -37,7 +61,11 @@ runs:
   main: "index.js"
 ```
 
-### 矩阵构建
+关键区别在于：**它不是完整的 workflow，而是一个可被多个 workflow 引用的构建块**。比如总部的一个 CI 步骤被 10 个项目使用，只需更新 Action 仓库一个地方即可。
+
+### 矩阵构建：一次测试覆盖多种环境
+
+如果你想确保代码在 Node 18/20/22 + Ubuntu/macOS/Windows 上都能通过测试：
 
 ```yaml
 jobs:
@@ -55,7 +83,9 @@ jobs:
       - run: npm test
 ```
 
-### 环境与审批
+这里的逻辑是：矩阵告诉 GitHub「把同样的步骤组合在不同参数下各跑一次」。上面的配置会产生 3 × 3 = 9 个并行 job。如果某个环境失败了，你会在 CI 结果中立刻看到。
+
+### 环境审批：部署到生产前需要人确认
 
 ```yaml
 jobs:
@@ -65,11 +95,13 @@ jobs:
       - run: ./deploy.sh
 ```
 
-生产环境可配置审批人，确保部署前有人审核。
+配置 `environment: production` 后，你可以要求在部署前必须有人审批。这样做的好处是：**防止任何人随意部署到生产环境**。
 
-## GitHub Pages
+## 场景二：你想把项目文档部署为一个网站
 
-### 部署静态站点
+### 解决方案：GitHub Pages
+
+Pages 是 GitHub 内置的静态站点托管服务。配置好之后，每次 push 到 main 分支都会自动重新部署。
 
 ```yaml
 # .github/workflows/deploy.yml
@@ -87,51 +119,61 @@ jobs:
 
 ### 自定义域名
 
+如果你想用自己的域名而不是 `xxx.github.io`：
+
+1. 在仓库 Settings → Pages 中填写自定义域名（如 `docs.yourdomain.com`）
+2. 在你的 DNS 服务商添加 CNAME 记录指向 `your-org.github.io`
+
+## 场景三：项目跟踪不应只有 Issue 列表
+
+### 解决方案：GitHub Projects
+
+Projects 提供了看板视图来跟踪 Issue 和 PR 的进度，类似 Trello 或 Jira。它有四种视图：
+
+1. **Table view**：类似电子表格，适合批量编辑
+2. **Board view**：看板，按状态列分类
+3. **Roadmap view**：时间线视图，适合跨项目规划
+4. **自动化规则**：当 Issue 或 PR 状态变化时自动移动卡片
+
+实际场景：一个团队的 PR 从 "In Review" → "Approved" → "Done" 是自动流转的，不需要手动拖拽。
+
+## 场景四：代码改了，但没人 review 怎么办
+
+### 解决方案：CODEOWNERS
+
+在仓库根目录创建 `.github/CODEOWNERS` 文件：
+
 ```bash
-# 在项目设置 Pages 中配置：
-# Custom domain: docs.yourdomain.com
-# 同时在 DNS 中添加 CNAME 或 A 记录指向 GitHub Pages
-```
-
-## GitHub Projects
-
-Projects 提供项目级的看板视图（类似 Jira）：
-
-1. **Table view**：类电子表格的视图
-2. **Board view**：看板视图
-3. **Roadmap view**：时间线视图
-4. **自动化规则**：根据 Issue/PR 状态自动移动卡片
-
-## 仓库管理高级功能
-
-### CODEOWNERS
-
-```bash
-# .github/CODEOWNERS
 * @team-core
 /src/api/ @team-api
 /docs/ @team-docs
 *.md @docs-maintainer
 ```
 
-自动为文件变更分配审核人。
+这样当有人修改 `src/api/` 下的文件时，GitHub 会自动把 `@team-api` 添加为 reviewer。你不需要在每次 PR 中手动指定审核人。
 
-### 规则集 (Rulesets)
+### 规则集：更灵活的保护策略
 
-规则集比 Branch protection 更灵活，可以跨多个分支和标签应用规则。
+规则集（Rulesets）是 Branch protection 的升级版。它可以跨多个分支和标签应用规则：
 
-- 可锁定仓库配置
-- 可要求线性历史
-- 可限制特定用户的创建/删除权限
+- 锁定仓库配置，防止被修改
+- 要求线性历史（不允许 merge commit）
+- 限制特定用户的创建或删除权限
 
 ### 安全特性
 
-| 功能 | 说明 |
-|------|------|
-| Dependabot | 自动检测依赖漏洞并创建 PR |
-| Secret scanning | 自动检测仓库中的密钥 |
-| Code scanning | 基于 CodeQL 的代码分析 |
-| Private vulnerability reporting | 安全研究人员私密报告漏洞 |
+| 功能 | 做什么 | 什么时候需要 |
+|------|--------|------------|
+| Dependabot | 自动检测依赖漏洞并创建修复 PR | 项目使用了第三方依赖 |
+| Secret scanning | 自动扫描仓库中的密钥（token、密码等） | 所有项目，预防密钥误提交 |
+| Code scanning | 基于 CodeQL 做代码安全分析 | 对安全性要求较高的项目 |
+| Private vulnerability reporting | 允许安全研究人员私下提交漏洞报告 | 开源项目 |
+
+## 给你的练习
+
+1. 在你的项目里创建一个自定义 Action，把常用的 CI 步骤提取出来
+2. 用 GitHub Pages 部署你的项目文档（可先尝试用默认的 `xxx.github.io` 域名）
+3. 创建一个 CODEOWNERS 文件，为不同目录指定不同的 reviewer
 
 ## 继续学习
 

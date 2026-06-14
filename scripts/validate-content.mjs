@@ -10,11 +10,15 @@ const allowedSections = new Set([
   "commands",
   "best-practices",
   "workflows",
-  "github",
-  "gitlab",
+  "platforms",
   "internals",
   "recovery",
   "concepts",
+  "devops",
+  "security",
+  "performance",
+  "migration",
+  "hosting",
 ]);
 
 function extractQuotedStrings(block) {
@@ -54,7 +58,9 @@ function metadataField(block, key) {
 }
 
 function hasConflictMarkers(source) {
-  return /^(<<<<<<<|>>>>>>>) /m.test(source);
+  // Remove all fenced code blocks (``` ... ```) before checking for conflict markers
+  const withoutCodeBlocks = source.replace(/```[\s\S]*?```/g, "");
+  return /^(<<<<<<<|>>>>>>>) /m.test(withoutCodeBlocks);
 }
 
 async function collectMdxPaths(locale) {

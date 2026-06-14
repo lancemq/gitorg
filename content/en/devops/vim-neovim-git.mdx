@@ -1,0 +1,122 @@
+export const metadata = {
+  title: "Vim/Neovim Git Integration Guide",
+  slug: "vim-neovim-git",
+  locale: "en",
+  section: "devops",
+  summary: "Complete guide to Git integration in Vim and Neovim, covering fugitive.vim, gitsigns.nvim, lazygit integration, and telescope Git extensions.",
+  sourceUrls: [
+    "https://github.com/tpope/vim-fugitive",
+    "https://github.com/lewis6991/gitsigns.nvim",
+    "https://github.com/jesseduffield/lazygit",
+  ],
+};
+
+# Vim/Neovim Git Integration Guide
+
+## What you will learn
+
+- Understand the core purpose of Vim/Neovim Git Integration Guide
+- Master the basic usage and common options of Vim/Neovim Git Integration Guide
+- Complete guide to Git integration in Vim and Neovim, covering fugitive.vim, gitsigns.nvim, lazygit integration, and telescope Git extensions.
+- Understand key concepts: fugitive.vim — The Git Swiss Army Knife
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+Your team is adopting CI/CD pipelines, or you're configuring Git integration in your IDE — but you're unsure how Git behaves differently in automated environments compared to local manual operations.
+
+## One-Sentence Understanding
+
+Vim and Neovim achieve powerful Git integration through their plugin ecosystems, from fugitive.vim's Git command interface to gitsigns.nvim's inline change markers.
+
+## fugitive.vim — The Git Swiss Army Knife
+
+### Basic Commands
+
+| Command | Action | Git Equivalent |
+|---------|--------|----------------|
+| `:Gstatus` | View working tree status | `git status` |
+| `:Gdiff` | View file diff | `git diff` |
+| `:Gcommit` | Commit changes | `git commit` |
+| `:Gpush` | Push to remote | `git push` |
+| `:Glog` | View commit history | `git log` |
+| `:Gblame` | File blame | `git blame` |
+
+### Advanced Workflow
+
+```
+:Gstatus → move to file → - to toggle stage → cc to commit
+:Gdiff → [c / ]c to navigate hunks → :Gdiffoff to close
+:Gedit HEAD~3 → modify buffer → save to execute rebase
+```
+
+## gitsigns.nvim — Inline Change Markers
+
+Adds git change markers to the sign column with hunk operations:
+
+```lua
+{
+  "lewis6991/gitsigns.nvim",
+  opts = {
+    signs = { add = { text = "│" }, change = { text = "│" }, delete = { text = "_" } },
+    current_line_blame = true,
+    current_line_blame_opts = { virt_text = true, virt_text_pos = "eol", delay = 1000 },
+  },
+}
+```
+
+Key maps: `]c` / `[c` navigate hunks, `<leader>hs` stage hunk, `<leader>hr` reset hunk.
+
+## lazygit Integration
+
+```vim
+:terminal lazygit
+nnoremap <leader>gg :terminal lazygit<CR>
+```
+
+With lazygit.nvim for a floating window:
+
+```lua
+{
+  "kdheepak/lazygit.nvim",
+  keys = { { "<leader>gg", "<cmd>LazyGit<CR>", desc = "LazyGit" } },
+}
+```
+
+## telescope Git Extensions
+
+```lua
+:Telescope git_status      -- Changed files
+:Telescope git_commits     -- Commit history
+:Telescope git_branches    -- Switch branches
+:Telescope git_bcommits    -- Current file history
+```
+
+Mappings:
+
+```lua
+nnoremap <leader>gs <cmd>Telescope git_status<CR>
+nnoremap <leader>gc <cmd>Telescope git_commits<CR>
+nnoremap <leader>gb <cmd>Telescope git_branches<CR>
+```
+
+## Other Plugins
+
+| Plugin | Purpose |
+|--------|---------|
+| tpope/vim-rhubarb | Open GitHub from Vim |
+| sindrets/diffview.nvim | Visual diff browser |
+| NeogitOrg/neogit | Magit-style Git UI |
+
+## Try it yourself
+
+1. Practice the vim-neovim-git command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+
+## Continue Learning
+
+1. `commands/git-status` — git status deep dive
+2. `commands/git-diff` — diff techniques
+3. `ide/vscode-git` — VS Code Git integration

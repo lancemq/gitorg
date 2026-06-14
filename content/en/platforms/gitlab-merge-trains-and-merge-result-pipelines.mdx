@@ -1,0 +1,57 @@
+export const metadata = {
+  title: "GitLab merge trains and merged result pipelines",
+  slug: "gitlab-merge-trains-and-merge-result-pipelines",
+  locale: "en",
+  section: "platforms",
+  summary: "Use merge trains and merged-result pipelines to validate integration reality before merge, especially under high parallel MR traffic.",
+  sourceUrls: [
+    "https://docs.gitlab.com/ee/ci/pipelines/merge_trains/",
+    "https://docs.gitlab.com/ee/ci/pipelines/merged_results_pipelines.html",
+  ],
+};
+
+# GitLab merge trains and merged result pipelines
+
+## What you will learn
+
+- Understand the core purpose of GitLab merge trains and merged result pipelines
+- Master the basic usage and common options of GitLab merge trains and merged result pipelines
+- Use merge trains and merged-result pipelines to validate integration reality before merge, especially under high parallel MR traffic.
+- Understand key concepts: Two core pieces
+- Know when to use this feature and when to avoid it
+
+
+A branch pipeline passing does not guarantee the post-merge combination will stay green. Merge trains target that integration gap.
+
+
+## Start with a problem
+
+You're already using GitHub or GitLab to host code, but beyond push and pull, you're not fully familiar with the collaboration features these platforms offer — PR workflows, code review, and permission management.
+
+## Two core pieces
+
+- merged result pipeline: CI on the merge outcome
+- merge train: ordered queue for MR integration
+
+## Best-fit scenarios
+
+1. high merge concurrency on one protected branch
+2. frequent “base changed” pipeline churn
+3. strong requirement for stable mainline
+
+<WarningBox title="Queueing is orchestration, not quality replacement">
+  Merge trains reduce merge race risk, but still depend on meaningful test coverage.
+</WarningBox>
+
+## Good follow-up reads
+
+1. `merge queue workflow`
+2. `gitlab ci and runners`
+3. `sync before review`
+
+## Try it yourself
+
+1. Practice the gitlab-merge-trains-and-merge-result-pipelines command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

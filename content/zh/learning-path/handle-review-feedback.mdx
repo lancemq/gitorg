@@ -1,45 +1,76 @@
 export const metadata = {
-  title: "处理评审反馈",
+  title: "处理 Review 反馈",
   slug: "handle-review-feedback",
   locale: "zh",
   section: "learning-path",
-  summary: "掌握评审反馈处理节奏：区分必须修改与讨论项、按批次提交修订、维持 PR 可审查性与上下文连续性。",
+  summary: "PR 收到 review 反馈后如何正确处理：区分反馈类型、做出对应修改、安全地更新 PR，避免常见错误操作。",
   sourceUrls: [
-    "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/code-review/about-pull-request-reviews",
     "https://git-scm.com/docs/git-commit",
-    "https://git-scm.com/docs/git-range-diff",
+    "https://git-scm.com/docs/git-push",
   ],
 };
 
-# 处理评审反馈
+# 处理 Review 反馈
 
-评审不是“改到 reviewer 不说话”为止，而是共同收敛风险和可维护性。
+## 学完这篇你会掌握什么
 
-## 推荐节奏
+- 区分 review 反馈的类型：必须修改、值得讨论、仅供参考
+- 收到反馈后在本地正确修改并更新 PR
+- 不触发不必要的 CI 重跑
+- 理解 review 往返是协作的正常成本，不是冲突
 
-1. 先把反馈分组：必须改 / 讨论项
-2. 小批次提交修订，不要一次性大改
-3. 每轮修订后写清“改了什么、为什么”
+## 先想一个问题
 
-## 常用动作
+你刚发了一个 PR，满怀期待等着合并。结果 reviewer 回了 5 条评论——有要改的、有问问题的、有建议的。这时候你的第一反应是"又要改一遍"还是"先看一下每一条说的是什么"？
+
+很多人收到 review 反馈后急着改代码，反而忽略了更重要的事：先理解 reviewer 在问什么。
+
+## 收到 review 后的第一步：分类
+
+review 反馈通常分三类：
+
+1. **必须修改**——代码逻辑错误、安全隐患、缺少边界处理
+2. **值得讨论**——设计选择、命名偏好、架构取舍
+3. **仅供参考**——风格建议、非强制性优化
+
+花 30 秒把评论大致分类，你就知道哪些要立刻改、哪些可以讨论、哪些可以直接说"了解了"。
+
+## 如何修改并更新 PR
+
+收到 review 后，不需要关闭 PR 重新开。直接在同一个分支上继续提交即可：
 
 ```bash
-git add -p
-git commit -m "fix: address review comments on error handling"
-git push
+# 在同一个功能分支上
+git switch feature/first-pr
+
+# 根据反馈修改代码
+git add <changed-files>
+git commit -m "fix: handle edge case from review feedback"
+
+# 推送到同一分支，PR 自动更新
+git push origin feature/first-pr
 ```
 
-## 关键习惯
+PR 会自动添加新的提交，reviewer 可以看到你的修改。
 
-在评论区用“已修复/保留原因”逐条回应，降低认知来回切换成本。
+## 几个重要的"不要"
 
-<WarningBox title="别把多个不相关修改塞进同一轮反馈提交">
-  混合提交会让 reviewer 难以判断每条评论是否真的被解决。
+- **不要 rebase 已推送的 PR 分支**——除非你清楚知道自己在做什么。rebase 会改变提交哈希，reviewer 之前 review 过的提交就不见了
+- **不要 force push 到 PR 分支**——除非在 PR 开始前和 reviewer 沟通过
+- **不要因为 review 往返次数多就觉得是自己写得差**——review 本身就是协作的一部分
+
+<WarningBox title="不要在 PR 上 force push">
+  一旦 PR 收到了 review，force push 会让 reviewer 之前看过的代码消失。除非团队约定使用 squash merge，否则保持提交稳定。
 </WarningBox>
+
+## 给你的练习
+
+1. 在测试仓库中创建一个 PR，让同事给 2-3 条 review 意见，练习在同一个分支追加提交并更新 PR
+2. 故意在收到 review 后使用 rebase + force push，观察 review 页面发生什么
+3. 记录一个 PR 从发起到合并的 review 往返次数，分析哪一类反馈占多数
 
 ## 接下来建议继续学什么
 
-1. `merge and close task`
-2. `small batch review`
-3. `code review handoff quality`
-
+1. `pull request prep` — 减少 review 往返的准备工作
+2. `pull requests and reviews` — PR 与代码审查最佳实践
+3. `small batch review` — 小批量 review 的优势

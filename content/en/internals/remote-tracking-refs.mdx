@@ -13,12 +13,26 @@ export const metadata = {
 
 # Remote-Tracking References
 
+## What you will learn
+
+- Understand the core purpose of Remote-Tracking References
+- Master the basic usage and common options of Remote-Tracking References
+- Understand the difference between `main` and `origin/main` so fetch, pull, push, and branch sync become easier to reason about.
+- Understand key concepts: Why Git keeps them separate
+- Know when to use this feature and when to avoid it
+
+
 Many sync mistakes come from not separating these two names:
 
 - `main`: your local branch
 - `origin/main`: your local record of the remote state
 
 The names look similar, but they play very different roles in Git's sync model.
+
+
+## Start with a problem
+
+You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
 
 ## Why Git keeps them separate
 
@@ -169,3 +183,10 @@ It pairs especially well with:
 - `git branch -vv`
 - `git remote`
 - `git status`
+
+## Try it yourself
+
+1. Practice the remote-tracking-refs command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

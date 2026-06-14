@@ -1,0 +1,163 @@
+export const metadata = {
+  title: "Gerrit 代码审查系统",
+  slug: "gerrit-code-review",
+  locale: "zh",
+  section: "hosting",
+  summary: "Gerrit 是一个基于 Git 的代码审查系统，广泛用于开源项目（如 Android、OpenStack）。本文介绍其独特的工作流程与审查机制。",
+  sourceUrls: [
+    "https://www.gerritcodereview.com",
+    "https://gerrit.googlesource.com/gerrit",
+  ],
+};
+
+# Gerrit 代码审查系统
+
+## 学完这篇你会掌握什么
+
+- 理解 Gerrit 代码审查系统 的核心作用和适用场景
+- 掌握 Gerrit 代码审查系统 的基本用法和常用参数
+- Gerrit 是一个基于 Git 的代码审查系统，广泛用于开源项目（如 Android、OpenStack）。本文介绍其独特的工作流程与审查机制。
+- 理解 什么是 Gerrit 相关的概念
+- 掌握 Gerrit 工作流程 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+## 先想一个问题
+
+你在选择或配置 Git 托管方案——可能是要自建 Gitea，也可能是在对比 GitHub、GitLab、Gitee 的功能差异和成本。你不确定哪个方案最适合你的团队。
+
+## 一句话理解
+
+Gerrit 与 GitHub PR 最大的区别：Gerrit 不允许直接推送到分支，所有提交先进入审查状态，通过审核后才能合入，确保每一行代码都经过审查。
+
+## 什么是 Gerrit
+
+Gerrit 最初由 Google 为 Android 项目开发，后成为开源项目。它的核心设计理念是 **每个提交都必须经过审查**。
+
+| 特性 | Gerrit | GitHub PR |
+|------|--------|-----------|
+| 推送方式 | `git push origin HEAD:refs/for/main` | `git push origin feature-branch` |
+| 审查单元 | 单个 commit | 整个 PR（可以包含多个 commit） |
+| 历史编辑 | 通过 rebase 更新 | 追加新 commit 或 force push |
+| 评分系统 | Verified + Code-Review | 单一 review 状态 |
+
+## Gerrit 工作流程
+
+### 推送到审查队列
+
+```bash
+# 常规推送：直接推送到分支（被禁止）
+git push origin main          # ❌ Gerrit 拒绝
+
+# 推送到审查队列
+git push origin HEAD:refs/for/main  # ✅ 创建 Review
+```
+
+每次推送会创建一个 **Change**，Change 对应一个 Commit。
+
+### Change-Id 与 Commit Hook
+
+Gerrit 使用 Change-Id 跟踪同一个 Change 的不同版本：
+
+```
+commit 1a2b3c4d5e6f7g8h9i0j
+Author: Zhang San <zhangsan@example.com>
+Date:   Mon Mar 1 10:00:00 2025 +0800
+
+    feat: add user authentication
+
+    Change-Id: Iabcd1234efgh5678ijkl9012mnop3456qrst7890
+```
+
+安装 commit-msg hook 自动生成 Change-Id：
+
+```bash
+gitdir=$(git rev-parse --git-dir)
+scp -p -P 29418 user@gerrit-server:hooks/commit-msg $gitdir/hooks/
+```
+
+之后每次 `git commit` 自动添加 Change-Id。
+
+### 更新 Change
+
+```bash
+# 修改本地 commit
+git add -p && git commit --amend
+# 重新推送到同一个 Change（通过 Change-Id 匹配）
+git push origin HEAD:refs/for/main
+```
+
+## 审查工作流程
+
+### 评分标签
+
+| 标签 | 分值范围 | 含义 |
+|------|---------|------|
+| Verified | -1 到 +1 | CI 验证是否通过 |
+| Code-Review | -2 到 +2 | 人工代码审查评分 |
+
+- **+2 Code-Review**: 批准合入
+- **-2 Code-Review**: 拒绝合入（否决权）
+- **+1/-1 Code-Review**: 一般意见，无否决权
+
+### 合入条件
+
+```
+Code-Review: +2  (至少一个 +2，无 -2)
+Verified: +1     (CI 通过)
+```
+
+可使用 Labels 配置额外条件：
+
+```
+[access "refs/heads/*"]
+    label-Code-Review = -2..+2 group:core-developers
+    label-Code-Review = -1..+1 group:developers
+    label-Verified = -1..+1 group:ci-service
+```
+
+## 提交策略 (Submit Strategies)
+
+| 策略 | 行为 | 适用场景 |
+|------|------|---------|
+| **Merge if Necessary** | 有冲突时自动创建合并提交 | 低频协作，接受合并历史 |
+| **Rebase Always** | 合入前自动 Rebase 到目标分支 | 保持线性历史，高频协作 |
+| **Cherry Pick Always** | 始终 Cherry-pick 到目标分支 | 精细控制提交内容 |
+| **Fast Forward Only** | 仅当能 Fast-forward 时才合入 | 严格线性历史 |
+
+## 管理基础
+
+### 安装（Docker）
+
+```bash
+docker run -d -p 8080:8080 -p 29418:29418 \
+  -v /data/gerrit:/var/gerrit/review_site \
+  gerritcodereview/gerrit
+```
+
+### 项目创建
+
+```bash
+ssh -p 29418 admin@gerrit-server gerrit create-project \
+  --name my-project --owner "Administrators"
+```
+
+### 权限配置
+
+| 引用 (Ref) | 权限 |
+|-----------|------|
+| refs/heads/* | Code-Review, Verified 评分 |
+| refs/heads/main | 仅允许通过审查合入 |
+| refs/for/main | 允许所有人推送审查 |
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+
+## 继续学习建议
+
+1. `hosting/platform-comparison` — 托管平台对比
+2. `github/advanced-collaboration` — 高级协作流程
+3. `hosting/aws-codecommit` — CodeCommit 集成

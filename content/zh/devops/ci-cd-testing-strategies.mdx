@@ -1,0 +1,221 @@
+export const metadata = {
+  title: "CI/CD 测试策略与 Git 集成",
+  slug: "ci-cd-testing-strategies",
+  locale: "zh",
+  section: "devops",
+  summary: "探讨如何在 CI/CD 流水线中利用 Git 元数据设计高效的测试策略，包括 PR 测试与 Push 测试的区别、矩阵测试、并行化、快照测试和基于分支的集成测试环境。",
+  sourceUrls: [
+    "https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows",
+    "https://circleci.com/docs/parallelism-faster-jobs/",
+  ],
+};
+
+# CI/CD 测试策略与 Git 集成
+
+## 学完这篇你会掌握什么
+
+- 理解 CI/CD 测试策略与 Git 集成 的核心作用和适用场景
+- 掌握 CI/CD 测试策略与 Git 集成 的基本用法和常用参数
+- 探讨如何在 CI/CD 流水线中利用 Git 元数据设计高效的测试策略，包括 PR 测试与 Push 测试的区别、矩阵测试、并行化、快照测试和基于分支的集成测试环境。
+- 理解 PR 测试 vs Push 测试 相关的概念
+- 掌握 矩阵测试与 Git 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+## 先想一个问题
+
+你的团队正在引入 CI/CD，或者你正在配置 IDE 中的 Git 集成——但你不确定在自动化的场景下，Git 的行为和本地手动操作有什么不同，需要注意什么安全问题。
+
+## 一句话理解
+
+利用 Git 的分支、提交和变更信息，可以在 CI/CD 中精确控制测试范围、并行策略和环境选择，从而在保证质量的同时最小化测试耗时。
+
+## PR 测试 vs Push 测试
+
+### PR 测试：精确变更验证
+
+PR 测试针对合并前后的差异运行，适合快速反馈：
+
+```yaml
+# GitHub Actions - 仅 PR 触发完整测试套件
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - "src/**"
+      - "tests/**"
+
+jobs:
+  test:
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - run: |
+          CHANGED_FILES=$(git diff --name-only HEAD~1)
+          if echo "$CHANGED_FILES" | grep -q "src/"; then
+            npm run test:unit
+          fi
+```
+
+### Push 测试：全面回归验证
+
+Push 到主干分支时运行完整测试，确保合并后的代码库仍保持健康：
+
+```yaml
+on:
+  push:
+    branches: [main, develop]
+
+jobs:
+  full-test:
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: npm ci && npm run test:full
+```
+
+| 维度 | PR 测试 | Push 测试 |
+|------|---------|-----------|
+| 目标 | 快速反馈 | 全面回归 |
+| 范围 | 变更相关 | 全量 |
+| 触发点 | PR open/sync | 合并到主干 |
+| 耗时要求 | 分钟级 | 可更长 |
+
+## 矩阵测试与 Git
+
+### 跨分支矩阵测试
+
+```yaml
+# CircleCI 矩阵测试
+version: 2.1
+jobs:
+  test:
+    parameters:
+      node-version:
+        type: string
+    docker:
+      - image: cimg/node:<< parameters.node-version >>
+    steps:
+      - checkout
+      - run: npm ci && npm test
+
+workflows:
+  matrix-test:
+    jobs:
+      - test:
+          matrix:
+            parameters:
+              node-version: ["18.0", "20.0", "22.0"]
+          filters:
+            branches:
+              only: /^(main|release)\/.*$/
+```
+
+### 基于 Git 元数据的条件矩阵
+
+```yaml
+steps:
+  - run: |
+      CHANGED_PACKAGES=$(git diff --name-only HEAD~3 -- 'packages/*/' | cut -d/ -f2 | sort -u)
+      for pkg in $CHANGED_PACKAGES; do
+        echo "Need to test: $pkg"
+      done
+```
+
+## 测试并行化与 Git Metadata
+
+### 基于文件变更的测试分片
+
+```yaml
+# GitHub Actions - 按测试文件分片
+jobs:
+  test:
+    strategy:
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm run test -- --shard=${{ matrix.shard }}/4
+```
+
+### CircleCI 并行化
+
+```yaml
+version: 2.1
+jobs:
+  test:
+    parallelism: 4
+    steps:
+      - checkout
+      - run: |
+          # 使用 CircleCI CLI 自动分配测试
+          circleci tests glob "tests/**/*.test.js" | circleci tests split --split-by=timings
+          npm test -- --runInBand
+```
+
+## 快照测试与 Git
+
+### 利用 Git 分支隔离快照
+
+```yaml
+jobs:
+  snapshot:
+    steps:
+      - checkout
+      - run: |
+          BRANCH_SLUG=$(echo "$CIRCLE_BRANCH" | sed 's/[^a-zA-Z0-9]/-/g')
+          npm run test:snapshot -- --output-file="snapshots/$BRANCH_SLUG.snap"
+      - store_artifacts:
+          path: snapshots/
+```
+
+### 跨分支快照比较
+
+```yaml
+- run: |
+    if [ "$CIRCLE_BRANCH" != "main" ]; then
+      git fetch origin main
+      npm run test:snapshot -- --compare-with=origin/main
+    fi
+```
+
+## 基于 Git 分支的集成测试环境
+
+### 动态环境创建
+
+```yaml
+jobs:
+  integration:
+    steps:
+      - checkout
+      - run: |
+          # 从分支名生成环境标识
+          ENV_NAME=$(echo "$CIRCLE_BRANCH" | tr '/' '-' | tr '[:upper:]' '[:lower:]')
+          echo "Deploying review env: $ENV_NAME"
+          # 部署到临时环境
+          ./deploy-review.sh "$ENV_NAME"
+```
+
+### 预览环境 URL 自动发布
+
+```yaml
+- run: |
+    PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | grep -oE '[0-9]+$')
+    echo "Preview URL: https://preview-$PR_NUMBER.example.com"
+    # 在 PR 中自动评论
+    gh pr comment "$PR_NUMBER" --body "预览环境: https://preview-$PR_NUMBER.example.com"
+```
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+
+## 继续学习建议
+
+1. `ci-cd/circleci-git` — CircleCI 与 Git 集成
+2. `ci-cd/github-actions-basics` — GitHub Actions 与 Git 协同
+3. `ci-cd/ci-cd-deployment-strategies` — CI/CD 部署策略与 Git 版本管理

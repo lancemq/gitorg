@@ -12,6 +12,19 @@ export const metadata = {
 
 # Rollback Deployment Workflow
 
+## What you will learn
+
+- Understand the core purpose of Rollback Deployment Workflow
+- Master the basic usage and common options of Rollback Deployment Workflow
+- Combine Git tags, revert, and fast branch switching to build a safe and controllable deployment rollback process.
+- Understand key concepts: Rollback strategy selection
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
+
 ## The short version
 
 The rollback deployment workflow uses **tagged release points**, **rollback branches**, and **revert strategies** to let you return to the last stable version within minutes when a production issue is discovered, instead of scrambling in an emergency.
@@ -232,3 +245,10 @@ npm run db:migrate:down 20240115120000
 3. If the problematic commit has already been built upon by others, revert will create new conflicts
 4. Roll back versions that include database schema changes with special caution
 5. Combine the deployment system's rollback capability (e.g., k8s rollback) with Git rollback for best results
+
+## Try it yourself
+
+1. Practice the rollback-deployment-workflow command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

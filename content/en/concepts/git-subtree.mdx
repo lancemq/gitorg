@@ -12,6 +12,20 @@ export const metadata = {
 
 # Git Subtree: Managing Nested Repositories
 
+## What you will learn
+
+- Understand the core purpose of Git Subtree: Managing Nested Repositories
+- Master the basic usage and common options of Git Subtree: Managing Nested Repositories
+- A practical comparison of git subtree vs git submodule, and how to use subtree for embedding and synchronizing external projects.
+- Understand key concepts: What is Git Subtree?
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+You've encountered a conceptual question while using Git — you roughly know what it means, but you're not entirely sure about its precise definition and boundaries.
+
 ## What is Git Subtree?
 
 `git subtree` allows you to embed one repository (the **subproject**) inside another repository (the **main project**) as a subdirectory. Unlike submodules, which store only a reference to an external commit, subtree **merges the subproject's history directly into your repository**.
@@ -284,3 +298,10 @@ If the subproject is large, consider:
 | Remove subtree | `git rm -r DIR` |
 
 `git subtree` is a powerful tool for embedding external projects while maintaining a clean contributor experience. It shines when you need to modify the subproject and push changes back upstream, and when you want to avoid the complexity of submodule management. For large, rarely-modified dependencies, submodules may still be the better choice.
+
+## Try it yourself
+
+1. Practice the git-subtree command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

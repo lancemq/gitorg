@@ -11,6 +11,19 @@ export const metadata = {
 
 # git-worktree Tutorial
 
+## What you will learn
+
+- Understand the core purpose of git-worktree Tutorial
+- Master the basic usage and common options of git-worktree Tutorial
+- Create parallel working directories for one repository to reduce stash/switch friction and improve multi-task flow.
+- Understand key concepts: Why this often beats stash-driven switching
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
 ## The short version
 
 `git worktree` gives one repository multiple checkouts so different tasks can run in separate directories.
@@ -178,4 +191,10 @@ You can create multiple experiment worktrees simultaneously to compare different
 - Worktrees share the same `.git` directory and object database, so disk usage is efficient compared to multiple clones.
 - Use `git worktree list` to see all active worktrees and `git worktree remove <path>` to clean up when done.
 - Worktree metadata is stored in `.git/worktrees/`, so moving or renaming the main repository directory may require updating worktree paths.
+
+## Try it yourself
+
+1. Practice the git-worktree command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

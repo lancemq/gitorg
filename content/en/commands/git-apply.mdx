@@ -11,6 +11,19 @@ export const metadata = {
 
 # git-apply Tutorial
 
+## What you will learn
+
+- Understand the core purpose of git-apply Tutorial
+- Master the basic usage and common options of git-apply Tutorial
+- Explains how to use git-apply to apply patch content to the working tree or index.
+- Understand key concepts: When it is a good fit
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
 ## The short version
 
 git-apply is used to apply patch content to the working tree or index.
@@ -75,4 +88,10 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 - Use `--check` to test whether a patch applies cleanly before actually modifying files, avoiding partial application.
 - If a patch was generated with different line endings or context lines, application may fail; `--ignore-whitespace` or `--3way` can help.
 - Unlike `git am`, `git apply` does not preserve author information or commit messages from the original patch.
+
+## Try it yourself
+
+1. Practice the git-apply command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

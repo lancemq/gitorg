@@ -12,6 +12,21 @@ export const metadata = {
 
 # Commit Graph 深入
 
+## 学完这篇你会掌握什么
+
+- 理解 Commit Graph 深入 的核心作用和适用场景
+- 掌握 Commit Graph 深入 的基本用法和常用参数
+- 深入理解 Git Commit Graph 的分层结构、Generation Number、Bloom Filter 与大型仓库加速原理。
+- 理解 概述 相关的概念
+- 掌握 为什么需要 Commit Graph 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+
+## 先想一个问题
+
+你的 Git 仓库越来越大，clone 越来越慢，日常操作也开始卡顿。你想知道有哪些方法可以优化，又不确定哪些优化手段适合自己的项目场景。
+
 ## 概述
 
 **Commit Graph** 是 Git 的加速索引，将提交拓扑信息序列化到二进制文件，使 `git log`、`git merge-base`、`git bisect` 等操作从 O(N) 降为 O(log N) 甚至 O(1)。
@@ -207,3 +222,10 @@ git commit-graph write --reachable
 2. `performance/git-maintenance` — 自动维护框架
 3. `concepts/git-bisect-deep` — Bisect 利用 Commit Graph
 4. `commands/git-commit-graph` — 命令参考
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+

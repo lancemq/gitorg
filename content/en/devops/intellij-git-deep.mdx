@@ -1,0 +1,126 @@
+export const metadata = {
+  title: "IntelliJ IDEA Git Deep Dive",
+  slug: "intellij-git-deep",
+  locale: "en",
+  section: "devops",
+  summary: "Go beyond basic JetBrains Git usage — master Annotate/Blame, Shelving vs Stashing, interactive rebase UI, conflict resolution, Changelists, and platform integrations.",
+  sourceUrls: [
+    "https://www.jetbrains.com/help/idea/version-control-integration.html",
+    "https://www.jetbrains.com/help/idea/commit-and-push-changes.html",
+  ],
+};
+
+# IntelliJ IDEA Git Deep Dive
+
+## What you will learn
+
+- Understand the core purpose of IntelliJ IDEA Git Deep Dive
+- Master the basic usage and common options of IntelliJ IDEA Git Deep Dive
+- Go beyond basic JetBrains Git usage — master Annotate/Blame, Shelving vs Stashing, interactive rebase UI, conflict resolution, Changelists, and platform integrations.
+- Understand key concepts: Annotate / Blame
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+Your team is adopting CI/CD pipelines, or you're configuring Git integration in your IDE — but you're unsure how Git behaves differently in automated environments compared to local manual operations.
+
+## One-Sentence Understanding
+
+IntelliJ IDEA's Git integration goes far beyond basic commit and push — every advanced workflow from annotate to interactive rebase and changelist management is a polished visual tool.
+
+## Annotate / Blame
+
+Right-click the gutter → **Annotate with Git Blame**:
+
+- Each line shows: commit SHA, author, date
+- Click annotation to jump to commit details
+- Filter by author and date range
+
+Advanced: Previous Committers, Blame Before (specific revision), Show Diff.
+
+## Shelving vs Stashing
+
+| Feature | Shelve | Stash |
+|---------|--------|-------|
+| Visual management | ✓ List UI | ✗ CLI only |
+| Partial shelve | ✓ Select lines | ✗ File-level only |
+| Persistence | ✓ Permanent | ✗ Lost after drop |
+| Git native | ✗ Patch-based | ✓ Native object |
+
+Usage: `Local Changes → Right-click → Shelve Changes...`; use `git stash` in terminal.
+
+## Interactive Rebase UI
+
+Right-click a commit → **Interactively Rebase from Here...**
+
+```
+☐ [pick]   a1b2c3d  Fix login validation
+☐ [pick]   e4f5g6h  Add error handling
+☐ [squash] i7j8k9l  Address feedback
+☐ [drop]   m0n1o2p  Remove debug log
+```
+
+Drag to reorder. Actions: pick, reword (`F2`), squash, fixup, drop (`Delete`), edit. Live diff preview for each commit.
+
+## Conflict Resolution UI
+
+Automatic three-way merge dialog on conflict:
+
+```
+[Left: Yours]  [Center: Result]  [Right: Theirs]
+```
+
+Shortcuts: `Ctrl+Shift+Left/Right` accept left/right, `Ctrl+Shift+N/P` next/previous conflict.
+
+## Changelist Management
+
+Multiple virtual staging areas for logical grouping:
+
+```
+Default (active)     → src/feature/AuthService.ts
+Bugfix (hotfix)      → src/hotfix/crash-fix.ts
+Review (pending)     → src/refactor/api-client.ts
+```
+
+Create: `Local Changes → + New Changelist`, drag files to categorize.
+
+## Git Tool Window
+
+`Alt+9` opens the Git tool window:
+
+- **Log**: Customize columns, filter by branch/author/date
+- **Console**: See actual Git commands executed
+- **Branches**: Grouped local/remote/tags
+
+## Platform Integration
+
+| Feature | GitHub | GitLab |
+|---------|--------|--------|
+| PR/MR view | ✓ Built-in | ✓ Built-in |
+| Code Review | ✓ Comments | ✓ Suggestions |
+| Issue linking | ✓ Auto-link | ✓ Auto-link |
+
+## Recommended Settings
+
+```yaml
+Settings → Version Control → Commit:
+  Use non-modal commit interface: ✓
+  Reformat code: ✓
+  Optimize imports: ✓
+
+Settings → Version Control → Git:
+  Update method: Rebase
+```
+
+## Try it yourself
+
+1. Practice the intellij-git-deep command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+
+## Continue Learning
+
+1. `commands/git-rebase` — Interactive rebase command reference
+2. `commands/git-merge` — Merge strategies and conflict resolution
+3. `concepts/stash` — Stash and Shelve comparison

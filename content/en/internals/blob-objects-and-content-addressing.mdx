@@ -11,7 +11,21 @@ export const metadata = {
 
 # Blob Objects and Content Addressing
 
+## What you will learn
+
+- Understand the core purpose of Blob Objects and Content Addressing
+- Master the basic usage and common options of Blob Objects and Content Addressing
+- Explain how blobs store raw content and why hashes become the identity of Git objects.
+- Understand key concepts: How blob, tree, and commit connect
+- Know when to use this feature and when to avoid it
+
+
 If you want to understand Git below the command surface, blobs are one of the best places to start. A blob is one of Git's most basic object types, and it explains why Git can treat content itself as the primary identity.
+
+
+## Start with a problem
+
+You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
 
 ## How blob, tree, and commit connect
 
@@ -163,3 +177,10 @@ It pairs especially well with:
 - `git ls-tree`
 - `git show`
 - `git rev-parse`
+
+## Try it yourself
+
+1. Practice the blob-objects-and-content-addressing command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

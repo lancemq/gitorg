@@ -12,6 +12,20 @@ export const metadata = {
 
 # Perforce to Git Migration
 
+## What you will learn
+
+- Understand the core purpose of Perforce to Git Migration
+- Master the basic usage and common options of Perforce to Git Migration
+- Migrate Perforce repositories to Git using git-p4, preserving branch structure, commit history, and author information.
+- Understand key concepts: Overview
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+Your team is migrating from another version control system to Git, or moving code and history between different Git platforms. You're worried about losing commit history or author information during the process.
+
 ## Overview
 
 Perforce (Helix Core) is widely used in enterprise environments. `git-p4` is Git's official bidirectional bridge for Perforce-to-Git migration.
@@ -119,6 +133,12 @@ git lfs track "*.psd" "*.bin"
 Perforce's file permission model doesn't map to Git. Recommended:
 1. Review sensitive file permissions after migration
 2. Use `.gitattributes` for necessary permissions
+
+## Try it yourself
+
+1. Practice the git-p4-perforce command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 
 ## Continue Learning
 

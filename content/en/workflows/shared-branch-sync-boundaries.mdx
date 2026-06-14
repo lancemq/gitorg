@@ -13,6 +13,15 @@ export const metadata = {
 
 # Sync Boundaries on Shared Branches
 
+## What you will learn
+
+- Understand the core purpose of Sync Boundaries on Shared Branches
+- Master the basic usage and common options of Sync Boundaries on Shared Branches
+- Define what is safe and unsafe on a branch shared by multiple people so sync stays predictable and history rewrites do not turn into team-wide incidents.
+- Understand key concepts: Why shared branches are different
+- Know when to use this feature and when to avoid it
+
+
 Once multiple people depend on the same branch, actions that feel harmless on a personal branch can become destructive at team scale.  
 On a solo branch, rebase and reset may be cleanup. On a shared branch, they may change the synchronization baseline for everyone else.
 
@@ -26,6 +35,11 @@ On a solo branch, rebase and reset may be cleanup. On a shared branch, they may 
   outputs="safe sync|explainable history|controlled risk"
   note="Shared branches optimize for collective predictability, not personal cleanup speed."
 />
+
+
+## Start with a problem
+
+Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
 
 ## Why shared branches are different
 
@@ -127,3 +141,10 @@ Main, release, and multi-person feature branches do not all deserve identical ru
 1. `Fetch vs pull`
 2. `PR merge strategy and platform settings`
 3. `Merge queue workflow`
+
+## Try it yourself
+
+1. Practice the shared-branch-sync-boundaries command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

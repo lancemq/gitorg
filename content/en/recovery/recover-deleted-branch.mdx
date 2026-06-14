@@ -13,6 +13,20 @@ export const metadata = {
 
 # Recover a deleted branch
 
+## What you will learn
+
+- Understand the core purpose of Recover a deleted branch
+- Master the basic usage and common options of Recover a deleted branch
+- When a branch disappears, first determine whether only the name is gone or whether the commits have become hard to reach, then restore it from reflog or another surviving reference.
+- Understand key concepts: Do not confuse "the branch name is gone" with "the commits are gone"
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+You just ran a Git command and the result wasn't what you expected — maybe you even lost some commits. This has happened before, and you want a reliable set of recovery techniques.
+
 ## Do not confuse "the branch name is gone" with "the commits are gone"
 
 <ReflogFigure
@@ -95,3 +109,10 @@ So once you notice the deletion, stop reshaping the repository and investigate f
 
 The immediate goal is not “get the old name back.”  
 The goal is “attach a durable name to the old work before it drifts farther away.”
+
+## Try it yourself
+
+1. Practice the recover-deleted-branch command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

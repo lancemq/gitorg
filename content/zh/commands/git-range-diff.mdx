@@ -11,6 +11,20 @@ export const metadata = {
 
 # git-range-diff 教程
 
+## 学完这篇你会掌握什么
+
+- 理解 git-range-diff 教程 的核心作用和适用场景
+- 掌握 git-range-diff 教程 的基本用法和常用参数
+- 比较两组“补丁序列”而不是单点 diff，适合在 rebase 或重排提交后向 reviewer 解释“这次版本改动到底变了什么”。
+- 理解 什么时候最有价值 相关的概念
+- 掌握 典型命令 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+## 先想一个问题
+
+你正在 Git 仓库里工作，遇到了一个具体的操作需求——但你不确定用哪个命令、用哪个参数最合适，也不知道这个命令到底能做什么、不能做什么。
+
 ## 一句话理解
 
 `git range-diff` 比较的是“两段提交序列之间的补丁变化”，不是单个提交或两个目录快照。
@@ -103,3 +117,10 @@ git range-diff origin/main...feature-v1 origin/main...feature-v2
 2. `stacked pull requests workflow`
 3. `git-rebase`
 搭配 `git log --oneline --graph`、`git diff` 和 `git rebase` 一起理解，可以更全面地掌握如何安全地审查和比较提交序列的变化。
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+

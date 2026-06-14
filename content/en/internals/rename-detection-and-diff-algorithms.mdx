@@ -13,7 +13,21 @@ export const metadata = {
 
 # Rename detection and diff algorithms
 
+## What you will learn
+
+- Understand the core purpose of Rename detection and diff algorithms
+- Master the basic usage and common options of Rename detection and diff algorithms
+- Learn how Git infers renames and how diff algorithm choices affect review readability and change interpretation.
+- Understand key concepts: How rename detection works
+- Know when to use this feature and when to avoid it
+
+
 Git objects do not store a built-in “rename event.” Rename is usually inferred during diff.
+
+
+## Start with a problem
+
+You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
 
 ## How rename detection works
 
@@ -54,4 +68,10 @@ For large refactors, do pure-rename commits before logic edits to keep diffs und
 1. `tree objects and snapshots`
 2. `git-diff`
 3. `small batch review`
+
+## Try it yourself
+
+1. Practice the rename-detection-and-diff-algorithms command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

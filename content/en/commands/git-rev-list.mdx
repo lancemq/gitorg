@@ -11,6 +11,19 @@ export const metadata = {
 
 # git-rev-list Tutorial
 
+## What you will learn
+
+- Understand the core purpose of git-rev-list Tutorial
+- Master the basic usage and common options of git-rev-list Tutorial
+- Explains how to use git-rev-list to enumerate commit sets in a script-friendly way.
+- Understand key concepts: When it is a good fit
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
 ## The short version
 
 git-rev-list is used to enumerate commit sets in a script-friendly way.
@@ -76,4 +89,10 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 - The output format is very compact (one hash per line) — unlike `git log`, it does not include commit messages or other human-readable details.
 - Rich filtering options are available: `--count` outputs only the number, `--max-count` limits output, and `--after`/`--before` filter by date.
 - For very large repositories, output can be extremely long — consider using `--count` or `--max-count` to limit the volume.
+
+## Try it yourself
+
+1. Practice the git-rev-list command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

@@ -12,53 +12,104 @@ export const metadata = {
 
 # SSH 密钥管理与 Git 安全认证
 
+## 学完这篇你会掌握什么
+
+- 生成 SSH 密钥对并配置到 Git 平台
+- 理解公钥和私钥分别起什么作用
+- 管理多个 Git 账号的 SSH 密钥
+- 知道密钥泄露后应该怎么做
+
+## 先想一个问题
+
+每次 `git push` 都要输入用户名和密码，你可能早已觉得麻烦。更关键的是：密码在网络传输中可能被截获。  
+SSH 密钥解决的就是这两个问题：**不用每次输密码 + 更安全的认证方式**。
+
+它的工作原理很简单：你生成一对密钥——一个公钥（可以公开）、一个私钥（必须保密）。你把公钥交给 GitHub/GitLab，私钥留在本地。当你 push 时，服务器用公钥验证你的身份，只有持有对应私钥的人才能通过验证。
+
 ## 一句话理解
 
-SSH 密钥是 Git 远程操作中最安全的认证方式之一。正确管理 SSH 密钥可以让你在不输入密码的情况下安全地推送和拉取代码。
+SSH 密钥是 Git 远程操作中最安全的认证方式之一。配置好之后，你可以在不输入密码的情况下安全地推送和拉取代码。
 
-## SSH 密钥基础
+## 第一步：生成密钥对
 
-### 生成密钥对
+第一次配置 SSH 时，你只需要执行一次生成命令：
 
 ```bash
-# 生成 Ed25519 密钥（推荐）
 ssh-keygen -t ed25519 -C "your_email@example.com"
+```
 
-# 或 RSA 密钥（兼容旧系统）
+这里有两个重要的选择：
+
+- **`-t ed25519`**：指定密钥类型。Ed25519 比传统的 RSA 更快、更安全，是目前推荐的做法
+- **`-C`**：一个备注标签，方便你区分不同密钥。通常填你的邮箱
+
+你会被问到两个问题：
+
+1. **存放路径**：按回车用默认位置（`~/.ssh/id_ed25519`）即可
+2. **密码（passphrase）**：建议设置。即使私钥文件被人拿到，没有密码也无法使用
+
+如果你需要兼容旧系统（比如很老的服务端），可以选择 RSA：
+
+```bash
 ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
 ```
 
-Ed25519 比 RSA 更快、更安全，推荐使用。
+**你可能想问**：Ed25519 和 RSA 选哪个？  
+绝大多数场景选 Ed25519。只有在服务端不支持 Ed25519 时才用 RSA。
 
-### 添加公钥到 Git 平台
+## 第二步：把公钥告诉 Git 平台
+
+生成密钥后，你需要把公钥的内容复制到 GitHub（或 GitLab）的 SSH Keys 设置页面。
 
 ```bash
-# 复制公钥
 cat ~/.ssh/id_ed25519.pub
-
-# 粘贴到 GitHub/GitLab/Bitbucket 的 SSH Keys 设置中
 ```
 
-### 测试连接
+会输出类似 `ssh-ed25519 AAAAC3...` 的一行文本，把它完整复制下来：
+
+1. 打开 GitHub → Settings → SSH and GPG keys → New SSH key
+2. 粘贴公钥内容
+3. 保存
+
+<MentalModelBox title="公钥和私钥的区别">
+  <p>把公钥想象成锁，把私钥想象成钥匙。你把锁交给 GitHub（公钥），钥匙留在自己手里（私钥）。每次 push 时，GitHub 用锁验证——只有用你的钥匙才能打开。所以<strong>私钥绝对不能给别人</strong>。</p>
+</MentalModelBox>
+
+## 第三步：验证连接
+
+配置完成后的验证方法：
 
 ```bash
-# GitHub
 ssh -T git@github.com
+```
 
-# GitLab
+如果看到类似下面的输出，就表示配置成功：
+
+```
+Hi your-username! You've successfully authenticated, but GitHub does not provide shell access.
+```
+
+其他平台的测试命令：
+
+```bash
 ssh -T git@gitlab.com
-
-# Bitbucket
 ssh -T git@bitbucket.org
 ```
 
-## 多密钥管理
+## 多个 Git 账号怎么办
 
 ### 问题场景
 
-当你有多个 Git 账号时（如个人 GitHub + 公司 GitLab），需要为不同主机使用不同密钥。
+假设你同时有：
 
-### 解决方案：~/.ssh/config
+- 个人 GitHub 账号
+- 公司 GitLab 账号
+
+如果使用默认密钥，Git 会拿同一个私钥去连接两个平台，但这两个平台需要不同的公钥。你需要让 Git 根据目标平台选择不同的密钥。
+
+### 解决方案：配置 ~/.ssh/config
+
+在 `~/.ssh/config` 文件中为不同主机指定不同密钥。如果文件不存在就创建一个：
 
 ```ssh-config
 # 个人 GitHub 账号
@@ -80,33 +131,28 @@ Host github-work
   IdentityFile ~/.ssh/id_ed25519_work
 ```
 
-使用第二个 GitHub 账号时，将 remote 地址改为：
+使用第二个 GitHub 账号时，remote 地址要改成对应 Host 的名字：
 
 ```bash
 git remote set-url origin git@github-work:username/repo.git
 ```
 
-## ssh-agent
+## ssh-agent：不用每次都输密码
 
-ssh-agent 是 SSH 密钥的缓存管理器，让你无需每次操作都输入密码。
+如果你给私钥设置了密码（passphrase），那么每次用 SSH 连接时都要输入一次。ssh-agent 可以帮你缓存已解锁的密钥，只需要在每次开机后输入一次密码。
 
-### 启动和管理
+### 启动并添加密钥
 
 ```bash
-# 启动 ssh-agent
 eval "$(ssh-agent -s)"
-
-# 添加密钥
 ssh-add ~/.ssh/id_ed25519
-
-# 列出已添加的密钥
-ssh-add -l
-
-# macOS 上使用 Keychain 持久化
-ssh-add --apple-use-keychain ~/.ssh/id_ed25519
 ```
 
-### macOS 配置
+第一次执行 `ssh-add` 时会提示你输入私钥密码，之后在当前会话中就不再需要了。
+
+### macOS 上的持久化配置
+
+在 macOS 上可以让 ssh-agent 记住密钥，即使重启也不需要重新添加：
 
 ```ssh-config
 Host *
@@ -115,62 +161,73 @@ Host *
   IdentityFile ~/.ssh/id_ed25519
 ```
 
-## 部署密钥
+## 部署密钥：给 CI 用
 
-部署密钥允许只读（或读写）访问单个仓库，常用于 CI/CD 或自动化脚本。
+部署密钥（Deploy Key）是一种特殊配置：**只给单个仓库授权**，不给整个账号授权。适合 CI/CD 或自动化脚本使用。
+
+### 配置步骤
 
 ```bash
-# 生成部署专用密钥
+# 生成一个专用密钥
 ssh-keygen -t ed25519 -f ~/.ssh/deploy_key -C "ci-deploy@company.com"
 
-# 在 GitHub 仓库设置中添加为 Deploy Key
-# 勾选 Allow write access 如果需要推送
+# 在 GitHub 仓库 Settings → Deploy keys 中添加公钥
+# 如果需要推送权限，勾选 Allow write access
 ```
 
-使用部署密钥：
+### 使用部署密钥执行 Git 操作
 
 ```bash
 GIT_SSH_COMMAND="ssh -i ~/.ssh/deploy_key" git push origin main
 ```
 
-## SSH 签名提交
+## 常见误解
 
-Git 支持使用 SSH 签名验证提交：
+### 误解 1：多个平台可以用同一个 SSH 密钥
+
+可以，但不建议。如果你的个人 GitHub 密钥泄露了，攻击者也可能用它访问你的公司 GitLab。**每个平台使用独立的密钥**可以限制泄露的影响范围。
+
+### 误解 2：公钥公开出去没关系
+
+公钥本来就是设计成可以公开的。真正需要保护的是私钥。
+
+### 误解 3：SSH 配置完就能永久使用
+
+密钥会过期，或者你可能忘记密码。建议定期检查和更新。
+
+## 安全底线：这几点一定要做到
+
+### 1. 私钥必须设密码
+
+如果不设密码，私钥文件泄露 = 账号被盗。
+
+### 2. 不同平台用不同密钥
+
+控制泄露后的影响范围。
+
+### 3. 定期检查哪些密钥被授权了
 
 ```bash
-# 配置签名密钥
-git config --global user.signingkey ~/.ssh/id_ed25519.pub
-git config --global gpg.format ssh
-
-# 签名提交
-git commit -S -m "signed commit"
-
-# 配置全局签名
-git config --global commit.gpgsign true
-```
-
-## 安全最佳实践
-
-### 密钥保护
-
-- 始终为密钥设置密码（passphrase）
-- 不同平台使用不同密钥
-- 定期轮换密钥
-- 使用 `ssh-keygen -l -f ~/.ssh/id_ed25519.pub` 验证指纹
-
-### 检查已授权的密钥
-
-```bash
-# 查看 GitHub 上授权的密钥
+# 查看 GitHub 上当前授权的密钥
 curl -H "Authorization: token YOUR_TOKEN" https://api.github.com/user/keys
-
-# 查看 GitLab 上授权的密钥
-curl --header "PRIVATE-TOKEN: YOUR_TOKEN" https://gitlab.com/api/v4/user/keys
 ```
 
-### 吊销泄露的密钥
+如果你发现不认识的密钥，立即撤销。
 
-立即删除公钥和私钥文件，生成新密钥对，并从所有平台删除旧公钥。
+### 4. 密钥泄露后的紧急处理
+
+怀疑密钥泄露时：
+
+1. 立即删除本地私钥和公钥文件
+2. 生成新的密钥对
+3. 到所有平台删除旧公钥，添加新公钥
+4. 排查泄露渠道（是否上传到了公开仓库、是否发给了别人）
+
+## 给你的练习
+
+1. 生成一对 Ed25519 密钥并配置到 GitHub，然后执行一次 `git push` 确认不再需要输入密码
+2. 如果你的公司也在用 Git 平台，配置第二个密钥并在 `~/.ssh/config` 中做区分
+3. 查看 GitHub 上当前有哪些已授权的 SSH 密钥，检查是否有不认识的项目
 
 ## 继续学习建议
 

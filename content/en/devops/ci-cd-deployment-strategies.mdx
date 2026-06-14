@@ -1,0 +1,262 @@
+export const metadata = {
+  title: "CI/CD Deployment Strategies with Git",
+  slug: "ci-cd-deployment-strategies",
+  locale: "en",
+  section: "devops",
+  summary: "A comprehensive guide to Git-based deployment strategies including tag-based deployments, environment promotion (dev→staging→prod), canary releases, GitOps deployment patterns, and rollback strategies using Git revert.",
+  sourceUrls: [
+    "https://trunkbaseddevelopment.com/",
+    "https://www.gitops.tech/",
+  ],
+};
+
+# CI/CD Deployment Strategies with Git
+
+## What you will learn
+
+- Understand the core purpose of CI/CD Deployment Strategies with Git
+- Master the basic usage and common options of CI/CD Deployment Strategies with Git
+- A comprehensive guide to Git-based deployment strategies including tag-based deployments, environment promotion (dev→staging→prod), canary releases, GitOps deployment patterns, and rollback strategies using Git revert.
+- Understand key concepts: Git Tag-Based Deployments
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+Your team is adopting CI/CD pipelines, or you're configuring Git integration in your IDE — but you're unsure how Git behaves differently in automated environments compared to local manual operations.
+
+## One-Sentence Understanding
+
+Use Git as the central control layer for deployments — leveraging tags, branches, and commit history to define environment promotion paths, enabling traceable and reversible automated releases.
+
+## Git Tag-Based Deployments
+
+### Semantic Version Tags
+
+```yaml
+# GitHub Actions - tag-triggered deployment
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  deploy:
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+      - run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          echo "Deploying version $VERSION to production"
+          ./deploy.sh "$VERSION"
+```
+
+### Version Inference with `git describe`
+
+```yaml
+- run: |
+    git fetch --tags origin
+    VERSION=$(git describe --tags --abbrev=0 --match "v*" 2>/dev/null || echo "v0.0.0")
+    BUILD_META=$(git rev-parse --short HEAD)
+    echo "FULL_VERSION=${VERSION}+${BUILD_META}" >> $GITHUB_ENV
+```
+
+## Environment Promotion
+
+### Three-Stage Promotion Model
+
+```
+Feature Branch → Develop (Dev Env) → Main (Staging Env) → Tag (Production Env)
+```
+
+### Environment Promotion Pipeline
+
+```yaml
+# GitLab CI - environment promotion
+stages:
+  - build
+  - deploy-dev
+  - deploy-staging
+  - deploy-prod
+
+build:
+  stage: build
+  script: npm run build
+  artifacts:
+    paths:
+      - dist/
+
+deploy-dev:
+  stage: deploy-dev
+  script: deploy-to-dev
+  environment:
+    name: development
+    url: https://dev.example.com
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop"
+
+deploy-staging:
+  stage: deploy-staging
+  script: deploy-to-staging
+  environment:
+    name: staging
+    url: https://staging.example.com
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+deploy-prod:
+  stage: deploy-prod
+  script: deploy-to-prod
+  environment:
+    name: production
+    url: https://example.com
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: manual  # requires manual approval
+```
+
+### Environment Promotion Checklist
+
+| Environment | Trigger | Method | Validation |
+|-------------|---------|--------|------------|
+| Dev | Push develop | Auto | Unit tests pass |
+| Staging | PR merge to main | Auto | Integration tests pass |
+| Prod | Tag push | Manual approval | All tests + sign-off |
+
+## Canary Deployments with Git
+
+### Git Branch-Based Canary Strategy
+
+```yaml
+jobs:
+  canary:
+    steps:
+      - checkout
+      - run: |
+          if [ "$CIRCLE_BRANCH" = "canary" ]; then
+            ./deploy-canary.sh  # deploy to 10% of instances
+            sleep 300           # observe for 5 minutes
+            ./promote-canary.sh # full rollout if stable
+          fi
+```
+
+### Progressive Traffic Shift
+
+```yaml
+- run: |
+    COMMIT_HASH=$(git rev-parse --short HEAD)
+    CANARY_PERCENT=$(( 0x${COMMIT_HASH:0:2} % 100 ))
+    echo "Canary traffic: ${CANARY_PERCENT}%"
+    ./deploy-weighted.sh "${CANARY_PERCENT}"
+```
+
+## GitOps Deployment Patterns
+
+### GitOps Core Principles
+
+```
+Git Repository (Single Source of Truth)
+       ↓
+  CI Pipeline (Build & Test)
+       ↓
+GitOps Operator (e.g. ArgoCD / Flux)
+       ↓
+  Target Environment
+```
+
+### ArgoCD Example
+
+```yaml
+# argo-application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-app
+spec:
+  source:
+    repoURL: https://github.com/org/manifests.git
+    targetRevision: main
+    path: overlays/production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: production
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+```
+
+### Flux CD Example
+
+```yaml
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: apps
+spec:
+  interval: 5m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./apps/production
+  prune: true
+```
+
+## Rollback Strategies
+
+### Git Revert Rollback
+
+```yaml
+# Automated rollback in CI
+jobs:
+  rollback:
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: |
+          LAST_STABLE=$(git tag --sort=-version:refname | head -2 | tail -1)
+          echo "Rolling back to: $LAST_STABLE"
+          git revert --no-commit HEAD
+          git commit -m "Revert to $LAST_STABLE [rollback]"
+          git push
+          git tag -f "rollback-$(date +%Y%m%d%H%M)" HEAD
+          git push --tags -f
+```
+
+### Progressive Rollback
+
+```yaml
+- run: |
+    for p in 100 75 50 25 0; do
+      echo "Shifting traffic to ${p}% stable version"
+      ./shift-traffic.sh "$p"
+      sleep 60
+    done
+```
+
+### Rollback Decision Tree
+
+```mermaid
+graph TD
+    A[Fault detected] --> B{Rollback method?}
+    B --> C[Git revert]
+    B --> D[Git reset + force push]
+    B --> E[Infrastructure rollback]
+    C --> F[Preserves history, safe for public branches]
+    D --> G[Rewrites history, private branches only]
+    E --> H[Restore previous release artifact]
+```
+
+## Try it yourself
+
+1. Practice the ci-cd-deployment-strategies command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+
+## Continue Learning
+
+1. `ci-cd/ci-cd-testing-strategies` — CI/CD testing strategies with Git
+2. `ci-cd/circleci-git` — CircleCI with Git integration
+3. `ci-cd/ci-security-basics` — Git security in CI/CD

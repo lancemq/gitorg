@@ -13,6 +13,15 @@ export const metadata = {
 
 # A sync routine for multi-person collaboration
 
+## What you will learn
+
+- Understand the core purpose of A sync routine for multi-person collaboration
+- Master the basic usage and common options of A sync routine for multi-person collaboration
+- Use a fetch-first, inspect-first sync rhythm in team collaboration so pull does not become a source of surprise or silent history mutation.
+- Understand key concepts: Why not let pull do everything
+- Know when to use this feature and when to avoid it
+
+
 In team Git work, the real problem is often not command knowledge. It is sync behavior that is too implicit.  
 When several people move the same branches, “just pull and see what happens” creates more confusion than speed.
 
@@ -26,6 +35,11 @@ When several people move the same branches, “just pull and see what happens”
   outputs="merge|rebase|wait"
   note="The best sync action is one you can still explain five minutes later."
 />
+
+
+## Start with a problem
+
+Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
 
 ## Why not let pull do everything
 
@@ -133,3 +147,10 @@ Command consistency helps, but decision consistency matters more. Teams become s
 
 A sync action should remain explainable.  
 If you cannot explain why the history looks the way it does after syncing, the routine is still too implicit.
+
+## Try it yourself
+
+1. Practice the multi-person-sync-routine command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

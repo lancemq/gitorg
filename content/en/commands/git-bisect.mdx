@@ -12,7 +12,21 @@ export const metadata = {
 
 # git bisect
 
+## What you will learn
+
+- Understand the core purpose of git bisect
+- Master the basic usage and common options of git bisect
+- Use binary search across history to locate the commit that introduced a regression, making it one of the most valuable debugging commands in Git.
+- Understand key concepts: Basic flow
+- Know when to use this feature and when to avoid it
+
+
 `git bisect` helps you find the first bad commit by repeatedly cutting the search space in half.
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
 
 ## Basic flow
 
@@ -154,4 +168,10 @@ This is useful for sharing debugging sessions with teammates or resuming after a
 - Always finish with `git bisect reset` to return to your original branch. Forgetting to reset leaves your repo in a detached HEAD state.
 - Bisect operates on your local checkout. If your working tree has uncommitted changes that conflict with bisect's checkouts, stash or commit them first.
 - If the regression is in build artifacts rather than source (e.g., compiler version changed), bisect may give misleading results — ensure your test validates the right thing.
+
+## Try it yourself
+
+1. Practice the git-bisect command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

@@ -12,6 +12,19 @@ export const metadata = {
 
 # Partial Clone: On-Demand Git Object Fetching
 
+## What you will learn
+
+- Understand the core purpose of Partial Clone: On-Demand Git Object Fetching
+- Master the basic usage and common options of Partial Clone: On-Demand Git Object Fetching
+- An in-depth look at Git partial clone — how filters and promisor remotes work, and how to speed up clone and fetch in large repositories.
+- Understand key concepts: How It Works
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+Your Git repository keeps growing, clones are getting slower, and everyday operations are starting to feel sluggish. You want to know what optimization techniques are available and which ones fit your project.
+
 ## One-Sentence Understanding
 
 Partial clone lets you clone a repository downloading only the Git objects you need, fetching others on-demand — like lazy loading for Git.
@@ -136,6 +149,12 @@ git cat-file -p <blob-hash>
 git fetch --unshallow
 git config --unset extensions.partialClone
 ```
+
+## Try it yourself
+
+1. Practice the partial-clone command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 
 ## Continue Learning
 

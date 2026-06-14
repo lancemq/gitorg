@@ -13,6 +13,20 @@ export const metadata = {
 
 # Recover after a bad rebase
 
+## What you will learn
+
+- Understand the core purpose of Recover after a bad rebase
+- Master the basic usage and common options of Recover after a bad rebase
+- When rebase introduces conflicts, missing commits, or a result you no longer trust, stop rewriting history and recover control with abort, reflog, and rescue branches.
+- Understand key concepts: The main mistake is usually continuing blindly
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+You just ran a Git command and the result wasn't what you expected — maybe you even lost some commits. This has happened before, and you want a reliable set of recovery techniques.
+
 ## The main mistake is usually continuing blindly
 
 <RebaseFigure
@@ -98,3 +112,10 @@ Its job is not to fix everything immediately. Its job is to preserve evidence an
 
 After a bad rebase, the first goal is not “get to push again quickly.”  
 The first goal is “return to a state I can explain.”
+
+## Try it yourself
+
+1. Practice the recover-after-rebase command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

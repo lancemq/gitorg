@@ -1,0 +1,150 @@
+export const metadata = {
+  title: "Azure DevOps (TFS) to Git Migration",
+  slug: "azure-devops-migration",
+  locale: "en",
+  section: "migration",
+  summary: "A comprehensive guide for migrating from Team Foundation Server (TFS/TFVC) to Git, covering tool selection, history migration, branch mapping, and team transition strategies.",
+  sourceUrls: ["https://learn.microsoft.com/en-us/azure/devops/learn/git/centralized-to-git"],
+};
+
+## Start with a problem
+
+Your team is migrating from another version control system to Git, or moving code and history between different Git platforms. You're worried about losing commit history or author information during the process.
+
+## One-Sentence Understanding
+
+Migrating from TFVC to Git is not just a tool swap — it is a mindset shift from centralized to distributed version control.
+
+## TFVC vs Git Core Differences
+
+TFVC (Team Foundation Version Control) is a centralized system where the server holds the single source of truth and developers pull workspace copies. Git is distributed — every developer has a full repository clone, supports offline work, and offers lightweight branching.
+
+| Dimension | TFVC | Git |
+|-----------|------|-----|
+| Architecture | Centralized, server-dependent | Distributed, full local copy |
+| Branching | Path-based (expensive) | Pointer-based (cheap) |
+| Committing | File-level check-in, auto changeset | Staging area + local commit |
+| Permissions | File-level ACLs | Repository-level |
+| Offline | Server connection required | Fully offline capable |
+
+## History Migration with git-tfs
+
+[git-tfs](https://github.com/git-tfs/git-tfs) is the most mature TFVC-to-Git migration tool. Basic workflow:
+
+```bash
+# Clone a TFVC branch into a Git repo (full history)
+
+## What you will learn
+
+- Understand the core purpose of Clone a TFVC branch into a Git repo (full history)
+- Master the basic usage and common options of Clone a TFVC branch into a Git repo (full history)
+- A comprehensive guide for migrating from Team Foundation Server (TFS/TFVC) to Git, covering tool selection, history migration, branch mapping, and team transition strategies.
+- Understand key concepts: TFVC vs Git Core Differences
+- Know when to use this feature and when to avoid it
+
+git tfs clone https://tfs.company.com/tfs/collection $/project/trunk --branches
+
+# Pull all changesets and convert to Git commits
+git tfs pull
+
+# Clean and optimize the local repository
+git gc --aggressive
+```
+
+Key options: `--branches` auto-detects TFVC branching and maps it to Git branches; `--changeset=1234` starts an incremental clone from a specific changeset.
+
+## Handling Work Item Links
+
+TFVC changesets are often linked to Work Items. After migration, these links are lost in Git commits. Mitigation strategies:
+
+1. Work item IDs are written into commit messages by git-tfs by default
+2. Manually associate commits using Azure DevOps "Commit Fix" feature
+3. Write scripts that read git-tfs metadata and rebuild associations via Azure DevOps REST API
+
+## TFVC Branch Structure Mapping
+
+TFVC uses path-based folder branches (e.g., `$/project/main`, `$/project/release/v1.0`), while Git uses lightweight pointer branches.
+
+Typical mapping rules:
+
+| TFVC Path | Git Branch |
+|-----------|------------|
+| `$/project/trunk` | `main` or `master` |
+| `$/project/branches/release/v1.0` | `release/v1.0` |
+| `$/project/branches/feature/new-ui` | `feature/new-ui` |
+| `$/project/tags/v1.0` | `tags/v1.0` |
+
+```bash
+# Manually rename branches after git-tfs clone
+git tfs clone https://server/tfs $/project/trunk --branches
+git branch -m trunk main
+```
+
+## Team Training Considerations
+
+Migration success hinges on team proficiency with the new workflow. Recommended training plan:
+
+1. **Core Concepts** (half-day): commits, branches, remote repositories
+2. **Daily Workflow** (half-day): clone, commit, push, pull, merge, rebase
+3. **Branching Strategy** (half-day): GitFlow, GitHub Flow, Trunk-Based Development
+4. **Advanced Topics** (half-day): interactive rebase, cherry-pick, bisect, submodules
+
+Common pitfall: developers try to emulate TFVC's "exclusive check-out" in Git. Guide the team toward Git's merge-driven workflow instead.
+
+## Migration Planning Checklist
+
+A complete migration plan should include:
+
+```
+□ Assessment: Analyze repo size, branch structure, history depth
+□ Tool Selection: Evaluate git-tfs / Azure DevOps Migrator / custom scripts
+□ Trial Migration: Run full migration in isolation, verify results
+□ UAT Validation: Team validates migrated repo, checks history completeness
+□ Freeze Period: Notify team to stop check-ins, run final migration
+□ Cutover: Update CI/CD pipelines to point to the new Git repo
+□ Archive: Set TFVC repo to read-only for historical reference
+```
+
+```bash
+# Verify migration completeness: compare changeset count
+git log --oneline | wc -l
+
+# Verify commit messages contain original changeset IDs
+git log --format="%an %s %b" | grep "git-tfs-id:"
+
+# List all branches to ensure mapping is complete
+git branch -a
+```
+
+## Handling Large Files and Binaries
+
+TFVC repos often accumulate large binaries (NuGet packages, build artifacts, design assets). Before migrating:
+
+1. Exclude non-essential binaries with `.gitignore`
+2. Use [Git LFS](https://git-lfs.com) for required large files
+3. Skip specified paths via `git-tfs --ignore` flag
+
+```bash
+# Create .gitignore excluding build artifacts
+echo "bin/
+obj/
+*.dll
+*.exe
+packages/" >> .gitignore
+
+# Track required large files with Git LFS
+git lfs track "*.psd"
+git lfs track "*.zip"
+```
+
+## Try it yourself
+
+1. Practice the azure-devops-migration command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+
+## Continue Learning
+
+- See [Migration Strategy Guide](./migration-strategy-guide) for a complete migration framework
+- Read [git filter-repo Repository Rewriting Deep Dive](./git-filter-repo) for post-migration history cleanup
+- Recommended reading: Microsoft's [Centralized to Git](https://learn.microsoft.com/en-us/azure/devops/learn/git/centralized-to-git) documentation

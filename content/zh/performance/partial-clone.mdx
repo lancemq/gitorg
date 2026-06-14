@@ -12,6 +12,19 @@ export const metadata = {
 
 # Partial Clone：按需获取 Git 对象
 
+## 学完这篇你会掌握什么
+
+- 理解 partial clone 的工作原理和核心概念（filter、promisor remote）
+- 知道三种 filter 类型（blob:none、tree:0、blob:limit）各适用于什么场景
+- 能配置 partial clone 来加速大仓库的 clone 和 fetch
+- 了解 partial clone 的局限性和迁移回完整仓库的方法
+
+## 先想一个问题
+
+假设团队有一个包含 10 年历史的大仓库，完整 clone 需要下载 500MB。你只是想做一个小修复，却要把全部历史拉到本地——这既慢又浪费。
+
+Partial clone 要解决的就是这个问题：**我第一次 clone 时能不能只下载必要的部分，其他内容在我真正需要时才拉取？**
+
 ## 一句话理解
 
 Partial clone 让你在克隆仓库时只下载必要的 Git 对象，其他对象在需要时自动从远端获取——就像"懒加载"一样。
@@ -159,6 +172,12 @@ git fetch --unshallow
 # 关闭部分克隆
 git config --unset extensions.partialClone
 ```
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
 
 ## 继续学习建议
 

@@ -1,0 +1,144 @@
+export const metadata = {
+  title: "终端 Git UI 工具指南",
+  slug: "terminal-git-ui",
+  locale: "zh",
+  section: "devops",
+  summary: "了解 lazygit、tig 等终端 Git UI 工具，在不离开终端的情况下获得可视化 Git 操作体验。",
+  sourceUrls: [
+    "https://github.com/jesseduffield/lazygit",
+    "https://jonas.github.io/tig/",
+  ],
+};
+
+# 终端 Git UI 工具指南
+
+## 学完这篇你会掌握什么
+
+- 理解 终端 Git UI 工具指南 的核心作用和适用场景
+- 掌握 终端 Git UI 工具指南 的基本用法和常用参数
+- 了解 lazygit、tig 等终端 Git UI 工具，在不离开终端的情况下获得可视化 Git 操作体验。
+- 理解 概述 相关的概念
+- 掌握 lazygit 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+
+## 先想一个问题
+
+你的团队正在引入 CI/CD，或者你正在配置 IDE 中的 Git 集成——但你不确定在自动化的场景下，Git 的行为和本地手动操作有什么不同，需要注意什么安全问题。
+
+## 概述
+
+终端 Git UI 工具让你在终端中获得图形化的 Git 操作体验，不需要切换到独立的 GUI 应用。它们结合了命令行的速度和可视化操作的直观性。
+
+## lazygit
+
+[lazygit](https://github.com/jesseduffield/lazygit) 是最流行的终端 Git UI 之一，使用 Go 编写，支持所有主流操作系统。
+
+### 安装
+
+```bash
+# macOS
+brew install lazygit
+
+# Linux (Debian/Ubuntu)
+sudo add-apt-repository ppa:lazygit-team/release
+sudo apt-get update
+sudo apt-get install lazygit
+
+# 直接启动
+lazygit
+```
+
+### 核心功能
+
+| 功能 | 快捷键 | 说明 |
+|------|--------|------|
+| Stage/Unstage | `Space` | 切换文件暂存状态 |
+| Commit | `c` | 提交变更 |
+| 分支切换 | `b` | 查看和切换分支 |
+| Merge | `m` | 合并分支到当前分支 |
+| Rebase | `r` | Interactive rebase |
+| Stash | `s` | 暂存改动 |
+| Push | `P` | 推送到远端 |
+| Log | `l` | 查看提交日志 |
+| Diff | `Enter` | 查看文件差异 |
+
+### 常用工作流
+
+```bash
+# 进入仓库后启动
+cd my-project
+lazygit
+
+# 主要操作面板（左右方向键切换）：
+# - Status: 当前状态
+# - Files: 待处理的文件
+# - Branches: 分支管理
+# - Commits: 提交历史
+# - Stash: 暂存区
+```
+
+## tig
+
+[tig](https://jonas.github.io/tig/) 是一个基于 ncurses 的 Git 文本模式界面，专注于高效的日志查看和 diff 浏览。
+
+### 安装
+
+```bash
+# macOS
+brew install tig
+
+# Linux
+apt-get install tig
+```
+
+### 核心功能
+
+```bash
+# 启动
+tig                  # 提交日志视图
+tig log --oneline    # 简洁日志
+tig diff             # diff 视图
+tig blame file.js    # Blame 视图
+tig status           # 状态视图
+```
+
+### 快捷键
+
+| 快捷键 | 功能 |
+|--------|------|
+| `j`/`k` | 上下移动 |
+| `Enter` | 查看选中提交详情 |
+| `/` | 搜索 |
+| `m` | 查看分支引用 |
+| `t` | 切换 tree 视图 |
+
+## 选择建议
+
+| 需求 | 推荐工具 |
+|------|---------|
+| 日常提交与暂存操作 | lazygit |
+| 浏览提交历史与 diff | tig |
+| Interactive rebase | lazygit |
+| Blame 追踪 | tig |
+| 完整 GUI 体验 | lazygit |
+
+## 注意事项
+
+1. 终端 UI 工具本质上是调用 Git 命令，**不改变 Git 的行为**
+2. 建议理解底层命令后再使用 UI 工具，避免操作时不清楚实际影响
+3. 冲突解决仍需理解 Git 的合并机制
+
+## 继续学习
+
+1. `ide/github-desktop` — GitHub Desktop 图形客户端
+2. `ide/vscode-git` — VS Code 中的 Git 集成
+3. `commands/git-log` — git log 命令详解
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+

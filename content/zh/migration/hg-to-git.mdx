@@ -12,6 +12,20 @@ export const metadata = {
 
 # Mercurial 到 Git 迁移指南
 
+## 学完这篇你会掌握什么
+
+- 理解 Mercurial 到 Git 迁移指南 的核心作用和适用场景
+- 掌握 Mercurial 到 Git 迁移指南 的基本用法和常用参数
+- 系统介绍从 Mercurial（Hg）迁移到 Git 的流程，包括 hg-fast-export 工具、分支和标签转换、以及常见差异处理。
+- 理解 迁移前的概念对比 相关的概念
+- 掌握 使用 hg-fast-export 迁移 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+## 先想一个问题
+
+你的团队正在从其他版本控制系统迁移到 Git，或者需要在不同 Git 平台之间迁移代码和历史。你担心迁移过程中会不会丢失提交记录或作者信息。
+
 ## 一句话理解
 
 Mercurial 和 Git 在概念上相似（都是分布式版本控制），但命令集、分支模型和内部数据结构不同。迁移不仅是数据转换，更是工作流的重新设计。
@@ -167,6 +181,12 @@ git config --global alias.summary "log --oneline --graph --all"
 git config --global alias.record "add -p"
 git config --global alias.sync "pull --rebase"
 ```
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
 
 ## 继续学习建议
 

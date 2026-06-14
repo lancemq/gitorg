@@ -12,6 +12,20 @@ export const metadata = {
 
 # Understanding Detached HEAD State
 
+## What you will learn
+
+- Understand the core purpose of Understanding Detached HEAD State
+- Master the basic usage and common options of Understanding Detached HEAD State
+- Explain what detached HEAD is, how you enter this state, and how to safely exit detached HEAD while preserving your work.
+- Understand key concepts: In One Sentence
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+You've encountered a conceptual question while using Git — you roughly know what it means, but you're not entirely sure about its precise definition and boundaries.
+
 ## In One Sentence
 
 A detached HEAD means HEAD points directly to a commit instead of a branch name. It's not an error — it's Git's "temporary browsing mode" that lets you inspect history, but requires deliberate action to exit safely.
@@ -178,6 +192,12 @@ git switch main
 ### In CI and Scripts
 
 CI environments frequently checkout specific commits. Use `git checkout --detach` to make the intent explicit.
+
+## Try it yourself
+
+1. Practice the detached-head command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 
 ## Continue Learning
 

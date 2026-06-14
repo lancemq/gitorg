@@ -12,6 +12,20 @@ export const metadata = {
 
 # Managing Large Files with Git Large File Storage
 
+## What you will learn
+
+- Understand the core purpose of Managing Large Files with Git Large File Storage
+- Master the basic usage and common options of Managing Large Files with Git Large File Storage
+- A complete guide to Git Large File Storage — installation, tracking large files, migration, and team workflow considerations.
+- Understand key concepts: The Problem with Large Files in Git
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+You've encountered a conceptual question while using Git — you roughly know what it means, but you're not entirely sure about its precise definition and boundaries.
+
 ## The Problem with Large Files in Git
 
 Git was designed for source code — text files that are relatively small and change incrementally. When you store large binary files (images, videos, datasets, compiled binaries, game assets) in a Git repository, several problems arise:
@@ -391,3 +405,10 @@ Git LFS is not appropriate for all large files:
 | Check LFS environment | `git lfs env` |
 
 Git LFS is an essential tool for any project that deals with large binary files. By replacing large files with lightweight pointers and storing actual content separately, LFS keeps your Git repository fast, manageable, and within hosting limits. Proper planning and early adoption are key to a smooth LFS experience.
+
+## Try it yourself
+
+1. Practice the git-lfs command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

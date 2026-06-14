@@ -11,6 +11,19 @@ export const metadata = {
 
 # git-gc Tutorial
 
+## What you will learn
+
+- Understand the core purpose of git-gc Tutorial
+- Master the basic usage and common options of git-gc Tutorial
+- Explains how to use git-gc to run garbage collection and housekeeping.
+- Understand key concepts: When it is a good fit
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
 ## The short version
 
 git-gc is used to run garbage collection and housekeeping.
@@ -75,4 +88,10 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 - The `--prune` parameter controls how long unreachable objects are kept (default is 2 weeks); using `--prune=now` removes them immediately, so use with caution.
 - If you are worried about accidentally deleting objects, first check the state with `git fsck`, or back up the repository before running `git gc`.
 - Garbage collection can reorganize objects, packs, and reachability — confirm whether you still depend on temporarily unreachable objects before cleanup.
+
+## Try it yourself
+
+1. Practice the git-gc command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

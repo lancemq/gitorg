@@ -1,0 +1,216 @@
+export const metadata = {
+  title: "CI/CD Testing Strategies with Git",
+  slug: "ci-cd-testing-strategies",
+  locale: "en",
+  section: "devops",
+  summary: "Explore how to design efficient testing strategies in CI/CD pipelines using Git metadata, including PR vs push testing, matrix testing across branches, test parallelization, snapshot testing, and branch-based integration test environments.",
+  sourceUrls: [
+    "https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows",
+    "https://circleci.com/docs/parallelism-faster-jobs/",
+  ],
+};
+
+# CI/CD Testing Strategies with Git
+
+## What you will learn
+
+- Understand the core purpose of CI/CD Testing Strategies with Git
+- Master the basic usage and common options of CI/CD Testing Strategies with Git
+- Explore how to design efficient testing strategies in CI/CD pipelines using Git metadata, including PR vs push testing, matrix testing across branches, test parallelization, snapshot testing, and branch-based integration test environments.
+- Understand key concepts: PR Testing vs Push Testing
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+Your team is adopting CI/CD pipelines, or you're configuring Git integration in your IDE — but you're unsure how Git behaves differently in automated environments compared to local manual operations.
+
+## One-Sentence Understanding
+
+By leveraging Git's branch, commit, and change information, you can precisely control test scope, parallelism, and environment selection in CI/CD — ensuring quality while minimizing test duration.
+
+## PR Testing vs Push Testing
+
+### PR Testing: Targeted Change Validation
+
+PR testing runs on the diff between source and target branches, ideal for fast feedback:
+
+```yaml
+# GitHub Actions - full test suite on PR only
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - "src/**"
+      - "tests/**"
+
+jobs:
+  test:
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - run: |
+          CHANGED_FILES=$(git diff --name-only HEAD~1)
+          if echo "$CHANGED_FILES" | grep -q "src/"; then
+            npm run test:unit
+          fi
+```
+
+### Push Testing: Full Regression
+
+Run the full suite on push to main branches to ensure the merged codebase remains healthy:
+
+```yaml
+on:
+  push:
+    branches: [main, develop]
+
+jobs:
+  full-test:
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: npm ci && npm run test:full
+```
+
+| Dimension | PR Testing | Push Testing |
+|-----------|------------|--------------|
+| Goal | Fast feedback | Full regression |
+| Scope | Change-related | Full suite |
+| Trigger | PR open/sync | Merge to main |
+| Time budget | Minutes | Can be longer |
+
+## Matrix Testing with Git
+
+### Cross-Branch Matrix Testing
+
+```yaml
+# CircleCI matrix testing
+version: 2.1
+jobs:
+  test:
+    parameters:
+      node-version:
+        type: string
+    docker:
+      - image: cimg/node:<< parameters.node-version >>
+    steps:
+      - checkout
+      - run: npm ci && npm test
+
+workflows:
+  matrix-test:
+    jobs:
+      - test:
+          matrix:
+            parameters:
+              node-version: ["18.0", "20.0", "22.0"]
+          filters:
+            branches:
+              only: /^(main|release)\/.*$/
+```
+
+### Conditional Matrix Based on Git Metadata
+
+```yaml
+steps:
+  - run: |
+      CHANGED_PACKAGES=$(git diff --name-only HEAD~3 -- 'packages/*/' | cut -d/ -f2 | sort -u)
+      for pkg in $CHANGED_PACKAGES; do
+        echo "Need to test: $pkg"
+      done
+```
+
+## Test Parallelization with Git Metadata
+
+### Sharding Based on File Changes
+
+```yaml
+# GitHub Actions - shard by test files
+jobs:
+  test:
+    strategy:
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm run test -- --shard=${{ matrix.shard }}/4
+```
+
+### CircleCI Parallelism
+
+```yaml
+version: 2.1
+jobs:
+  test:
+    parallelism: 4
+    steps:
+      - checkout
+      - run: |
+          circleci tests glob "tests/**/*.test.js" | circleci tests split --split-by=timings
+          npm test -- --runInBand
+```
+
+## Snapshot Testing with Git
+
+### Isolate Snapshots by Branch
+
+```yaml
+jobs:
+  snapshot:
+    steps:
+      - checkout
+      - run: |
+          BRANCH_SLUG=$(echo "$CIRCLE_BRANCH" | sed 's/[^a-zA-Z0-9]/-/g')
+          npm run test:snapshot -- --output-file="snapshots/$BRANCH_SLUG.snap"
+      - store_artifacts:
+          path: snapshots/
+```
+
+### Cross-Branch Snapshot Comparison
+
+```yaml
+- run: |
+    if [ "$CIRCLE_BRANCH" != "main" ]; then
+      git fetch origin main
+      npm run test:snapshot -- --compare-with=origin/main
+    fi
+```
+
+## Branch-Based Integration Test Environments
+
+### Dynamic Environment Creation
+
+```yaml
+jobs:
+  integration:
+    steps:
+      - checkout
+      - run: |
+          ENV_NAME=$(echo "$CIRCLE_BRANCH" | tr '/' '-' | tr '[:upper:]' '[:lower:]')
+          echo "Deploying review env: $ENV_NAME"
+          ./deploy-review.sh "$ENV_NAME"
+```
+
+### Auto-Post Preview URLs
+
+```yaml
+- run: |
+    PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | grep -oE '[0-9]+$')
+    echo "Preview URL: https://preview-$PR_NUMBER.example.com"
+    gh pr comment "$PR_NUMBER" --body "Preview: https://preview-$PR_NUMBER.example.com"
+```
+
+## Try it yourself
+
+1. Practice the ci-cd-testing-strategies command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+
+## Continue Learning
+
+1. `ci-cd/circleci-git` — CircleCI with Git integration
+2. `ci-cd/github-actions-basics` — GitHub Actions Git integration
+3. `ci-cd/ci-cd-deployment-strategies` — CI/CD deployment strategies with Git

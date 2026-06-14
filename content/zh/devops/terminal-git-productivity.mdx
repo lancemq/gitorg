@@ -1,0 +1,159 @@
+export const metadata = {
+  title: "终端 Git 效率提升",
+  slug: "terminal-git-productivity",
+  locale: "zh",
+  section: "devops",
+  summary: "通过 Git 别名、shell 自动补全、lazygit、tig、delta diff 查看器和 git-prompt 定制等工具，大幅提升终端 Git 操作效率。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases",
+    "https://github.com/jesseduffield/lazygit",
+    "https://github.com/dandavison/delta",
+  ],
+};
+
+# 终端 Git 效率提升
+
+## 学完这篇你会掌握什么
+
+- 理解 终端 Git 效率提升 的核心作用和适用场景
+- 掌握 终端 Git 效率提升 的基本用法和常用参数
+- 通过 Git 别名、shell 自动补全、lazygit、tig、delta diff 查看器和 git-prompt 定制等工具，大幅提升终端 Git 操作效率。
+- 理解 Git 别名 相关的概念
+- 掌握 Shell 自动补全 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+## 先想一个问题
+
+你的团队正在引入 CI/CD，或者你正在配置 IDE 中的 Git 集成——但你不确定在自动化的场景下，Git 的行为和本地手动操作有什么不同，需要注意什么安全问题。
+
+## 一句话理解
+
+终端是 Git 的原生环境，通过别名、专用工具和定制提示符，可将日常 Git 操作效率提升数倍。
+
+## Git 别名
+
+```ini
+[alias]
+  st = status
+  co = checkout
+  br = branch
+  ci = commit
+  di = diff
+  lg = log --oneline --graph --all --decorate
+  aa = add --all
+  unstage = reset HEAD --
+  undo = reset --soft HEAD~1
+  ri = rebase -i
+  tree = log --all --graph --oneline --decorate
+  cleanup = !git branch --merged main | grep -v \" main\" | xargs -r git branch -d
+  lines = !git log --author=\"$(git config user.name)\" --pretty=tformat: --numstat | awk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf \"added: %s, removed: %s, total: %s\", add, subs, loc }'
+```
+
+## Shell 自动补全
+
+**Bash**:
+```bash
+source /usr/share/bash-completion/completions/git
+export GIT_PS1_SHOWDIRTYSTATE=true
+```
+
+**Zsh** (oh-my-zsh):
+```zsh
+plugins=(git gitfast)
+```
+
+**Fish** (内置补全):
+```fish
+abbr -a gst 'git status'
+abbr -a gco 'git checkout'
+abbr -a glg 'git log --oneline --graph --all --decorate'
+```
+
+## lazygit
+
+```bash
+brew install lazygit
+cd my-project && lazygit
+```
+
+| 面板 | 快捷键 | 功能 |
+|------|--------|------|
+| 文件 | `Space` | 暂存/取消 |
+| 文件 | `c` | 提交 |
+| 分支 | `b` | 切换分支 |
+| 提交 | `s` | Squash |
+
+配置 delta 为分页器：`git.paging.pager: delta`。
+
+## tig
+
+```bash
+brew install tig
+tig            # 提交历史
+tig status     # 状态
+tig blame file # Blame
+```
+
+## delta — 增强 Diff
+
+```ini
+[core]
+  pager = delta
+[delta]
+  side-by-side = true
+  line-numbers = true
+  syntax-theme = Dracula
+```
+
+特性：语法高亮、并排视图、行号、代码导航。
+
+## git-prompt
+
+```bash
+export GIT_PS1_SHOWDIRTYSTATE=1
+export GIT_PS1_SHOWSTASHSTATE=1
+export GIT_PS1_SHOWUPSTREAM="auto"
+PS1='\w$(__git_ps1 " (%s)")\$ '
+```
+
+或使用 starship：
+
+```toml
+[git_branch]
+format = "on [$symbol$branch]($style) "
+[git_status]
+staged = "+\${count}"
+modified = "!\${count}"
+```
+
+## git-branchless
+
+```bash
+brew install git-branchless
+git sl       # 智能提交图
+git undo     # 撤销上次操作
+git restack  # 修复中断的依赖
+git record   # 交互式暂存并提交
+```
+
+## 其他工具
+
+| 工具 | 用途 |
+|------|------|
+| git-extras | 额外 Git 命令集合 |
+| gh (GitHub CLI) | GitHub 命令行 |
+| forgit | fzf Git 集成 |
+| gita | 多仓库管理 |
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+
+## 继续学习建议
+
+1. `commands/git-config` — Git 配置详解
+2. `commands/git-log` — git log 高级用法
+3. `best-practices/git-aliases` — Git 别名最佳实践

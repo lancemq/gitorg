@@ -12,6 +12,15 @@ export const metadata = {
 
 # Recovering with reflog
 
+## What you will learn
+
+- Understand the core purpose of Recovering with reflog
+- Master the basic usage and common options of Recovering with reflog
+- Use reflog to locate previous references and recover from reset, rebase, or lost branch states.
+- Understand key concepts: When reflog is the right first stop
+- Know when to use this feature and when to avoid it
+
+
 `git reflog` is often the most practical recovery tool in everyday Git accidents. After a bad reset, rebase, amend, or pull, what you usually lose first is not the commit object itself but the name and reference that used to point to it.
 
 <ReflogFigure
@@ -25,6 +34,11 @@ export const metadata = {
 <MentalModelBox title="Find the old position before choosing the fix">
   Reflog does not magically undo everything for you. It helps you answer a more important question first: where did this branch or HEAD point before things went sideways? Once you know that, the recovery strategy becomes much easier to choose safely.
 </MentalModelBox>
+
+
+## Start with a problem
+
+You just ran a Git command and the result wasn't what you expected — maybe you even lost some commits. This has happened before, and you want a reliable set of recovery techniques.
 
 ## When reflog is the right first stop
 
@@ -147,3 +161,10 @@ When Git history looks wrong, start with this:
 1. `git reflog`
 2. create a rescue branch
 3. choose reset, cherry-pick, merge, or manual reconstruction only after the old position is safe
+
+## Try it yourself
+
+1. Practice the reflog-recovery command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

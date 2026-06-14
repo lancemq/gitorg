@@ -13,6 +13,19 @@ export const metadata = {
 
 # Security best practices with Git
 
+## What you will learn
+
+- Understand the core purpose of Security best practices with Git
+- Master the basic usage and common options of Security best practices with Git
+- Handling sensitive info leaks, key management, .env security, git-secrets, GPG-signed commits, and SSH key management.
+- Understand key concepts: Handling accidentally committed sensitive info
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+Your team has developed some Git habits over time, but you're not sure if they are optimal — or you've just been through an incident caused by a Git mistake and want to avoid repeating it.
+
 ## The short version
 
 <CommandFlowFigure
@@ -407,3 +420,10 @@ git log --all --format="%h %an %ae %s" -- config.js
 3. **Leaks in forks**: If someone forked your repo, leaked keys may still exist in the fork
 4. **CI/CD logs**: CI logs may also expose sensitive info; clean them regularly
 5. **Collaborative security**: Everyone on the team should follow security practices
+
+## Try it yourself
+
+1. Practice the security-with-git command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

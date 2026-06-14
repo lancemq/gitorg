@@ -1,0 +1,270 @@
+export const metadata = {
+  title: "GitHub Actions 与 Git 协同",
+  slug: "github-actions-basics",
+  locale: "zh",
+  section: "devops",
+  summary: "系统介绍 GitHub Actions 如何与 Git 仓库协同工作，包括事件触发、工作流语法、CI/CD 集成和最佳实践。",
+  sourceUrls: [
+    "https://docs.github.com/en/actions",
+    "https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows",
+  ],
+};
+
+# GitHub Actions 与 Git 协同
+
+## 学完这篇你会掌握什么
+
+- 理解 GitHub Actions 和 Git 事件模型的关系
+- 看懂并编写基础的 CI/CD 工作流
+- 知道 `actions/checkout` 有哪些常用参数以及各自的作用
+- 了解 CI 中操作 Git 时的安全边界
+
+## 先想一个问题
+
+假设你刚把一个功能分支推到 GitHub，接下来希望自动运行测试、检查代码风格，通过后再自动部署。如果完全靠手动操作，每次都要：
+
+1. 在本地跑测试
+2. 登录 GitHub 点 CI 面板查看
+3. 确认没问题后手动部署
+
+这套流程重复几次你就会想：能不能让 GitHub 在收到 push 时自动帮我做这些？
+
+这就是 GitHub Actions 要解决的问题。
+
+## 一句话理解
+
+GitHub Actions 是 GitHub 内置的 CI/CD 平台，它的核心思路很简单：**把 Git 事件（push、PR、release 等）和自动化任务绑定在一起**。每次你执行 `git push` 时，Actions 就能自动启动你预先定义好的工作流。
+
+## Actions 的 Git 事件模型
+
+工作流由 Git 事件驱动。你需要先理解的是：**让你的 Git 操作和 CI 流水线之间建立触发关系**。
+
+### 最基本的三类触发事件
+
+```yaml
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  release:
+    types: [published]
+```
+
+这段配置的意思是：
+
+- 有人 push 到 main 分支时触发
+- 有人向 main 发起 PR 时触发
+- 发布新 release 时触发
+
+### push 事件：最常见的 CI 触发器
+
+每次 `git push` 到远程仓库时触发。你最常见的用法是做两件事：push 到功能分支时跑测试，push 到 main 时部署。
+
+```yaml
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "src/**"
+      - "package.json"
+```
+
+注意 `paths` 这个参数——它表示"只有这些路径的改动才触发"。为什么要加这个限制？如果团队有人只改了 README，你并不希望 CI 重新跑一遍全部测试。
+
+### pull_request 事件：review 前的质量关卡
+
+PR 的 open、synchronize（新 push）、reopened 等动作都会触发。适合在代码审查前做自动化检查：
+
+```yaml
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+```
+
+你可能会问：为什么既要有 push 触发又要有 PR 触发？  
+它们的侧重点不同：
+
+- **push 触发**：确保每次提交后代码质量没问题
+- **PR 触发**：确保合并前的代码经过了 review 和 CI 双重检查
+
+### 其他 Git 相关事件
+
+- `create` / `delete`：分支或标签创建/删除时触发
+- `workflow_dispatch`：手动触发——相当于加了一个"立即运行"按钮
+- `schedule`：定时触发，用 cron 语法，适合夜间测试或定期清理
+
+<MentalModelBox title="事件模型的核心思路">
+  <p>每个 Git 操作就是一个信号。Actions 的工作就是监听这些信号，然后执行对应的自动化任务。关键是要想清楚：<strong>我想让哪些 Git 操作触发哪些自动化行为</strong>。</p>
+</MentalModelBox>
+
+## 工作流中如何跟 Git 交互
+
+工作流运行时需要读取仓库代码。这就引出了 CI/CD 里一个非常基础但也容易被忽略的问题：**工作流运行时到底看到了多少 Git 历史？**
+
+### actions/checkout 的作用
+
+```yaml
+steps:
+  - uses: actions/checkout@v4
+```
+
+这步会在 CI 机器上执行相当于 `git clone` 的操作。但它默认只获取最新的那次提交（即 `fetch-depth: 1`）。
+
+### 为什么 fetch-depth 很重要
+
+先看一个具体场景：你的 linter 需要对改动到的文件做增量检查（比如只 lint PR 中修改过的文件）。这就需要 CI 知道"当前提交"和"目标分支的 HEAD"之间的差异。要拿到这个信息，CI 必须有足够的历史记录。
+
+```yaml
+- uses: actions/checkout@v4
+  with:
+    fetch-depth: 0      # 拉取全部 git 历史
+```
+
+这是一条常用的配置。`fetch-depth` 控制的是 CI 获取多少提交历史：
+
+| 取值 | 使用场景 | 速度 | 能做什么 |
+|------|---------|------|---------|
+| `1`（默认） | 最常用，只跑完整测试和构建 | 最快 | 编译、打包、部署 |
+| `0` | 需要比较 diff、生成变更日志 | 较慢 | `git diff`、SonarQube、lint-staged |
+| `2` | PR 场景，比 `1` 多一个父提交 | 适中 | 部分 diff 工具可用 |
+
+**关键判断**：如果 CI 只需要编译和部署，`fetch-depth: 1` 就够了。如果需要分析"这次改了哪些文件"这类信息，就把 `fetch-depth` 设为 `0`。
+
+## 从零搭建一条 CI/CD 流水线
+
+下面从最简单的场景开始，逐步增加复杂度。
+
+### 第一步：PR 验证工作流
+
+你的第一个需求是：每次有人发起 PR，自动跑 lint 和测试。
+
+```yaml
+name: PR Check
+on: pull_request
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm run lint
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm test
+```
+
+这里要注意一个设计思路：**把 lint 和 test 拆成两个 job**。这样做的好处是，即使 lint 失败了，test 仍然会运行，你可以在一次 CI 运行中看到全部结果，而不是修完 lint 才发现 test 也挂了。
+
+### 第二步：合并后自动部署
+
+接着你希望：改动合并到 main 后自动部署。
+
+```yaml
+name: Deploy
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci && npm run build
+      - run: npm run deploy
+```
+
+这个工作流很简单：main 分支有 push 时，先安装依赖、构建，然后部署。触发事件从 `pull_request` 换成了 `push`，但结构是一样的。
+
+### 第三步：打 tag 自动发布
+
+当团队准备发布新版本时，你希望打一个 tag 就能自动生成 Release。
+
+```yaml
+name: Release
+on:
+  push:
+    tags: ["v*"]
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci && npm run build
+      - uses: softprops/action-gh-release@v1
+```
+
+`tags: ["v*"]` 表示匹配所有以 `v` 开头的 tag（如 `v1.0.0`、`v2.3.1`）。这是语义版本发布的常见做法。
+
+## CI 中操作 Git 的安全边界
+
+在 CI 中操作 Git 和本地有很大不同。这里有两条最重要的原则。
+
+### 不要在 CI 中 force push
+
+Actions 运行时有 `GITHUB_TOKEN` 环境变量，它具备仓库的部分写入权限。但 `git push --force` 在 CI 中非常危险——一旦 force push 出错，你可能覆盖了别人的提交且没有本地 reflog 可以恢复。
+
+**更好的做法**：如果你的 CI 需要创建分支或 tag，使用 GitHub API 而不是 Git 命令。
+
+### 使用 GitHub API 做 Git 操作
+
+下面的例子展示如何通过 API 创建分支，而不是用 `git push`：
+
+```yaml
+- uses: actions/github-script@v7
+  with:
+    script: |
+      await github.rest.git.createRef({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        ref: 'refs/heads/release-${{ github.run_id }}',
+        sha: context.sha
+      })
+```
+
+### 矩阵构建：在多个环境中测试
+
+这是 CI 中一个非常实用的模式：同时测试多个 Node 版本。
+
+```yaml
+strategy:
+  matrix:
+    node-version: [18, 20, 22]
+steps:
+  - uses: actions/checkout@v4
+  - uses: actions/setup-node@v4
+    with:
+      node-version: ${{ matrix.node-version }}
+  - run: npm test
+```
+
+原理很简单：矩阵配置告诉 GitHub 「把同样的步骤在不同参数下各跑一次」。以上配置会在 Node 18、20、22 三个版本上分别运行测试。
+
+## 常见误解
+
+### 误解 1：CI 中的 Git 状态和本地完全一致
+
+不。CI 默认只拿到最新一次提交（`fetch-depth: 1`），没有完整历史。如果你需要比较两个分支的差异，要主动调整 `fetch-depth` 参数。
+
+### 误解 2：工作流文件必须一次性写对
+
+不需要。你可以在 PR 中反复推送修改 `.github/workflows/` 下的文件，Actions 会自动使用最新的版本。建议先从最简单的版本开始，逐步添加步骤。
+
+### 误解 3：CI 失败了就一定是代码有问题
+
+不一定。CI 可能因为网络问题、缓存过期、依赖变更等原因失败。排查 CI 问题时先看日志，再怀疑代码。
+
+## 给你的练习
+
+1. 在你的一个项目里创建 `.github/workflows/pr-check.yml`，实现 PR 时自动跑 lint 和 test
+2. 把 `fetch-depth` 从默认值改成 `0`，观察 CI 时间的变化
+3. 试着加一个 matrix 配置，在不同操作系统上同时运行测试
+
+## 继续学习建议
+
+1. `workflows/merge-queue-workflow` — GitHub Merge Queue 的工作流
+2. `workflows/ci-optimization-with-git` — CI 中的 Git 优化策略
+3. GitHub Actions 官方文档

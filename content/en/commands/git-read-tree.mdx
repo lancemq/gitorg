@@ -11,6 +11,19 @@ export const metadata = {
 
 # git-read-tree Tutorial
 
+## What you will learn
+
+- Understand the core purpose of git-read-tree Tutorial
+- Master the basic usage and common options of git-read-tree Tutorial
+- Explains how to use git-read-tree to read tree objects into the index for lower-level operations.
+- Understand key concepts: When it is a good fit
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
 ## The short version
 
 git-read-tree is used to read tree objects into the index for lower-level operations.
@@ -76,4 +89,10 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 - Multi-tree merge mode (`-m`) marks conflict entries in the index, requiring manual resolution before a new commit can be created.
 - `read-tree` operates on the index rather than directly on the working tree (unless `-u` is used) — understanding the relationship between tree, index, and working tree is important.
 - Unless you are writing low-level scripts or implementing custom Git operations, you should typically use higher-level commands like `git reset` or `git checkout` instead.
+
+## Try it yourself
+
+1. Practice the git-read-tree command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

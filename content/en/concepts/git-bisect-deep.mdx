@@ -11,6 +11,20 @@ export const metadata = {
 
 # Git Bisect Deep Dive
 
+## What you will learn
+
+- Understand the core purpose of Git Bisect Deep Dive
+- Master the basic usage and common options of Git Bisect Deep Dive
+- Master Git bisect's binary search, automation with run mode, visualization, and large repo optimization.
+- Understand key concepts: Overview
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+You've encountered a conceptual question while using Git — you roughly know what it means, but you're not entirely sure about its precise definition and boundaries.
+
 ## Overview
 
 `git bisect` uses **binary search** to find the commit that introduced a bug. It turns O(n) linear search into O(log n) — the core tool for regression hunting.
@@ -244,6 +258,12 @@ git bisect run ./build.sh
 3. **Limit search paths** — 10x+ speedup in large monorepos
 4. **Save `bisect log`** — postmortem, audit, team sharing
 5. **Automate in CI** — nightly bisect to catch regressions early
+
+## Try it yourself
+
+1. Practice the git-bisect-deep command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 
 ## Continue Learning
 

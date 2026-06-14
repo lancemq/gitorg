@@ -13,6 +13,15 @@ export const metadata = {
 
 # Revert-First Stabilization Workflow
 
+## What you will learn
+
+- Understand the core purpose of Revert-First Stabilization Workflow
+- Master the basic usage and common options of Revert-First Stabilization Workflow
+- In high-impact regressions, restore service stability first and separate root-cause fixes afterward to reduce incident duration and secondary risk.
+- Understand key concepts: When revert should be the default
+- Know when to use this feature and when to avoid it
+
+
 During production regressions, teams often try to diagnose and patch live at the same time. Revert-first separates goals: restore stability first, then fix root cause safely.
 
 <CommandFlowFigure
@@ -25,6 +34,11 @@ During production regressions, teams often try to diagnose and patch live at the
   outputs="shorter outage window|lower secondary-failure risk|auditable fix path"
   note="Priority order is stability first, perfect fix second."
 />
+
+
+## Start with a problem
+
+Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
 
 ## When revert should be the default
 
@@ -87,4 +101,10 @@ Keep emergency change scope minimal to avoid widening validation surface.
 1. `Hotfix and urgent fixes`
 2. `Hotfix rollback after release`
 3. `Bisect regression triage workflow`
+
+## Try it yourself
+
+1. Practice the revert-first-stabilization-workflow command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

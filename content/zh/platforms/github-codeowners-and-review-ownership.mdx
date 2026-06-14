@@ -1,0 +1,69 @@
+export const metadata = {
+  title: "GitHub CODEOWNERS 与评审归属",
+  slug: "github-codeowners-and-review-ownership",
+  locale: "zh",
+  section: "platforms",
+  summary: "通过 CODEOWNERS 建立文件级评审归属，减少关键模块无人负责或评审漂移的问题。",
+  sourceUrls: [
+    "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners",
+    "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/code-review/about-pull-request-reviews",
+  ],
+};
+
+# GitHub CODEOWNERS 与评审归属
+
+## 学完这篇你会掌握什么
+
+- 理解 GitHub CODEOWNERS 与评审归属 的核心作用和适用场景
+- 掌握 GitHub CODEOWNERS 与评审归属 的基本用法和常用参数
+- 通过 CODEOWNERS 建立文件级评审归属，减少关键模块无人负责或评审漂移的问题。
+- 理解 设计原则 相关的概念
+- 掌握 与分支保护联动 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+CODEOWNERS 的核心价值不是“多一个审批步骤”，而是让关键路径改动自动路由到有责任的 reviewer。
+
+
+## 先想一个问题
+
+你已经在用 GitHub 或 GitLab 托管代码，但除了 push 和 pull，你对平台提供的协作功能还不够熟悉——PR 流程、代码审查、权限管理这些应该怎么用才合适？
+
+## 设计原则
+
+1. 按模块边界定义 owner，不按个人临时分工
+2. 避免单点 owner，关键模块至少双 owner
+3. 定期同步组织结构变化
+
+<PlatformHierarchyFigure
+  title="CODEOWNERS 与审查责任分配"
+  caption="CODEOWNERS 将文件路径与审查者绑定，确保关键代码变更必须经过合适的人审查。"
+  topLabel="文件路径"
+  topItems="src/|docs/|config/"
+  middleLabel="CODEOWNERS"
+  middleItems="@team-backend|@team-docs|@team-devops"
+  bottomLabel="审查要求"
+  bottomItems="必须审批|自动分配|责任明确"
+/>
+
+
+## 与分支保护联动
+
+当开启 “require review from code owners”，关键文件变更会自动触发 owner 审批门禁。
+
+<WarningBox title="CODEOWNERS 过细会导致评审拥堵">
+  规则颗粒度过小会让 PR 频繁触发大量 owner，反而降低吞吐。
+</WarningBox>
+
+## 接下来建议继续看什么
+
+1. `code review handoff quality`
+2. `small batch review`
+3. `github pull requests and reviews`
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+

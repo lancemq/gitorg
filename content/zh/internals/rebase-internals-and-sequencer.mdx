@@ -13,7 +13,22 @@ export const metadata = {
 
 # rebase 内部机制与 sequencer
 
+## 学完这篇你会掌握什么
+
+- 理解 rebase 内部机制与 sequencer 的核心作用和适用场景
+- 掌握 rebase 内部机制与 sequencer 的基本用法和常用参数
+- 从 sequencer 视角理解 rebase 的提交重放过程，帮助定位 rebase 中断、冲突恢复与历史重写后的提交变化。
+- 理解 它在做什么 相关的概念
+- 掌握 为什么提交 ID 会变化 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
 rebase 本质上是“按顺序重放提交”，而 sequencer 是管理这条重放队列的执行器。
+
+
+## 先想一个问题
+
+你每天都在用 Git 命令，但偶尔会遇到一些 '奇怪' 的行为——比如明明没改文件却被提示有改动，或者 rebase 时突然多了预期之外的冲突。你想理解 Git 底层是怎么工作的。
 
 ## 它在做什么
 
@@ -59,3 +74,10 @@ git switch -c rescue/pre-rebase HEAD@{n}
 1. `recover after rebase`
 2. `commit graph`
 3. `git-rebase`
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+

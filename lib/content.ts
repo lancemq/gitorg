@@ -5,14 +5,12 @@ import { cache } from "react";
 import {
   bestPracticeSlugs,
   commandSlugs,
-  githubSlugs,
-  gitlabSlugs,
+  platformsSlugs,
   internalsSlugs,
   learningPathSlugs,
   recoverySlugs,
   workflowSlugs,
-  ciCdSlugs,
-  ideSlugs,
+  devopsSlugs,
   securitySlugs,
   performanceSlugs,
   migrationSlugs,
@@ -29,17 +27,15 @@ export type DocSection =
   | "commands"
   | "best-practices"
   | "workflows"
-  | "github"
-  | "gitlab"
   | "internals"
   | "recovery"
   | "concepts"
-  | "ci-cd"
-  | "ide"
   | "security"
   | "performance"
   | "migration"
-  | "hosting";
+  | "hosting"
+  | "platforms"
+  | "devops";
 
 export type DocTier = "core" | "recommended" | "extended";
 
@@ -183,20 +179,20 @@ export const docPathRegistry = [
   "workflows/database-migration-safety-workflow",
   "workflows/api-versioning-change-workflow",
   "workflows/incident-retro-to-guardrail-workflow",
-  "github/github-flow-basics",
-  "github/pull-requests-and-reviews",
-  "github/forks-and-open-source-contribution",
-  "github/issues-projects-and-discussions",
-  "github/github-actions-and-skills",
-  "github/github-branch-protection-and-rulesets",
-  "github/github-codeowners-and-review-ownership",
-  "gitlab/gitlab-flow-and-merge-requests",
-  "gitlab/gitlab-forks-and-contributions",
-  "gitlab/gitlab-issues-boards-and-milestones",
-  "gitlab/gitlab-groups-projects-and-permissions",
-  "gitlab/gitlab-ci-and-runners",
-  "gitlab/gitlab-protected-branches-and-approval-rules",
-  "gitlab/gitlab-merge-trains-and-merge-result-pipelines",
+  "platforms/github-flow-basics",
+  "platforms/pull-requests-and-reviews",
+  "platforms/forks-and-open-source-contribution",
+  "platforms/issues-projects-and-discussions",
+  "platforms/github-actions-and-skills",
+  "platforms/github-branch-protection-and-rulesets",
+  "platforms/github-codeowners-and-review-ownership",
+  "platforms/gitlab-flow-and-merge-requests",
+  "platforms/gitlab-forks-and-contributions",
+  "platforms/gitlab-issues-boards-and-milestones",
+  "platforms/gitlab-groups-projects-and-permissions",
+  "platforms/gitlab-ci-and-runners",
+  "platforms/gitlab-protected-branches-and-approval-rules",
+  "platforms/gitlab-merge-trains-and-merge-result-pipelines",
   "internals/object-database",
   "internals/plumbing-and-porcelain",
   "internals/index-and-working-tree",
@@ -273,14 +269,14 @@ export const docPathRegistry = [
   "best-practices/tagging-and-versioning",
   "best-practices/bisect-friendly-commits",
   "best-practices/backup-before-rewrite",
-  "ci-cd/github-actions-basics",
-  "ci-cd/gitlab-ci-basics",
-  "ci-cd/jenkins-integration",
-  "ci-cd/ci-security-basics",
-  "ide/vscode-git",
-  "ide/jetbrains-git",
-  "ide/github-desktop",
-  "ide/terminal-git-ui",
+  "devops/github-actions-basics",
+  "devops/gitlab-ci-basics",
+  "devops/jenkins-integration",
+  "devops/ci-security-basics",
+  "devops/vscode-git",
+  "devops/jetbrains-git",
+  "devops/github-desktop",
+  "devops/terminal-git-ui",
   "security/ssh-key-management",
   "security/gpg-signing",
   "security/credential-helper",
@@ -301,12 +297,12 @@ export const docPathRegistry = [
   "hosting/self-hosted-git",
   "hosting/github-deep-dive",
   "hosting/gitea-setup",
-  "ci-cd/circleci-git",
-  "ci-cd/ci-cd-testing-strategies",
-  "ci-cd/ci-cd-deployment-strategies",
-  "ide/vim-neovim-git",
-  "ide/intellij-git-deep",
-  "ide/terminal-git-productivity",
+  "devops/circleci-git",
+  "devops/ci-cd-testing-strategies",
+  "devops/ci-cd-deployment-strategies",
+  "devops/vim-neovim-git",
+  "devops/intellij-git-deep",
+  "devops/terminal-git-productivity",
   "security/secret-scanning",
   "security/secure-git-workflows",
   "security/git-security-audit",
@@ -463,14 +459,14 @@ const recommendedDocPaths = new Set<DocPath>([
   "workflows/database-migration-safety-workflow",
   "workflows/api-versioning-change-workflow",
   "workflows/incident-retro-to-guardrail-workflow",
-  "github/github-flow-basics",
-  "github/pull-requests-and-reviews",
-  "github/github-branch-protection-and-rulesets",
-  "github/github-codeowners-and-review-ownership",
-  "gitlab/gitlab-flow-and-merge-requests",
-  "gitlab/gitlab-ci-and-runners",
-  "gitlab/gitlab-protected-branches-and-approval-rules",
-  "gitlab/gitlab-merge-trains-and-merge-result-pipelines",
+  "platforms/github-flow-basics",
+  "platforms/pull-requests-and-reviews",
+  "platforms/github-branch-protection-and-rulesets",
+  "platforms/github-codeowners-and-review-ownership",
+  "platforms/gitlab-flow-and-merge-requests",
+  "platforms/gitlab-ci-and-runners",
+  "platforms/gitlab-protected-branches-and-approval-rules",
+  "platforms/gitlab-merge-trains-and-merge-result-pipelines",
   "internals/plumbing-and-porcelain",
   "internals/repository-layout-and-gitdir",
   "internals/merge-base-and-ancestry",
@@ -480,10 +476,10 @@ const recommendedDocPaths = new Set<DocPath>([
   "internals/rename-detection-and-diff-algorithms",
   "internals/rebase-internals-and-sequencer",
   "internals/hooks-and-policy-enforcement",
-  "ci-cd/jenkins-integration",
-  "ci-cd/ci-security-basics",
-  "ide/github-desktop",
-  "ide/terminal-git-ui",
+  "devops/jenkins-integration",
+  "devops/ci-security-basics",
+  "devops/github-desktop",
+  "devops/terminal-git-ui",
   "security/credential-helper",
   "security/signing-advanced",
   "performance/shallow-clone-deep",
@@ -496,12 +492,12 @@ const recommendedDocPaths = new Set<DocPath>([
   "migration/platform-migration",
   "hosting/github-deep-dive",
   "hosting/gitea-setup",
-  "ci-cd/circleci-git",
-  "ci-cd/ci-cd-testing-strategies",
-  "ci-cd/ci-cd-deployment-strategies",
-  "ide/vim-neovim-git",
-  "ide/intellij-git-deep",
-  "ide/terminal-git-productivity",
+  "devops/circleci-git",
+  "devops/ci-cd-testing-strategies",
+  "devops/ci-cd-deployment-strategies",
+  "devops/vim-neovim-git",
+  "devops/intellij-git-deep",
+  "devops/terminal-git-productivity",
   "security/secret-scanning",
   "security/secure-git-workflows",
   "security/git-security-audit",
@@ -538,11 +534,7 @@ const sectionSearchSuggestionDefaults: Partial<
     prerequisite: "learning-path/sync-with-remote",
     risk: "best-practices/shared-history-boundaries",
   },
-  github: {
-    prerequisite: "learning-path/first-feature-branch",
-    risk: "best-practices/shared-history-boundaries",
-  },
-  gitlab: {
+  platforms: {
     prerequisite: "learning-path/first-feature-branch",
     risk: "best-practices/shared-history-boundaries",
   },
@@ -554,12 +546,8 @@ const sectionSearchSuggestionDefaults: Partial<
     prerequisite: "commands/git-reflog",
     risk: "best-practices/shared-history-boundaries",
   },
-  "ci-cd": {
+  devops: {
     prerequisite: "learning-path/sync-with-remote",
-    risk: "best-practices/shared-history-boundaries",
-  },
-  ide: {
-    prerequisite: "learning-path/quick-start",
     risk: "best-practices/shared-history-boundaries",
   },
   security: {
@@ -646,15 +634,10 @@ const primerDefaults: Record<Locale, Record<DocSection, DocPrimerSeed>> = {
       prerequisites: ["知道 fetch / pull / push / branch 的基本作用", "能理解一条分支为什么会分叉"],
       risks: ["照抄流程却没确认当前分支关系", "在共享分支上用错整合方式"],
     },
-    github: {
-      audience: ["已经会基础 Git、准备系统学习 GitHub 协作的人", "要在团队里使用 PR、Issue、Actions 的开发者"],
+    platforms: {
+      audience: ["已经会基础 Git、准备系统学习 GitHub / GitLab 平台协作的人", "要在团队里使用 PR、Issue、MR、Actions 的开发者"],
       prerequisites: ["知道 branch、commit、push、remote 的基本作用", "愿意把平台功能和 Git 操作一起理解"],
-      risks: ["只记 GitHub 按钮流程却忽略底层 Git 边界", "把平台规则当成可以替代本地历史判断"],
-    },
-    gitlab: {
-      audience: ["已经会基础 Git、准备系统学习 GitLab 协作的人", "要在团队里使用 Merge Request、Issue Board 和 CI/CD 的开发者"],
-      prerequisites: ["知道 branch、commit、push、remote 的基本作用", "愿意把平台功能和 Git 操作一起理解"],
-      risks: ["只记 GitLab 页面操作却忽略底层 Git 边界", "把平台策略误当成可以替代本地历史判断"],
+      risks: ["只记平台按钮流程却忽略底层 Git 边界", "把平台规则当成可以替代本地历史判断"],
     },
     internals: {
       audience: ["想建立稳定 Git 心智模型的学习者", "经常遇到历史、引用、恢复问题的开发者"],
@@ -676,15 +659,10 @@ const primerDefaults: Record<Locale, Record<DocSection, DocPrimerSeed>> = {
       prerequisites: ["知道提交不是文件快照列表那么简单"],
       risks: ["把概念页当命令说明页使用"],
     },
-    "ci-cd": {
-      audience: ["要在 CI/CD 中使用 Git 的开发者", "想理解管线中 Git 操作的边界和安全性"],
+    devops: {
+      audience: ["要在 CI/CD 与 IDE 中使用 Git 的开发者", "想理解管线中 Git 操作的边界和安全性"],
       prerequisites: ["知道 branch、commit、push 的基本用法", "有基础 CI/CD 概念"],
-      risks: ["在 CI 中误用 GITHUB_TOKEN 导致安全风险", "不理解 shallow clone 和 partial clone 的区别"],
-    },
-    ide: {
-      audience: ["想提升 IDE 中 Git 使用效率的开发者"],
-      prerequisites: ["知道基本的 Git 命令"],
-      risks: ["依赖 IDE 操作而不理解底层 Git 行为"],
+      risks: ["在 CI 中误用 GITHUB_TOKEN 导致安全风险", "不理解 shallow clone 和 partial clone 的区别", "依赖 IDE 操作而不理解底层 Git 行为"],
     },
     security: {
       audience: ["需要配置 Git 安全认证的开发者"],
@@ -723,15 +701,10 @@ const primerDefaults: Record<Locale, Record<DocSection, DocPrimerSeed>> = {
       prerequisites: ["Basic understanding of fetch, pull, push, and branches", "A sense of how and why branches diverge"],
       risks: ["Copying a workflow without checking branch state", "Choosing the wrong integration path on shared branches"],
     },
-    github: {
-      audience: ["Readers who know basic Git and now need GitHub collaboration fluency", "Developers using pull requests, issues, and Actions in real teams"],
+    platforms: {
+      audience: ["Readers who know basic Git and now need GitHub or GitLab collaboration fluency", "Developers using pull requests, merge requests, issues, and Actions in real teams"],
       prerequisites: ["A basic sense of branches, commits, pushes, and remotes", "Willingness to connect platform features back to Git behavior"],
-      risks: ["Memorizing GitHub UI steps without understanding the Git boundary underneath", "Assuming platform policy replaces local history judgment"],
-    },
-    gitlab: {
-      audience: ["Readers who know basic Git and now need GitLab collaboration fluency", "Developers using merge requests, issue boards, and CI/CD in real teams"],
-      prerequisites: ["A basic sense of branches, commits, pushes, and remotes", "Willingness to connect platform features back to Git behavior"],
-      risks: ["Memorizing GitLab UI steps without understanding the Git boundary underneath", "Assuming platform policy replaces local history judgment"],
+      risks: ["Memorizing platform UI steps without understanding the Git boundary underneath", "Assuming platform policy replaces local history judgment"],
     },
     internals: {
       audience: ["Readers building a durable Git mental model", "Developers who keep running into history, ref, or recovery confusion"],
@@ -753,15 +726,10 @@ const primerDefaults: Record<Locale, Record<DocSection, DocPrimerSeed>> = {
       prerequisites: ["A basic sense that commits are not just a file list"],
       risks: ["Treating a concepts page like a command how-to"],
     },
-    "ci-cd": {
-      audience: ["Developers using Git in CI/CD pipelines", "Readers who want to understand Git operation boundaries in automation"],
+    devops: {
+      audience: ["Developers using Git in CI/CD pipelines and IDE integrations", "Readers who want to understand Git operation boundaries in automation"],
       prerequisites: ["Basic understanding of branch, commit, and push", "Basic CI/CD concepts"],
-      risks: ["Misusing GITHUB_TOKEN causing security issues", "Not understanding the trade-off between shallow and partial clone"],
-    },
-    ide: {
-      audience: ["Developers who want to improve Git efficiency in their IDE"],
-      prerequisites: ["Basic Git command knowledge"],
-      risks: ["Relying on IDE operations without understanding underlying Git behavior"],
+      risks: ["Misusing GITHUB_TOKEN causing security issues", "Not understanding the trade-off between shallow and partial clone", "Relying on IDE operations without understanding underlying Git behavior"],
     },
     security: {
       audience: ["Developers who need to configure Git security and authentication"],
@@ -965,10 +933,8 @@ function getOrderedPathSeries(section: DocSection): DocPath[] {
       return bestPracticeSlugs.map((slug) => `best-practices/${slug}` as DocPath);
     case "workflows":
       return workflowSlugs.map((slug) => `workflows/${slug}` as DocPath);
-    case "github":
-      return githubSlugs.map((slug) => `github/${slug}` as DocPath);
-    case "gitlab":
-      return gitlabSlugs.map((slug) => `gitlab/${slug}` as DocPath);
+    case "platforms":
+      return platformsSlugs.map((slug) => `platforms/${slug}` as DocPath);
     case "internals":
       return [
         "concepts/git-history",
@@ -980,10 +946,8 @@ function getOrderedPathSeries(section: DocSection): DocPath[] {
       return recoverySlugs.map((slug) => `recovery/${slug}` as DocPath);
     case "concepts":
       return conceptSlugs.map((slug) => `concepts/${slug}` as DocPath);
-    case "ci-cd":
-      return ciCdSlugs.map((slug) => `ci-cd/${slug}` as DocPath);
-    case "ide":
-      return ideSlugs.map((slug) => `ide/${slug}` as DocPath);
+    case "devops":
+      return devopsSlugs.map((slug) => `devops/${slug}` as DocPath);
     case "security":
       return securitySlugs.map((slug) => `security/${slug}` as DocPath);
     case "performance":
@@ -1004,13 +968,11 @@ function sortBySeriesOrder<T extends { path: DocPath }>(docs: T[]) {
       ...getOrderedPathSeries("commands"),
       ...getOrderedPathSeries("best-practices"),
       ...getOrderedPathSeries("workflows"),
-      ...getOrderedPathSeries("github"),
-      ...getOrderedPathSeries("gitlab"),
+      ...getOrderedPathSeries("platforms"),
       ...getOrderedPathSeries("internals"),
       ...getOrderedPathSeries("recovery"),
       ...getOrderedPathSeries("concepts"),
-      ...getOrderedPathSeries("ci-cd"),
-      ...getOrderedPathSeries("ide"),
+      ...getOrderedPathSeries("devops"),
       ...getOrderedPathSeries("security"),
       ...getOrderedPathSeries("performance"),
       ...getOrderedPathSeries("migration"),
@@ -1054,14 +1016,9 @@ export async function getLearningPathDocs(locale: Locale) {
   return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("learning-path/")));
 }
 
-export async function getGithubDocs(locale: Locale) {
+export async function getPlatformsDocs(locale: Locale) {
   const docs = await getIndexedDocs(locale);
-  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("github/")));
-}
-
-export async function getGitlabDocs(locale: Locale) {
-  const docs = await getIndexedDocs(locale);
-  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("gitlab/")));
+  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("platforms/")));
 }
 
 export async function getInternalsDocs(locale: Locale) {
@@ -1074,14 +1031,9 @@ export async function getRecoveryDocs(locale: Locale) {
   return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("recovery/")));
 }
 
-export async function getCiCdDocs(locale: Locale) {
+export async function getDevopsDocs(locale: Locale) {
   const docs = await getIndexedDocs(locale);
-  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("ci-cd/")));
-}
-
-export async function getIdeDocs(locale: Locale) {
-  const docs = await getIndexedDocs(locale);
-  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("ide/")));
+  return sortBySeriesOrder(docs.filter((doc) => doc.path.startsWith("devops/")));
 }
 
 export async function getSecurityDocs(locale: Locale) {
@@ -1130,12 +1082,8 @@ export function getDocHref(locale: Locale, docPath: DocPath) {
     return `/${locale}/workflows/${docPath.replace("workflows/", "")}`;
   }
 
-  if (docPath.startsWith("github/")) {
-    return `/${locale}/github/${docPath.replace("github/", "")}`;
-  }
-
-  if (docPath.startsWith("gitlab/")) {
-    return `/${locale}/gitlab/${docPath.replace("gitlab/", "")}`;
+  if (docPath.startsWith("platforms/")) {
+    return `/${locale}/platforms/${docPath.replace("platforms/", "")}`;
   }
 
   if (docPath.startsWith("internals/")) {
@@ -1146,12 +1094,8 @@ export function getDocHref(locale: Locale, docPath: DocPath) {
     return `/${locale}/recovery/${docPath.replace("recovery/", "")}`;
   }
 
-  if (docPath.startsWith("ci-cd/")) {
-    return `/${locale}/ci-cd/${docPath.replace("ci-cd/", "")}`;
-  }
-
-  if (docPath.startsWith("ide/")) {
-    return `/${locale}/ide/${docPath.replace("ide/", "")}`;
+  if (docPath.startsWith("devops/")) {
+    return `/${locale}/devops/${docPath.replace("devops/", "")}`;
   }
 
   if (docPath.startsWith("security/")) {
@@ -1278,7 +1222,7 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
     "workflows/feature-branch-collaboration",
   ],
   "learning-path/open-first-pull-request": [
-    "github/pull-requests-and-reviews",
+    "platforms/pull-requests-and-reviews",
     "best-practices/pull-request-prep",
     "workflows/prepare-commits-before-pull-request",
   ],
@@ -1312,75 +1256,75 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
     "workflows/release-branch-workflow",
     "workflows/hotfix-and-urgent-fixes",
   ],
-  "github/github-flow-basics": [
+  "platforms/github-flow-basics": [
     "workflows/feature-branch-collaboration",
     "workflows/prepare-commits-before-pull-request",
-    "github/pull-requests-and-reviews",
+    "platforms/pull-requests-and-reviews",
   ],
-  "github/pull-requests-and-reviews": [
+  "platforms/pull-requests-and-reviews": [
     "best-practices/pull-request-prep",
     "workflows/pr-merge-strategy-and-platform-settings",
-    "github/issues-projects-and-discussions",
+    "platforms/issues-projects-and-discussions",
   ],
-  "github/forks-and-open-source-contribution": [
+  "platforms/forks-and-open-source-contribution": [
     "workflows/open-source-fork-pr-contribution",
     "workflows/fork-upstream-sync",
     "best-practices/topic-branches",
   ],
-  "github/issues-projects-and-discussions": [
+  "platforms/issues-projects-and-discussions": [
     "workflows/feature-branch-collaboration",
     "best-practices/small-batch-review",
-    "github/github-actions-and-skills",
+    "platforms/github-actions-and-skills",
   ],
-  "github/github-actions-and-skills": [
+  "platforms/github-actions-and-skills": [
     "workflows/merge-queue-workflow",
     "workflows/pr-merge-strategy-and-platform-settings",
     "commands/git-worktree",
   ],
-  "github/github-branch-protection-and-rulesets": [
+  "platforms/github-branch-protection-and-rulesets": [
     "workflows/pr-merge-strategy-and-platform-settings",
     "best-practices/shared-history-boundaries",
-    "github/pull-requests-and-reviews",
+    "platforms/pull-requests-and-reviews",
   ],
-  "github/github-codeowners-and-review-ownership": [
+  "platforms/github-codeowners-and-review-ownership": [
     "best-practices/code-review-handoff-quality",
     "best-practices/small-batch-review",
-    "github/pull-requests-and-reviews",
+    "platforms/pull-requests-and-reviews",
   ],
-  "gitlab/gitlab-flow-and-merge-requests": [
+  "platforms/gitlab-flow-and-merge-requests": [
     "workflows/feature-branch-collaboration",
-    "github/pull-requests-and-reviews",
+    "platforms/pull-requests-and-reviews",
     "best-practices/pull-request-prep",
   ],
-  "gitlab/gitlab-forks-and-contributions": [
+  "platforms/gitlab-forks-and-contributions": [
     "workflows/open-source-fork-pr-contribution",
     "workflows/fork-upstream-sync",
     "best-practices/topic-branches",
   ],
-  "gitlab/gitlab-issues-boards-and-milestones": [
-    "github/issues-projects-and-discussions",
+  "platforms/gitlab-issues-boards-and-milestones": [
+    "platforms/issues-projects-and-discussions",
     "workflows/feature-branch-collaboration",
     "best-practices/small-batch-review",
   ],
-  "gitlab/gitlab-groups-projects-and-permissions": [
+  "platforms/gitlab-groups-projects-and-permissions": [
     "best-practices/shared-history-boundaries",
     "workflows/shared-branch-sync-boundaries",
-    "github/forks-and-open-source-contribution",
+    "platforms/forks-and-open-source-contribution",
   ],
-  "gitlab/gitlab-ci-and-runners": [
-    "github/github-actions-and-skills",
+  "platforms/gitlab-ci-and-runners": [
+    "platforms/github-actions-and-skills",
     "workflows/merge-queue-workflow",
     "workflows/pr-merge-strategy-and-platform-settings",
   ],
-  "gitlab/gitlab-protected-branches-and-approval-rules": [
-    "gitlab/gitlab-flow-and-merge-requests",
+  "platforms/gitlab-protected-branches-and-approval-rules": [
+    "platforms/gitlab-flow-and-merge-requests",
     "best-practices/shared-history-boundaries",
     "workflows/pr-merge-strategy-and-platform-settings",
   ],
-  "gitlab/gitlab-merge-trains-and-merge-result-pipelines": [
+  "platforms/gitlab-merge-trains-and-merge-result-pipelines": [
     "workflows/merge-queue-workflow",
-    "gitlab/gitlab-ci-and-runners",
-    "gitlab/gitlab-flow-and-merge-requests",
+    "platforms/gitlab-ci-and-runners",
+    "platforms/gitlab-flow-and-merge-requests",
   ],
   "internals/plumbing-and-porcelain": [
     "commands/git-cat-file",
@@ -1622,23 +1566,23 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
     "commands/git-stash",
     "recovery/reflog-recovery",
   ],
-  "ci-cd/jenkins-integration": [
-    "ci-cd/github-actions-basics",
-    "ci-cd/gitlab-ci-basics",
-    "ci-cd/ci-security-basics",
+  "devops/jenkins-integration": [
+    "devops/github-actions-basics",
+    "devops/gitlab-ci-basics",
+    "devops/ci-security-basics",
   ],
-  "ci-cd/ci-security-basics": [
+  "devops/ci-security-basics": [
     "security/credential-helper",
     "security/ssh-key-management",
-    "ci-cd/jenkins-integration",
+    "devops/jenkins-integration",
   ],
-  "ide/github-desktop": [
-    "ide/terminal-git-ui",
-    "ide/vscode-git",
+  "devops/github-desktop": [
+    "devops/terminal-git-ui",
+    "devops/vscode-git",
     "learning-path/quick-start",
   ],
-  "ide/terminal-git-ui": [
-    "ide/github-desktop",
+  "devops/terminal-git-ui": [
+    "devops/github-desktop",
     "commands/git-log",
     "commands/git-diff",
   ],
@@ -1674,7 +1618,7 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
   ],
   "hosting/github-deep-dive": [
     "hosting/platform-comparison",
-    "github/github-flow-basics",
+    "platforms/github-flow-basics",
     "hosting/gitea-setup",
   ],
   "hosting/gitea-setup": [
@@ -1682,35 +1626,35 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
     "hosting/github-deep-dive",
     "hosting/platform-comparison",
   ],
-  "ci-cd/circleci-git": [
-    "ci-cd/github-actions-basics",
-    "ci-cd/gitlab-ci-basics",
-    "ci-cd/ci-cd-testing-strategies",
+  "devops/circleci-git": [
+    "devops/github-actions-basics",
+    "devops/gitlab-ci-basics",
+    "devops/ci-cd-testing-strategies",
   ],
-  "ci-cd/ci-cd-testing-strategies": [
-    "ci-cd/github-actions-basics",
-    "ci-cd/circleci-git",
-    "ci-cd/ci-cd-deployment-strategies",
+  "devops/ci-cd-testing-strategies": [
+    "devops/github-actions-basics",
+    "devops/circleci-git",
+    "devops/ci-cd-deployment-strategies",
   ],
-  "ci-cd/ci-cd-deployment-strategies": [
-    "ci-cd/ci-cd-testing-strategies",
-    "ci-cd/ci-security-basics",
+  "devops/ci-cd-deployment-strategies": [
+    "devops/ci-cd-testing-strategies",
+    "devops/ci-security-basics",
     "workflows/release-branch-workflow",
   ],
-  "ide/vim-neovim-git": [
-    "ide/terminal-git-productivity",
-    "ide/vscode-git",
+  "devops/vim-neovim-git": [
+    "devops/terminal-git-productivity",
+    "devops/vscode-git",
     "commands/git-diff",
   ],
-  "ide/intellij-git-deep": [
-    "ide/jetbrains-git",
-    "ide/vscode-git",
+  "devops/intellij-git-deep": [
+    "devops/jetbrains-git",
+    "devops/vscode-git",
     "commands/git-log",
   ],
-  "ide/terminal-git-productivity": [
-    "ide/terminal-git-ui",
+  "devops/terminal-git-productivity": [
+    "devops/terminal-git-ui",
     "commands/git-config",
-    "ide/vim-neovim-git",
+    "devops/vim-neovim-git",
   ],
   "security/secret-scanning": [
     "security/credential-helper",
@@ -1745,7 +1689,7 @@ const relatedOverrides: Partial<Record<DocPath, readonly DocPath[]>> = {
   "hosting/aws-codecommit": [
     "hosting/platform-comparison",
     "hosting/gerrit-code-review",
-    "ci-cd/ci-cd-deployment-strategies",
+    "devops/ci-cd-deployment-strategies",
   ],
   "hosting/gerrit-code-review": [
     "hosting/github-deep-dive",
@@ -1830,15 +1774,12 @@ const representativeSectionPaths = {
     "workflows/sync-before-review",
     "workflows/hotfix-and-urgent-fixes",
   ],
-  github: [
-    "github/github-flow-basics",
-    "github/pull-requests-and-reviews",
-    "github/github-actions-and-skills",
-  ],
-  gitlab: [
-    "gitlab/gitlab-flow-and-merge-requests",
-    "gitlab/gitlab-issues-boards-and-milestones",
-    "gitlab/gitlab-ci-and-runners",
+  platforms: [
+    "platforms/github-flow-basics",
+    "platforms/pull-requests-and-reviews",
+    "platforms/github-actions-and-skills",
+    "platforms/gitlab-flow-and-merge-requests",
+    "platforms/gitlab-ci-and-runners",
   ],
   internals: [
     "internals/object-database",
@@ -1850,18 +1791,16 @@ const representativeSectionPaths = {
     "recovery/recover-after-reset",
     "recovery/undo-after-pull",
   ],
-  "ci-cd": [
-    "ci-cd/github-actions-basics",
-    "ci-cd/gitlab-ci-basics",
+  devops: [
+    "devops/github-actions-basics",
+    "devops/gitlab-ci-basics",
+    "devops/vscode-git",
+    "devops/jetbrains-git",
   ],
   concepts: [
     "concepts/three-layers",
     "concepts/git-history",
     "concepts/detached-head",
-  ],
-  ide: [
-    "ide/vscode-git",
-    "ide/jetbrains-git",
   ],
   security: [
     "security/ssh-key-management",
@@ -1902,7 +1841,7 @@ export async function getRelatedDocs(
 
 export async function getFeaturedSectionDocs(
   locale: Locale,
-  section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "github" | "gitlab" | "internals" | "recovery" | "ci-cd" | "ide" | "security" | "performance" | "migration" | "hosting" | "concepts">,
+  section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "platforms" | "internals" | "recovery" | "devops" | "security" | "performance" | "migration" | "hosting" | "concepts">,
   limit = 3,
 ): Promise<DocCard[]> {
    const docs =
@@ -1914,34 +1853,30 @@ export async function getFeaturedSectionDocs(
         ? await getBestPracticeDocs(locale)
         : section === "workflows"
           ? await getWorkflowDocs(locale)
-          : section === "github"
-            ? await getGithubDocs(locale)
-            : section === "gitlab"
-              ? await getGitlabDocs(locale)
+          : section === "platforms"
+            ? await getPlatformsDocs(locale)
             : section === "internals"
               ? await getInternalsDocs(locale)
               : section === "recovery"
                 ? await getRecoveryDocs(locale)
-                : section === "ci-cd"
-                  ? await getCiCdDocs(locale)
-                  : section === "ide"
-                    ? await getIdeDocs(locale)
-                    : section === "security"
-                      ? await getSecurityDocs(locale)
-                      : section === "performance"
-                        ? await getPerformanceDocs(locale)
-                        : section === "migration"
-                    ? await getMigrationDocs(locale)
-                    : section === "hosting"
-                      ? await getHostingDocs(locale)
-                      : await getConceptsDocs(locale);
+                : section === "devops"
+                  ? await getDevopsDocs(locale)
+                  : section === "security"
+                    ? await getSecurityDocs(locale)
+                    : section === "performance"
+                      ? await getPerformanceDocs(locale)
+                      : section === "migration"
+                  ? await getMigrationDocs(locale)
+                  : section === "hosting"
+                    ? await getHostingDocs(locale)
+                    : await getConceptsDocs(locale);
 
   return sortByTierAndSeriesOrder(docs).slice(0, limit).map((doc) => toIndexedDocCard(locale, doc));
 }
 
 export async function getRepresentativeSectionDocs(
   locale: Locale,
-  section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "github" | "gitlab" | "internals" | "recovery" | "ci-cd" | "ide" | "security" | "performance" | "migration" | "hosting" | "concepts">,
+  section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "platforms" | "internals" | "recovery" | "devops" | "security" | "performance" | "migration" | "hosting" | "concepts">,
   limit = 3,
 ): Promise<DocCard[]> {
   const paths = representativeSectionPaths[section] ?? [];
@@ -1967,10 +1902,10 @@ export async function getLatestHomeDocs(locale: Locale, limit = 4): Promise<DocC
     "commands/git-range-diff",
     "commands/git-bisect",
     "commands/git-switch",
-    "ci-cd/jenkins-integration",
-    "ci-cd/ci-security-basics",
-    "ide/github-desktop",
-    "ide/terminal-git-ui",
+    "devops/jenkins-integration",
+    "devops/ci-security-basics",
+    "devops/github-desktop",
+    "devops/terminal-git-ui",
     "security/credential-helper",
     "security/signing-advanced",
     "performance/shallow-clone-deep",
@@ -2024,13 +1959,11 @@ export async function getContentStats(locale: Locale): Promise<ContentStats> {
       commands: 0,
       "best-practices": 0,
       workflows: 0,
-      github: 0,
-      gitlab: 0,
+      platforms: 0,
       internals: 0,
       recovery: 0,
       concepts: 0,
-      "ci-cd": 0,
-      ide: 0,
+      devops: 0,
       security: 0,
       performance: 0,
       migration: 0,

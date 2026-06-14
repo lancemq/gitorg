@@ -12,6 +12,19 @@ export const metadata = {
 
 # git-merge-base Tutorial
 
+## What you will learn
+
+- Understand the core purpose of git-merge-base Tutorial
+- Master the basic usage and common options of git-merge-base Tutorial
+- Explains how to use git-merge-base to find the best common ancestor between histories.
+- Understand key concepts: When it is a good fit
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
 ## The short version
 
 git-merge-base is used to find the best common ancestor between histories.
@@ -78,4 +91,10 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 - Merge-base returns only commit hashes — it does not produce diffs or explain what changed. Pair it with `git diff` or `git log` for full context.
 - For octopus merges (more than two branches), merge-base can compute a common base across all inputs, but the result may be less intuitive than pairwise analysis.
 - Merge-base is entirely read-only. It never writes to the repository, moves refs, or creates objects.
+
+## Try it yourself
+
+1. Practice the git-merge-base command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

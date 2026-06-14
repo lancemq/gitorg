@@ -13,6 +13,19 @@ export const metadata = {
 
 # git checkout Tutorial
 
+## What you will learn
+
+- Understand the core purpose of git checkout Tutorial
+- Master the basic usage and common options of git checkout Tutorial
+- Explains git checkout as the older multi-purpose command for branch switching and path restoration, and how it relates to switch and restore.
+- Understand key concepts: Why it feels overloaded
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
 ## The short version
 
 `git checkout` is the classic multi-purpose Git command that can both switch branches and restore paths.
@@ -82,4 +95,10 @@ This puts you into detached HEAD, which is useful for inspection but easy to mis
 - After checking out a commit you enter detached HEAD; if you keep committing without creating a branch, those experimental commits are easy to lose.
 - When an argument could be either a branch name or a path, use the `--` separator to disambiguate: `git checkout -- <path>`.
 - When the working tree has uncommitted changes, Git will refuse a branch switch to avoid overwriting — you need to commit, stash, or discard changes first.
+
+## Try it yourself
+
+1. Practice the git-checkout command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

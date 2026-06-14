@@ -13,6 +13,20 @@ export const metadata = {
 
 # Rescue work from detached HEAD
 
+## What you will learn
+
+- Understand the core purpose of Rescue work from detached HEAD
+- Master the basic usage and common options of Rescue work from detached HEAD
+- Detached HEAD is not an error by itself. The real risk is creating commits there and leaving them without a branch name that preserves them.
+- Understand key concepts: Detached HEAD simply means HEAD points to a commit, not a branch name
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+You just ran a Git command and the result wasn't what you expected — maybe you even lost some commits. This has happened before, and you want a reliable set of recovery techniques.
+
 ## Detached HEAD simply means HEAD points to a commit, not a branch name
 
 <RefsHeadFigure
@@ -94,3 +108,10 @@ git switch -c <branch-name>
 ```
 
 Name it first, then continue. That keeps detached HEAD from turning into a recovery story.
+
+## Try it yourself
+
+1. Practice the detached-head-rescue command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

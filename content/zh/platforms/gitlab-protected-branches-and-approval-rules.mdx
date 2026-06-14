@@ -1,0 +1,60 @@
+export const metadata = {
+  title: "GitLab 受保护分支与审批规则",
+  slug: "gitlab-protected-branches-and-approval-rules",
+  locale: "zh",
+  section: "platforms",
+  summary: "通过 Protected branches 与 Merge request approval rules 固化团队协作边界，减少高风险改动直接进入主线。",
+  sourceUrls: [
+    "https://docs.gitlab.com/ee/user/project/protected_branches.html",
+    "https://docs.gitlab.com/ee/user/project/merge_requests/approvals/",
+  ],
+};
+
+# GitLab 受保护分支与审批规则
+
+## 学完这篇你会掌握什么
+
+- 理解 GitLab 受保护分支与审批规则 的核心作用和适用场景
+- 掌握 GitLab 受保护分支与审批规则 的基本用法和常用参数
+- 通过 Protected branches 与 Merge request approval rules 固化团队协作边界，减少高风险改动直接进入主线。
+- 理解 最小落地策略 相关的概念
+- 掌握 常见治理收益 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+GitLab 协作治理的核心组合是：受保护分支控制写入权限，审批规则控制合并质量门槛。
+
+
+## 先想一个问题
+
+你已经在用 GitHub 或 GitLab 托管代码，但除了 push 和 pull，你对平台提供的协作功能还不够熟悉——PR 流程、代码审查、权限管理这些应该怎么用才合适？
+
+## 最小落地策略
+
+1. 主线只允许通过 MR 合并
+2. 关键分支禁止开发者直接推送
+3. 至少一位或多位审批人通过
+4. 必需 CI 通过后才能合并
+
+## 常见治理收益
+
+- 降低误操作推送风险
+- 强化关键模块评审责任
+- 让合并决策可追溯
+
+<WarningBox title="权限模型要和团队角色同步更新">
+  组织结构变化后若不更新保护策略，权限会出现“历史遗留漏洞”。
+</WarningBox>
+
+## 接下来建议继续看什么
+
+1. `gitlab flow and merge requests`
+2. `pr merge strategy and platform settings`
+3. `shared history boundaries`
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+

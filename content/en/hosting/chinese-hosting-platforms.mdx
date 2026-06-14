@@ -1,0 +1,188 @@
+export const metadata = {
+  title: "Chinese Git Hosting Platforms Guide",
+  slug: "chinese-hosting-platforms",
+  locale: "en",
+  section: "hosting",
+  summary: "A guide to Chinese Git hosting platforms (Gitee, CODING, Tencent Cloud Code, Alibaba Cloud Code) covering feature comparisons, migration, and compliance considerations.",
+  sourceUrls: [
+    "https://gitee.com",
+    "https://coding.net",
+    "https://cloud.tencent.com/product/tcdev",
+    "https://code.aliyun.com",
+  ],
+};
+
+# Chinese Git Hosting Platforms Guide
+
+## What you will learn
+
+- Understand the core purpose of Chinese Git Hosting Platforms Guide
+- Master the basic usage and common options of Chinese Git Hosting Platforms Guide
+- A guide to Chinese Git hosting platforms (Gitee, CODING, Tencent Cloud Code, Alibaba Cloud Code) covering feature comparisons, migration, and compliance considerations.
+- Understand key concepts: Gitee (码云)
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're choosing or configuring a Git hosting solution — whether self-hosting Gitea or comparing GitHub, GitLab, and Gitee features. You're not sure which option best fits your team's needs.
+
+## One-Sentence Understanding
+
+Chinese Git hosting platforms primarily solve two needs: **faster access** (no VPN required to clone/push) and **data compliance** (meeting China's data localization requirements under the Cybersecurity Law), though their feature maturity and ecosystem still trail GitHub.
+
+## Gitee (码云)
+
+### Features and Limitations
+
+Gitee is the largest domestic Git hosting platform, operated by OSChina.
+
+| Feature | Free Tier | Enterprise |
+|---------|-----------|------------|
+| Collaborators | Unlimited (public repos) | Per-seat |
+| Repository size | 500 MB | 5 GB+ |
+| Max file size | 50 MB | 200 MB |
+| CI/CD | Gitee Go (limited free) | Gitee Go (more quotas) |
+| Code review | Pull Request | Custom review rules |
+
+### Known Limitations
+
+```bash
+# Gitee does not support git push --mirror (bug with Gitee→external)
+# Use --force instead
+git clone --bare https://gitee.com/user/repo.git
+cd repo.git
+git push --force --mirror https://github.com/user/repo.git
+```
+
+- No Git LFS support (partial in enterprise)
+- Strict API rate limiting (60 req/min unauthenticated)
+- Pages service is unreliable
+
+## CODING DevOps
+
+CODING is a Tencent Cloud DevOps platform offering code hosting through deployment.
+
+### Core Capabilities
+
+```
+Code Hosting → CI/CD (Built-in Jenkins) → Artifact Registry → Deployment
+```
+
+- Native Git LFS support
+- Built-in CI/CD (Jenkins + CODING CI)
+- Docker image registry
+- Deep Tencent Cloud integration
+
+```yaml
+# CODING CI config (Jenkinsfile)
+pipeline {
+  agent any
+  stages {
+    stage('Build') {
+      steps {
+        sh 'npm install && npm run build'
+      }
+    }
+    stage('Deploy') {
+      steps {
+        sh 'tcloud deploy --env production'
+      }
+    }
+  }
+}
+```
+
+### Comparison with Gitee
+
+| Dimension | CODING | Gitee |
+|-----------|--------|-------|
+| CI/CD | Full (Jenkins + built-in) | Basic (Gitee Go) |
+| Cloud integration | Tencent Cloud native | Standalone |
+| Pricing | Per-team | Free + Enterprise |
+| International access | Global CDN | China mainland only |
+
+## Tencent Cloud Code
+
+Previously Tencent Cloud DevOps (TCDev), targeting enterprise customers with code hosting, CI, and automated deployment.
+
+Features:
+- Deep integration with Tencent Cloud COS, SCF, etc.
+- Internal network Git access (no public bandwidth)
+- Code scanning (based on SonarQube)
+- Enterprise-grade SLA
+
+## Alibaba Cloud Code
+
+Previously Alibaba Cloud Code, now evolved into CloudEffect (云效) platform.
+
+```bash
+# CloudEffect basic Git operations
+git remote add origin https://code.aliyun.com/user/repo.git
+git push -u origin main
+```
+
+- Integrated with Alibaba Cloud DevOps toolchain (pipelines, test management)
+- Git LFS support
+- Built-in code scanning + security checks
+- Deep DingTalk integration (review notifications, CI results)
+
+## Platform Comparison Overview
+
+| Dimension | Gitee | CODING | Tencent Code | Alibaba Code |
+|-----------|-------|--------|-------------|-------------|
+| PR/MR | Yes | Yes | Yes | Yes |
+| CI/CD | Limited | Full | Full | Full |
+| Team management | Basic | RBAC | RBAC | RBAC |
+| Self-hosted runner | No | Yes | Yes | Yes |
+| Git LFS | No | Yes | Yes | Yes |
+| Open API | Limited | Full | Full | Full |
+| International access | Poor | Good | Good | Poor |
+
+## Migration Guide
+
+### From GitHub to Chinese Platforms
+
+```bash
+git clone --bare https://github.com/user/repo.git
+cd repo.git
+git remote add china https://gitee.com/user/repo.git  # or another platform
+git push --mirror china
+```
+
+Issues, Wiki, and CI/CD configurations must be migrated manually — git does not carry these metadata.
+
+### Between Chinese Platforms
+
+Use git remote or migration tools:
+
+```bash
+# Gitee → CODING
+git clone --bare https://gitee.com/user/repo.git
+cd repo.git
+git remote add coding https://e.coding.net/user/repo.git
+git push --mirror coding
+```
+
+## Compliance and Data Residency
+
+Under China's Cybersecurity Law, Data Security Law, and Personal Information Protection Law:
+
+- **Data localization**: Important data must be stored within mainland China
+- **Classified protection**: Enterprise platforms typically hold Level 3 (等保三级) certification
+- **Code auditing**: Sensitive code (finance, government) should use domestic platforms
+- **Data export**: Repositories containing personal information require security assessment for cross-border transfer
+
+> Most Chinese Git platforms host their data centers in Beijing, Shanghai, or Shenzhen.
+
+## Try it yourself
+
+1. Practice the chinese-hosting-platforms command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+
+## Continue Learning
+
+1. `hosting/platform-comparison` — Full platform comparison
+2. `hosting/gitea-setup` — Self-hosted Gitea setup
+3. `hosting/self-hosted-git` — Fully self-hosted Git service

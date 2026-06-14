@@ -12,6 +12,19 @@ export const metadata = {
 
 # git-submodule Tutorial
 
+## What you will learn
+
+- Understand the core purpose of git-submodule Tutorial
+- Master the basic usage and common options of git-submodule Tutorial
+- Manage external repository pointers inside a parent repository, with emphasis on committing submodule pointer updates in the superproject.
+- Understand key concepts: Core commands
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
 ## The short version
 
 A submodule is a pointer from a parent repo to a specific commit in another repo.
@@ -181,4 +194,10 @@ Always verify with `git diff --submodule` to see exactly what changed.
 - After cloning a repository with submodules, run `git submodule update --init --recursive` to fetch and check out all nested repositories.
 - Submodules can be confusing for collaborators who are unfamiliar with them — consider documenting the workflow in your project README.
 - Changing a submodule's URL requires updating both `.gitmodules` and the internal `.git/config`, and all team members need to sync the change.
+
+## Try it yourself
+
+1. Practice the git-submodule command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

@@ -12,6 +12,19 @@ export const metadata = {
 
 # git-grep Tutorial
 
+## What you will learn
+
+- Understand the core purpose of git-grep Tutorial
+- Master the basic usage and common options of git-grep Tutorial
+- Explains how to use git-grep to search text inside the repository.
+- Understand key concepts: When it is a good fit
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
 ## The short version
 
 git-grep is used to search text inside the repository.
@@ -76,4 +89,10 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 - You can combine multiple search patterns with `--and`, `--or`, and `--not` for more precise matching.
 - The search scope can be limited by specifying a commit, tree object, or path, such as `git grep "TODO" v1.0 -- src/`.
 - In large repositories, git grep is typically faster than system grep because Git only traverses indexed files rather than scanning the entire filesystem.
+
+## Try it yourself
+
+1. Practice the git-grep command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

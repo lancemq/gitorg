@@ -12,6 +12,19 @@ export const metadata = {
 
 # Signing Commits Workflow
 
+## What you will learn
+
+- Understand the core purpose of Signing Commits Workflow
+- Master the basic usage and common options of Signing Commits Workflow
+- Use GPG or SSH to sign commits, establishing verifiable commit identity and a trusted collaboration chain.
+- Understand key concepts: Why signed commits are needed
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
+
 ## The short version
 
 Signed commits cryptographically sign each commit using a **GPG or SSH key**, letting collaborators verify that the commit truly came from the claimed author and preventing identity forgery and supply-chain attacks.
@@ -203,3 +216,10 @@ shred -u private.key
 3. When enabling signing on an existing project, old unsigned commits do not automatically become verified
 4. If a key is compromised, revoke it immediately and generate a new one
 5. CI/CD automated commits typically do not need signing, but critical release tags should be signed
+
+## Try it yourself
+
+1. Practice the signing-commits-workflow command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

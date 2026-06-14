@@ -12,7 +12,21 @@ export const metadata = {
 
 # git mv
 
+## What you will learn
+
+- Understand the core purpose of git mv
+- Master the basic usage and common options of git mv
+- Rename or move tracked files while keeping the index in sync, which makes large refactors easier to stage consistently.
+- Understand key concepts: Common examples
+- Know when to use this feature and when to avoid it
+
+
 `git mv` renames or moves a tracked file and stages that path change at the same time.
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
 
 ## Common examples
 
@@ -64,4 +78,10 @@ Git can often infer renames even if you use your shell `mv` first. The main valu
 - Git's rename detection means a shell `mv` followed by `git add` often produces the same result, so `git mv` is mainly a convenience.
 - If the destination file already exists, `git mv` will refuse unless you force it, to avoid accidental overwrites.
 - Uncommitted edits in a file being moved are carried along with the rename — the content does not change, only the path.
+
+## Try it yourself
+
+1. Practice the git-mv command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

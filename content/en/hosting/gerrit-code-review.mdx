@@ -1,0 +1,162 @@
+export const metadata = {
+  title: "Gerrit Code Review System",
+  slug: "gerrit-code-review",
+  locale: "en",
+  section: "hosting",
+  summary: "Gerrit is a Git-based code review system widely used by open-source projects like Android and OpenStack. This guide covers its unique workflow and review mechanisms.",
+  sourceUrls: [
+    "https://www.gerritcodereview.com",
+    "https://gerrit.googlesource.com/gerrit",
+  ],
+};
+
+# Gerrit Code Review System
+
+## What you will learn
+
+- Understand the core purpose of Gerrit Code Review System
+- Master the basic usage and common options of Gerrit Code Review System
+- Gerrit is a Git-based code review system widely used by open-source projects like Android and OpenStack. This guide covers its unique workflow and review mechanisms.
+- Understand key concepts: What is Gerrit
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're choosing or configuring a Git hosting solution — whether self-hosting Gitea or comparing GitHub, GitLab, and Gitee features. You're not sure which option best fits your team's needs.
+
+## One-Sentence Understanding
+
+The fundamental difference between Gerrit and GitHub PRs: Gerrit does not allow direct pushes to branches — every commit enters a review state first and can only be merged after approval, ensuring every line of code is reviewed.
+
+## What is Gerrit
+
+Gerrit was originally built by Google for the Android project and later open-sourced. Its core design principle: **every commit must go through review**.
+
+| Feature | Gerrit | GitHub PR |
+|---------|--------|-----------|
+| Push method | `git push origin HEAD:refs/for/main` | `git push origin feature-branch` |
+| Review unit | Single commit | Entire PR (can contain multiple commits) |
+| History editing | Update via rebase | Append commits or force push |
+| Scoring system | Verified + Code-Review | Single review status |
+
+## Gerrit Workflow
+
+### Push for Review
+
+```bash
+# Regular push: directly to branch (rejected)
+git push origin main          # ❌ Gerrit rejects
+
+# Push to review queue
+git push origin HEAD:refs/for/main  # ✅ Creates a Review
+```
+
+Each push creates a **Change**, which maps to a single Commit.
+
+### Change-Id and Commit Hook
+
+Gerrit uses Change-Id to track different versions of the same Change:
+
+```
+commit 1a2b3c4d5e6f7g8h9i0j
+Author: John Doe <john@example.com>
+Date:   Mon Mar 1 10:00:00 2025 +0800
+
+    feat: add user authentication
+
+    Change-Id: Iabcd1234efgh5678ijkl9012mnop3456qrst7890
+```
+
+Install the commit-msg hook for automatic Change-Id generation:
+
+```bash
+gitdir=$(git rev-parse --git-dir)
+scp -p -P 29418 user@gerrit-server:hooks/commit-msg $gitdir/hooks/
+```
+
+Every `git commit` will now include a Change-Id automatically.
+
+### Updating a Change
+
+```bash
+# Amend the local commit
+git add -p && git commit --amend
+# Push again — Gerrit matches by Change-Id
+git push origin HEAD:refs/for/main
+```
+
+## Review Workflow
+
+### Label System
+
+| Label | Range | Meaning |
+|-------|-------|---------|
+| Verified | -1 to +1 | CI verification status |
+| Code-Review | -2 to +2 | Human code review score |
+
+- **+2 Code-Review**: Approved for merge
+- **-2 Code-Review**: Rejected (veto power)
+- **+1/-1 Code-Review**: General feedback, no veto
+
+### Submission Requirements
+
+```
+Code-Review: +2  (at least one +2, no -2)
+Verified: +1     (CI passed)
+```
+
+Custom labels can be configured:
+
+```
+[access "refs/heads/*"]
+    label-Code-Review = -2..+2 group:core-developers
+    label-Code-Review = -1..+1 group:developers
+    label-Verified = -1..+1 group:ci-service
+```
+
+## Submit Strategies
+
+| Strategy | Behavior | Use Case |
+|----------|----------|----------|
+| **Merge if Necessary** | Auto-merge commit on conflict | Low-frequency collaboration |
+| **Rebase Always** | Auto-rebase before merge | Linear history, high-frequency |
+| **Cherry Pick Always** | Always cherry-pick to target | Fine-grained commit control |
+| **Fast Forward Only** | Only if fast-forward possible | Strict linear history |
+
+## Basic Admin Setup
+
+### Installation (Docker)
+
+```bash
+docker run -d -p 8080:8080 -p 29418:29418 \
+  -v /data/gerrit:/var/gerrit/review_site \
+  gerritcodereview/gerrit
+```
+
+### Create a Project
+
+```bash
+ssh -p 29418 admin@gerrit-server gerrit create-project \
+  --name my-project --owner "Administrators"
+```
+
+### Permission Configuration
+
+| Reference (Ref) | Permission |
+|-----------------|------------|
+| refs/heads/* | Code-Review, Verified labels |
+| refs/heads/main | Merge only through review |
+| refs/for/main | Allow all users to push for review |
+
+## Try it yourself
+
+1. Practice the gerrit-code-review command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+
+## Continue Learning
+
+1. `hosting/platform-comparison` — Platform comparison
+2. `github/advanced-collaboration` — Advanced collaboration
+3. `hosting/aws-codecommit` — CodeCommit integration

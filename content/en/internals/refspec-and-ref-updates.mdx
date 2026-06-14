@@ -12,9 +12,23 @@ export const metadata = {
 
 # Refspecs and Ref Updates
 
+## What you will learn
+
+- Understand the core purpose of Refspecs and Ref Updates
+- Master the basic usage and common options of Refspecs and Ref Updates
+- Explain how refspecs determine which refs are mapped and updated during fetch and push.
+- Understand key concepts: Start with the real problem
+- Know when to use this feature and when to avoid it
+
+
 If you think about sync as only "download objects" or "upload commits," you are seeing only half of the operation. Git also has to answer: which refs should those updates change?
 
 That is what a refspec describes.
+
+
+## Start with a problem
+
+You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
 
 ## Start with the real problem
 
@@ -182,3 +196,10 @@ It pairs especially well with:
 - `git remote`
 - `git branch -r`
 - `git ls-remote`
+
+## Try it yourself
+
+1. Practice the refspec-and-ref-updates command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

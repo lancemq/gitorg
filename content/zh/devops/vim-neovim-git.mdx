@@ -1,0 +1,132 @@
+export const metadata = {
+  title: "Vim/Neovim Git 集成指南",
+  slug: "vim-neovim-git",
+  locale: "zh",
+  section: "devops",
+  summary: "全面介绍 Vim/Neovim 中的 Git 集成，包括 fugitive.vim 插件、gitsigns.nvim、lazygit 集成及 telescope Git 扩展。",
+  sourceUrls: [
+    "https://github.com/tpope/vim-fugitive",
+    "https://github.com/lewis6991/gitsigns.nvim",
+    "https://github.com/jesseduffield/lazygit",
+  ],
+};
+
+# Vim/Neovim Git 集成指南
+
+## 学完这篇你会掌握什么
+
+- 理解 Vim/Neovim Git 集成指南 的核心作用和适用场景
+- 掌握 Vim/Neovim Git 集成指南 的基本用法和常用参数
+- 全面介绍 Vim/Neovim 中的 Git 集成，包括 fugitive.vim 插件、gitsigns.nvim、lazygit 集成及 telescope Git 扩展。
+- 理解 fugitive.vim — Git 瑞士军刀 相关的概念
+- 掌握 gitsigns.nvim — 行内标记 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+## 先想一个问题
+
+你的团队正在引入 CI/CD，或者你正在配置 IDE 中的 Git 集成——但你不确定在自动化的场景下，Git 的行为和本地手动操作有什么不同，需要注意什么安全问题。
+
+## 一句话理解
+
+Vim 和 Neovim 通过插件系统获得强大的 Git 集成，从 fugitive.vim 的 Git 命令界面到 gitsigns.nvim 的行内标记，让你在编辑器中完成所有 Git 操作。
+
+## fugitive.vim — Git 瑞士军刀
+
+### 基本命令
+
+| 命令 | 功能 | 对应 Git 命令 |
+|------|------|--------------|
+| `:Gstatus` | 查看工作区状态 | `git status` |
+| `:Gdiff` | 查看文件差异 | `git diff` |
+| `:Gcommit` | 提交变更 | `git commit` |
+| `:Gpush` | 推送到远端 | `git push` |
+| `:Glog` | 查看提交历史 | `git log` |
+| `:Gblame` | 文件 Blame | `git blame` |
+
+### 高级工作流
+
+```
+:Gstatus 打开状态窗口
+→ 光标移到文件按 - 暂存/取消暂存
+→ 按 cc 提交
+→ 按 D 查看 diff
+
+:Gdiff 打开左右分屏对比
+→ [c 和 ]c 跳转到上一处/下一处改动
+→ :Gdiffoff 关闭
+
+:Gedit HEAD~3 打开 Rebase 编辑 buffer
+→ 修改并保存即执行交互式 rebase
+```
+
+## gitsigns.nvim — 行内标记
+
+在符号栏显示添加、修改、删除标记，支持 hunk 级操作：
+
+```lua
+{
+  "lewis6991/gitsigns.nvim",
+  opts = {
+    signs = { add = { text = "│" }, change = { text = "│" }, delete = { text = "_" } },
+    current_line_blame = true,
+    current_line_blame_opts = { virt_text = true, virt_text_pos = "eol", delay = 1000 },
+  },
+}
+```
+
+常用映射：`]c` / `[c` 跳转 hunk，`<leader>hs` 暂存 hunk，`<leader>hr` 撤销 hunk。
+
+## lazygit 集成
+
+```vim
+:terminal lazygit
+" 或配置快捷键
+nnoremap <leader>gg :terminal lazygit<CR>
+```
+
+使用 lazygit.nvim 在浮动窗口中打开：
+
+```lua
+{
+  "kdheepak/lazygit.nvim",
+  keys = { { "<leader>gg", "<cmd>LazyGit<CR>", desc = "LazyGit" } },
+}
+```
+
+## telescope Git 扩展
+
+```lua
+:Telescope git_status      -- 改动文件
+:Telescope git_commits     -- 提交历史
+:Telescope git_branches    -- 切换分支
+:Telescope git_bcommits    -- 当前文件历史
+```
+
+配置快捷键：
+
+```lua
+nnoremap <leader>gs <cmd>Telescope git_status<CR>
+nnoremap <leader>gc <cmd>Telescope git_commits<CR>
+nnoremap <leader>gb <cmd>Telescope git_branches<CR>
+```
+
+## 其他推荐插件
+
+| 插件 | 功能 |
+|------|------|
+| tpope/vim-rhubarb | fugitive 扩展，在浏览器中打开 GitHub |
+| sindrets/diffview.nvim | 可视化 diff 浏览器 |
+| NeogitOrg/neogit | 类 Magit 的 Git 界面 |
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+
+## 继续学习建议
+
+1. `commands/git-status` — git status 命令详解
+2. `commands/git-diff` — git diff 对比技巧
+3. `ide/vscode-git` — VS Code Git 集成对比

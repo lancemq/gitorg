@@ -12,6 +12,15 @@ export const metadata = {
 
 # Repository Layout, .git, and GIT_DIR
 
+## What you will learn
+
+- Understand the core purpose of Repository Layout, .git, and GIT_DIR
+- Master the basic usage and common options of Repository Layout, .git, and GIT_DIR
+- Understanding working trees, gitdirs, common directories, and worktrees helps explain where Git really stores repository state.
+- Understand key concepts: The most common shape
+- Know when to use this feature and when to avoid it
+
+
 At first, many people treat a Git repository as “my project folder plus a hidden `.git` directory.”  
 That is good enough until you hit cases like:
 
@@ -21,6 +30,11 @@ That is good enough until you hit cases like:
 - explicitly setting `GIT_DIR`
 
 At that point, you need a stronger model of what the repository actually is.
+
+
+## Start with a problem
+
+You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
 
 ## The most common shape
 
@@ -132,3 +146,10 @@ If you do not understand the difference between working tree and gitdir, multi-w
 ## A conclusion worth keeping
 
 **The working tree tells you where files are edited. The gitdir tells Git where repository state actually lives.**
+
+## Try it yourself
+
+1. Practice the repository-layout-and-gitdir command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

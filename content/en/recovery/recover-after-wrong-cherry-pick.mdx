@@ -13,7 +13,21 @@ export const metadata = {
 
 # Recover after a wrong cherry-pick
 
+## What you will learn
+
+- Understand the core purpose of Recover after a wrong cherry-pick
+- Master the basic usage and common options of Recover after a wrong cherry-pick
+- If the wrong commit was cherry-picked, choose reset or revert based on whether the history is already shared, then replay the correct patch sequence.
+- Understand key concepts: Decision boundary
+- Know when to use this feature and when to avoid it
+
+
 The critical decision is whether the picked commit is already shared.
+
+
+## Start with a problem
+
+You just ran a Git command and the result wasn't what you expected — maybe you even lost some commits. This has happened before, and you want a reliable set of recovery techniques.
 
 ## Decision boundary
 
@@ -61,4 +75,10 @@ Then cherry-pick the correct commit(s) in the intended order.
 1. `recover after reset`
 2. `assess force-push impact`
 3. `git-cherry-pick`
+
+## Try it yourself
+
+1. Practice the recover-after-wrong-cherry-pick command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

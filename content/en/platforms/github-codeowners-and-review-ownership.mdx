@@ -1,0 +1,68 @@
+export const metadata = {
+  title: "GitHub CODEOWNERS and review ownership",
+  slug: "github-codeowners-and-review-ownership",
+  locale: "en",
+  section: "platforms",
+  summary: "Use CODEOWNERS to route pull-request review to responsible maintainers and reduce ownership gaps on critical code paths.",
+  sourceUrls: [
+    "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners",
+    "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/code-review/about-pull-request-reviews",
+  ],
+};
+
+# GitHub CODEOWNERS and review ownership
+
+## What you will learn
+
+- Understand the core purpose of GitHub CODEOWNERS and review ownership
+- Master the basic usage and common options of GitHub CODEOWNERS and review ownership
+- Use CODEOWNERS to route pull-request review to responsible maintainers and reduce ownership gaps on critical code paths.
+- Understand key concepts: Design guidelines
+- Know when to use this feature and when to avoid it
+
+
+CODEOWNERS is an ownership-routing mechanism, not just an extra review formality.
+
+
+## Start with a problem
+
+You're already using GitHub or GitLab to host code, but beyond push and pull, you're not fully familiar with the collaboration features these platforms offer — PR workflows, code review, and permission management.
+
+## Design guidelines
+
+1. map owners to module boundaries, not temporary assignments
+2. avoid single-owner critical paths
+3. maintain ownership map as team topology changes
+
+<PlatformHierarchyFigure
+  title="CODEOWNERS and Review Ownership"
+  caption="CODEOWNERS binds file paths to reviewers, ensuring key code changes must be reviewed by the right people."
+  topLabel="File Paths"
+  topItems="src/|docs/|config/"
+  middleLabel="CODEOWNERS"
+  middleItems="@team-backend|@team-docs|@team-devops"
+  bottomLabel="Review Requirements"
+  bottomItems="Mandatory approval|Auto assignment|Clear ownership"
+/>
+
+
+## With branch protection
+
+When “require review from code owners” is enabled, PRs touching owned paths cannot merge without owner review.
+
+<WarningBox title="Overly granular rules can create review bottlenecks">
+  Too many narrow ownership patterns can request unnecessary reviewers and slow throughput.
+</WarningBox>
+
+## Good follow-up reads
+
+1. `code review handoff quality`
+2. `small batch review`
+3. `github pull requests and reviews`
+
+## Try it yourself
+
+1. Practice the github-codeowners-and-review-ownership command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

@@ -12,7 +12,21 @@ export const metadata = {
 
 # git rm
 
+## What you will learn
+
+- Understand the core purpose of git rm
+- Master the basic usage and common options of git rm
+- Remove tracked files and stage that removal, which makes it easier to separate filesystem deletion from Git history changes.
+- Understand key concepts: Common patterns
+- Know when to use this feature and when to avoid it
+
+
 `git rm` does more than delete a file. It removes the tracked path and stages that deletion for the next commit.
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
 
 ## Common patterns
 
@@ -66,4 +80,10 @@ Once committed and shared, the deletion becomes part of project history, so use 
 - Using `--cached` removes the file from the index but keeps it in the working tree — useful when you realize a file should have been gitignored.
 - The `-f` flag is required when the file has uncommitted changes that differ from HEAD, to confirm you really want to discard them.
 - Once the deletion is committed and shared, recovering the file requires digging through commit history — `git rm` itself does not destroy data, but the commit that records the removal changes the project's visible state.
+
+## Try it yourself
+
+1. Practice the git-rm command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

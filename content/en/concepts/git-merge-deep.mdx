@@ -12,6 +12,20 @@ export const metadata = {
 
 # Git Merge Deep Dive
 
+## What you will learn
+
+- Understand the core purpose of Git Merge Deep Dive
+- Master the basic usage and common options of Git Merge Deep Dive
+- Understand Git merge strategies, recursive merge, ours/theirs, octopus merge, and conflict resolution.
+- Understand key concepts: Overview
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+You've encountered a conceptual question while using Git — you roughly know what it means, but you're not entirely sure about its precise definition and boundaries.
+
 ## Overview
 
 `git merge` joins two or more development histories. Git supports multiple merge strategies, defaulting to **recursive**.
@@ -196,6 +210,12 @@ git merge --abort  # Cancel
 | "Not possible to fast-forward" | Diverged history | Use `--no-ff` or rebase first |
 | Many conflicts | Long divergence | Merge upstream regularly, or rebase sync |
 | Too many merge commits | Frequent mainline merges | Use rebase instead of merge for sync |
+
+## Try it yourself
+
+1. Practice the git-merge-deep command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 
 ## Continue Learning
 

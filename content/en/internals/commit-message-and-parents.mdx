@@ -12,7 +12,21 @@ export const metadata = {
 
 # Commit Objects, Parents, and Messages
 
+## What you will learn
+
+- Understand the core purpose of Commit Objects, Parents, and Messages
+- Master the basic usage and common options of Commit Objects, Parents, and Messages
+- Show how commit objects connect trees, parent commits, and messages into the history graph.
+- Understand key concepts: How commits link through parents
+- Know when to use this feature and when to avoid it
+
+
 A commit is not just "some saved changes plus a message." It is the object that ties together a repository snapshot, parent history, authorship metadata, and message text into one node of the history graph.
+
+
+## Start with a problem
+
+You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
 
 ## How commits link through parents
 
@@ -140,3 +154,10 @@ It pairs especially well with:
 - `git rebase`
 - `git log --graph`
 - `git cat-file`
+
+## Try it yourself
+
+1. Practice the commit-message-and-parents command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

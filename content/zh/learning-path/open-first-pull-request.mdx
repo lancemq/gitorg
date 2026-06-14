@@ -12,13 +12,28 @@ export const metadata = {
 
 # 发起第一个 Pull Request
 
-当你已经会在分支上提交，下一步就是把改动“交给团队审查并合并”。
+## 学完这篇你会掌握什么
 
-## 发起前最小检查
+- 准备好发起 PR 前的最小检查清单
+- 在本地完成 rebase 同步后再推送分支
+- 写清楚 PR 的改动目的、变更点和验证方式
+- 理解 PR 是协作接口，不只是代码上传入口
 
-1. 改动是否只围绕一件事
-2. 分支是否同步过最新主线
-3. 提交信息是否可读
+## 先想一个问题
+
+你已经在一个功能分支上完成了开发，也做了提交。现在你想把改动"交给团队"。但如果你只是 push 分支然后在 GitHub 上点了一下 New Pull Request，reviewer 点开一看——没有描述、没有上下文、提交信息是"fix"和"update"——你觉得他能理解你要做什么吗？
+
+PR 不是代码上传入口，而是你写给 reviewer 的一封信。
+
+## 发起前的最小检查清单
+
+在 push 之前，先检查：
+
+1. **改动是否只围绕一件事**——如果一个 PR 同时修了 bug、加了功能、还格式化了代码，reviewer 很难一次性 Review
+2. **分支是否同步过最新主线**——用 `git fetch origin && git rebase origin/main` 确保分支基于最新主线
+3. **提交信息是否可读**——`git log --oneline` 看过去几条提交，自己能不能看懂
+
+这三条都满足，就可以准备发起 PR 了。
 
 ## 最小流程
 
@@ -28,19 +43,32 @@ git rebase origin/main
 git push -u origin feature/first-pr
 ```
 
-然后在平台创建 PR，补齐：
+然后在平台创建 PR，补齐三要素：
 
-- 改动目的
-- 核心变更点
-- 风险与验证方式
+- **改动目的**：为什么改这个？要解决什么问题？
+- **核心变更点**：改了哪些文件、改了什么逻辑？
+- **风险与验证方式**：怎么确认改对了？有没有需要特别注意的副作用？
 
-<WarningBox title="不要把“草稿代码”直接当 PR 交付">
+一个好的 PR 描述可以让 review 周期从"反复追问"缩短到"一次性通过"。
+
+## 为什么 PR 描述比你想的更重要
+
+Reviewer 在看你的代码之前，先看到的是你的 PR 描述。如果描述说清楚了"为什么改"和"怎么验证"，reviewer 就能带着上下文看代码——而不是反过来，先猜你要做什么，再看代码对不对。
+
+一个写得太简略的 PR，本质上是把理解成本转嫁给了 reviewer。
+
+<WarningBox title={'不要把\u201c草稿代码\u201d直接当 PR 交付'}>
   PR 是协作接口，不只是代码上传入口。描述不完整会显著增加评审往返成本。
 </WarningBox>
 
+## 给你的练习
+
+1. 在测试仓库中创建一个功能分支，做 2-3 个提交，用 git rebase -i 整理成 1 个干净提交后发起 PR
+2. 故意写一个没有描述的 PR，找同事 review，记录他问了多少个问题
+3. 下次写 PR 时，先写描述再写代码——看 review 效率是否提升
+
 ## 接下来建议继续学什么
 
-1. `handle review feedback`
-2. `pull request prep`
-3. `pull requests and reviews`
-
+1. `handle review feedback` — 如何处理 review 反馈
+2. `pull request prep` — PR 提交前的准备清单
+3. `pull requests and reviews` — PR 与代码审查最佳实践

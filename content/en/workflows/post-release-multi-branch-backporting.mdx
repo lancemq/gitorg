@@ -12,6 +12,15 @@ export const metadata = {
 
 # Post-release Multi-branch Backporting
 
+## What you will learn
+
+- Understand the core purpose of Post-release Multi-branch Backporting
+- Master the basic usage and common options of Post-release Multi-branch Backporting
+- Control order, validation, and branch boundaries when one fix must be backported into multiple released maintenance lines.
+- Understand key concepts: What this workflow really solves
+- Know when to use this feature and when to avoid it
+
+
 After release, a single fix may need to land on several maintained versions. At that point the question is no longer just “can we backport it?” It becomes:
 
 - which maintained lines actually need it
@@ -29,6 +38,11 @@ After release, a single fix may need to land on several maintained versions. At 
   outputs="clear branch state|traceable fix coverage|clean release communication"
   note="The hard part is rarely the command itself. It is choosing and validating well."
 />
+
+
+## Start with a problem
+
+Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
 
 ## What this workflow really solves
 
@@ -134,3 +148,10 @@ A backport that is not reflected in release notes, support docs, or changelog co
 1. `Backport with cherry-pick`
 2. `Release branch workflow`
 3. `Hotfix and urgent fixes`
+
+## Try it yourself
+
+1. Practice the post-release-multi-branch-backporting command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

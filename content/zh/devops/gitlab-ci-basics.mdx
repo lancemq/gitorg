@@ -1,0 +1,182 @@
+export const metadata = {
+  title: "GitLab CI/CD 与 Git 协同",
+  slug: "gitlab-ci-basics",
+  locale: "zh",
+  section: "devops",
+  summary: "系统介绍 GitLab CI/CD 如何与 Git 仓库深度集成，包括 .gitlab-ci.yml 配置、流水线触发策略和最佳实践。",
+  sourceUrls: [
+    "https://docs.gitlab.com/ee/ci/",
+    "https://docs.gitlab.com/ee/ci/yaml/",
+  ],
+};
+
+# GitLab CI/CD 与 Git 协同
+
+## 学完这篇你会掌握什么
+
+- 理解 GitLab CI/CD 与 Git 协同 的核心作用和适用场景
+- 掌握 GitLab CI/CD 与 Git 协同 的基本用法和常用参数
+- 系统介绍 GitLab CI/CD 如何与 Git 仓库深度集成，包括 .gitlab-ci.yml 配置、流水线触发策略和最佳实践。
+- 理解 核心概念 相关的概念
+- 掌握 分支策略与流水线 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+## 先想一个问题
+
+你的团队正在引入 CI/CD，或者你正在配置 IDE 中的 Git 集成——但你不确定在自动化的场景下，Git 的行为和本地手动操作有什么不同，需要注意什么安全问题。
+
+## 一句话理解
+
+GitLab CI/CD 内建于 GitLab 仓库中，通过仓库根目录的 `.gitlab-ci.yml` 文件定义流水线，实现"代码即流水线"的 DevOps 模式。
+
+## 核心概念
+
+### .gitlab-ci.yml
+
+流水线定义文件存放在仓库根目录：
+
+```yaml
+stages:
+  - build
+  - test
+  - deploy
+
+build-job:
+  stage: build
+  script:
+    - npm ci
+    - npm run build
+
+test-job:
+  stage: test
+  script:
+    - npm test
+
+deploy-job:
+  stage: deploy
+  script:
+    - npm run deploy
+```
+
+### Git 事件与流水线触发
+
+| Git 事件 | 流水线行为 |
+|----------|-----------|
+| `git push` | 自动触发对应分支的流水线 |
+| Merge Request 创建/更新 | 触发 MR 流水线 |
+| Tag push | 触发标签流水线，适合发布 |
+| 定时流水线 | 基于 cron 调度 |
+
+## 分支策略与流水线
+
+### 按分支控制
+
+```yaml
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      variables:
+        DEPLOY_ENV: "production"
+    - if: $CI_COMMIT_BRANCH == "develop"
+      variables:
+        DEPLOY_ENV: "staging"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      variables:
+        DEPLOY_ENV: "review"
+```
+
+### Merge Request 流水线
+
+MR 流水线在 PR/MR 的上下文中运行，可以访问源分支和目标分支的信息：
+
+```yaml
+merge-check:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    - git diff --check origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME...HEAD
+```
+
+## 与 Git 深度集成的功能
+
+### CI/CD 变量与 Git 信息
+
+GitLab CI 提供大量与 Git 相关的预定义变量：
+
+```yaml
+job:
+  script:
+    - echo "分支: $CI_COMMIT_BRANCH"
+    - echo "提交: $CI_COMMIT_SHORT_SHA"
+    - echo "Tag: $CI_COMMIT_TAG"
+    - echo "提交者: $CI_COMMIT_AUTHOR"
+```
+
+### 使用 CI_JOB_TOKEN 进行 Git 操作
+
+```yaml
+git-push-job:
+  script:
+    - git remote set-url origin https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/group/project.git
+    - git checkout -b auto-release/$CI_COMMIT_SHORT_SHA
+    - git push origin auto-release/$CI_COMMIT_SHORT_SHA
+```
+
+### 合并结果流水线（Merge Result Pipeline）
+
+在 MR 的合并结果上运行流水线，比仅在源分支上运行更准确：
+
+```yaml
+merge-result:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    - npm ci && npm test
+```
+
+## Git 操作的最佳实践
+
+### 使用 Git 深度（fetch-depth）
+
+```yaml
+variables:
+  GIT_STRATEGY: clone
+  GIT_DEPTH: 10
+```
+
+- `GIT_DEPTH: 10`：只获取最近 10 个提交，加速 CI
+- `GIT_DEPTH: 0`：获取全部历史
+- `GIT_STRATEGY: clone`：每次完整克隆（隔离性最好）
+- `GIT_STRATEGY: fetch`：增量获取（更快但可能遇到问题）
+
+### 使用 Git Clean 策略
+
+```yaml
+variables:
+  GIT_CLEAN_FLAGS: -ffdx
+```
+
+确保流水线运行在干净的工作区中。
+
+## 差异化优势
+
+相比 GitHub Actions，GitLab CI/CD 有几个独特优势：
+
+1. **内置 Registry**：Container Registry 与 CI 深度集成
+2. **Review Apps**：每次 MR 自动创建预览环境
+3. **Merge Trains**：自动排序 MR 并验证合并结果
+4. **GitLab Pages**：直接从 CI 部署静态站点
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+
+## 继续学习建议
+
+1. `gitlab/gitlab-ci-and-runners` — GitLab CI 与 Runner 详解
+2. `gitlab/gitlab-merge-trains-and-merge-result-pipelines` — Merge Train 机制
+3. `workflows/ci-optimization-with-git` — CI 中的 Git 优化

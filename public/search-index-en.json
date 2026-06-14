@@ -2010,6 +2010,26 @@
     "suggestions": []
   },
   {
+    "href": "/en/docs/concepts/git-lfs-deep",
+    "path": "concepts/git-lfs-deep",
+    "section": "concepts",
+    "tier": "recommended",
+    "slug": "git-lfs-deep",
+    "title": "Git LFS Deep Dive",
+    "summary": "Understand Git LFS architecture, performance tuning, server configuration, and large-scale migration strategies.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/docs/concepts/git-hooks-deep",
+    "path": "concepts/git-hooks-deep",
+    "section": "concepts",
+    "tier": "recommended",
+    "slug": "git-hooks-deep",
+    "title": "Git Hooks Deep Dive",
+    "summary": "Understand Git Hooks types, lifecycle, sharing mechanisms, and CI/CD integration practices.",
+    "suggestions": []
+  },
+  {
     "href": "/en/commands/git-rerere",
     "path": "commands/git-rerere",
     "section": "commands",
@@ -2300,6 +2320,16 @@
     "suggestions": []
   },
   {
+    "href": "/en/performance/git-maintenance",
+    "path": "performance/git-maintenance",
+    "section": "performance",
+    "tier": "recommended",
+    "slug": "git-maintenance",
+    "title": "Git Maintenance Deep Dive",
+    "summary": "Master git maintenance's automated repository upkeep, including task scheduling, incremental repacking, and multi-repo management.",
+    "suggestions": []
+  },
+  {
     "href": "/en/migration/svn-to-git",
     "path": "migration/svn-to-git",
     "section": "migration",
@@ -2377,6 +2407,156 @@
     "slug": "gitea-setup",
     "title": "Gitea Self-Hosted Git Service",
     "summary": "Set up a lightweight self-hosted Git service with Gitea, including installation, configuration, backup, and daily administration.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/ci-cd/circleci-git",
+    "path": "ci-cd/circleci-git",
+    "section": "ci-cd",
+    "tier": "recommended",
+    "slug": "circleci-git",
+    "title": "CircleCI with Git Integration",
+    "summary": "A comprehensive guide to integrating CircleCI with Git, including configuration, trigger strategies, checkout optimization, dependency caching, pipeline parameterization with Git tags, and orb usage for Git operations.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/ci-cd/ci-cd-testing-strategies",
+    "path": "ci-cd/ci-cd-testing-strategies",
+    "section": "ci-cd",
+    "tier": "recommended",
+    "slug": "ci-cd-testing-strategies",
+    "title": "CI/CD Testing Strategies with Git",
+    "summary": "Explore how to design efficient testing strategies in CI/CD pipelines using Git metadata, including PR vs push testing, matrix testing across branches, test parallelization, snapshot testing, and branch-based integration test environments.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/ci-cd/ci-cd-deployment-strategies",
+    "path": "ci-cd/ci-cd-deployment-strategies",
+    "section": "ci-cd",
+    "tier": "recommended",
+    "slug": "ci-cd-deployment-strategies",
+    "title": "CI/CD Deployment Strategies with Git",
+    "summary": "A comprehensive guide to Git-based deployment strategies including tag-based deployments, environment promotion (dev→staging→prod), canary releases, GitOps deployment patterns, and rollback strategies using Git revert.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/ide/vim-neovim-git",
+    "path": "ide/vim-neovim-git",
+    "section": "ide",
+    "tier": "recommended",
+    "slug": "vim-neovim-git",
+    "title": "Vim/Neovim Git Integration Guide",
+    "summary": "Complete guide to Git integration in Vim and Neovim, covering fugitive.vim, gitsigns.nvim, lazygit integration, and telescope Git extensions.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/ide/intellij-git-deep",
+    "path": "ide/intellij-git-deep",
+    "section": "ide",
+    "tier": "recommended",
+    "slug": "intellij-git-deep",
+    "title": "IntelliJ IDEA Git Deep Dive",
+    "summary": "Go beyond basic JetBrains Git usage — master Annotate/Blame, Shelving vs Stashing, interactive rebase UI, conflict resolution, Changelists, and platform integrations.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/ide/terminal-git-productivity",
+    "path": "ide/terminal-git-productivity",
+    "section": "ide",
+    "tier": "recommended",
+    "slug": "terminal-git-productivity",
+    "title": "Terminal Git Productivity",
+    "summary": "Supercharge your terminal Git workflow with aliases, shell completion, lazygit, tig, delta diff viewer, git-prompt customization, and git-branchless.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/security/secret-scanning",
+    "path": "security/secret-scanning",
+    "section": "security",
+    "tier": "recommended",
+    "slug": "secret-scanning",
+    "title": "Secret Scanning & Leak Prevention in Git",
+    "summary": "How secrets end up in Git, automated scanning with git-secrets, truffleHog, Gitleaks, platform-level detection, BFG cleanup, and pre-commit prevention.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/security/secure-git-workflows",
+    "path": "security/secure-git-workflows",
+    "section": "security",
+    "tier": "recommended",
+    "slug": "secure-git-workflows",
+    "title": "Secure Git Collaboration Workflows",
+    "summary": "Signed commits with GPG/SSH, verified commits on GitHub/GitLab, branch protection rules, required status checks, signed tags, and secure supply chain practices.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/security/git-security-audit",
+    "path": "security/git-security-audit",
+    "section": "security",
+    "tier": "recommended",
+    "slug": "git-security-audit",
+    "title": "Git Repository Security Audit",
+    "summary": "Auditing Git repository access, git-fsck for integrity, scanning history for exposed secrets, audit logging with GitHub/GitLab, verifying author identities, and compliance considerations.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/migration/azure-devops-migration",
+    "path": "migration/azure-devops-migration",
+    "section": "migration",
+    "tier": "recommended",
+    "slug": "azure-devops-migration",
+    "title": "Azure DevOps (TFS) to Git Migration",
+    "summary": "A comprehensive guide for migrating from Team Foundation Server (TFS/TFVC) to Git, covering tool selection, history migration, branch mapping, and team transition strategies.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/migration/git-filter-repo",
+    "path": "migration/git-filter-repo",
+    "section": "migration",
+    "tier": "recommended",
+    "slug": "git-filter-repo",
+    "title": "git filter-repo Repository Rewriting Deep Dive",
+    "summary": "An in-depth look at git filter-repo, covering repository splitting, file cleanup, author info rewriting, and advanced usage compared to filter-branch and BFG.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/migration/migration-strategy-guide",
+    "path": "migration/migration-strategy-guide",
+    "section": "migration",
+    "tier": "recommended",
+    "slug": "migration-strategy-guide",
+    "title": "Repository Migration Strategy Guide",
+    "summary": "A complete migration framework covering assessment, trial, cutover, and transition phases, plus tool selection matrix, author mapping, history tradeoffs, and team communication plans.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/hosting/aws-codecommit",
+    "path": "hosting/aws-codecommit",
+    "section": "hosting",
+    "tier": "recommended",
+    "slug": "aws-codecommit",
+    "title": "AWS CodeCommit Integration Guide",
+    "summary": "AWS CodeCommit is a fully-managed Git repository service by AWS. This guide covers setup, authentication, CI/CD integration, and comparisons with other platforms.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/hosting/gerrit-code-review",
+    "path": "hosting/gerrit-code-review",
+    "section": "hosting",
+    "tier": "recommended",
+    "slug": "gerrit-code-review",
+    "title": "Gerrit Code Review System",
+    "summary": "Gerrit is a Git-based code review system widely used by open-source projects like Android and OpenStack. This guide covers its unique workflow and review mechanisms.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/hosting/chinese-hosting-platforms",
+    "path": "hosting/chinese-hosting-platforms",
+    "section": "hosting",
+    "tier": "recommended",
+    "slug": "chinese-hosting-platforms",
+    "title": "Chinese Git Hosting Platforms Guide",
+    "summary": "A guide to Chinese Git hosting platforms (Gitee, CODING, Tencent Cloud Code, Alibaba Cloud Code) covering feature comparisons, migration, and compliance considerations.",
     "suggestions": []
   }
 ]

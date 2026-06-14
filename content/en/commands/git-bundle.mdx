@@ -11,6 +11,19 @@ export const metadata = {
 
 # git-bundle Tutorial
 
+## What you will learn
+
+- Understand the core purpose of git-bundle Tutorial
+- Master the basic usage and common options of git-bundle Tutorial
+- Package Git history into a single transferable file for offline or restricted-network exchange when direct fetch/push is unavailable.
+- Understand key concepts: Best-fit scenarios
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
 ## The short version
 
 `git bundle` creates a transportable file that can act as a history source for clone or fetch.
@@ -87,4 +100,10 @@ Bundle is better for batch snapshots than high-frequency bidirectional collabora
 - Use `git bundle verify <file>` to check whether a bundle is complete and can be applied to the current repository.
 - A bundle created with `--all` includes all refs, but you can limit the scope to specific branches or commit ranges for smaller files.
 - The receiving repository must already contain any prerequisite commits referenced by the bundle; otherwise, you need to transfer those first.
+
+## Try it yourself
+
+1. Practice the git-bundle command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

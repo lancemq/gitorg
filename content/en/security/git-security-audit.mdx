@@ -1,0 +1,275 @@
+export const metadata = {
+  title: "Git Repository Security Audit",
+  slug: "git-security-audit",
+  locale: "en",
+  section: "security",
+  summary: "Auditing Git repository access, git-fsck for integrity, scanning history for exposed secrets, audit logging with GitHub/GitLab, verifying author identities, and compliance considerations.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-fsck",
+    "https://docs.github.com/en/enterprise-cloud@latest/admin/monitoring-activity-in-your-enterprise/reviewing-audit-logs",
+    "https://docs.gitlab.com/ee/administration/audit_events.html",
+  ],
+};
+
+# Git Repository Security Audit
+
+## What you will learn
+
+- Understand the core purpose of Git Repository Security Audit
+- Master the basic usage and common options of Git Repository Security Audit
+- Auditing Git repository access, git-fsck for integrity, scanning history for exposed secrets, audit logging with GitHub/GitLab, verifying author identities, and compliance considerations.
+- Understand key concepts: Auditing Git Repository Access
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're concerned about Git repository security — maybe key management isn't ideal, or commits aren't signed. You're not sure if your security setup is sufficient or where to start hardening it.
+
+## One-Sentence Understanding
+
+A Git security audit systematically examines repository history, access logs, commit integrity, and author identities to detect breaches, leaked secrets, and policy violations.
+
+## Auditing Git Repository Access
+
+### GitHub Audit Log
+
+```
+Settings → Audit log → Filter events
+```
+
+Key events to monitor:
+
+| Event | What It Indicates |
+|-------|-------------------|
+| `repo.push` | Code pushed to repository |
+| `repo.access` | Repository visibility changed |
+| `protected_branch.update` | Branch protection modified |
+| `protected_branch.destroy` | Branch protection removed |
+| `repo.transfer` | Repository ownership transferred |
+| `git.clone` | Repository cloned |
+| `collaborator.add` | New collaborator added |
+| `integration_installation_add` | New app installed |
+
+### GitLab Audit Events
+
+```
+Admin Area → Monitoring → Audit Events
+```
+
+Events tracked: project changes, user access, deploy keys, protected branches, CI/CD settings.
+
+## git-fsck for Repository Integrity
+
+`git fsck` checks the object database for corruption and dangling objects.
+
+```bash
+# Basic integrity check
+git fsck
+
+# Check all objects including unreachable
+git fsck --full
+
+# Check with verbose output
+git fsck --full --verbose
+
+# Show dangling objects (could contain leaked secrets)
+git fsck --lost-found
+
+# Recover dangling objects
+git fsck --lost-found
+git checkout git fsck | grep dangling | awk '{print $3}' | xargs git show
+```
+
+### What git-fsck Detects
+
+- Missing objects (corruption)
+- Dangling blobs (deleted files still in object store)
+- Dangling commits (rewritten history remnants)
+- Invalid object types
+- Broken links between objects
+
+## Checking for Exposed Secrets
+
+### History Scan Commands
+
+```bash
+# Search all commits for a pattern
+git log --all --oneline --grep="password\|secret\|api_key"
+
+# Search commit content
+git log --all -p -S "AKIAIOSFODNN7" -- .  # AWS key example
+
+# Search file names in history
+git log --all --diff-filter=A --name-only --pretty=format: | sort -u
+
+# Check for large files (potential secret dumps)
+git rev-list --all --objects | \
+  git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' | \
+  awk '/^blob/ {print $3, $4}' | sort -rn | head -20
+```
+
+### Automated Audit Tool
+
+```bash
+# Run truffleHog as an audit
+trufflehog git https://github.com/user/repo.git \
+  --json > audit-report.json
+
+# Run Gitleaks on entire history
+gitleaks detect --source . --log-opts="--all" \
+  --report-format json --report audit.json
+
+# git-secrets scan
+git secrets --scan-history
+```
+
+## Analyzing Commit History for Sensitive Data
+
+### Find Who Introduced a Secret
+
+```bash
+# Git blame specific lines
+git blame -L 5,10 config.js
+
+# Find commit that introduced a specific string
+git log --all -S "password123" --pretty=format:"%H %an %ae %ai"
+git log --all -p --full-history -S "password123"
+
+# List all contributors and their email addresses
+git log --all --format="%an <%ae>" | sort -u
+```
+
+### Detect Anomalous Patterns
+
+```bash
+# Sudden large binary blobs
+git rev-list --all --objects --size | \
+  awk '{if ($2 > 100000) print $2, $1}' | sort -rn
+
+# Commits with unusual timing (midnight, weekends)
+git log --all --format="%H %ai %an" | grep -E "(00:|01:|02:|03:|04:)"
+```
+
+## Audit Logging with GitHub/GitLab
+
+### GitHub
+
+Export audit logs programmatically:
+
+```bash
+# With GitHub CLI
+gh api /orgs/{org}/audit-log -q '.[] | select(.action=="repo.push")'
+
+# With REST API
+curl -H "Authorization: token $TOKEN" \
+  https://api.github.com/orgs/{org}/audit-log
+```
+
+### GitLab
+
+```bash
+# List audit events via API
+curl --header "PRIVATE-TOKEN: $TOKEN" \
+  https://gitlab.com/api/v4/audit_events
+
+# Project-specific events
+curl --header "PRIVATE-TOKEN: $TOKEN" \
+  https://gitlab.com/api/v4/projects/{id}/audit_events
+```
+
+### Self-Hosted
+
+For self-hosted Git servers, parse server logs:
+
+```bash
+# SSH access logs
+grep "git-receive-pack\|git-upload-pack" /var/log/auth.log
+
+# Apache/Nginx logs
+grep "info/refs\|git-upload-pack" /var/log/nginx/access.log
+```
+
+## Verifying Author Identities
+
+### Cross-Reference Emails
+
+```bash
+# List all unique authors
+git log --all --format="%an,%ae" | sort -u
+
+# Check for suspicious name/email combinations
+git log --all --format="%an <%ae>" | grep -vi "@company.com"
+
+# Find commits with different name but same email
+git log --all --format="%an,%ae" | sort -u | awk -F, '{print $2}' | uniq -d
+```
+
+### Verify GPG Signatures in Bulk
+
+```bash
+# List all unsigned commits (policy audit)
+git log --all --format="%H %GS" | grep " $"
+
+# Count signed vs unsigned
+git log --all --format="%G?" | sort | uniq -c
+
+# Show commits with bad signatures
+git log --all --format="%H %an %ae %G?" | grep " B$"
+```
+
+## Compliance Considerations
+
+### Standards and Frameworks
+
+| Standard | Git Audit Requirements |
+|----------|----------------------|
+| SOC 2 | Access logging, change management, code review |
+| PCI DSS | Track all access, monitor for card data leaks |
+| GDPR | Identify personal data in commits, right to erasure |
+| ISO 27001 | Version control audit trails, access reviews |
+
+### Audit Checklist
+
+1. **Access**: Review all collaborators, teams, and token permissions
+2. **History**: Scan all branches and tags for secrets
+3. **Integrity**: Run `git fsck --full` on all repos
+4. **Signatures**: Verify commit signing compliance rate
+5. **CI/CD**: Review pipeline definitions for credential exposure
+6. **Dependencies**: Check for compromised upstream dependency commits
+7. **Backups**: Ensure audit logs are retained and immutable
+
+### Creating an Audit Report
+
+```bash
+#!/bin/bash
+# audit-report.sh
+echo "=== Repo: $(basename $(pwd)) ==="
+echo "Total commits: $(git rev-list --all --count)"
+echo "Total authors: $(git log --all --format='%an' | sort -u | wc -l)"
+echo "Unsigned commits: $(git log --all --format='%G?' | grep 'N' | wc -l)"
+echo "Dangling objects: $(git fsck --lost-found 2>&1 | wc -l)"
+echo "Contributors:"
+git log --all --format='%an <%ae>' | sort -u
+```
+
+## Key Takeaways
+
+1. **git-fsck reveals hidden data** — dangling blobs may contain leaked secrets
+2. **Automated scanning is essential** — manual history review is infeasible at scale
+3. **Platform audit logs track who did what** — essential for incident response
+4. **Author identity verification detects impersonation** — cross-reference names, emails, and GPG keys
+5. **Compliance demands regular audits** — integrate checks into quarterly or monthly rotations
+
+## Try it yourself
+
+1. Practice the git-security-audit command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+
+## Continue Learning
+
+1. `commands/git-fsck` — Full reference for git-fsck options
+2. `security/secret-scanning` — Tools and workflows for secret detection
+3. `security/gpg-signing` — Commit signature verification
+4. `best-practices/security-with-git` — Broader Git security practices

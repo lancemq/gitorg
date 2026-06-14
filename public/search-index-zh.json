@@ -2010,6 +2010,26 @@
     "suggestions": []
   },
   {
+    "href": "/zh/docs/concepts/git-lfs-deep",
+    "path": "concepts/git-lfs-deep",
+    "section": "concepts",
+    "tier": "recommended",
+    "slug": "git-lfs-deep",
+    "title": "Git LFS 深入",
+    "summary": "深入理解 Git LFS 的架构原理、性能调优、服务端配置与大规模迁移策略。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/concepts/git-hooks-deep",
+    "path": "concepts/git-hooks-deep",
+    "section": "concepts",
+    "tier": "recommended",
+    "slug": "git-hooks-deep",
+    "title": "Git Hooks 深入",
+    "summary": "深入理解 Git Hooks 的类型、生命周期、共享机制以及在 CI/CD 中的集成实践。",
+    "suggestions": []
+  },
+  {
     "href": "/zh/commands/git-rerere",
     "path": "commands/git-rerere",
     "section": "commands",
@@ -2300,6 +2320,16 @@
     "suggestions": []
   },
   {
+    "href": "/zh/performance/git-maintenance",
+    "path": "performance/git-maintenance",
+    "section": "performance",
+    "tier": "recommended",
+    "slug": "git-maintenance",
+    "title": "Git Maintenance 深入",
+    "summary": "掌握 git maintenance 命令的自动化仓库维护机制，包括任务调度、增量打包与多仓库管理。",
+    "suggestions": []
+  },
+  {
     "href": "/zh/migration/svn-to-git",
     "path": "migration/svn-to-git",
     "section": "migration",
@@ -2377,6 +2407,156 @@
     "slug": "gitea-setup",
     "title": "Gitea 自建 Git 服务",
     "summary": "使用 Gitea 搭建轻量级自托管 Git 服务，包括安装、配置、备份与日常管理。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/ci-cd/circleci-git",
+    "path": "ci-cd/circleci-git",
+    "section": "ci-cd",
+    "tier": "recommended",
+    "slug": "circleci-git",
+    "title": "CircleCI 与 Git 集成",
+    "summary": "深入介绍 CircleCI 如何与 Git 仓库协同工作，包括流水线配置、Git 触发策略、检出优化、缓存机制以及基于 Git Tag 的参数化构建。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/ci-cd/ci-cd-testing-strategies",
+    "path": "ci-cd/ci-cd-testing-strategies",
+    "section": "ci-cd",
+    "tier": "recommended",
+    "slug": "ci-cd-testing-strategies",
+    "title": "CI/CD 测试策略与 Git 集成",
+    "summary": "探讨如何在 CI/CD 流水线中利用 Git 元数据设计高效的测试策略，包括 PR 测试与 Push 测试的区别、矩阵测试、并行化、快照测试和基于分支的集成测试环境。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/ci-cd/ci-cd-deployment-strategies",
+    "path": "ci-cd/ci-cd-deployment-strategies",
+    "section": "ci-cd",
+    "tier": "recommended",
+    "slug": "ci-cd-deployment-strategies",
+    "title": "CI/CD 部署策略与 Git 版本管理",
+    "summary": "全面介绍基于 Git 标签的部署策略，包括环境晋升（开发→预发→生产）、金丝雀发布、GitOps 部署模式以及利用 Git revert 实现回滚的最佳实践。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/ide/vim-neovim-git",
+    "path": "ide/vim-neovim-git",
+    "section": "ide",
+    "tier": "recommended",
+    "slug": "vim-neovim-git",
+    "title": "Vim/Neovim Git 集成指南",
+    "summary": "全面介绍 Vim/Neovim 中的 Git 集成，包括 fugitive.vim 插件、gitsigns.nvim、lazygit 集成及 telescope Git 扩展。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/ide/intellij-git-deep",
+    "path": "ide/intellij-git-deep",
+    "section": "ide",
+    "tier": "recommended",
+    "slug": "intellij-git-deep",
+    "title": "IntelliJ IDEA Git 深度指南",
+    "summary": "深入探索 IntelliJ IDEA 的 Git 高级功能，包括 annotate/blame、shelving、交互式 rebase UI、冲突解决、Changelist 管理和平台集成。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/ide/terminal-git-productivity",
+    "path": "ide/terminal-git-productivity",
+    "section": "ide",
+    "tier": "recommended",
+    "slug": "terminal-git-productivity",
+    "title": "终端 Git 效率提升",
+    "summary": "通过 Git 别名、shell 自动补全、lazygit、tig、delta diff 查看器和 git-prompt 定制等工具，大幅提升终端 Git 操作效率。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/security/secret-scanning",
+    "path": "security/secret-scanning",
+    "section": "security",
+    "tier": "recommended",
+    "slug": "secret-scanning",
+    "title": "Git 密钥扫描与泄露防护",
+    "summary": "密钥如何泄露到 Git、git-secrets、truffleHog、Gitleaks 自动扫描、平台级检测、BFG 历史清理与 pre-commit 预防机制。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/security/secure-git-workflows",
+    "path": "security/secure-git-workflows",
+    "section": "security",
+    "tier": "recommended",
+    "slug": "secure-git-workflows",
+    "title": "Git 安全协作工作流",
+    "summary": "GPG/SSH 签名提交、GitHub/GitLab 验证标记、分支保护规则、必需状态检查、签名标签及安全供应链实践。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/security/git-security-audit",
+    "path": "security/git-security-audit",
+    "section": "security",
+    "tier": "recommended",
+    "slug": "git-security-audit",
+    "title": "Git 仓库安全审计",
+    "summary": "审查 Git 仓库访问、git-fsck 完整性检查、扫描历史中的泄露密钥、GitHub/GitLab 审计日志、验证作者身份与合规性考量。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/migration/azure-devops-migration",
+    "path": "migration/azure-devops-migration",
+    "section": "migration",
+    "tier": "recommended",
+    "slug": "azure-devops-migration",
+    "title": "Azure DevOps (TFS) 到 Git 迁移",
+    "summary": "从 Team Foundation Server (TFS/TFVC) 迁移到 Git 的完整指南，涵盖工具选型、历史迁移、分支映射和团队过渡策略。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/migration/git-filter-repo",
+    "path": "migration/git-filter-repo",
+    "section": "migration",
+    "tier": "recommended",
+    "slug": "git-filter-repo",
+    "title": "git filter-repo 仓库重写深入",
+    "summary": "深入解析 git filter-repo 工具，涵盖仓库拆分、文件清理、作者信息重写等高级用法，以及与 filter-branch 和 BFG 的对比。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/migration/migration-strategy-guide",
+    "path": "migration/migration-strategy-guide",
+    "section": "migration",
+    "tier": "recommended",
+    "slug": "migration-strategy-guide",
+    "title": "代码仓库迁移策略指南",
+    "summary": "完整的仓库迁移框架，涵盖评估、试迁移、切换和过渡四阶段，工具选型矩阵、作者映射、历史取舍和团队沟通策略。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/hosting/aws-codecommit",
+    "path": "hosting/aws-codecommit",
+    "section": "hosting",
+    "tier": "recommended",
+    "slug": "aws-codecommit",
+    "title": "AWS CodeCommit 集成指南",
+    "summary": "AWS CodeCommit 是 AWS 提供的全托管 Git 仓库服务。本文介绍其配置、认证、CI/CD 集成及与其他平台的对比。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/hosting/gerrit-code-review",
+    "path": "hosting/gerrit-code-review",
+    "section": "hosting",
+    "tier": "recommended",
+    "slug": "gerrit-code-review",
+    "title": "Gerrit 代码审查系统",
+    "summary": "Gerrit 是一个基于 Git 的代码审查系统，广泛用于开源项目（如 Android、OpenStack）。本文介绍其独特的工作流程与审查机制。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/hosting/chinese-hosting-platforms",
+    "path": "hosting/chinese-hosting-platforms",
+    "section": "hosting",
+    "tier": "recommended",
+    "slug": "chinese-hosting-platforms",
+    "title": "国内 Git 托管平台指南",
+    "summary": "国内主流 Git 托管平台（Gitee、CODING、腾讯云 Code、阿里云 Code）的功能对比、迁移指南与合规性考量。",
     "suggestions": []
   }
 ]

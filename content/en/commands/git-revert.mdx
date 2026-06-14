@@ -12,6 +12,19 @@ export const metadata = {
 
 # git revert Tutorial
 
+## What you will learn
+
+- Understand the core purpose of git revert Tutorial
+- Master the basic usage and common options of git revert Tutorial
+- Explains why git revert is the safe way to undo shared commits, and how it differs from reset at the history level.
+- Understand key concepts: Why this matters in teams
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
 ## The short version
 
 `git revert` does not remove an old commit. Instead, it creates a new commit that reverses the effect of an earlier one.
@@ -91,4 +104,10 @@ As a practical rule, prefer `revert` when the commit is already shared.
 - If the operation might affect team flow, run `git status`, `git log --oneline --graph`, and `git reflog` first so the recovery path is visible.
 - When in doubt, create a backup branch before continuing so you preserve an obvious way back.
 - Reverting a merge commit usually requires `-m` so Git knows which parent should be treated as the mainline.
+
+## Try it yourself
+
+1. Practice the git-revert command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

@@ -12,6 +12,21 @@ export const metadata = {
 
 # Scalar Git 深入
 
+## 学完这篇你会掌握什么
+
+- 理解 Scalar Git 深入 的核心作用和适用场景
+- 掌握 Scalar Git 深入 的基本用法和常用参数
+- 了解 Scalar（原 GVFS）：微软为超大型仓库设计的虚拟文件系统与后台同步工具，实现按需下载与标准 Git 兼容。
+- 理解 概述 相关的概念
+- 掌握 架构 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+
+## 先想一个问题
+
+你的 Git 仓库越来越大，clone 越来越慢，日常操作也开始卡顿。你想知道有哪些方法可以优化，又不确定哪些优化手段适合自己的项目场景。
+
 ## 概述
 
 **Scalar**（原 GVFS - Git Virtual File System）是微软为**超大型仓库**（Windows 内核、Office、Azure DevOps 等，百万级文件、数百 GB）开发的工具套件。它让 Git 在大规模单体仓库中可用，核心能力：
@@ -246,3 +261,10 @@ scalar register
 2. `performance/git-maintenance` — 维护框架
 3. `internals/transfer-protocols-and-negotiation` — 传输协议
 4. `performance/large-repo-optimization` — 大型仓库优化
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+

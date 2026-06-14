@@ -9,6 +9,20 @@ export const metadata = {
 
 # Understanding .gitattributes
 
+## What you will learn
+
+- Understand the core purpose of Understanding .gitattributes
+- Master the basic usage and common options of Understanding .gitattributes
+- A deep dive into .gitattributes for controlling line endings, merge strategies, diff drivers, and binary file handling in Git.
+- Understand key concepts: What is .gitattributes?
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+You've encountered a conceptual question while using Git — you roughly know what it means, but you're not entirely sure about its precise definition and boundaries.
+
 ## What is .gitattributes?
 
 While `.gitignore` tells Git **which** files to track, `.gitattributes` tells Git **how** to handle those files. It is a plain text file that assigns attributes to paths, influencing how Git performs operations like merging, diffing, exporting, and line-ending normalization.
@@ -407,3 +421,10 @@ vendor/* linguist-vendored=true
 | `linguist-*` | GitHub language detection overrides |
 
 `.gitattributes` is a powerful but often overlooked Git feature. Proper configuration prevents line-ending conflicts, enables meaningful diffs for binary files, and ensures clean distribution archives. Add it to your project templates alongside `.gitignore` for a more robust repository setup.
+
+## Try it yourself
+
+1. Practice the git-attributes command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

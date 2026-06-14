@@ -13,7 +13,21 @@ export const metadata = {
 
 # Three-way merge mechanics
 
+## What you will learn
+
+- Understand the core purpose of Three-way merge mechanics
+- Master the basic usage and common options of Three-way merge mechanics
+- Understand how Git computes merges from base, ours, and theirs so conflicts and merge outcomes are easier to reason about.
+- Understand key concepts: Inputs
+- Know when to use this feature and when to avoid it
+
+
 Git merge is a three-input computation: `base`, `ours`, and `theirs`.
+
+
+## Start with a problem
+
+You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
 
 ## Inputs
 
@@ -49,4 +63,10 @@ To resolve conflicts well, inspect base context instead of only choosing ours/th
 1. `merge-base and ancestry`
 2. `git-merge`
 3. `rerere for recurring conflicts`
+
+## Try it yourself
+
+1. Practice the three-way-merge-mechanics command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
 

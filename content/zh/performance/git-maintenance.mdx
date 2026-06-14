@@ -11,6 +11,21 @@ export const metadata = {
 
 # Git Maintenance 深入
 
+## 学完这篇你会掌握什么
+
+- 理解 Git Maintenance 深入 的核心作用和适用场景
+- 掌握 Git Maintenance 深入 的基本用法和常用参数
+- 掌握 git maintenance 命令的自动化仓库维护机制，包括任务调度、增量打包与多仓库管理。
+- 理解 概述 相关的概念
+- 掌握 与 gc 的区别 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+
+## 先想一个问题
+
+你的 Git 仓库越来越大，clone 越来越慢，日常操作也开始卡顿。你想知道有哪些方法可以优化，又不确定哪些优化手段适合自己的项目场景。
+
 ## 概述
 
 `git maintenance`（Git 2.31+）是 Git 提供的自动化仓库维护框架。它比手动运行 `git gc` 更智能——在后台增量执行维护任务，避免一次性 GC 带来的性能抖动。
@@ -179,3 +194,10 @@ git config maintenance.gc.timer.hourly true
 1. `performance/gc-repack-strategies` — gc/repack 策略
 2. `performance/large-repo-optimization` — 大型仓库优化
 3. `internals/packfiles-and-storage` — Pack 文件原理
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+

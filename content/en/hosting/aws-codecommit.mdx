@@ -1,0 +1,183 @@
+export const metadata = {
+  title: "AWS CodeCommit Integration Guide",
+  slug: "aws-codecommit",
+  locale: "en",
+  section: "hosting",
+  summary: "AWS CodeCommit is a fully-managed Git repository service by AWS. This guide covers setup, authentication, CI/CD integration, and comparisons with other platforms.",
+  sourceUrls: [
+    "https://docs.aws.amazon.com/codecommit",
+    "https://docs.aws.amazon.com/codecommit/latest/userguide/auth-and-access-control.html",
+  ],
+};
+
+# AWS CodeCommit Integration Guide
+
+## What you will learn
+
+- Understand the core purpose of AWS CodeCommit Integration Guide
+- Master the basic usage and common options of AWS CodeCommit Integration Guide
+- AWS CodeCommit is a fully-managed Git repository service by AWS. This guide covers setup, authentication, CI/CD integration, and comparisons with other platforms.
+- Understand key concepts: Repository Setup
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're choosing or configuring a Git hosting solution — whether self-hosting Gitea or comparing GitHub, GitLab, and Gitee features. You're not sure which option best fits your team's needs.
+
+## One-Sentence Understanding
+
+AWS CodeCommit is a fully-managed, AWS-native Git service — its biggest difference from GitHub/GitLab is the lack of a web-based PR interface, with all interaction happening through the AWS ecosystem and CLI.
+
+## Repository Setup
+
+### Create a Repository
+
+```bash
+aws codecommit create-repository --repository-name my-repo --repository-description "My project"
+```
+
+Clone an empty repository:
+
+```bash
+git clone codecommit::ap-northeast-1://my-repo
+cd my-repo && git add . && git commit -m "Initial commit" && git push
+```
+
+### IAM Authentication vs SSH
+
+| Method | Pros | Cons |
+|--------|------|------|
+| IAM User + HTTPS | Fine-grained access control | Requires IAM policy setup |
+| SSH Keys | Familiar workflow | Key management overhead |
+| Git Credentials (HTTPS) | Temporary credentials, no IAM user | Credentials expire hourly |
+
+Example IAM policy:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "codecommit:GitPull",
+        "codecommit:GitPush"
+      ],
+      "Resource": "arn:aws:codecommit:ap-northeast-1:123456789012:my-repo"
+    }
+  ]
+}
+```
+
+### HTTPS Git Credentials
+
+Generate Git credentials in the IAM console, then configure:
+
+```bash
+git config --global credential.helper '!aws codecommit credential-helper $@'
+git config --global credential.UseHttpPath true
+```
+
+HTTPS URLs will now authenticate automatically via the credential helper.
+
+## CodePipeline Integration
+
+Use CodeCommit as the source stage in CodePipeline:
+
+```yaml
+# buildspec.yml
+version: 0.2
+phases:
+  install:
+    commands:
+      - npm install
+  build:
+    commands:
+      - npm run build
+artifacts:
+  files:
+    - 'dist/**/*'
+```
+
+Pipeline stages:
+1. **Source**: CodeCommit repository + branch
+2. **Build**: CodeBuild (via buildspec.yml)
+3. **Deploy**: ECS / Lambda / S3
+
+### Triggers & Notifications
+
+```bash
+aws codecommit create-trigger \
+  --repository-name my-repo \
+  --trigger-configuration name=my-trigger,events=all,destinationArn=arn:aws:sns:ap-northeast-1:123456789012:my-topic
+```
+
+## Cross-Account Access
+
+Share repositories across AWS accounts via AWS RAM:
+
+```
+Account A (Owner) → Create repo → Share with Account B
+Account B (Collaborator) → Accept share → git clone cross-account
+```
+
+Alternatively, use IAM roles with AssumeRole to pull code across accounts.
+
+## Repository Mirroring & Migration
+
+### Mirror from GitHub to CodeCommit
+
+```bash
+git clone --mirror https://github.com/user/repo.git
+cd repo.git
+git remote add codecommit codecommit::ap-northeast-1://my-repo
+git push --mirror codecommit
+```
+
+Use CodeBuild + EventBridge for periodic sync automation.
+
+### Migrate from Other Platforms
+
+```bash
+git clone --mirror <source-url>
+cd repo.git
+git remote add target <codecommit-url>
+git push --mirror target
+git lfs fetch --all && git lfs push --all target
+```
+
+## Git LFS Support & Limitations
+
+CodeCommit supports Git LFS with the following constraints:
+
+| Feature | Limit |
+|---------|-------|
+| Max file size | 5 GB (LFS files) |
+| Repository size | Recommended < 10 GB |
+| LFS storage | Additional charge (per GB/month) |
+| Concurrent pushes | Max 30 |
+
+> CodeCommit's LFS is backed by S3, with higher latency than GitHub. Use it primarily for build artifacts and large binaries.
+
+## Comparison with GitHub/GitLab
+
+| Dimension | CodeCommit | GitHub | GitLab |
+|-----------|-----------|--------|--------|
+| Web UI (PR/MR) | No | Yes | Yes |
+| CI/CD integration | CodePipeline | Actions | GitLab CI |
+| Permission model | IAM policy | Org/Team | Role/Group |
+| Self-hosted option | No | No | Community Edition |
+| Pricing | Pay-per-use | Per-seat + plan | Per-seat + plan |
+
+## Try it yourself
+
+1. Practice the aws-codecommit command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+
+## Continue Learning
+
+1. `hosting/platform-comparison` — Platform comparison
+2. `hosting/gerrit-code-review` — Gerrit code review system
+3. `github/github-flow-basics` — GitHub Flow basics

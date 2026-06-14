@@ -13,33 +13,74 @@ export const metadata = {
 
 # 第一次安全热修复
 
-热修复最难的是“快但不乱”。目标是先恢复服务，再追求完美。
+## 学完这篇你会掌握什么
+
+- 理解热修复和特性开发的节奏差异
+- 从稳定基线切出 `hotfix/` 分支，做最小必要改动
+- 快速验证、发布、回补主线的完整流程
+- 在高压下保持"快但不乱"的纪律
+
+## 先想一个问题
+
+线上出了紧急 bug，用户反馈登录超时，老板在群里 @你。这时候最危险的不是 bug 本身，而是你因为着急而**跨过平时的流程**——比如直接在 main 上改代码、不建分支、或者顺手夹带一个无关的重构。
+
+热修复最难的不是技术，而是"快但不乱"。
+
+## 热修复和特性开发的本质区别
+
+| 维度 | 特性开发 | 热修复 |
+|------|---------|--------|
+| 节奏 | 按计划迭代 | 紧急响应 |
+| 改动范围 | 可大可小 | 最小必要改动 |
+| 分支来源 | 从最新 main 切出 | 从稳定基线切出 |
+| 评审 | 完整 review | 可缩短但不可跳过 |
+| 合并后 | 正常清理 | 必须回补主线 |
 
 ## 最小热修复流程
 
-1. 从稳定基线切 `hotfix/*` 分支
-2. 只做必要最小改动
-3. 快速验证并发布
-4. 回补主线，防止分叉漂移
-
 ```bash
+git switch main
+git pull --ff-only
 git switch -c hotfix/login-timeout
+# 只做必要的最小改动
 git commit -m "fix: avoid login timeout under retry storm"
 git push -u origin hotfix/login-timeout
 ```
 
+然后走 PR 或直接合并到发布分支。关键是：**只改必须改的代码**。
+
+### 为什么从稳定基线切分支
+
+热修复分支不能从开发中的功能分支切出，而要从**当前生产环境对应的提交**切出。这样可以确保你的修复不包含任何未发布的改动。
+
 ## 高压场景的两条纪律
 
-- 不顺手夹带无关优化
-- 每一步都保留可回退路径
+1. **不顺手夹带无关优化**——"既然都在改这个文件了，顺便重构一下"是热修复中最常见的错误。每一次夹带都增加了出错的可能。
+2. **每一步都保留可回退路径**——push 之前确认远端有备份分支，或者确保你知道如何 revert。
 
 <WarningBox title="紧急不等于跳过流程">
-  跳过评审和验证也许更快，但二次事故概率会显著上升。
+  跳过评审和验证也许更快，但二次事故概率会显著上升。热修复可以缩短流程，但不能取消流程。
 </WarningBox>
+
+## 热修复后的回补
+
+热修复合并到发布分支后，一定要把修复**同样合并到 main**（或其他开发主线），否则下次发布时修复会丢失：
+
+```bash
+git switch main
+git pull --ff-only
+git cherry-pick <hotfix-commit-sha>
+git push
+```
+
+## 给你的练习
+
+1. 在一个测试仓库中模拟热修复流程：从 main 切 hotfix 分支，做最小改动，合并后 cherry-pick 回 main
+2. 故意在热修复中"顺手"加一个无关改动，观察 review 时的反馈
+3. 设定一条团队规则：热修复分支名必须以 `hotfix/` 开头，并与 issue 编号关联
 
 ## 接下来建议继续学什么
 
-1. `hotfix and urgent fixes`
-2. `revert-first stabilization workflow`
-3. `recover after accidental merge`
-
+1. `hotfix and urgent fixes` — 热修复完整工作流
+2. `revert-first stabilization workflow` — 优先回滚的稳定策略
+3. `recover after accidental merge` — 误合并后的恢复

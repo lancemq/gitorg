@@ -12,6 +12,21 @@ export const metadata = {
 
 # Git Rerere 深入
 
+## 学完这篇你会掌握什么
+
+- 理解 Git Rerere 深入 的核心作用和适用场景
+- 掌握 Git Rerere 深入 的基本用法和常用参数
+- 掌握 Git Rerere（重用记录的冲突解决）的配置、工作流集成、存储机制与团队共享策略。
+- 理解 概述 相关的概念
+- 掌握 启用与配置 相关的操作
+- 知道在什么场景下使用该命令，什么场景下避免使用
+
+
+
+## 先想一个问题
+
+你在使用 Git 的过程中遇到了一个概念问题——你大概知道它是什么意思，但不太确定它的确切含义和边界，也不太确定自己理解得对不对。
+
 ## 概述
 
 **Rerere = Reuse Recorded Resolution**（重用记录的冲突解决）。它让 Git 记住你如何解决冲突，下次遇到相同冲突时**自动复用**解决方案。
@@ -266,3 +281,10 @@ cat .git/rr-cache/<hash>/postimage
 2. `workflows/rerere-for-recurring-conflicts` — 循环冲突工作流
 3. `concepts/git-merge-deep` — Git Merge 深入
 3. `concepts/git-rebase-deep` — Git Rebase 深入
+
+## 给你的练习
+
+1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
+2. 尝试该命令的不同参数选项，对比输出结果的差异
+3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+

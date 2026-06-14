@@ -12,6 +12,20 @@ export const metadata = {
 
 # Git Hooks: Automating Git Workflows
 
+## What you will learn
+
+- Understand the core purpose of Git Hooks: Automating Git Workflows
+- Master the basic usage and common options of Git Hooks: Automating Git Workflows
+- A practical guide to Git hooks, covering client-side and server-side hooks, common use cases, and best practices for hook management.
+- Understand key concepts: What Are Git Hooks?
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+You've encountered a conceptual question while using Git — you roughly know what it means, but you're not entirely sure about its precise definition and boundaries.
+
 ## What Are Git Hooks?
 
 Git hooks are **scripts** that run automatically when specific Git events occur. They are the primary mechanism for automating and enforcing policies within a Git repository. Hooks can run on the client side (your local machine) or on the server side (the remote repository), and they cover the entire Git lifecycle from making commits to pushing changes.
@@ -396,3 +410,10 @@ The `prepare` script runs automatically after `npm install`.
 | `post-receive` | Server | After ref update | No |
 
 Git hooks are a powerful mechanism for automating and enforcing workflows. Use client-side hooks for developer convenience (linting, formatting) and server-side hooks for policy enforcement (branch protection, signed commits). Always provide clear error messages and allow reasonable bypass options for edge cases.
+
+## Try it yourself
+
+1. Practice the git-hooks command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+

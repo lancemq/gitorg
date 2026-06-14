@@ -12,6 +12,15 @@ export const metadata = {
 
 # PR Merge Strategy and Platform Settings
 
+## What you will learn
+
+- Understand the core purpose of PR Merge Strategy and Platform Settings
+- Master the basic usage and common options of PR Merge Strategy and Platform Settings
+- Make pull request merge policy and platform configuration part of the same decision so history shape and repository settings stay aligned.
+- Understand key concepts: Why these two decisions belong together
+- Know when to use this feature and when to avoid it
+
+
 Teams often debate squash versus rebase merge in abstract terms, but the real outcome depends on what the hosting platform actually allows.  
 This topic is therefore not only about Git semantics. It is about whether your repository settings truly enforce the history shape your team claims to want.
 
@@ -25,6 +34,11 @@ This topic is therefore not only about Git semantics. It is about whether your r
   outputs="allowed merge methods|branch protections|consistent defaults"
   note="If platform settings disagree with team policy, platform settings will win in practice."
 />
+
+
+## Start with a problem
+
+Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
 
 ## Why these two decisions belong together
 
@@ -126,3 +140,10 @@ PR merge strategy is a platform workflow question as much as a Git theory questi
 1. `Squash vs rebase merge`
 2. `Merge queue workflow`
 3. `Sync before review`
+
+## Try it yourself
+
+1. Practice the pr-merge-strategy-and-platform-settings command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+
