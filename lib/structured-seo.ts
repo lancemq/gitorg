@@ -37,6 +37,13 @@ const sectionLabels: Record<Locale, Record<DocMetadata["section"], string>> = {
   },
 };
 
+/**
+ * Legacy resource-type label kept for /llms.txt and /content-index.json consumers.
+ * Google deprecated the HowTo (2023-09-13) and Course (2025-09-09) rich-result
+ * schemas, so we no longer emit this in BlogPosting JSON-LD — but the labels
+ * still help LLMs categorize retrieved pages.
+ * @deprecated For schema output, do not use. Kept for LLM-facing manifests.
+ */
 const learningResourceType: Record<DocMetadata["section"], string> = {
   "learning-path": "Course module",
   commands: "Reference guide",
@@ -66,8 +73,11 @@ type DocStructuredDataInput = {
   tier: DocTier;
   pageUrl: string;
   siteUrl: string;
+  /** ISO-8601 date string for dateModified. Falls back to createdAt if absent. */
   lastModified?: string;
   breadcrumbs: string[];
+  /** Optional word count to enrich BlogPosting; computed at build time when available. */
+  wordCount?: number;
 };
 
 export function getSectionLabel(locale: Locale, section: DocMetadata["section"]) {
@@ -120,6 +130,20 @@ export function buildDocKeywords(metadata: DocMetadata, docPath: DocPath, tier: 
   ];
 }
 
+/**
+ * Build BlogPosting JSON-LD per Google's 2026 Article guidance:
+ * https://developers.google.com/search/docs/appearance/structured-data/article
+ *
+ * Required-by-Google recommended properties emitted:
+ *   - headline, image[], datePublished, dateModified, author{Person,url}
+ *
+ * Deliberately NOT emitted (Google has deprecated their rich results):
+ *   - HowTo (deprecated 2023-09-13)
+ *   - Course / LearningResource as rich result (Course info deprecated 2025-09-09)
+ *
+ * `citation` and `mentions` are retained as semantic hints; they don't drive
+ * rich results but help LLM-citation discovery (GEO).
+ */
 export function buildDocStructuredData({
   locale,
   metadata,
@@ -129,16 +153,40 @@ export function buildDocStructuredData({
   siteUrl,
   lastModified,
   breadcrumbs,
+  wordCount,
 }: DocStructuredDataInput) {
   const inLanguage = getLocaleLang(locale);
   const keywords = buildDocKeywords(metadata, docPath, tier);
   const sectionLabel = getSectionLabel(locale, metadata.section);
-  const resourceType = getLearningResourceType(metadata.section);
   const citationGuidance = getCitationGuidance(metadata.section, locale);
+
+  // Build author: prefer a Person linked to /{locale}/authors/{slug} when
+  // metadata.author is set, else fall back to the site Organization.
+  const author = metadata.author
+    ? {
+        "@type": "Person" as const,
+        name: metadata.author,
+        url: `${siteUrl}/${locale}/authors/${metadata.author}`,
+      }
+    : {
+        "@type": "Organization" as const,
+        name: siteName,
+        url: siteUrl,
+      };
+
+  // datePublished is required by Article guidance; fall back to lastModified
+  // when createdAt is absent so we never emit JSON-LD without it.
+  const datePublished = metadata.createdAt ?? lastModified;
+  const dateModified = lastModified ?? metadata.createdAt;
+
+  // image[] — supply both 16:9 and 1:1 variants per Google's recommendation
+  // for richer thumbnail eligibility. We point to the same /opengraph-image
+  // route; differentiating dimensions is a follow-up (per-article OG).
+  const image = [`${siteUrl}/opengraph-image`];
 
   return {
     "@context": "https://schema.org",
-    "@type": ["TechArticle", "LearningResource"],
+    "@type": "BlogPosting",
     headline: metadata.title,
     name: metadata.title,
     description: metadata.summary,
@@ -146,33 +194,27 @@ export function buildDocStructuredData({
     inLanguage,
     url: pageUrl,
     mainEntityOfPage: pageUrl,
-    dateModified: lastModified,
-    image: `${siteUrl}/opengraph-image`,
+    ...(datePublished ? { datePublished } : {}),
+    ...(dateModified ? { dateModified } : {}),
+    image,
     isAccessibleForFree: true,
     articleSection: sectionLabel,
-    learningResourceType: resourceType,
-    educationalLevel: tierLabel[tier],
-    teaches: keywords.slice(0, 8),
     keywords,
     about: breadcrumbs,
-    mentions: ["Git", sectionLabel, resourceType],
+    mentions: ["Git", sectionLabel],
     citation: metadata.sourceUrls,
     sameAs: metadata.sourceUrls,
     usageInfo: citationGuidance,
-    author: {
-      "@type": "Organization",
-      name: siteName,
-      url: siteUrl,
-    },
+    ...(wordCount ? { wordCount } : {}),
+    author,
     publisher: {
       "@type": "Organization",
       name: siteName,
       url: siteUrl,
-    },
-    provider: {
-      "@type": "Organization",
-      name: siteName,
-      url: siteUrl,
+      logo: {
+        "@type": "ImageObject",
+        url: `${siteUrl}/opengraph-image`,
+      },
     },
     isPartOf: {
       "@type": "WebSite",

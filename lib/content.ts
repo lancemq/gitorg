@@ -46,6 +46,16 @@ export type DocMetadata = {
   summary: string;
   sourceUrls: string[];
   section: DocSection;
+  /**
+   * Author slug, resolved against `content/authors/{slug}.mdx` and `/{locale}/authors/{slug}`.
+   * Optional — when absent, structured data falls back to the site Organization as author.
+   */
+  author?: string;
+  /**
+   * ISO-8601 publish date (e.g. "2024-09-12"). Optional — when absent, falls back to
+   * file mtime via getDocLastModified so BlogPosting still has a `datePublished`.
+   */
+  createdAt?: string;
 };
 
 export const docPathRegistry = [
@@ -846,6 +856,8 @@ async function readDocMetadata(locale: Locale, docPath: DocPath): Promise<DocMet
   const slug = extractMetadataField(metadataBlock, "slug");
   const summary = extractMetadataField(metadataBlock, "summary");
   const section = extractMetadataField(metadataBlock, "section") as DocSection | undefined;
+  const author = extractMetadataField(metadataBlock, "author");
+  const createdAt = extractMetadataField(metadataBlock, "createdAt");
 
   if (!title || !slug || !summary || !section) {
     throw new Error(`Unable to parse metadata from ${absolutePath}`);
@@ -858,6 +870,8 @@ async function readDocMetadata(locale: Locale, docPath: DocPath): Promise<DocMet
     summary,
     section,
     sourceUrls: extractMetadataSourceUrls(metadataBlock),
+    ...(author ? { author } : {}),
+    ...(createdAt ? { createdAt } : {}),
   };
 }
 
