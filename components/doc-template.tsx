@@ -3,6 +3,7 @@ import type { ComponentType } from "react";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { DocPrimer } from "@/components/doc-primer";
 import { DocSupport } from "@/components/doc-support";
+import { GeoBlock } from "@/components/geo-block";
 import { SiteShell } from "@/components/site-shell";
 import { buildBreadcrumbData, StructuredData } from "@/components/structured-data";
 import { buildDocStructuredData } from "@/lib/structured-seo";
@@ -10,10 +11,13 @@ import type { Locale, SidebarContent } from "@/lib/i18n";
 import {
   getDocTier,
   type DocCard,
+  type DocCitation,
   type DocNeighbors,
   type DocPath,
   type DocPrimer as DocPrimerType,
+  type DocQuote,
   type DocSection,
+  type DocStat,
 } from "@/lib/content";
 import { getSiteUrl } from "@/lib/site";
 
@@ -37,6 +41,10 @@ type DocTemplateProps = {
   showSources?: boolean;
   relatedDocs?: DocCard[];
   neighbors?: DocNeighbors;
+  /** GEO signals from MDX frontmatter — all optional, see lib/content.ts. */
+  quotes?: DocQuote[];
+  stats?: DocStat[];
+  citations?: DocCitation[];
 };
 
 export function DocTemplate({
@@ -56,6 +64,9 @@ export function DocTemplate({
   showSources = false,
   relatedDocs = [],
   neighbors,
+  quotes,
+  stats,
+  citations,
 }: DocTemplateProps) {
   const siteUrl = getSiteUrl();
   const breadcrumbItems = breadcrumbs.map((item) => ({
@@ -69,6 +80,9 @@ export function DocTemplate({
     summary,
     section: docPath.split("/")[0] as DocSection,
     sourceUrls,
+    quotes,
+    stats,
+    citations,
   };
 
   return (
@@ -98,6 +112,19 @@ export function DocTemplate({
         </header>
 
         {primer ? <DocPrimer locale={locale} primer={primer} /> : null}
+
+        {/*
+          GEO block: rendered between primer and body so quotes/stats/citations
+          appear high on the page where LLM scrapers and Google snippet pickers
+          both look. Returns null when no GEO frontmatter is present, so older
+          articles render unchanged until backfilled.
+        */}
+        <GeoBlock
+          locale={locale}
+          quotes={quotes}
+          stats={stats}
+          citations={citations}
+        />
 
         <section className="panel doc-content">
           <div className="mdx-content">

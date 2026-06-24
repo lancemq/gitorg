@@ -129,6 +129,9 @@ export default async function DocDetailPage({ params }: Props) {
       docPath={docPath}
       sourcesTitle={dict.docsIndex.sourcesTitle}
       sourceUrls={doc.metadata.sourceUrls}
+      quotes={doc.metadata.quotes}
+      stats={doc.metadata.stats}
+      citations={doc.metadata.citations}
       primer={primer}
       lastModified={lastModified.toISOString()}
       Body={DocBody}
