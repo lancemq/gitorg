@@ -1,6 +1,8 @@
 import type { DocMetadata, DocPath, DocTier } from "@/lib/content";
 import type { Locale } from "@/lib/i18n";
 import { getLocaleLang } from "@/lib/seo";
+import { getAuthorSync } from "@/lib/authors-sync";
+import { SITE_DEFAULT_AUTHOR_SLUG } from "@/lib/site";
 
 const siteName = "GitOrg Atlas";
 
@@ -160,19 +162,31 @@ export function buildDocStructuredData({
   const sectionLabel = getSectionLabel(locale, metadata.section);
   const citationGuidance = getCitationGuidance(metadata.section, locale);
 
-  // Build author: prefer a Person linked to /{locale}/authors/{slug} when
-  // metadata.author is set, else fall back to the site Organization.
-  const author = metadata.author
-    ? {
-        "@type": "Person" as const,
-        name: metadata.author,
-        url: `${siteUrl}/${locale}/authors/${metadata.author}`,
-      }
-    : {
-        "@type": "Organization" as const,
-        name: siteName,
-        url: siteUrl,
-      };
+  // Build author: per Google's helpful-content guidance, a Person + url that
+  // points to a real bio page is a stronger E-E-A-T signal than the bare
+  // Organization. We prefer the explicit frontmatter `author` slug, and fall
+  // back to the site's default author slug (lib/site.ts) so every
+  // BlogPosting still resolves to a real ProfilePage.
+  //
+  // Display name is resolved from the author registry when possible (sync
+  // readFileSync at module load — see lib/authors-sync.ts); if the registry
+  // doesn't have the slug we fall back to the slug itself, which keeps the
+  // JSON-LD valid even before the bio file is added.
+  const authorSlug = metadata.author ?? SITE_DEFAULT_AUTHOR_SLUG;
+  const resolvedAuthor = getAuthorSync(authorSlug);
+  const authorDisplayName = resolvedAuthor
+    ? locale === "zh" && resolvedAuthor.nameZh
+      ? resolvedAuthor.nameZh
+      : resolvedAuthor.name
+    : authorSlug;
+  const author = {
+    "@type": "Person" as const,
+    name: authorDisplayName,
+    url: `${siteUrl}/${locale}/authors/${authorSlug}`,
+    ...(resolvedAuthor?.sameAs && resolvedAuthor.sameAs.length > 0
+      ? { sameAs: resolvedAuthor.sameAs }
+      : {}),
+  };
 
   // datePublished is required by Article guidance; fall back to lastModified
   // when createdAt is absent so we never emit JSON-LD without it.

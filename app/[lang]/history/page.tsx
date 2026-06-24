@@ -66,6 +66,7 @@ export default async function GitHistoryPage({ params }: Props) {
       docPath="concepts/git-history"
       sourcesTitle={dict.docsIndex.sourcesTitle}
       sourceUrls={doc.metadata.sourceUrls}
+      authorSlug={doc.metadata.author}
       lastModified={lastModified.toISOString()}
       Body={DocBody}
       relatedDocs={relatedDocs}

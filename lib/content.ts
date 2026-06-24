@@ -1,5 +1,6 @@
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
+import type { ComponentType } from "react";
 import { cache } from "react";
 
 import {
@@ -896,7 +897,15 @@ export function getDocPaths(_locale: Locale) {
 }
 
 export async function getDocByPath(locale: Locale, docPath: DocPath) {
-  const mdxModule = await contentModules[locale][docPath]();
+  const mdxModule = (await contentModules[locale][docPath]()) as {
+    default: ComponentType;
+    // MDX modules declare `metadata` with a literal shape based on what each
+    // file happens to set. We widen to DocMetadata here so callers can read
+    // optional fields (author, createdAt, and GEO fields in later PRs)
+    // without each file needing them — TypeScript would otherwise narrow
+    // per-file and reject access.
+    metadata: DocMetadata;
+  };
   return {
     path: docPath,
     Component: mdxModule.default,

@@ -1,0 +1,17 @@
+{
+  "slug": "lance-mq",
+  "name": "Lance MQ",
+  "nameZh": "Lance",
+  "role": {
+    "zh": "GitOrg Atlas 维护者，长期实战 Git 工作流与代码评审",
+    "en": "Maintainer of GitOrg Atlas. Long-running practitioner of Git workflows and code review."
+  },
+  "bio": {
+    "zh": "在多家技术团队负责代码评审流程与 Git 工作流落地，处理过大型仓库的迁移、历史重写、合并冲突复盘与 CI/CD 集成。GitOrg Atlas 的内容来自这些真实场景，包含演练用例和恢复路径。",
+    "en": "Has led code-review processes and Git workflow rollouts across multiple engineering teams, including large-repo migrations, history rewriting, conflict post-mortems, and CI/CD integration. The content on GitOrg Atlas is sourced from those real situations, with reproducible examples and recovery playbooks."
+  },
+  "yearsOfGit": 12,
+  "sameAs": [
+    "https://github.com/lance-mq"
+  ]
+}

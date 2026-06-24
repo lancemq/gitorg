@@ -87,6 +87,7 @@ export default async function RecoveryDetailPage({ params }: Props) {
       docPath={docPath}
       sourcesTitle={dict.docsIndex.sourcesTitle}
       sourceUrls={doc.metadata.sourceUrls}
+      authorSlug={doc.metadata.author}
       primer={primer}
       lastModified={lastModified.toISOString()}
       Body={DocBody}

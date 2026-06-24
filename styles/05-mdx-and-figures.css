@@ -1472,3 +1472,26 @@
     linear-gradient(180deg, rgba(249, 244, 234, 0.96), rgba(245, 239, 229, 0.92));
   border-color: rgba(180, 64, 32, 0.14);
 }
+
+/* Author byline rendered in the article hero. Restrained styling — the
+   point is to surface authorship clearly, not to dominate the hero. */
+.author-byline {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.author-byline a {
+  color: inherit;
+  border-bottom: 1px dotted currentColor;
+}
+
+.author-byline a:hover {
+  color: var(--accent, #2a6cf4);
+  border-bottom-color: currentColor;
+}
+
+.author-byline-experience {
+  font-size: 13px;
+  opacity: 0.85;
+}

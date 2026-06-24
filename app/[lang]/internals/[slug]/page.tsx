@@ -87,6 +87,7 @@ export default async function InternalDetailPage({ params }: Props) {
       docPath={docPath}
       sourcesTitle={dict.docsIndex.sourcesTitle}
       sourceUrls={doc.metadata.sourceUrls}
+      authorSlug={doc.metadata.author}
       primer={primer}
       lastModified={lastModified.toISOString()}
       Body={DocBody}
