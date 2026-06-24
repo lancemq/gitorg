@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/react";
 import Script from "next/script";
 
 import { StructuredData } from "@/components/structured-data";
+import { WebVitalsReporter } from "@/components/web-vitals-reporter";
 import { getSiteOrigin } from "@/lib/site";
 
 import "./globals.css";
@@ -104,6 +105,7 @@ export default function RootLayout({
         />
         {children}
         <Analytics />
+        <WebVitalsReporter />
       </body>
     </html>
   );
