@@ -38,3 +38,6 @@ Thumbs.db
 
 # Deployment / platform metadata
 .vercel/
+
+# Dev.to mirror output (regenerated from scripts/export-to-devto.mjs)
+/content/_devto
