@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 
 import { HtmlLangSync } from "@/components/html-lang-sync";
 import { isValidLocale, type Locale } from "@/lib/i18n";
@@ -34,6 +35,17 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <div data-locale={locale} lang={getLocaleLang(locale)}>
       <HtmlLangSync locale={locale} />
+      {/*
+        百度自动推送脚本：仅中文路由注入，英文用户无需此 payload。
+        移自 app/layout.tsx，配合 AdSense 切到 lazyOnload，整体降低初始主线程占用。
+      */}
+      {process.env.NODE_ENV === "production" && locale === "zh" ? (
+        <Script
+          id="baidu-auto-push"
+          src="https://push.zhanzhang.baidu.com/push.js"
+          strategy="afterInteractive"
+        />
+      ) : null}
       {children}
     </div>
   );
