@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { DocPrimer } from "@/components/doc-primer";
 import { DocSupport } from "@/components/doc-support";
+import { GeoBlock } from "@/components/geo-block";
 import { SiteShell } from "@/components/site-shell";
 import { buildBreadcrumbData, StructuredData } from "@/components/structured-data";
 import { getCommandDoc, getDocLastModified, getDocNeighbors, getDocPrimer, getDocTier, getRelatedDocs } from "@/lib/content";
@@ -142,6 +143,14 @@ export default async function CommandPage({ params }: Props) {
       </section>
 
       <DocPrimer locale={locale} primer={primer} />
+
+      {/* GEO block: quotes / stats / citations from MDX frontmatter. */}
+      <GeoBlock
+        locale={locale}
+        quotes={doc.metadata.quotes}
+        stats={doc.metadata.stats}
+        citations={doc.metadata.citations}
+      />
 
       <section className="panel doc-content command-doc-content">
         <div className="mdx-content">

@@ -1,5 +1,6 @@
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
+import type { ComponentType } from "react";
 import { cache } from "react";
 
 import {
@@ -39,6 +40,37 @@ export type DocSection =
 
 export type DocTier = "core" | "recommended" | "extended";
 
+export type DocCitationKind = "official" | "book" | "discussion" | "blog" | "paper";
+
+export type DocQuote = {
+  /** Verbatim quote. Keep short — 1-3 sentences. */
+  text: string;
+  /** Who/what is being quoted, e.g. "Pro Git, 2nd Ed., §3.6" or "Linus Torvalds, LKML 2009". */
+  attribution: string;
+  /** Optional canonical URL for the quote source. */
+  url?: string;
+};
+
+export type DocStat = {
+  /** The numeric/quantitative value, e.g. "~2.3s", "115%", "10x". */
+  value: string;
+  /** Plain-language label, e.g. "1000 commit rebase vs merge extra time". */
+  label: string;
+  /** Source of the measurement, free-text. */
+  source: string;
+  /** Optional URL to the underlying benchmark/study. */
+  url?: string;
+};
+
+export type DocCitation = {
+  /** Display title. */
+  title: string;
+  /** Canonical URL. */
+  url: string;
+  /** Coarse classification for GEO ranking/diversity heuristics. */
+  kind: DocCitationKind;
+};
+
 export type DocMetadata = {
   title: string;
   slug: string;
@@ -56,6 +88,18 @@ export type DocMetadata = {
    * file mtime via getDocLastModified so BlogPosting still has a `datePublished`.
    */
   createdAt?: string;
+  /**
+   * GEO (Generative Engine Optimization) signals. The KDD '24 GEO paper
+   * (arXiv 2311.09735) shows direct quotations (+41%), statistics (+30%),
+   * fluency (+28%), and cited sources (+27%) drive LLM citation rates.
+   *
+   * All three fields are optional and parsed from MDX frontmatter when present.
+   * Backfilled progressively per article; older articles without these fields
+   * continue to work — downstream code treats `undefined` and `[]` the same.
+   */
+  quotes?: DocQuote[];
+  stats?: DocStat[];
+  citations?: DocCitation[];
 };
 
 export const docPathRegistry = [
@@ -896,7 +940,14 @@ export function getDocPaths(_locale: Locale) {
 }
 
 export async function getDocByPath(locale: Locale, docPath: DocPath) {
-  const mdxModule = await contentModules[locale][docPath]();
+  const mdxModule = (await contentModules[locale][docPath]()) as {
+    default: ComponentType;
+    // MDX modules declare `metadata` with a literal shape based on what each
+    // file happens to set. We widen to DocMetadata here so callers can read
+    // optional GEO fields (quotes/stats/citations) without each file needing
+    // them — TypeScript would otherwise narrow per-file and reject access.
+    metadata: DocMetadata;
+  };
   return {
     path: docPath,
     Component: mdxModule.default,

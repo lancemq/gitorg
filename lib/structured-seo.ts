@@ -184,6 +184,27 @@ export function buildDocStructuredData({
   // route; differentiating dimensions is a follow-up (per-article OG).
   const image = [`${siteUrl}/opengraph-image`];
 
+  // GEO enrichment: structured citations override the plain sourceUrls when
+  // present, and quote/stat URLs are folded into a richer `citation` list so
+  // LLM scrapers see attributed sources directly in JSON-LD.
+  const structuredCitationUrls = (metadata.citations ?? [])
+    .map((c) => c.url)
+    .filter((url): url is string => Boolean(url));
+  const quoteUrls = (metadata.quotes ?? [])
+    .map((q) => q.url)
+    .filter((url): url is string => Boolean(url));
+  const statUrls = (metadata.stats ?? [])
+    .map((s) => s.url)
+    .filter((url): url is string => Boolean(url));
+  const citation = Array.from(
+    new Set([
+      ...structuredCitationUrls,
+      ...quoteUrls,
+      ...statUrls,
+      ...metadata.sourceUrls,
+    ]),
+  );
+
   return {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -202,7 +223,7 @@ export function buildDocStructuredData({
     keywords,
     about: breadcrumbs,
     mentions: ["Git", sectionLabel],
-    citation: metadata.sourceUrls,
+    citation,
     sameAs: metadata.sourceUrls,
     usageInfo: citationGuidance,
     ...(wordCount ? { wordCount } : {}),
