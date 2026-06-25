@@ -1,0 +1,179 @@
+---
+title: git reset Tutorial
+published: false
+description: Explains how git reset moves HEAD, updates the index, and optionally overwrites the working tree through soft, mixed, and hard modes.
+canonical_url: https://gitorg.xyz/en/commands/git-reset
+tags: git, tutorial, beginners
+---
+# git reset Tutorial
+
+## What you will learn
+
+- Understand the core purpose of git reset Tutorial
+- Master the basic usage and common options of git reset Tutorial
+- Explains how git reset moves HEAD, updates the index, and optionally overwrites the working tree through soft, mixed, and hard modes.
+- Understand key concepts: The three layers to remember
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
+## The short version
+
+`git reset` moves the current reference and, depending on the mode, may also update the index and working tree.
+
+## The three layers to remember
+
+1. commit history
+2. staging area
+3. working tree
+
+Understanding reset means understanding which layers are affected.
+
+<ResetFigure
+  title="The three-layer impact of reset"
+  caption="All three reset modes move HEAD first. The real difference is whether the index and working tree are also forced to match the target commit."
+  layersLabel="Layer"
+  softLabel="--soft"
+  mixedLabel="--mixed"
+  hardLabel="--hard"
+/>
+
+Use this diagram as a quick pre-flight check. The moment you move from the first two columns to `--hard`, you are no longer just rewriting history expression, you are allowing the working tree to be overwritten.
+
+## The three modes that matter most
+
+### `--soft`
+
+Moves the reference only.
+
+### `--mixed`
+
+Moves the reference and resets the index, while keeping working tree changes.
+
+### `--hard`
+
+Moves the reference, resets the index, and overwrites working tree changes.
+
+## Re-reading reset through the three-layer model
+
+Reset becomes much easier if you ask three questions:
+
+1. should HEAD / the current branch move
+2. should the index be reset
+3. should the working tree be overwritten
+
+## Three common use cases
+
+### Undo the last commit but keep the changes
+
+```bash
+git reset --soft HEAD~1
+```
+
+### Unstage a file
+
+```bash
+git reset HEAD path/to/file
+```
+
+### Move all the way back to a safe commit
+
+```bash
+git reset --hard <commit>
+```
+
+## A safer operating order
+
+Before a risky reset, a better sequence is:
+
+1. `git status`
+2. `git log --oneline --decorate -5`
+3. `git reflog`
+4. create a backup branch if needed
+5. only then run reset
+
+If you still feel unsure about hard reset, compare the command you want with the figure above. If what you really want is “undo the commit but keep my file changes,” then `--hard` is probably not the right choice.
+
+## Common examples
+
+```bash
+git reset --soft HEAD~1
+git reset HEAD path/to/file
+git reset --hard <commit>
+```
+
+## Safety note
+
+Before destructive reset operations, check `git status`, inspect `git reflog`, or create a rescue branch first.
+
+## reset vs restore vs revert
+
+- `reset`: move references and optionally reset index / working tree
+- `restore`: recover file content more directly
+- `revert`: create a new commit that undoes an older one
+
+If the history is already shared with others, `revert` is often safer than rewriting it with `reset`.
+
+## Why `git reset HEAD <file>` confuses people
+
+It often looks like “restore the file,” but in practice its most common role is “unstage this file while keeping my working-tree edits.”
+
+## Extra caution cases
+
+Be especially careful if:
+
+- you are on a shared branch
+- you are not sure whether some of the current work should survive
+
+## Another common misconception
+
+Reset does not always permanently destroy commits right away. Often the obvious ref is gone before the underlying objects are actually unrecoverable.
+
+
+## What problem this command solves in a workflow
+
+`git reset` directly affects history shape, ref position, or relationships between commits. The first decision is whether you are organizing private local history or touching history that is already shared with others.
+
+## Typical use cases
+
+- Use `git reset` when integrating branches, undoing changes, selecting commits, or reshaping a sequence of commits.
+- Put `git reset` inside a “backup first, mutate second, verify last” flow so higher-risk history operations stay recoverable.
+- Use `git reset` to understand ancestry, recovery paths, and commit causality during conflict resolution or post-incident analysis.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="What history commands act on"
+  caption="History-oriented commands revolve around commit sequences, branch pointers, and ancestry. The difference is whether they add history, move refs, or rewrite an existing sequence."
+  inputsLabel="Inputs"
+  inputs="Commit sequence|Current branch|Ancestry"
+  commandLabel="git reset"
+  outputsLabel="Results"
+  outputs="New commit relations|Moved refs|Recovery path"
+  note="The highest-value preflight question for this category is simple: “Has this history already been shared?”"
+/>
+
+## Special cases and boundaries
+
+- The most expensive failure mode in history commands is rewriting or moving commits that other people already depend on.
+- If the operation might affect team flow, run `git status`, `git log --oneline --graph`, and `git reflog` first so the recovery path is visible.
+- When in doubt, create a backup branch before continuing so you preserve an obvious way back.
+- Any `--hard` reset should trigger a pause to verify whether the working tree still contains important unbacked-up changes.
+
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: compare the three reset modes"
+  intro="This drill is really about watching HEAD, the index, and the working tree change independently."
+  setupLabel="Setup"
+  setup={`git switch -c lab/reset-demo\n# make two commits\n# then edit a file and stage it with git add`}
+  stepsLabel="Try it"
+  steps="Run `git reset --soft HEAD~1` and inspect `git status`.|Repeat the experiment with `git reset --mixed HEAD~1`.|Only in a disposable repo, try `git reset --hard HEAD~1` once and compare the result."
+  outcomesLabel="What happens next"
+  outcomes="`--soft` keeps staged and working-tree changes in place.|`--mixed` moves staged changes back into the working tree.|`--hard` realigns HEAD, index, and working tree to the target commit."
+  mistakesLabel="Common mistake checks"
+  mistakes="If the real goal is “undo the commit but keep the changes,” `--hard` is usually the wrong choice.|If the commits are already shared, evaluate `revert` before rewriting with reset.|If you do not know the recovery path yet, inspect `git reflog` before continuing."
+/>

@@ -1,0 +1,128 @@
+---
+title: git cherry-pick Tutorial
+published: false
+description: Explains how to apply a selected commit onto the current branch and when cherry-pick is the right tool.
+canonical_url: https://gitorg.xyz/en/commands/git-cherry-pick
+tags: git, tutorial, beginners
+---
+# git cherry-pick Tutorial
+
+## What you will learn
+
+- Understand the core purpose of git cherry-pick Tutorial
+- Master the basic usage and common options of git cherry-pick Tutorial
+- Explains how to apply a selected commit onto the current branch and when cherry-pick is the right tool.
+- Understand key concepts: Where it fits best
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
+## The short version
+
+`git cherry-pick` reapplies the change introduced by a specific commit onto your current branch.
+
+## Where it fits best
+
+- backporting a fix into another branch
+- selecting only one or two commits instead of merging a whole branch
+- moving precise changes into a release branch
+
+## Basic usage
+
+```bash
+git checkout release/1.2
+git cherry-pick <commit-hash>
+```
+
+This creates a new commit on the current branch with the same change effect, but not the same commit ID.
+
+<CherryPickFigure
+  title="Cherry-pick transfers a patch, not a whole branch"
+  caption="The destination branch gets a new commit with the same change effect, but it keeps a new identity and a different parent chain."
+  sourceLabel="Patch on source branch"
+  targetLabel="Patch replayed on target"
+  transferLabel="pick"
+/>
+
+## Typical use cases
+
+### Backporting a fix
+
+If a bug is fixed on one branch but you only want that one patch on a release branch, cherry-pick is often the cleanest option.
+
+### Selecting one good commit from an experimental branch
+
+When only one or two commits are worth keeping, cherry-pick is usually lighter than merging the entire branch.
+
+## Conflict handling
+
+```bash
+git status
+# resolve conflicts
+git add <resolved-files>
+git cherry-pick --continue
+```
+
+Abort if needed:
+
+```bash
+git cherry-pick --abort
+```
+
+## A practical warning
+
+Cherry-pick is great for precise patch transfer, but heavy use across many branches can make history harder to reason about.
+
+## Before you use it
+
+- confirm whether the commit depends on earlier commits
+- confirm whether the destination branch already includes a similar change
+- confirm whether a full merge would actually be clearer
+
+
+## What problem this command solves in a workflow
+
+`git cherry-pick` directly affects history shape, ref position, or relationships between commits. The first decision is whether you are organizing private local history or touching history that is already shared with others.
+
+## Typical use cases
+
+- Use `git cherry-pick` when integrating branches, undoing changes, selecting commits, or reshaping a sequence of commits.
+- Put `git cherry-pick` inside a “backup first, mutate second, verify last” flow so higher-risk history operations stay recoverable.
+- Use `git cherry-pick` to understand ancestry, recovery paths, and commit causality during conflict resolution or post-incident analysis.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="What history commands act on"
+  caption="History-oriented commands revolve around commit sequences, branch pointers, and ancestry. The difference is whether they add history, move refs, or rewrite an existing sequence."
+  inputsLabel="Inputs"
+  inputs="Commit sequence|Current branch|Ancestry"
+  commandLabel="git cherry-pick"
+  outputsLabel="Results"
+  outputs="New commit relations|Moved refs|Recovery path"
+  note="The highest-value preflight question for this category is simple: “Has this history already been shared?”"
+/>
+
+## Special cases and boundaries
+
+- The most expensive failure mode in history commands is rewriting or moving commits that other people already depend on.
+- If the operation might affect team flow, run `git status`, `git log --oneline --graph`, and `git reflog` first so the recovery path is visible.
+- When in doubt, create a backup branch before continuing so you preserve an obvious way back.
+
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: backport one fix onto a release branch"
+  intro="This drill helps you see that cherry-pick transfers change intent, not the original commit identity or parent chain."
+  setupLabel="Setup"
+  setup={`git switch -c release/1.2\n# create a separate feature branch with one bug-fix commit`}
+  stepsLabel="Try it"
+  steps="Copy the hash of the fix commit from the feature branch.|Switch back to the release branch and run `git cherry-pick <hash>`.|Inspect the result with `git log --oneline --graph --decorate --all`."
+  outcomesLabel="What happens next"
+  outcomes="The target branch gets a new commit with similar content but a different ID.|The original parent chain is not copied over.|For patch-level backports, this is often more precise than a full merge."
+  mistakesLabel="Common mistake checks"
+  mistakes="If the picked commit depends on earlier commits, cherry-picking it alone may leave the target incomplete.|If equivalent changes already exist, repeated cherry-picks can make history noisy.|If the real need is the whole branch history, merge is usually clearer."
+/>

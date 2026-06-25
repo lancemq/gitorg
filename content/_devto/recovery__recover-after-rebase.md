@@ -1,0 +1,114 @@
+---
+title: Recover after a bad rebase
+published: false
+description: When rebase introduces conflicts, missing commits, or a result you no longer trust, stop rewriting history and recover control with abort, reflog, and rescue branches.
+canonical_url: https://gitorg.xyz/en/recovery/recover-after-rebase
+tags: git, tutorial, beginners
+---
+# Recover after a bad rebase
+
+## What you will learn
+
+- Understand the core purpose of Recover after a bad rebase
+- Master the basic usage and common options of Recover after a bad rebase
+- When rebase introduces conflicts, missing commits, or a result you no longer trust, stop rewriting history and recover control with abort, reflog, and rescue branches.
+- Understand key concepts: The main mistake is usually continuing blindly
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+You just ran a Git command and the result wasn't what you expected — maybe you even lost some commits. This has happened before, and you want a reliable set of recovery techniques.
+
+## The main mistake is usually continuing blindly
+
+<RebaseFigure
+  title="Rebase Recovery Strategy"
+  caption="Rebase rewrites commit history, producing new-ID commits. Old commits do not disappear immediately — reflog can show the pre-rebase state, and --abort can be used mid-process."
+  beforeLabel="Before rebase (safe state)"
+  afterLabel="After rebase (may be problematic)"
+  modeLabel="Recover: git reflog / git branch rescue"
+/>
+
+
+When people see conflicts, strange ordering, or “missing” commits after a rebase, they often respond by trying more rebase, reset, and checkout commands in panic.  
+The safer move is to stop and preserve the last trustworthy state first.
+
+## Separate two situations
+
+### Situation 1: the rebase is still in progress
+
+Git will usually tell you that you can:
+
+- `git rebase --continue`
+- `git rebase --skip`
+- `git rebase --abort`
+
+If you no longer trust the intermediate state, `--abort` is usually the safest option.
+
+### Situation 2: the rebase finished, but the result looks wrong
+
+That is when reflog matters most:
+
+```bash
+git reflog
+```
+
+Find the position from before the rebase and create a rescue branch:
+
+```bash
+git switch -c rescue/pre-rebase HEAD@{3}
+```
+
+## Why commits appear to vanish
+
+Rebase does not “move” the old commit objects. It replays your work on a new base and creates new commits.
+
+That means:
+
+- commit IDs change
+- parent relationships change
+- old commits may still exist for a while, but your branch no longer points to them
+
+So the problem is often “the name moved,” not “the data was instantly deleted.”
+
+## A conservative recovery flow
+
+```bash
+git status
+git log --oneline --graph --decorate -n 30
+git reflog
+git switch -c rescue/pre-rebase <old-commit>
+```
+
+Then choose one of three paths:
+
+- go back to the pre-rebase state
+- rescue only a subset of commits
+- restart the rebase more carefully
+
+## When `git rebase --abort` is the right choice
+
+Prefer `--abort` when:
+
+- the rebase is still active
+- you no longer know which conflict you are resolving
+- you are unsure whether `skip` would drop meaningful work
+- this was only local cleanup and not worth gambling on
+
+## When to create a rescue branch first
+
+If the rebase already finished and you want to compare “before” and “after,” create a rescue branch first.  
+Its job is not to fix everything immediately. Its job is to preserve evidence and a known-good checkpoint.
+
+## One practical rule
+
+After a bad rebase, the first goal is not “get to push again quickly.”  
+The first goal is “return to a state I can explain.”
+
+## Try it yourself
+
+1. Practice the recover-after-rebase command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process

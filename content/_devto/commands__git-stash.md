@@ -1,0 +1,178 @@
+---
+title: git stash Tutorial
+published: false
+description: Explains how to temporarily shelve local changes with git stash and later inspect, restore, or remove stash entries.
+canonical_url: https://gitorg.xyz/en/commands/git-stash
+tags: git, tutorial, beginners
+---
+# git stash Tutorial
+
+## What you will learn
+
+- Understand the core purpose of git stash Tutorial
+- Master the basic usage and common options of git stash Tutorial
+- Explains how to temporarily shelve local changes with git stash and later inspect, restore, or remove stash entries.
+- Understand key concepts: Good use cases
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
+## The short version
+
+`git stash` temporarily shelves your uncommitted work so you can switch tasks and come back later.
+
+<StashFigure
+  title="The typical stash cycle"
+  caption="The best use of stash is usually short-lived interruption handling: save the current state, switch context, then deliberately re-apply the work when you are ready."
+  workingLabel="Working tree"
+  stashLabel="Stash stack"
+  restoreLabel="Resume work"
+  saveLabel="stash push"
+  applyLabel="apply / pop"
+/>
+
+The most useful framing is to treat stash as a short-term holding area, not as a long-term archive or branch replacement.
+
+## Good use cases
+
+- you need to jump to another branch quickly
+- the work is not ready to commit yet
+- you want to preserve a short-lived experiment without keeping it in the working tree
+
+## Common operations
+
+### Save current work
+
+```bash
+git stash push -m "wip: login form"
+```
+
+### Inspect stash entries
+
+```bash
+git stash list
+```
+
+### Reapply the latest stash
+
+```bash
+git stash apply
+```
+
+### Reapply and remove it
+
+```bash
+git stash pop
+```
+
+### Inspect what a stash contains
+
+```bash
+git stash show -p stash@{0}
+```
+
+## Two advanced but very practical patterns
+
+### Include untracked files
+
+```bash
+git stash push -u -m "wip: include new files"
+```
+
+### Stash only part of the tree
+
+```bash
+git stash push src/checkout.ts
+```
+
+## apply vs pop
+
+- `apply`: restore but keep the stash entry
+- `pop`: restore and delete it if successful
+
+If you are not fully sure yet, `apply` is usually the safer option.
+
+That is why the diagram highlights `apply / pop` as a separate step. Many stash mistakes happen there: `pop` is convenient, but it bundles “restore the changes” with “try to remove the stash entry,” while `apply` keeps the recovery path more conservative.
+
+## A safer restore workflow
+
+Instead of immediately using `pop`, a safer sequence is often:
+
+1. `git stash list`
+2. `git stash show -p stash@{0}`
+3. `git stash apply stash@{0}`
+4. confirm the result
+5. `git stash drop stash@{0}`
+
+## Two practical habits
+
+### Always add a message
+
+```bash
+git stash push -m "wip: checkout flow"
+```
+
+That makes `git stash list` much easier to read later.
+
+### Prefer `apply` before deleting
+
+For important work, restoring first and deleting later is often safer than using `pop` immediately.
+
+## Why stash restores can still conflict
+
+Stash records a set of changes, but the surrounding code may have changed by the time you reapply it. That is why apply and pop can still produce conflicts.
+
+## A practical decision rule
+
+- use stash for short interruptions
+- use branches for work that lives longer than a quick context switch
+- use commits and branches for anything reviewable or shared
+
+
+## What problem this command solves in a workflow
+
+`git stash` solves the problem of "I need to temporarily set aside my uncommitted work so I can switch branches and come back later." It saves both the working tree and index state onto a stack, letting you park unfinished changes without committing them.
+
+## Typical use cases
+
+- When you need to jump to another branch quickly but your current work is not ready to commit, use `git stash push` to save the state and get a clean working tree.
+- Inspect saved stashes with `git stash list` and review their content with `git stash show -p stash@{0}` before reapplying.
+- Use `git stash push -u` to also include untracked files in the stash entry, so nothing is left behind when you switch context.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="Temporarily shelving uncommitted changes"
+  caption="stash captures the working tree and index state as a commit-like object on a stack, letting you restore it later with apply or pop."
+  inputsLabel="Input"
+  inputs="Working tree changes|Index state|Untracked files (with -u)"
+  commandLabel="git stash"
+  outputsLabel="Output"
+  outputs="Stash entry on stack|Clean working tree|Saved index state"
+  note="Treat stash as a short-term holding area, not a long-term archive — use branches for work that lives longer than a quick context switch."
+/>
+
+## Special cases and boundaries
+
+- Stash records a set of changes, but the surrounding code may have changed by the time you reapply it — apply and pop can still produce conflicts.
+- Use `apply` to restore changes while keeping the stash entry as a safety net, or `pop` to restore and remove the entry in one step.
+- Untracked files only travel with the stash entry when you use `-u` (or `-a` for ignored files too).
+- For important work that will continue for hours or days, a branch is usually a better fit than a growing stash pile.
+
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: apply first, then decide whether to drop"
+  intro="The fragile moment in stash is usually restore time, not save time. This drill turns the safer habit into a repeatable routine."
+  setupLabel="Setup"
+  setup={`git switch -c lab/stash-demo\n# edit one tracked file and create one untracked file`}
+  stepsLabel="Try it"
+  steps={`Run \`git stash push -u -m "wip: stash demo"\`.|Inspect the entry with \`git stash show -p stash@{0}\`.|Restore with \`git stash apply stash@{0}\` first, and only then decide whether to run \`git stash drop stash@{0}\`.`}
+  outcomesLabel="What happens next"
+  outcomes="You will see that untracked files only travel with stash when you use `-u`.|`apply` restores the work while keeping the stash entry as a safety net.|Dropping after inspection is more conservative than going straight to `pop`."
+  mistakesLabel="Common mistake checks"
+  mistakes="If the work will continue for hours or days, a branch is usually a better fit than a growing stash pile.|Do not jump to `pop` before checking what the stash actually contains.|A conflict during apply usually means the surrounding code changed, not that the stash is broken."
+/>

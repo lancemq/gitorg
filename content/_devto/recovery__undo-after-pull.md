@@ -1,0 +1,119 @@
+---
+title: Undo after a pull you regret
+published: false
+description: When a pull leaves your branch in an unexpected state, first determine what pull actually did, then recover with ORIG_HEAD, reflog, or a rescue branch.
+canonical_url: https://gitorg.xyz/en/recovery/undo-after-pull
+tags: git, tutorial, beginners
+---
+# Undo after a pull you regret
+
+## What you will learn
+
+- Understand the core purpose of Undo after a pull you regret
+- Master the basic usage and common options of Undo after a pull you regret
+- When a pull leaves your branch in an unexpected state, first determine what pull actually did, then recover with ORIG_HEAD, reflog, or a rescue branch.
+- Understand key concepts: Do not start with “how do I undo pull?”
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+You just ran a Git command and the result wasn't what you expected — maybe you even lost some commits. This has happened before, and you want a reliable set of recovery techniques.
+
+## Do not start with “how do I undo pull?”
+
+Start with: what did `git pull` actually do?
+
+It may have:
+
+- only fetched and fast-forwarded
+- created a merge commit
+- or rebased your local commits, depending on configuration
+
+Those are different recovery situations.
+
+<CommandFlowFigure
+  title="First classify the pull result"
+  caption="Do not treat every bad pull as one kind of problem. First determine whether the pull fast-forwarded, merged, or rebased."
+  inputsLabel="Inspect first"
+  inputs="git status|git log --oneline --graph|git reflog"
+  commandLabel="git pull"
+  outputsLabel="Possible outcomes"
+  outputs="fast-forward|merge commit|rebased history"
+  note="Recovery is safer once you know whether pull changed only the pointer, created a merge node, or rewrote commit identities."
+/>
+
+## First round of checks
+
+```bash
+git status
+git log --oneline --graph --decorate -n 20
+git reflog
+```
+
+Typical clues:
+
+- a new merge commit means merge-based pull
+- a rewritten-looking sequence means rebase-based pull
+- a simple pointer move usually means fast-forward
+
+## Why `ORIG_HEAD` matters
+
+Many merge and pull flows leave the previous position in `ORIG_HEAD`:
+
+```bash
+git show ORIG_HEAD
+git switch -c rescue/before-pull ORIG_HEAD
+```
+
+That is often the cheapest first safety step.
+
+## Three common rollback paths
+
+### 1. The pull only fast-forwarded
+
+If you simply want the old position back:
+
+```bash
+git reset --hard ORIG_HEAD
+```
+
+But create a rescue branch first if the state still matters.
+
+### 2. The pull created a merge commit
+
+If that merge has not been shared, moving back may be reasonable.  
+If it has already become part of team history, treat the problem more like a shared-history correction and consider `revert` instead.
+
+### 3. The pull used rebase
+
+Then this is closer to “recover after a bad rebase.”  
+Use reflog, recover the pre-pull position, and preserve it with a rescue branch first.
+
+## A safer long-term habit
+
+Many bad-pull stories happen because pull combines “observe remote updates” and “mutate my current branch” in one step.  
+The more conservative routine is:
+
+1. `git fetch`
+2. inspect the graph and status
+3. explicitly choose merge, rebase, or wait
+
+## Recommended order
+
+1. Identify what kind of pull this was
+2. Inspect `ORIG_HEAD` and `reflog`
+3. Create a `rescue/*` branch
+4. Then choose reset, revert, or a cleaner resync
+
+## A useful rule
+
+If you do not yet know whether the pull merged or rebased, do not rush into reset.  
+Preserve the pre-pull position first.
+
+## Try it yourself
+
+1. Practice the undo-after-pull command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process

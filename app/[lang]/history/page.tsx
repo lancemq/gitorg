@@ -69,6 +69,7 @@ export default async function GitHistoryPage({ params }: Props) {
       quotes={doc.metadata.quotes}
       stats={doc.metadata.stats}
       citations={doc.metadata.citations}
+      authorSlug={doc.metadata.author}
       lastModified={lastModified.toISOString()}
       Body={DocBody}
       relatedDocs={relatedDocs}

@@ -1,0 +1,189 @@
+---
+title: git rebase Tutorial
+published: false
+description: Explains the core model of git rebase, recommended workflows, risks, and recovery options.
+canonical_url: https://gitorg.xyz/en/commands/git-rebase
+tags: git, tutorial, productivity, beginners
+---
+# git rebase Tutorial
+
+## What you will learn
+
+- Understand the core purpose of git rebase Tutorial
+- Master the basic usage and common options of git rebase Tutorial
+- Explains the core model of git rebase, recommended workflows, risks, and recovery options.
+- Understand key concepts: When it is a good fit
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
+## The short version
+
+`git rebase` reapplies a set of commits onto a new base, so you often end up with similar content but different commit IDs.
+
+<MentalModelBox title="Build the right mental model first">
+  <p>Think of rebase as taking your branch-local commits, replaying them in order, and attaching that replayed sequence to a new base. It is not just integration. It rewrites ancestry.</p>
+</MentalModelBox>
+
+<RebaseFigure
+  title="How rebase changes history"
+  caption="The original feature commits E and F are replayed on top of the newer main branch, which is why the content survives while the commit IDs change."
+  beforeLabel="Before rebase"
+  afterLabel="After rebase"
+  modeLabel="re-apply commits"
+/>
+
+It helps to think of rebase as “re-queueing your work.” The key visual signal is that `E/F` become `E'/F'`, which is exactly why rebase is considered history rewriting.
+
+## When it is a good fit
+
+- Bring a feature branch up to date with `main`
+- Clean up commit history before merging
+- Reorder, squash, or rewrite commits with interactive rebase
+
+## Basic workflow
+
+```bash
+git checkout feature/login
+git fetch origin
+git rebase origin/main
+```
+
+## Handling conflicts
+
+```bash
+git status
+# resolve conflicts manually
+git add <resolved-files>
+git rebase --continue
+```
+
+Abort if needed:
+
+```bash
+git rebase --abort
+```
+
+## A safer real-world workflow
+
+When you want to clean up a local feature branch, a safer sequence is usually:
+
+1. run `git status` and confirm the working tree is clean
+2. run `git fetch origin`
+3. create a backup branch if the rewrite is risky
+4. run `git rebase origin/main`
+5. review the result with `git log --oneline --graph`
+
+For example:
+
+```bash
+git branch backup/feature-login-before-rebase
+```
+
+<TipBox title="A low-cost safety habit">
+  <p>Creating a quick backup branch before a risky rebase is one of the cheapest ways to reduce recovery pressure later.</p>
+</TipBox>
+
+## Why interactive rebase matters
+
+```bash
+git rebase -i HEAD~4
+```
+
+Interactive rebase is useful for:
+
+- squashing noisy commits
+- reordering history for readability
+- rewriting commit messages
+- dropping experimental commits
+
+The most common actions are still just:
+
+- `pick`
+- `reword`
+- `squash`
+- `fixup`
+- `drop`
+
+For most teams, turning a messy branch into a few clearer logical commits already delivers most of the value.
+
+## `pull --rebase` versus fetch-then-rebase
+
+Fetch-then-rebase is still easier to reason about because it separates:
+
+1. learning upstream state
+2. choosing to rewrite local history
+3. recovering when something goes wrong
+
+## Using the picture as a decision aid
+
+If your situation looks like “my own feature branch is behind main, and these commits have not been shared yet,” the rebase model above is usually a good fit.
+
+If what you really mean is “this branch is already part of review, CI, or someone else’s work,” then the safer question is no longer “can I make the history cleaner,” but “can I still rewrite it safely.”
+
+## Additional caution
+
+Rebase is not automatically safe just because the branch is “yours.” If CI, review flows, or teammates already rely on that branch, rewriting it can still create coordination cost.
+
+<WarningBox title="Where rebase turns risky">
+  <p>Once review, CI, or other people’s branches already depend on the current history, the problem is no longer only “can I resolve conflicts?” It becomes “is it still safe to move the commit lineage under everyone else?”</p>
+</WarningBox>
+
+## Recovery mindset
+
+If the result looks wrong, use reflog first. A conservative recovery path is:
+
+```bash
+git checkout -b rescue/rebase HEAD@{1}
+```
+
+Anchor the old position before deciding whether to reset or replay work again.
+
+
+## What problem this command solves in a workflow
+
+`git rebase` directly affects history shape, ref position, or relationships between commits. The first decision is whether you are organizing private local history or touching history that is already shared with others.
+
+## Typical use cases
+
+- Use `git rebase` when integrating branches, undoing changes, selecting commits, or reshaping a sequence of commits.
+- Put `git rebase` inside a “backup first, mutate second, verify last” flow so higher-risk history operations stay recoverable.
+- Use `git rebase` to understand ancestry, recovery paths, and commit causality during conflict resolution or post-incident analysis.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="What history commands act on"
+  caption="History-oriented commands revolve around commit sequences, branch pointers, and ancestry. The difference is whether they add history, move refs, or rewrite an existing sequence."
+  inputsLabel="Inputs"
+  inputs="Commit sequence|Current branch|Ancestry"
+  commandLabel="git rebase"
+  outputsLabel="Results"
+  outputs="New commit relations|Moved refs|Recovery path"
+  note="The highest-value preflight question for this category is simple: “Has this history already been shared?”"
+/>
+
+## Special cases and boundaries
+
+- The most expensive failure mode in history commands is rewriting or moving commits that other people already depend on.
+- If the operation might affect team flow, run `git status`, `git log --oneline --graph`, and `git reflog` first so the recovery path is visible.
+- When in doubt, create a backup branch before continuing so you preserve an obvious way back.
+- If the branch is already under review, CI, or someone else has based work on it, stop and check whether rewriting it is still safe.
+
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: rehearse a safe rebase on a throwaway branch"
+  intro="The goal is not just to remember the command. It is to watch the commit IDs change while the change content survives."
+  setupLabel="Setup"
+  setup={`git switch -c lab/rebase-demo\n# make two commits\n# switch to main and add one more commit`}
+  stepsLabel="Try it"
+  steps="Go back to the feature branch and run `git fetch`.|Run `git rebase origin/main` or rebase onto your updated local main.|Inspect the result with `git log --oneline --graph --decorate -6`."
+  outcomesLabel="What happens next"
+  outcomes="Your feature commits are replayed on top of the newer base.|The old commit IDs are replaced by new ones.|If no conflicts occur, the content usually survives while the history shape changes."
+  mistakesLabel="Common mistake checks"
+  mistakes="Do not rebase and force-push a branch that teammates already depend on without checking first.|If the rebase looks wrong midway through, stop and use `git rebase --abort` or `git reflog` instead of stacking more commands on top.|If your real goal is simple integration without history rewrite, merge may be the safer tool."
+/>

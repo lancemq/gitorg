@@ -1,5 +1,6 @@
 import type { ComponentType } from "react";
 
+import { AuthorByline } from "@/components/author-byline";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { DocPrimer } from "@/components/doc-primer";
 import { DocSupport } from "@/components/doc-support";
@@ -45,6 +46,8 @@ type DocTemplateProps = {
   quotes?: DocQuote[];
   stats?: DocStat[];
   citations?: DocCitation[];
+  /** Author slug from MDX frontmatter; falls back to site default when omitted. */
+  authorSlug?: string;
 };
 
 export function DocTemplate({
@@ -67,6 +70,7 @@ export function DocTemplate({
   quotes,
   stats,
   citations,
+  authorSlug,
 }: DocTemplateProps) {
   const siteUrl = getSiteUrl();
   const breadcrumbItems = breadcrumbs.map((item) => ({
@@ -83,6 +87,7 @@ export function DocTemplate({
     quotes,
     stats,
     citations,
+    ...(authorSlug ? { author: authorSlug } : {}),
   };
 
   return (
@@ -109,6 +114,7 @@ export function DocTemplate({
           <p className="eyebrow">{eyebrow}</p>
           <h1>{title}</h1>
           <p className="lead">{summary}</p>
+          <AuthorByline locale={locale} authorSlug={authorSlug} />
         </header>
 
         {primer ? <DocPrimer locale={locale} primer={primer} /> : null}

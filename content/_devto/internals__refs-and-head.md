@@ -1,0 +1,121 @@
+---
+title: Git References and HEAD
+published: false
+description: Put branches, tags, remote-tracking refs, and HEAD into one model so Git's pointer behavior becomes easier to reason about.
+canonical_url: https://gitorg.xyz/en/internals/refs-and-head
+tags: git, tutorial, beginners
+---
+# Git References and HEAD
+
+## What you will learn
+
+- Understand the core purpose of Git References and HEAD
+- Master the basic usage and common options of Git References and HEAD
+- Put branches, tags, remote-tracking refs, and HEAD into one model so Git's pointer behavior becomes easier to reason about.
+- Understand key concepts: 1. Why refs matter more than memorizing commands
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
+
+## The short version
+
+Commits are history nodes. References are names pointing at those nodes. HEAD tells Git which name or commit you are currently standing on.
+
+<RefsHeadFigure
+  title="How HEAD, branches, and refs connect"
+  caption="In the normal case, HEAD points to a branch name first, and that branch name points to a commit. Only detached HEAD points directly at a commit."
+  headLabel="HEAD following a branch"
+  branchLabel="Local branch"
+  tagLabel="Tag"
+  remoteLabel="Remote-tracking ref"
+  detachedLabel="Detached HEAD"
+/>
+
+## 1. Why refs matter more than memorizing commands
+
+Many Git commands are really about two actions:
+
+1. creating new objects
+2. moving references
+
+Once that is clear, reset, rebase, checkout, and reflog become much less mysterious.
+
+## 2. What a reference is
+
+A reference is a readable name for a commit location. Common examples are:
+
+- `main`
+- `feature/login`
+- `v2.0.0`
+- `origin/main`
+
+All of them eventually resolve to a commit object.
+
+## 3. Why a branch is just a movable reference
+
+A branch is not a full copy of the repository and not an isolated parallel database. It is simply a name that can move forward as new commits are added.
+
+That explains why:
+
+- branch creation is cheap
+- branch switching is fast
+- deleting a branch does not immediately erase the underlying commits
+
+## 4. How tags differ from branches
+
+Both are references, but they are usually used differently:
+
+- branches are expected to move
+- tags are usually meant to stay fixed
+
+So branches are more about current lines of development, while tags are more about named milestones.
+
+## 5. What HEAD really is
+
+In the normal case, `HEAD` is a symbolic reference. It typically points to the current branch, and that branch points to a commit.
+
+That is why:
+
+- switching branches changes what HEAD follows
+- committing moves the current branch, which makes HEAD appear to move too
+- reset changes where the current branch and HEAD resolve
+
+## 6. What detached HEAD means
+
+Detached HEAD means HEAD no longer follows a branch name. It points directly to a commit.
+
+That is not corruption. It simply means you are standing on a commit rather than a movable branch ref.
+
+If you commit in that state:
+
+- new commits are still created
+- but they are not automatically anchored by a branch name
+- so you should create a branch if you want that history to remain easy to reach
+
+## 7. Why remote-tracking refs matter
+
+`main` and `origin/main` are different things:
+
+- `main` is your local branch
+- `origin/main` is your local record of the remote branch state
+
+`git fetch` updates the second one. That separation is what gives Git its useful pause between “learn the remote state” and “change my branch.”
+
+## 8. Why reflog often saves you
+
+Reflog records reference movement history. Many recovery flows work because Git still remembers where a ref used to point, even after the visible branch name has moved elsewhere.
+
+That is why reset, rebase, and deleted-branch recovery so often begin with reflog.
+
+## The key takeaway
+
+A surprising amount of Git pain is really “a name moved” rather than “the repository broke.” Once objects and refs are mentally separated, branch behavior, HEAD state, and recovery logic become far easier to understand.
+
+## Try it yourself
+
+1. Practice the refs-and-head command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process

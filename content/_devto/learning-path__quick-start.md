@@ -1,0 +1,123 @@
+---
+title: Git Quick Start Series
+published: false
+description: Turn Git quick start into a small guided series: prepare your environment, learn staging and commit, understand remote sync, and open your first feature branch.
+canonical_url: https://gitorg.xyz/en/learning-path/quick-start
+tags: git, tutorial, beginners
+---
+# Git Quick Start Series
+
+## What you will learn
+
+- Understand the core purpose of Git Quick Start Series
+- Master the basic usage and common options of Git Quick Start Series
+- Turn Git quick start into a small guided series: prepare your environment, learn staging and commit, understand remote sync, and open your first feature branch.
+- Understand key concepts: What this series solves
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+When you're new to Git, the hardest part is often not the commands themselves, but knowing which ones to learn first and which ones can wait. This section helps you build the right learning sequence.
+
+## What this series solves
+
+When someone is new to Git, the real problem is usually not the number of commands. It is that the commands blur together and the sequence between them is unclear.
+
+This series breaks “getting started with Git” into four smaller reads:
+
+1. prepare the environment and get the repository
+2. learn staging and commit
+3. learn remote sync
+4. open your first feature branch
+
+You do not need all of Git at once. You need one stable loop first.
+
+<CommandFlowFigure
+  title="Quick-start series route"
+  caption="Breaking the minimum Git loop into smaller pages makes it easier to see whether you are stuck on setup, commit flow, remote sync, or basic collaboration."
+  inputsLabel="Starting point"
+  inputs="Local environment|Practice repository|Basic commands"
+  commandLabel="Overview → lesson pages"
+  outputsLabel="Result"
+  outputs="Usable loop|Stable rhythm|Collaboration readiness"
+  note="If one step already feels easy, keep moving. If one step still feels shaky, stay there and repeat it."
+/>
+
+## Recommended reading order
+
+### 1. [Setup and Clone](/en/docs/learning-path/setup-and-clone)
+
+Start with identity setup, repository access, and the first inspection steps after clone.
+
+### 2. [Staging and Commit](/en/docs/learning-path/stage-and-commit)
+
+Build the three-layer model of working tree, staging area, and commit history.
+
+### 3. [Remote Sync](/en/docs/learning-path/sync-with-remote)
+
+Separate `fetch`, `pull`, and `push` into observe, integrate, and publish.
+
+### 4. [First Feature Branch](/en/docs/learning-path/first-feature-branch)
+
+Move from a solo loop into the lightest form of collaboration flow.
+
+## Who this series is for
+
+- developers touching Git for the first time
+- people who know a few commands but not how they connect
+- anyone who still hesitates around `pull`, `push`, and `commit`
+- readers who want a stable base before touching rebase, reflog, or reset
+
+## Principles worth keeping while you learn
+
+### Inspect state before acting
+
+At key moments, get used to checking:
+
+```bash
+git status
+git log --oneline --decorate -5
+```
+
+### Stabilize the solo loop before deep collaboration topics
+
+If `edit -> add -> commit -> push` still feels shaky, advanced history tools can wait.
+
+### Learn actions before memorizing syntax
+
+For example:
+
+- `clone` gets the repository
+- `add` prepares the next commit
+- `commit` saves local history
+- `fetch` updates your remote view
+- `pull` downloads and integrates
+- `push` publishes local commits
+
+## What can wait until later
+
+This series intentionally does not rush you into:
+
+- `rebase`
+- `reset --hard`
+- `cherry-pick`
+- deeper reflog recovery
+- plumbing commands
+
+Those topics matter, but they make more sense after the minimum loop already feels stable.
+
+## Suggested next steps after the series
+
+Once the four pages here feel natural, continue with:
+
+1. fetch vs pull strategy boundaries
+2. git rebase usage boundaries
+3. feature-branch collaboration workflow
+
+## Try it yourself
+
+1. Practice the quick-start command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process

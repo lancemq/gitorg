@@ -1,0 +1,113 @@
+---
+title: git reflog
+published: false
+description: Read reference movement history, which makes reflog one of the most important commands for recovery after reset, rebase, and branch mistakes.
+canonical_url: https://gitorg.xyz/en/commands/git-reflog
+tags: git, tutorial, beginners
+---
+# git reflog
+
+## What you will learn
+
+- Understand the core purpose of git reflog
+- Master the basic usage and common options of git reflog
+- Read reference movement history, which makes reflog one of the most important commands for recovery after reset, rebase, and branch mistakes.
+- Understand key concepts: Why it matters
+- Know when to use this feature and when to avoid it
+
+
+`git reflog` records where refs such as `HEAD` have pointed over time. That makes it central to recovery workflows.
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
+## Why it matters
+
+After operations like:
+
+- `reset --hard`
+- `rebase`
+- `pull`
+- branch deletion or history rewrite
+
+the old commits may still exist, but the visible branch name may no longer point at them. Reflog helps you find those older positions.
+
+## Common examples
+
+```bash
+git reflog
+git reflog show HEAD
+git reset --hard HEAD@{1}
+git checkout -b rescue HEAD@{2}
+```
+
+## Best workflow
+
+1. inspect reflog
+2. locate the pre-mistake position
+3. either create a rescue branch or move the ref back
+
+<ReflogFigure
+  title="Reflog preserves position clues"
+  caption="In many rescue cases the old commit still exists, but the branch name no longer points to it. Reflog keeps those older positions visible long enough for you to attach a rescue branch."
+  historyLabel="Position history"
+  rescueLabel="Recovery move"
+  nowLabel="Current HEAD"
+/>
+
+## Key distinction
+
+- `git log` shows commit history
+- `git reflog` shows reference movement history
+
+That difference is why reflog is so useful when normal history still exists but your pointer is no longer where you expected.
+
+
+## What problem this command solves in a workflow
+
+`git reflog` is a read-only diagnostic tool that records the history of where references (especially HEAD and branch refs) have pointed. It does not modify commits, move refs, or reshape history — it simply reads and displays the ref movement log. Every checkout, reset, rebase, merge, and pull leaves a trail entry that reflog can surface, making it the primary recovery tool when you've lost track of a commit.
+
+## Typical use cases
+
+- Recovering from an accidental `reset --hard` — reflog shows you exactly where HEAD pointed before the reset.
+- Finding lost commits after a rebase or branch deletion — the old commits still exist in the object store; reflog reveals their hashes.
+- Understanding what operations have been performed on a branch — reflog provides a chronological audit trail of ref changes.
+- Creating a rescue branch at a specific historical position before attempting further corrective action.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="Reflog position trail"
+  caption="Every ref movement leaves an entry in the reflog. This trail lets you reconstruct where references pointed at any recent time, enabling recovery even when normal history no longer shows the commit."
+  inputsLabel="Inputs"
+  inputs="Ref movement history|HEAD positions|Timestamps"
+  commandLabel="git reflog"
+  outputsLabel="Results"
+  outputs="Position timeline|Lost commit hashes|Recovery anchors"
+  note="Reflog is read-only — it reports what happened, it does not change anything. Recovery requires a separate action like reset or branch creation."
+/>
+
+## Special cases and boundaries
+
+- Reflog entries expire over time (default: 90 days for reachable entries, 30 days for unreachable). Do not treat reflog as a permanent archive — act quickly if you need recovery.
+- Reflog is local to each repository. It is not shared via push/fetch, so you cannot recover ref movements that happened on another machine.
+- `git reflog show <ref>` shows the reflog for a specific ref (e.g., `refs/heads/main`). Without arguments, it defaults to HEAD.
+- Reflog entries use syntax like `HEAD@{1}` (one step ago) or `HEAD@{2023-01-15}` (position on a specific date).
+- Reflog only tracks ref movements, not arbitrary object creation. If a commit was never pointed to by a ref, it will not appear in reflog.
+
+## Try it yourself
+
+<PracticeLab
+  title="Exercise: recover the pre-reset position with reflog"
+  intro="The point of this drill is to experience that the pointer moved, but the old commit may still be recoverable."
+  setupLabel="Setup"
+  setup={`git switch -c lab/reflog-demo\n# make two commits\n# then run git reset --hard HEAD~1`}
+  stepsLabel="Try it"
+  steps="Run `git reflog` and find the HEAD position from before the reset.|Create a rescue branch with `git checkout -b rescue/reflog HEAD@{1}`.|Use `git log --oneline --graph --decorate --all` to compare the visible refs."
+  outcomesLabel="What happens next"
+  outcomes="You will see the old HEAD position recorded in reflog.|The older commit usually still exists even though the current branch no longer points to it.|Creating a rescue branch first is often safer than immediately hard-resetting again."
+  mistakesLabel="Common mistake checks"
+  mistakes="Do not stack more resets or rebases before you identify the old position.|Do not treat reflog like a permanent archive; act sooner rather than later.|If the recovery move affects shared refs, evaluate the impact before changing them."
+/>

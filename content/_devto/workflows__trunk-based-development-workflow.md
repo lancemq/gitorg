@@ -1,0 +1,136 @@
+---
+title: Trunk-Based Development Workflow
+published: false
+description: Keep main continuously releasable by using short-lived branches, frequent integration, and small merge batches.
+canonical_url: https://gitorg.xyz/en/workflows/trunk-based-development-workflow
+tags: git, tutorial, beginners
+---
+# Trunk-Based Development Workflow
+
+## What you will learn
+
+- Understand the core purpose of Trunk-Based Development Workflow
+- Master the basic usage and common options of Trunk-Based Development Workflow
+- Keep main continuously releasable by using short-lived branches, frequent integration, and small merge batches.
+- Understand key concepts: What this workflow solves
+- Know when to use this feature and when to avoid it
+
+
+Trunk-based development is not “no branches.” It is a discipline: keep branches short-lived so main stays integratable, recoverable, and releasable.
+
+<CommandFlowFigure
+  title="The minimal TBD loop"
+  caption="Cut a short branch from main, ship a small batch, sync again, and merge quickly. The objective is to reduce divergence time, not to push giant one-shot changes."
+  inputsLabel="Start state"
+  inputs="green main|small scoped task|clear rollback path"
+  commandLabel="branch → small commits → rebase/merge main → PR/merge"
+  outputsLabel="Outcome"
+  outputs="continuously releasable main|smaller conflict windows|faster regression isolation"
+  note="TBD works because of cadence: short branches, high sync frequency, small merges."
+/>
+
+
+## Start with a problem
+
+Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
+
+## What this workflow solves
+
+Long-lived branches often create:
+
+- heavy integration conflicts late in the cycle
+- CI confidence that is true only inside one branch
+- oversized merge sets that are hard to review and rollback
+
+TBD spreads integration risk into smaller, earlier steps.
+
+## Best-fit scenarios
+
+- many developers are changing the same repository daily
+- the team wants “release anytime” behavior from main
+- large initiatives can be decomposed into mergeable increments
+
+If your process still relies on long isolated development phases, TBD benefits will be limited.
+
+## Recommended operating sequence
+
+### 1. Branch from fresh main
+
+```bash
+git fetch origin
+git switch main
+git pull --ff-only origin main
+git switch -c feature/login-copy-tuning
+```
+
+### 2. Move in small commit batches
+
+```bash
+git add -p
+git commit -m "tune login copy tone"
+```
+
+Each commit should remain explainable, reviewable, and reversible.
+
+### 3. Sync with main before merge
+
+```bash
+git fetch origin
+git rebase origin/main
+```
+
+If your team avoids branch rebasing, update base through the platform merge flow instead.
+
+### 4. Review and merge quickly
+
+The key is reducing time-to-merge, not letting branches age for days.
+
+## How TBD differs from GitFlow
+
+- GitFlow emphasizes multiple long-lived branches
+- TBD emphasizes one trunk, short branch lifetime, and frequent integration
+
+Neither is universally superior. They serve different organizational rhythms.
+
+<WarningBox title="TBD is not direct unreviewed pushes to main">
+  You still need review, CI, and release guardrails. TBD changes integration timing and granularity, not quality standards.
+</WarningBox>
+
+## Three rollout risks teams underestimate
+
+1. Work items are not sliced small enough
+2. CI latency is too high to support fast integration
+3. Rollback practice is weak even though merge speed is high
+
+## Common mistakes
+
+### Mistake 1: short branches automatically mean high quality
+
+Short branches reduce integration friction; they do not replace quality gates.
+
+### Mistake 2: every branch must merge within one day
+
+Complex work can merge incrementally behind flags without exposing unfinished behavior.
+
+### Mistake 3: TBD removes the need for release strategy
+
+Higher merge frequency usually requires clearer versioning and rollback policy.
+
+<PracticeBox title="Rewrite one large effort into TBD-shaped batches">
+  1. Pick a recent large feature.
+  2. Split it into 3 to 6 independently mergeable slices.
+  3. Define the minimum rollback unit for each slice.
+  4. Verify each slice can pass CI independently on main.
+</PracticeBox>
+
+## Good follow-up reads
+
+1. `Feature branch collaboration`
+2. `Sync before review`
+3. `Merge queue workflow`
+
+## Try it yourself
+
+1. Practice the trunk-based-development-workflow command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process

@@ -1,0 +1,181 @@
+---
+title: GPG Signing & Git Commit Verification
+published: false
+description: A systematic guide to signing Git commits and tags with GPG, configuring verification, and enforcing signing policies in teams.
+canonical_url: https://gitorg.xyz/en/security/gpg-signing
+tags: git, tutorial, beginners
+---
+# GPG Signing & Git Commit Verification
+
+## What you will learn
+
+- Understand the core purpose of GPG Signing & Git Commit Verification
+- Master the basic usage and common options of GPG Signing & Git Commit Verification
+- A systematic guide to signing Git commits and tags with GPG, configuring verification, and enforcing signing policies in teams.
+- Understand key concepts: Why GPG Signing?
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You're concerned about Git repository security — maybe key management isn't ideal, or commits aren't signed. You're not sure if your security setup is sufficient or where to start hardening it.
+
+## One-Sentence Understanding
+
+GPG signing adds a cryptographic signature to your Git commits and tags, allowing anyone to verify that the commit genuinely came from you — not an imposter.
+
+## Why GPG Signing?
+
+Git's commit author information (name + email) is plain text — anyone can fake it:
+
+```bash
+git config user.name "Linus Torvalds"
+git config user.email "torvalds@linux-foundation.org"
+git commit -m "This isn't Linus's commit"
+```
+
+GPG signing cryptographically verifies the commit's authenticity.
+
+## Quick Start
+
+### Install GPG
+
+```bash
+# macOS
+brew install gpg
+
+# Ubuntu
+sudo apt install gpg
+
+# Windows
+choco install gpg4win
+```
+
+### Generate GPG Key
+
+```bash
+gpg --full-generate-key
+
+# Choose RSA and RSA (default)
+# Key size: 4096
+# Expiration: 2 years (recommended)
+# Name and email must match Git config
+```
+
+### List and Export Keys
+
+```bash
+# List private keys
+gpg --list-secret-keys --keyid-format LONG
+
+# Export public key (paste output to GitHub/GitLab)
+gpg --armor --export KEY_ID
+```
+
+## Configure Git
+
+### Set Signing Key
+
+```bash
+# Find your key ID
+gpg --list-secret-keys --keyid-format LONG
+
+# Configure Git
+git config --global user.signingkey KEY_ID
+
+# Optional: sign all commits
+git config --global commit.gpgsign true
+```
+
+### Sign Commits
+
+```bash
+# Sign individual commits
+git commit -S -m "signed commit"
+
+# With commit.gpgsign true
+git commit -m "automatically signed"
+```
+
+### Sign Tags
+
+```bash
+# Create signed tag
+git tag -s v1.0.0 -m "v1.0.0 release"
+
+# Verify tag
+git tag -v v1.0.0
+```
+
+## Verification
+
+### Local Verification
+
+```bash
+# Verify commit signature
+git log --show-signature -1
+
+# Verify all commits
+git log --show-signature
+
+# Show signature status only
+git log --format="%H %G? %GS"
+```
+
+The `%G?` format shows verification status:
+- `G`: Good signature
+- `B`: Bad signature
+- `U`: Unknown signer key
+- `N`: No signature
+
+### GitHub/GitLab Verification
+
+After adding your GPG public key, verified commits display a "Verified" badge.
+
+## Team Signing Policies
+
+### Enforce Signed Commits
+
+On GitHub:
+```
+Settings → Branches → Branch protection rules
+  → Require signed commits
+```
+
+On GitLab:
+```
+Settings → Repository → Protected Branches
+  → Require signature on commits
+```
+
+### Verify in CI
+
+```yaml
+- name: Verify commit signature
+  run: |
+    git log --show-signature -1
+    git verify-commit HEAD
+```
+
+## GPG vs SSH Signing
+
+Git 2.34+ supports SSH signing as a lighter alternative:
+
+| Factor | GPG Signing | SSH Signing |
+|--------|------------|-------------|
+| Key management | Separate PKI | Reuses SSH keys |
+| Complexity | Higher | Lower |
+| Platform support | Universal | Newer only |
+| Best for | Open source, compliance | Internal teams |
+
+## Try it yourself
+
+1. Practice the gpg-signing command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process
+
+## Continue Learning
+
+1. `best-practices/security-with-git` — Git security best practices
+2. SSH key management
+3. `workflows/signing-commits-workflow` — Signed commit workflow

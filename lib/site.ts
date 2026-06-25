@@ -1,5 +1,16 @@
 const DEFAULT_SITE_URL = "https://gitorg.xyz";
 
+/**
+ * Slug of the default author used when an MDX article omits `metadata.author`.
+ * Must match a file under content/authors/{slug}.json.
+ *
+ * Backfilling per-article author attribution can happen incrementally; until
+ * then, this default makes every BlogPosting JSON-LD point to a real
+ * ProfilePage rather than the bare Organization, which is the stronger
+ * E-E-A-T signal per Google's helpful-content guidance.
+ */
+export const SITE_DEFAULT_AUTHOR_SLUG = "lance-mq";
+
 function normalizeUrl(value?: string | null) {
   if (!value) {
     return DEFAULT_SITE_URL;

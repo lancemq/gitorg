@@ -1,0 +1,75 @@
+---
+title: Rebase internals and the sequencer
+published: false
+description: Understand rebase as commit replay managed by the sequencer, making conflict handling and recovery decisions more predictable.
+canonical_url: https://gitorg.xyz/en/internals/rebase-internals-and-sequencer
+tags: git, tutorial, beginners
+---
+# Rebase internals and the sequencer
+
+## What you will learn
+
+- Understand the core purpose of Rebase internals and the sequencer
+- Master the basic usage and common options of Rebase internals and the sequencer
+- Understand rebase as commit replay managed by the sequencer, making conflict handling and recovery decisions more predictable.
+- Understand key concepts: What the sequencer does
+- Know when to use this feature and when to avoid it
+
+
+Rebase is ordered commit replay. The sequencer coordinates replay state and pause/resume behavior.
+
+
+## Start with a problem
+
+You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
+
+## What the sequencer does
+
+1. computes replay set
+2. applies commits onto new base in order
+3. pauses on conflict
+4. resumes until queue is complete
+
+<RebaseFigure
+  title="Rebase Internals"
+  caption="Rebase essentially replays a commit sequence onto a new base, giving each commit a new ID."
+  beforeLabel="Before rebase"
+  afterLabel="After rebase"
+  modeLabel="sequencer replay"
+/>
+
+
+## Why commit IDs change
+
+Replayed commits are new objects with potentially different parents and metadata.
+
+## Meaning of `--continue`, `--skip`, `--abort`
+
+- `continue`: proceed with replay queue
+- `skip`: drop current queued commit
+- `abort`: discard replay and return to start point
+
+## Recovery-first pattern
+
+Before experimenting further:
+
+```bash
+git reflog
+git switch -c rescue/pre-rebase HEAD@{n}
+```
+
+<WarningBox title="Avoid repeated skip without explicit intent">
+  Skipping blindly can silently lose meaningful patches. Decide commit-by-commit why skip is safe.
+</WarningBox>
+
+## Good follow-up reads
+
+1. `recover after rebase`
+2. `commit graph`
+3. `git-rebase`
+
+## Try it yourself
+
+1. Practice the rebase-internals-and-sequencer command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process

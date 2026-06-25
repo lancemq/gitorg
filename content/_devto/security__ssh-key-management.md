@@ -1,0 +1,220 @@
+---
+title: SSH Key Management & Git Authentication
+published: false
+description: A systematic guide to SSH key generation, configuration, management, and Git authentication, including multiple keys, ssh-agent, deploy keys, and security best practices.
+canonical_url: https://gitorg.xyz/en/security/ssh-key-management
+tags: git, security, tutorial
+---
+# SSH Key Management & Git Authentication
+
+## What you will learn
+
+- Generate an SSH key pair and configure it on GitHub / GitLab
+- Understand the difference between public and private keys
+- Manage multiple Git accounts with separate SSH keys
+- Know what to do if a key is compromised
+
+## Start with a problem
+
+Every time you run `git push`, you type your username and password. It gets annoying fast. More importantly, passwords sent over the network can be intercepted.
+
+SSH keys solve both problems: **no more password typing + stronger security**.
+
+The idea is simple: you generate two keys — a public key (safe to share) and a private key (keep it secret). You give the public key to GitHub/GitLab, and keep the private key on your machine. When you push, the server verifies your identity by checking that you hold the matching private key.
+
+## One-Sentence Understanding
+
+SSH keys are one of the most secure and convenient ways to authenticate for Git remote operations. Once configured, you can push and pull without entering credentials.
+
+## Step 1: Generate a key pair
+
+Run this command once:
+
+```bash
+ssh-keygen -t ed25519 -C "your_email@example.com"
+```
+
+Two important choices here:
+
+- **`-t ed25519`**: key type. Ed25519 is faster and more secure than RSA, and is the current recommendation
+- **`-C`**: a comment label to help you identify the key later. Usually your email
+
+You will be asked two things:
+
+1. **File location**: press Enter to accept the default (`~/.ssh/id_ed25519`)
+2. **Passphrase**: strongly recommended. Even if someone steals your private key file, they still cannot use it without the passphrase
+
+If you need compatibility with older servers, use RSA instead:
+
+```bash
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+```
+
+Ed25519 vs RSA? Pick Ed25519 unless the server does not support it.
+
+## Step 2: Give your public key to GitHub
+
+Copy the public key and add it to your Git platform:
+
+```bash
+cat ~/.ssh/id_ed25519.pub
+```
+
+This outputs a line like `ssh-ed25519 AAAAC3...`. Copy it:
+
+1. Go to GitHub → Settings → SSH and GPG keys → New SSH key
+2. Paste the public key
+3. Save
+
+<MentalModelBox title="Public key vs private key analogy">
+  <p>Think of the public key as a lock and the private key as its only key. You give the lock to GitHub (public key), and keep the key (private key) on your machine. When you push, GitHub checks — only your key opens this lock. <strong>Never share your private key.</strong></p>
+</MentalModelBox>
+
+## Step 3: Verify the connection
+
+```bash
+ssh -T git@github.com
+```
+
+A success message looks like:
+
+```
+Hi your-username! You've successfully authenticated, but GitHub does not provide shell access.
+```
+
+For other platforms:
+
+```bash
+ssh -T git@gitlab.com
+ssh -T git@bitbucket.org
+```
+
+## What if you have multiple Git accounts
+
+### The problem
+
+You may have a personal GitHub account and a company GitLab account. With the default setup, Git tries the same key for both platforms. But each platform has its own public key.
+
+### Solution: configure ~/.ssh/config
+
+Create or edit `~/.ssh/config` to specify which key to use for each host:
+
+```ssh-config
+# Personal GitHub account
+Host github.com
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_personal
+
+# Company GitLab
+Host gitlab.company.com
+  HostName gitlab.company.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_work
+
+# Second GitHub account
+Host github-work
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_work
+```
+
+For the second GitHub account, adjust your remote URL to use the custom host alias:
+
+```bash
+git remote set-url origin git@github-work:username/repo.git
+```
+
+## ssh-agent: stop typing your passphrase
+
+If you set a passphrase on your private key, you must enter it each time SSH connects. ssh-agent caches the unlocked key so you only enter the passphrase once per session.
+
+### Start and add your key
+
+```bash
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+```
+
+The first `ssh-add` prompts for your passphrase. After that, no more passphrase prompts during this session.
+
+### macOS: persist across reboots
+
+```ssh-config
+Host *
+  UseKeychain yes
+  AddKeysToAgent yes
+  IdentityFile ~/.ssh/id_ed25519
+```
+
+## Deploy keys: for CI/CD
+
+A deploy key grants access to a single repository (not your entire account). Use it for CI/CD or automation scripts.
+
+### Setup
+
+```bash
+ssh-keygen -t ed25519 -f ~/.ssh/deploy_key -C "ci-deploy@company.com"
+```
+
+Then add the public key in GitHub repo Settings → Deploy keys. Check "Allow write access" if CI needs to push.
+
+### Usage
+
+```bash
+GIT_SSH_COMMAND="ssh -i ~/.ssh/deploy_key" git push origin main
+```
+
+## SSH Commit Signing
+
+Git can sign your commits with SSH keys so others can verify they came from you:
+
+```bash
+# Configure signing key
+git config --global user.signingkey ~/.ssh/id_ed25519.pub
+git config --global gpg.format ssh
+
+# Sign a commit
+git commit -S -m "signed commit"
+
+# Or enable signing for all commits
+git config --global commit.gpgsign true
+```
+
+## Common Misconceptions
+
+### Misconception 1: one SSH key for all platforms is fine
+
+Technically yes, but not recommended. If your personal GitHub key is compromised, the attacker also gets access to your company GitLab. **Use separate keys per platform** to limit the blast radius.
+
+### Misconception 2: public keys must be kept secret
+
+No. Public keys are designed to be shared. Only the private key needs protection.
+
+### Misconception 3: once configured, it works forever
+
+Keys can expire, and you might forget the passphrase. Check and rotate periodically.
+
+## Security Bottom Line
+
+1. **Always use a passphrase** — without it, a leaked private key file means instant account compromise
+2. **Separate keys per platform** — limit damage if one key leaks
+3. **Know what to do if a key is compromised**
+
+If you suspect a key leak:
+1. Delete the local private and public key files immediately
+2. Generate a new pair
+3. Remove the old public key from all platforms and add the new one
+4. Investigate how it leaked (public repo? shared with someone?)
+
+## Try it yourself
+
+1. Generate an Ed25519 key pair and configure it on GitHub. Push once to confirm passwordless authentication works
+2. If your company also uses a Git platform, generate a second key and configure `~/.ssh/config` to distinguish them
+3. Check your GitHub SSH keys settings — do you recognize all authorized keys?
+
+## Continue Learning
+
+1. `best-practices/security-with-git` — Git security best practices
+2. `commands/git-config` — Git configuration management
+3. GPG signing & verification

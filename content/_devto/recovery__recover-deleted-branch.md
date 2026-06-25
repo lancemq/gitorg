@@ -1,0 +1,111 @@
+---
+title: Recover a deleted branch
+published: false
+description: When a branch disappears, first determine whether only the name is gone or whether the commits have become hard to reach, then restore it from reflog or another surviving reference.
+canonical_url: https://gitorg.xyz/en/recovery/recover-deleted-branch
+tags: git, tutorial, productivity
+---
+# Recover a deleted branch
+
+## What you will learn
+
+- Understand the core purpose of Recover a deleted branch
+- Master the basic usage and common options of Recover a deleted branch
+- When a branch disappears, first determine whether only the name is gone or whether the commits have become hard to reach, then restore it from reflog or another surviving reference.
+- Understand key concepts: Do not confuse "the branch name is gone" with "the commits are gone"
+- Know when to use this feature and when to avoid it
+
+
+
+## Start with a problem
+
+You just ran a Git command and the result wasn't what you expected — maybe you even lost some commits. This has happened before, and you want a reliable set of recovery techniques.
+
+## Do not confuse "the branch name is gone" with "the commits are gone"
+
+<ReflogFigure
+  title="Recovering Deleted Branch via Reflog"
+  caption="Deleting a branch only removes the branch name — underlying commits usually still exist. Use reflog to find where the branch pointed before deletion, then recreate it with git branch."
+  historyLabel="Reflog history"
+  rescueLabel="Create rescue branch"
+  nowLabel="Current HEAD position"
+/>
+
+Deleting a branch usually removes a name first, not necessarily the underlying commits.  
+If another ref, reflog entry, or recent history still points near those commits, recovery is often straightforward.
+
+## First round of checks
+
+```bash
+git branch -a
+git reflog
+git log --oneline --graph --decorate --all -n 40
+```
+
+You are trying to answer two questions:
+
+1. Was only the local branch deleted, or is the remote branch gone too?
+2. Which commit did that branch most likely point to last?
+
+## The most common recovery path
+
+If you find the commit in reflog or the graph, just recreate the branch:
+
+```bash
+git branch feature/rescue <commit>
+```
+
+Or switch to it immediately:
+
+```bash
+git switch -c feature/rescue <commit>
+```
+
+## If the remote branch still exists
+
+Then this is often not a deep recovery problem at all. You mainly need to restore your local tracking branch:
+
+```bash
+git fetch origin
+git switch -c feature/name --track origin/feature/name
+```
+
+## If you only remember the rough area
+
+Use all the clues available:
+
+- reflog entries from recent checkout, merge, or rebase activity
+- pull request merge points
+- `git merge-base`
+- the commit graph around the divergence point
+
+The real target is not the old branch name. The real target is the commit it used to point to.
+
+## When recovery gets harder
+
+Recovery becomes harder when:
+
+- the branch was deleted a long time ago
+- no remaining branch or tag still points to those commits
+- reflog windows have expired
+- garbage collection has already cleaned unreachable data
+
+So once you notice the deletion, stop reshaping the repository and investigate first.
+
+## Recommended order
+
+1. Inspect `git reflog`
+2. Identify the last trustworthy commit
+3. Create a `rescue/*` branch there
+4. Decide later whether to restore the original branch name
+
+## A useful mindset
+
+The immediate goal is not “get the old name back.”  
+The goal is “attach a durable name to the old work before it drifts farther away.”
+
+## Try it yourself
+
+1. Practice the recover-deleted-branch command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process

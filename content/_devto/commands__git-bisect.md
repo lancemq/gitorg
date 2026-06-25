@@ -1,0 +1,171 @@
+---
+title: git bisect
+published: false
+description: Use binary search across history to locate the commit that introduced a regression, making it one of the most valuable debugging commands in Git.
+canonical_url: https://gitorg.xyz/en/commands/git-bisect
+tags: git, tutorial, beginners
+---
+# git bisect
+
+## What you will learn
+
+- Understand the core purpose of git bisect
+- Master the basic usage and common options of git bisect
+- Use binary search across history to locate the commit that introduced a regression, making it one of the most valuable debugging commands in Git.
+- Understand key concepts: Basic flow
+- Know when to use this feature and when to avoid it
+
+
+`git bisect` helps you find the first bad commit by repeatedly cutting the search space in half.
+
+
+## Start with a problem
+
+You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+
+## Basic flow
+
+```bash
+git bisect start
+git bisect bad
+git bisect good <good-commit>
+```
+
+Git then checks out midpoint commits and asks you to classify them as good or bad until the culprit is isolated.
+
+## Best use cases
+
+- regressions with a clear good/bad outcome
+- large history ranges that are too expensive to inspect manually
+- bugs with a reproducible test or verification step
+
+## Important caution
+
+Because bisect moves through many commits, always end with:
+
+```bash
+git bisect reset
+```
+
+The command is most powerful when your test step is stable and repeatable.
+
+
+## What problem this command solves in a workflow
+
+`git bisect` is a read-only diagnostic tool — it does not reshape history or move refs. It answers a single question: "which commit first introduced this regression?" You supply two anchor points (one known-good commit and one known-bad commit), and Git performs a binary search across the range, checking out midpoint commits and asking you to classify them until the culprit is isolated. The output is a single commit hash — the first bad commit.
+
+## Typical use cases
+
+- Regressions with a clear good/bad outcome (a test passes or fails, a bug reproduces or does not).
+- Large history ranges that are too expensive to inspect manually — bisect cuts the search space logarithmically.
+- Bugs with a reproducible test that can be automated via `git bisect run <script>`.
+- Post-incident analysis where you need to pinpoint exactly when a behavior changed.
+
+## Diagram view
+
+<CommandFlowFigure
+  title="Bisect search flow"
+  caption="Bisect narrows the search space by repeatedly checking out the midpoint between the remaining good and bad bounds. The result is a single commit hash — the first bad commit."
+  inputsLabel="Inputs"
+  inputs="Known-good commit|Known-bad commit|Classification feedback"
+  commandLabel="git bisect"
+  outputsLabel="Results"
+  outputs="First bad commit hash|No new commits created|No refs moved"
+  note="Bisect is read-only. It only checks out existing commits and records your classification — it never rewrites history."
+/>
+
+## Automating bisect with `git bisect run`
+
+When you have a reproducible test, you can fully automate the search:
+
+```bash
+git bisect start
+git bisect bad HEAD
+git bisect good v1.0.0
+git bisect run ./test-script.sh
+git bisect reset
+```
+
+The exit code of your script determines the classification:
+- **0** = good (the test passes at this commit)
+- **1–127** = bad (the test fails)
+- **125** = skip this commit (e.g., the commit doesn't build)
+
+This is the most efficient mode — Git will automatically check out each midpoint, run your script, and classify the result until the first bad commit is found.
+
+## Skipping untestable commits with `git bisect skip`
+
+Not every commit in the range can be tested. A commit might have a broken build, missing dependencies, or changes in an unrelated area. Use skip to move past it:
+
+```bash
+git bisect skip
+```
+
+You can also skip a range:
+
+```bash
+git bisect skip v1.2..v1.5
+```
+
+**Caution:** Skipping reduces precision. If too many commits are skipped, bisect may only narrow down to a range rather than a single commit.
+
+## Recovering from mislabeled good/bad
+
+If you accidentally label a commit as good when it's actually bad (or vice versa), the bisect result will be incorrect. Here's how to handle it:
+
+1. **Abort and restart:** The safest approach is to reset and start over with correct labels:
+   ```bash
+   git bisect reset
+   git bisect start
+   git bisect bad HEAD
+   git bisect good <correct-good-commit>
+   ```
+
+2. **Use `git bisect visualize`:** Run this to open a graphical log viewer (gitk or git log) and review which commits have been classified and how the search space narrowed.
+
+3. **Check `git bisect log`:** Review the full session log (see below) to find exactly where the mislabel occurred.
+
+## Reading bisect log output
+
+At any point during a bisect session, run:
+
+```bash
+git bisect log
+```
+
+This outputs the full session history:
+
+```
+git bisect start
+# bad: [a1b2c3d] Fix login timeout
+git bisect bad a1b2c3d
+# good: [e4f5g6h] Initial release
+git bisect good e4f5g6h
+# bad: [i7j8k9l] Update auth middleware
+git bisect bad i7j8k9l
+# good: [m0n1o2p] Refactor database layer
+git bisect good m0n1o2p
+```
+
+You can also save and replay a session:
+
+```bash
+git bisect log > bisect-session.txt
+git bisect replay bisect-session.txt
+```
+
+This is useful for sharing debugging sessions with teammates or resuming after an interruption.
+
+## Special cases and boundaries
+
+- Bisect requires a binary (good/bad) decision for each tested commit. If a commit is untestable (build broken, irrelevant area changed), use `git bisect skip` — but skipping reduces precision.
+- `git bisect run` can fully automate the search when you have a script that returns 0 for good and 1 for bad. This is the most powerful mode.
+- Always finish with `git bisect reset` to return to your original branch. Forgetting to reset leaves your repo in a detached HEAD state.
+- Bisect operates on your local checkout. If your working tree has uncommitted changes that conflict with bisect's checkouts, stash or commit them first.
+- If the regression is in build artifacts rather than source (e.g., compiler version changed), bisect may give misleading results — ensure your test validates the right thing.
+
+## Try it yourself
+
+1. Practice the git-bisect command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process

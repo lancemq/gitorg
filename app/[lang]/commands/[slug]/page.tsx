@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { DocPrimer } from "@/components/doc-primer";
 import { DocSupport } from "@/components/doc-support";
+import { AuthorByline } from "@/components/author-byline";
 import { GeoBlock } from "@/components/geo-block";
 import { SiteShell } from "@/components/site-shell";
 import { buildBreadcrumbData, StructuredData } from "@/components/structured-data";
@@ -130,6 +131,7 @@ export default async function CommandPage({ params }: Props) {
           <p className="eyebrow">{dict.commandPage.eyebrow}</p>
           <h1>{doc.metadata.title}</h1>
           <p className="lead">{doc.metadata.summary}</p>
+          <AuthorByline locale={locale} authorSlug={doc.metadata.author} />
         </div>
 
         <aside className="command-meta panel">

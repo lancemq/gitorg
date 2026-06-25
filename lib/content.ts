@@ -944,8 +944,9 @@ export async function getDocByPath(locale: Locale, docPath: DocPath) {
     default: ComponentType;
     // MDX modules declare `metadata` with a literal shape based on what each
     // file happens to set. We widen to DocMetadata here so callers can read
-    // optional GEO fields (quotes/stats/citations) without each file needing
-    // them — TypeScript would otherwise narrow per-file and reject access.
+    // optional fields (author, createdAt, quotes/stats/citations) without
+    // each file needing them — TypeScript would otherwise narrow per-file
+    // and reject access.
     metadata: DocMetadata;
   };
   return {

@@ -1,0 +1,158 @@
+---
+title: Git Object Database
+published: false
+description: Understand blob, tree, commit, and tag objects, and why Git describes itself as a content-addressable object database.
+canonical_url: https://gitorg.xyz/en/internals/object-database
+tags: git, computerscience, beginners
+---
+# Git Object Database
+
+## What you will learn
+
+- Understand the core purpose of Git Object Database
+- Master the basic usage and common options of Git Object Database
+- Understand blob, tree, commit, and tag objects, and why Git describes itself as a content-addressable object database.
+- Understand key concepts: Why the object model is the first layer of foundation
+- Know when to use this feature and when to avoid it
+
+
+## Start with a problem
+
+You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
+
+## The short version
+
+## Why the object model is the first layer of foundation
+
+<CommitGraphFigure
+  title="Git Object Database: Four Object Types"
+  caption="Git is built around four object types: blob for file content, tree for directory structure, commit for history snapshots, and tag for named references. All objects link to each other through hash IDs."
+  linearLabel="Blob → file content"
+  mergeLabel="Tree → directory structure"
+  rewriteLabel="Commit → history snapshot | Tag → named reference"
+  pointerLabel="Ref points to"
+/>
+
+At the lowest level, Git is not a list of file versions.
+ It is a database that stores objects and locates them again by IDs derived from their content.
+
+<MentalModelBox title="Do not picture Git as cloud storage">
+  <p>A steadier model is this: Git stores objects first, then uses refs, HEAD, and tags as names that point at those objects. Most day-to-day commands move names around durable objects.</p>
+</MentalModelBox>
+
+## Why the object model comes first
+
+Several Git behaviors become easier to reason about once the object model is clear:
+
+- why commit creates new objects
+- why the same content can be reused across branches
+- why branch creation is almost instant
+- why old commits often still exist after reset
+
+## 1. What content-addressable means
+
+Git does not start by inventing an arbitrary object number. Instead it:
+
+1. takes content
+2. computes an object ID from that content
+3. uses that ID to retrieve the object later
+
+That is the key idea behind content addressing.
+
+## 2. The four common object types
+
+### blob
+
+A blob stores file content only. It does not store the filename.
+
+### tree
+
+A tree stores directory structure, including names and pointers to blobs or other trees.
+
+### commit
+
+A commit records:
+
+- the tree for the snapshot
+- one or more parent commits
+- author and committer metadata
+- the commit message
+
+### tag
+
+A tag gives a stable, human-readable name to an object, often for releases.
+
+## 3. Why blobs do not include filenames
+
+Git separates content from structure:
+
+- blobs hold content
+- trees hold names and hierarchy
+
+That separation makes content reuse more natural and keeps the storage model cleaner.
+
+## 4. What really happens during commit
+
+From the object-database perspective, commit is roughly:
+
+1. write a tree from the staged state
+2. create a new commit object
+3. point that commit at the tree and parent(s)
+4. move the current branch ref forward
+
+So commit is not “edit old history.” It is “add a new object and move a name.”
+
+## 5. Objects are not the same as the working tree
+
+A useful separation is:
+
+- working tree: the files you are editing now
+- index: the snapshot being prepared
+- object database: the data Git has already written as durable objects
+
+Only after content is written into objects does it become part of Git history.
+
+## 6. How the object model explains common commands
+
+### `git add`
+
+It does not create a commit. It moves file state toward the next tree.
+
+### `git commit`
+
+It writes new tree and commit objects.
+
+### `git branch`
+
+It usually does not duplicate objects. It creates a new ref to an existing commit.
+
+### `git switch` / `git checkout`
+
+They make the working state line up with the objects named by a different ref.
+
+## 7. Existing objects are not always easy to find
+
+This matters for recovery. An object may still exist in the database while becoming harder to reach because no branch, tag, or reflog entry points to it clearly anymore.
+
+That is why many recovery situations are really about lost references, not instantly deleted objects.
+
+<TipBox title="Why this matters for recovery">
+  <p>Many “I lost my work” Git incidents are not about instant deletion. They are about losing the obvious ref that still pointed at the object.</p>
+</TipBox>
+
+## The most useful takeaway
+
+If you remember one model, remember this:
+
+1. blobs store content
+2. trees store structure
+3. commits store snapshots and parent links
+4. refs and HEAD are just names pointing at those objects
+
+That mental split makes later topics like refs, rebase, reset, and recovery much easier.
+
+## Try it yourself
+
+1. Practice the object-database command in a test repository and observe state changes before and after
+2. Experiment with different options and compare the output differences
+3. Simulate a real scenario where you would need to use this, and walk through the full process

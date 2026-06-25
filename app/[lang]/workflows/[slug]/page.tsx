@@ -90,6 +90,7 @@ export default async function WorkflowDetailPage({ params }: Props) {
       quotes={doc.metadata.quotes}
       stats={doc.metadata.stats}
       citations={doc.metadata.citations}
+      authorSlug={doc.metadata.author}
       primer={primer}
       lastModified={lastModified.toISOString()}
       Body={DocBody}
