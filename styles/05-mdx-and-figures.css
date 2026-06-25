@@ -1584,3 +1584,21 @@
   font-size: 13px;
   opacity: 0.85;
 }
+
+/* INP / rendering optimization.
+   The doc-content panel is by far the longest sub-tree on the page —
+   long MDX articles routinely render 1500-3000 element nodes including
+   code blocks, figures, callouts. We tell the browser it can defer
+   layout/paint work for these sections when they are off-screen, with
+   an intrinsic size hint to keep scroll position stable.
+
+   Per web.dev/articles/inp, this is one of the biggest levers for
+   reducing main-thread style-calculation and layout work, especially
+   for tap/keypress responsiveness in long articles. Browsers without
+   `content-visibility` support ignore the rule cleanly. */
+.doc-content,
+.command-doc-content,
+.geo-block {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 1200px;
+}
