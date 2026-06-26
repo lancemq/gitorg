@@ -125,7 +125,7 @@ git switch -c rescue/before-pull ORIG_HEAD
 很多“pull 后悔了”问题，本质上都来自于 pull 同时做了“获取远端变化”和“改当前分支”两件事。  
 如果你想降低这类事故，平时更稳的节奏是：
 
-1. `git fetch`
+1. [`git fetch`](/zh/commands/git-fetch)
 2. 看图和状态
 3. 再决定 merge、rebase，还是先不动
 
@@ -146,4 +146,14 @@ git switch -c rescue/before-pull ORIG_HEAD
 1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
 2. 尝试该命令的不同参数选项，对比输出结果的差异
 3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+
+{/* internal-links:auto */}
+
+## 延伸阅读
+
+沿着同一主题继续深入：
+
+- [找回“消失的 stash”](/zh/recovery/recover-lost-stash)
+- [reflog 恢复手册](/zh/recovery/reflog-recovery)
+- [合并提交后怎么撤销](/zh/recovery/undo-merge-commit)
 

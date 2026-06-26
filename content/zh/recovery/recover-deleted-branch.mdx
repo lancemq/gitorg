@@ -120,7 +120,7 @@ git switch -c feature/name --track origin/feature/name
 
 ## 推荐动作顺序
 
-1. `git reflog`
+1. [`git reflog`](/zh/commands/git-reflog)
 2. 找到最后一个可信提交
 3. 新建 `rescue/*` 分支
 4. 再决定是否恢复原分支名
@@ -135,4 +135,14 @@ git switch -c feature/name --track origin/feature/name
 1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
 2. 尝试该命令的不同参数选项，对比输出结果的差异
 3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+
+{/* internal-links:auto */}
+
+## 延伸阅读
+
+沿着同一主题继续深入：
+
+- [cherry-pick 挑错提交后的恢复](/zh/recovery/recover-after-wrong-cherry-pick)
+- [仓库损坏后怎么恢复](/zh/recovery/recover-from-corrupted-repo)
+- [提交丢失后怎么找回](/zh/recovery/recover-lost-commits)
 

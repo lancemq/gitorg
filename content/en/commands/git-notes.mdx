@@ -121,9 +121,9 @@ Unstructured notes quickly become noisy and hard to trust.
 
 ## Good follow-up reads
 
-1. `commit message conventions`
-2. `release checklist discipline`
-3. `git-show`
+1. [`commit message conventions`](/en/best-practices/commit-message-conventions)
+2. [`release checklist discipline`](/en/best-practices/release-checklist-discipline)
+3. [`git-show`](/en/commands/git-show)
 - Adding a note to a commit that already has a note in the same namespace causes a conflict. Use `git notes append` to add to an existing note, or `git notes edit` to modify it.
 - Notes are stored under a specific ref namespace (`refs/notes/commits` by default). You can create multiple namespaces with `--ref=<name>` for different types of annotations.
 - Notes are not pushed or fetched by default. To share notes with a team, configure `notes.ref` or use `git push origin refs/notes/*`.
@@ -136,4 +136,14 @@ Unstructured notes quickly become noisy and hard to trust.
 1. Practice the git-notes command in a test repository and observe state changes before and after
 2. Experiment with different options and compare the output differences
 3. Simulate a real scenario where you would need to use this, and walk through the full process
+
+{/* internal-links:auto */}
+
+## Further reading
+
+Keep going on the same topic:
+
+- [git mv](/en/commands/git-mv)
+- [git-prune Tutorial](/en/commands/git-prune)
+- [git pull Tutorial](/en/commands/git-pull)
 

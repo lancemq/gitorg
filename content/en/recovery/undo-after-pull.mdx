@@ -119,7 +119,7 @@ Use reflog, recover the pre-pull position, and preserve it with a rescue branch 
 Many bad-pull stories happen because pull combines “observe remote updates” and “mutate my current branch” in one step.  
 The more conservative routine is:
 
-1. `git fetch`
+1. [`git fetch`](/en/commands/git-fetch)
 2. inspect the graph and status
 3. explicitly choose merge, rebase, or wait
 
@@ -140,4 +140,14 @@ Preserve the pre-pull position first.
 1. Practice the undo-after-pull command in a test repository and observe state changes before and after
 2. Experiment with different options and compare the output differences
 3. Simulate a real scenario where you would need to use this, and walk through the full process
+
+{/* internal-links:auto */}
+
+## Further reading
+
+Keep going on the same topic:
+
+- [Recover a lost stash](/en/recovery/recover-lost-stash)
+- [Recovering with reflog](/en/recovery/reflog-recovery)
+- [How to undo a merge commit](/en/recovery/undo-merge-commit)
 

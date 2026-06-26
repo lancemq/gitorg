@@ -88,13 +88,23 @@ git switch -c rescue/pre-rebase HEAD@{n}
 
 ## 接下来建议继续看什么
 
-1. `recover after rebase`
-2. `commit graph`
-3. `git-rebase`
+1. [`recover after rebase`](/zh/recovery/recover-after-rebase)
+2. [`commit graph`](/zh/internals/commit-graph)
+3. [`git-rebase`](/zh/commands/git-rebase)
 
 ## 给你的练习
 
 1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
 2. 尝试该命令的不同参数选项，对比输出结果的差异
 3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+
+{/* internal-links:auto */}
+
+## 延伸阅读
+
+沿着同一主题继续深入：
+
+- [对象可达性与垃圾回收](/zh/internals/reachability-and-garbage-collection)
+- [Git 中的引用与 HEAD](/zh/internals/refs-and-head)
+- [Refspec 与引用更新教程](/zh/internals/refspec-and-ref-updates)
 

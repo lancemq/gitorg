@@ -188,7 +188,7 @@ git clone --depth 1 ...
 
 ## 安全注意事项
 
-1. `git gc` 不删除还未过期的 reflog 条目
+1. [`git gc`](/zh/commands/git-gc) 不删除还未过期的 reflog 条目
 2. `git repack -a -d` 可能耗时较长，不要在共享仓库运行时执行
 3. GC 后的对象在一定时间内可通过 reflog 找回
 4. 不要对裸仓库（bare repo）频繁执行 `--aggressive`
@@ -204,4 +204,14 @@ git clone --depth 1 ...
 1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
 2. 尝试该命令的不同参数选项，对比输出结果的差异
 3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+
+{/* internal-links:auto */}
+
+## 延伸阅读
+
+沿着同一主题继续深入：
+
+- [Commit Graph 深入](/zh/performance/commit-graph-deep)
+- [Git Maintenance 深入](/zh/performance/git-maintenance)
+- [大仓库性能优化策略](/zh/performance/large-repo-optimization)
 

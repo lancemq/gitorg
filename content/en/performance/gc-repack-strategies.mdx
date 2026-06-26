@@ -187,7 +187,7 @@ git clone --depth 1 ...
 
 ## Safety Notes
 
-1. `git gc` won't delete reflog entries that haven't expired
+1. [`git gc`](/en/commands/git-gc) won't delete reflog entries that haven't expired
 2. `git repack -a -d` can be slow — don't run on shared repos in use
 3. GC'd objects can still be recovered via reflog for a time
 4. Avoid frequent `--aggressive` on bare repos
@@ -203,3 +203,14 @@ git clone --depth 1 ...
 1. `performance/shallow-clone-deep` — Deep dive into shallow clone
 2. `performance/partial-clone` — Partial clone guide
 3. `internals/packfiles-and-storage` — Pack file internals
+
+{/* internal-links:auto */}
+
+## Further reading
+
+Keep going on the same topic:
+
+- [Commit Graph Deep Dive](/en/performance/commit-graph-deep)
+- [Git Maintenance Deep Dive](/en/performance/git-maintenance)
+- [Large Repository Performance Optimization](/en/performance/large-repo-optimization)
+

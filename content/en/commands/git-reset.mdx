@@ -106,9 +106,9 @@ git reset --hard <commit>
 
 Before a risky reset, a better sequence is:
 
-1. `git status`
+1. [`git status`](/en/commands/git-status)
 2. `git log --oneline --decorate -5`
-3. `git reflog`
+3. [`git reflog`](/en/commands/git-reflog)
 4. create a backup branch if needed
 5. only then run reset
 
@@ -194,3 +194,14 @@ Reset does not always permanently destroy commits right away. Often the obvious 
   mistakesLabel="Common mistake checks"
   mistakes="If the real goal is “undo the commit but keep the changes,” `--hard` is usually the wrong choice.|If the commits are already shared, evaluate `revert` before rewriting with reset.|If you do not know the recovery path yet, inspect `git reflog` before continuing."
 />
+
+{/* internal-links:auto */}
+
+## Further reading
+
+Keep going on the same topic:
+
+- [git-rerere Tutorial](/en/commands/git-rerere)
+- [git restore Tutorial](/en/commands/git-restore)
+- [git-rev-list Tutorial](/en/commands/git-rev-list)
+

@@ -109,9 +109,9 @@ git reset --hard <commit>
 
 当你准备做可能破坏当前状态的 reset 时，推荐顺序是：
 
-1. `git status`
+1. [`git status`](/zh/commands/git-status)
 2. `git log --oneline --decorate -5`
-3. `git reflog`
+3. [`git reflog`](/zh/commands/git-reflog)
 4. 如有必要先建救援分支
 5. 再执行 reset
 
@@ -189,8 +189,8 @@ git reset --hard <commit>
 
 执行破坏性 reset 前，先做至少一件事：
 
-1. `git status`
-2. `git reflog`
+1. [`git status`](/zh/commands/git-status)
+2. [`git reflog`](/zh/commands/git-reflog)
 3. 建一个救援分支
 
 ## 一个实战判断原则
@@ -258,6 +258,17 @@ git reset --hard <commit>
 
 接下来建议继续补：
 
-1. `git reflog`
-2. `git restore`
-3. `git revert`
+1. [`git reflog`](/zh/commands/git-reflog)
+2. [`git restore`](/zh/commands/git-restore)
+3. [`git revert`](/zh/commands/git-revert)
+
+{/* internal-links:auto */}
+
+## 延伸阅读
+
+沿着同一主题继续深入：
+
+- [git-rerere 教程](/zh/commands/git-rerere)
+- [git restore 教程](/zh/commands/git-restore)
+- [git-rev-list 教程](/zh/commands/git-rev-list)
+

@@ -82,7 +82,7 @@ git config --global rerere.autoupdate true
 第一次冲突时：
 
 1. 手动解决
-2. `git add` 暂存结果
+2. [`git add`](/zh/commands/git-add) 暂存结果
 3. 完成 rebase 或 merge
 
 之后同类冲突再次出现时，rerere 就可能自动套用之前的处理方式，把你从重复劳动里解放出来。
@@ -115,13 +115,23 @@ rerere 不是让你“不理解冲突”，而是把“已经理解并解决过�
 
 ## 接下来建议继续学什么
 
-1. `long-lived branch conflict governance`
-2. `long-lived branch maintenance`
-3. `fetch vs pull`
+1. [`long-lived branch conflict governance`](/zh/workflows/long-lived-branch-conflict-governance)
+2. [`long-lived branch maintenance`](/zh/workflows/long-lived-branch-maintenance)
+3. [`fetch vs pull`](/zh/workflows/fetch-vs-pull)
 
 ## 给你的练习
 
 1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
 2. 尝试该命令的不同参数选项，对比输出结果的差异
 3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+
+{/* internal-links:auto */}
+
+## 延伸阅读
+
+沿着同一主题继续深入：
+
+- [Release Train 工作流](/zh/workflows/release-train-workflow)
+- [Revert-First 稳定化工作流](/zh/workflows/revert-first-stabilization-workflow)
+- [部署回滚工作流](/zh/workflows/rollback-deployment-workflow)
 

@@ -107,13 +107,23 @@ git am --abort
 - 如果补丁的上下文和当前代码基线不匹配，应用会失败，此时需要先确认补丁是基于哪个版本生成的。
 - 邮件编码、签名行和空白符格式都可能影响补丁解析，必要时可用 `--ignore-whitespace` 或 `--3way` 提高容错。
 
-1. `git-format-patch`
-2. `git-send-email`
-3. `recover after wrong cherry-pick`
+1. [`git-format-patch`](/zh/commands/git-format-patch)
+2. [`git-send-email`](/zh/commands/git-send-email)
+3. [`recover after wrong cherry-pick`](/zh/recovery/recover-after-wrong-cherry-pick)
 
 ## 给你的练习
 
 1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
 2. 尝试该命令的不同参数选项，对比输出结果的差异
 3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+
+{/* internal-links:auto */}
+
+## 延伸阅读
+
+沿着同一主题继续深入：
+
+- [git add 教程](/zh/commands/git-add)
+- [git-apply 教程](/zh/commands/git-apply)
+- [git-archive 教程](/zh/commands/git-archive)
 
