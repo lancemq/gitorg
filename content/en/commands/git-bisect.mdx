@@ -9,6 +9,21 @@ export const metadata = {
     "https://git-scm.com/docs/git-bisect",
     "https://git-scm.com/book/en/v2/Git-Tools-Debugging-with-Git",
   ],
+  quotes: [
+    {
+      text: "git bisect uses a binary search to find the commit that introduced a bug, narrowing the range by roughly half with each tested commit.",
+      attribution: "git-bisect(1) official manual",
+      url: "https://git-scm.com/docs/git-bisect.html",
+    },
+  ],
+  stats: [
+    {
+      value: "log2(N)",
+      label: "bisect needs about log2(N) tests to locate a bad commit among N candidates",
+      source: "git-bisect(1) official manual",
+      url: "https://git-scm.com/docs/git-bisect.html",
+    },
+  ],
   citations: [
     {
       title: "Git bisect",

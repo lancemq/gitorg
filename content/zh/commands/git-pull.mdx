@@ -9,6 +9,21 @@ export const metadata = {
     "https://git-scm.com/docs/git-pull",
     "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
   ],
+  quotes: [
+    {
+      text: "git pull runs git fetch followed by a merge (or rebase with --rebase) of the fetched commits into the current branch.",
+      attribution: "git-pull(1) official manual",
+      url: "https://git-scm.com/docs/git-pull.html",
+    },
+  ],
+  stats: [
+    {
+      value: "fetch + merge",
+      label: "pull is literally two operations; --rebase swaps the second step from merge to rebase",
+      source: "git-pull(1) official manual",
+      url: "https://git-scm.com/docs/git-pull.html",
+    },
+  ],
   citations: [
     {
       title: "Git pull",

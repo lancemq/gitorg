@@ -9,6 +9,21 @@ export const metadata = {
     "https://git-scm.com/docs/git-push",
     "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
   ],
+  quotes: [
+    {
+      text: "git push --force-with-lease rejects the push if the remote ref has been updated by someone else, making it a safer alternative to --force on shared branches.",
+      attribution: "git-push(1) official manual",
+      url: "https://git-scm.com/docs/git-push.html",
+    },
+  ],
+  stats: [
+    {
+      value: "safer",
+      label: "--force-with-lease checks remote ref state before overwriting, unlike blind --force",
+      source: "git-push(1) official manual",
+      url: "https://git-scm.com/docs/git-push.html",
+    },
+  ],
   citations: [
     {
       title: "Git push",

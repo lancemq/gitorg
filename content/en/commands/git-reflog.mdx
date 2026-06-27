@@ -9,6 +9,21 @@ export const metadata = {
     "https://git-scm.com/docs/git-reflog",
     "https://git-scm.com/book/en/v2/Git-Internals-Git-References",
   ],
+  quotes: [
+    {
+      text: "The reflog records when the tip of branches and HEAD were updated in the local repository; it is not transferred across clones and is pruned after 90 days by default.",
+      attribution: "git-reflog(1) official manual",
+      url: "https://git-scm.com/docs/git-reflog.html",
+    },
+  ],
+  stats: [
+    {
+      value: "90 days",
+      label: "default reflog expiry for reachable entries; 30 days for unreachable (gc.reflogExpireUnreachable)",
+      source: "git-reflog(1) / git-gc(1) official manual",
+      url: "https://git-scm.com/docs/git-reflog.html",
+    },
+  ],
   citations: [
     {
       title: "Git reflog",
