@@ -1602,3 +1602,101 @@
   content-visibility: auto;
   contain-intrinsic-size: auto 1200px;
 }
+
+/* Learning-path step badge + "what's next" card.
+   Only rendered on learning-path articles (step frontmatter set). */
+.learning-path-meta {
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.lp-step-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 4px 12px;
+  width: fit-content;
+  border-radius: 999px;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.22);
+  font-size: 13px;
+}
+
+.lp-step-label {
+  font-weight: 600;
+  color: #4f46e5;
+}
+
+.lp-step-count {
+  color: var(--text-muted);
+}
+
+.lp-next-card {
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: #fafbff;
+  border: 1px solid #e6e8ef;
+}
+
+.lp-next-title {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.lp-next-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.lp-next-link:hover .lp-next-name {
+  text-decoration: underline;
+}
+
+.lp-next-step {
+  font-size: 12px;
+  font-weight: 700;
+  color: #4f46e5;
+  background: rgba(99, 102, 241, 0.12);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.lp-next-name {
+  flex: 1;
+  font-weight: 600;
+}
+
+.lp-next-arrow {
+  color: var(--text-muted);
+}
+
+.lp-next-card-finish strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #0f766e;
+}
+
+.lp-next-card-finish p {
+  margin: 0 0 10px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.lp-next-cta {
+  font-weight: 600;
+  color: #0f766e;
+  text-decoration: none;
+}
+
+.lp-next-cta:hover {
+  text-decoration: underline;
+}

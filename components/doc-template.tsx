@@ -5,6 +5,7 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { DocPrimer } from "@/components/doc-primer";
 import { DocSupport } from "@/components/doc-support";
 import { GeoBlock } from "@/components/geo-block";
+import { LearningPathMeta } from "@/components/learning-path-meta";
 import { SiteShell } from "@/components/site-shell";
 import { buildBreadcrumbData, StructuredData } from "@/components/structured-data";
 import { buildDocStructuredData } from "@/lib/structured-seo";
@@ -48,6 +49,8 @@ type DocTemplateProps = {
   citations?: DocCitation[];
   /** Author slug from MDX frontmatter; falls back to site default when omitted. */
   authorSlug?: string;
+  /** Learning-path step number (1-based). Renders step badge + next card when set. */
+  step?: number;
 };
 
 export function DocTemplate({
@@ -71,6 +74,7 @@ export function DocTemplate({
   stats,
   citations,
   authorSlug,
+  step,
 }: DocTemplateProps) {
   const siteUrl = getSiteUrl();
   const breadcrumbItems = breadcrumbs.map((item) => ({
@@ -115,6 +119,7 @@ export function DocTemplate({
           <h1>{title}</h1>
           <p className="lead">{summary}</p>
           <AuthorByline locale={locale} authorSlug={authorSlug} />
+          <LearningPathMeta locale={locale} step={step} next={neighbors?.next} />
         </header>
 
         {primer ? <DocPrimer locale={locale} primer={primer} /> : null}

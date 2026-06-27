@@ -89,6 +89,12 @@ export type DocMetadata = {
    */
   createdAt?: string;
   /**
+   * Learning-path step number (1-based). Only set on learning-path articles.
+   * Drives a "Step N / total" badge and the "what's next" card. Optional —
+   * non-learning-path articles leave this unset.
+   */
+  step?: number;
+  /**
    * GEO (Generative Engine Optimization) signals. The KDD '24 GEO paper
    * (arXiv 2311.09735) shows direct quotations (+41%), statistics (+30%),
    * fluency (+28%), and cited sources (+27%) drive LLM citation rates.
@@ -887,6 +893,14 @@ function extractMetadataField(source: string, key: keyof Omit<DocMetadata, "sour
   return match?.[1];
 }
 
+/** Extract a numeric metadata field (e.g. `step: 3`). Returns undefined if absent or non-numeric. */
+function extractMetadataNumber(source: string, key: string): number | undefined {
+  const match = source.match(new RegExp(`${key}:\\s*(\\d+)`));
+  if (!match) return undefined;
+  const n = Number(match[1]);
+  return Number.isFinite(n) ? n : undefined;
+}
+
 function extractMetadataSourceUrls(source: string) {
   const sourceUrlsBlock = source.match(/sourceUrls:\s*\[([\s\S]*?)\]/)?.[1] ?? "";
   return Array.from(sourceUrlsBlock.matchAll(/"([^"]+)"/g), (match) => match[1]);
@@ -902,6 +916,7 @@ async function readDocMetadata(locale: Locale, docPath: DocPath): Promise<DocMet
   const section = extractMetadataField(metadataBlock, "section") as DocSection | undefined;
   const author = extractMetadataField(metadataBlock, "author");
   const createdAt = extractMetadataField(metadataBlock, "createdAt");
+  const step = extractMetadataNumber(metadataBlock, "step");
 
   if (!title || !slug || !summary || !section) {
     throw new Error(`Unable to parse metadata from ${absolutePath}`);
@@ -916,6 +931,7 @@ async function readDocMetadata(locale: Locale, docPath: DocPath): Promise<DocMet
     sourceUrls: extractMetadataSourceUrls(metadataBlock),
     ...(author ? { author } : {}),
     ...(createdAt ? { createdAt } : {}),
+    ...(step ? { step } : {}),
   };
 }
 

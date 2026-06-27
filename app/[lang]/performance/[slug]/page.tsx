@@ -91,6 +91,7 @@ export default async function PerformanceDetailPage({ params }: Props) {
       stats={doc.metadata.stats}
       citations={doc.metadata.citations}
       authorSlug={doc.metadata.author}
+      step={doc.metadata.step}
       primer={primer}
       lastModified={lastModified.toISOString()}
       Body={DocBody}
