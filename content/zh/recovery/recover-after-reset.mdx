@@ -10,6 +10,21 @@ export const metadata = {
     "https://git-scm.com/docs/git-reflog",
     "https://git-scm.com/book/en/v2/Git-Tools-Reset-Demystified",
   ],
+  quotes: [
+    {
+      text: "Because git reset only moves branch pointers and never deletes commits, the previous tip is still in the reflog and can be restored with git reset --hard <reflog-sha>.",
+      attribution: "Pro Git, 2nd Ed., §7.7 Reset Demystified",
+      url: "https://git-scm.com/book/en/v2/Git-Tools-Reset-Demystified",
+    },
+  ],
+  stats: [
+    {
+      value: "no delete",
+      label: "reset moves a pointer; the orphaned commits stay in the object database until gc prunes them",
+      source: "git-reset(1) official manual",
+      url: "https://git-scm.com/docs/git-reset.html",
+    },
+  ],
   citations: [
     {
       title: "Git reset",

@@ -10,6 +10,21 @@ export const metadata = {
     "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
     "https://git-scm.com/book/en/v2/Git-Branching-Rebasing",
   ],
+  quotes: [
+    {
+      text: "The commit-graph file stores the commit graph structure and selected commit metadata in a binary format to speed up graph walks used by commands like git log --graph and git status.",
+      attribution: "git-commit-graph(1) official manual",
+      url: "https://git-scm.com/docs/git-commit-graph.html",
+    },
+  ],
+  stats: [
+    {
+      value: "O(log N)",
+      label: "commit-graph enables bounded reachability queries instead of walking full object chains",
+      source: "git-commit-graph(1) official manual",
+      url: "https://git-scm.com/docs/git-commit-graph.html",
+    },
+  ],
   citations: [
     {
       title: "Git Basics Viewing the Commit History",

@@ -8,6 +8,21 @@ export const metadata = {
   sourceUrls: [
     "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/merging-a-pull-request-with-a-merge-queue?tool=webui",
   ],
+  quotes: [
+    {
+      text: "A merge queue re-validates each pull request against the latest target branch tip before merging, so serial integration catches conflicts that per-branch CI misses.",
+      attribution: "GitHub Docs, Managing a merge queue",
+      url: "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/managing-a-merge-queue",
+    },
+  ],
+  stats: [
+    {
+      value: "serial",
+      label: "PRs merge one at a time after rebase+test against the updated queue head — eliminates last-merge-in breaks",
+      source: "GitHub Docs, Managing a merge queue",
+      url: "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/managing-a-merge-queue",
+    },
+  ],
   citations: [
     {
       title: "Merging a pull request with a merge queue",

@@ -10,6 +10,21 @@ export const metadata = {
     "https://git-scm.com/docs/git-checkout",
     "https://git-scm.com/docs/git-reflog",
   ],
+  quotes: [
+    {
+      text: "In a detached HEAD state you can still create commits, but they're not on any branch and become unreachable once you switch away — rescue them by creating a branch first.",
+      attribution: "Pro Git, 2nd Ed., §3.4 Branch Management",
+      url: "https://git-scm.com/book/en/v2/Git-Branching-Branch-Management",
+    },
+  ],
+  stats: [
+    {
+      value: "git branch <name>",
+      label: "creating a branch from the detached commit pins it to a ref so it survives the next checkout",
+      source: "git-checkout(1) official manual",
+      url: "https://git-scm.com/docs/git-checkout.html",
+    },
+  ],
   citations: [
     {
       title: "Git switch",

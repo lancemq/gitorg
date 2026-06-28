@@ -10,6 +10,21 @@ export const metadata = {
     "https://git-scm.com/docs/git-cherry-pick",
     "https://git-scm.com/docs/git-reflog",
   ],
+  quotes: [
+    {
+      text: "Rebase works by replaying each commit from the branch being rebased onto the new base, producing new commits with different hashes but the same changes.",
+      attribution: "Pro Git, 2nd Ed., §3.6 Rebasing",
+      url: "https://git-scm.com/book/en/v2/Git-Branching-Rebasing",
+    },
+  ],
+  stats: [
+    {
+      value: "replay",
+      label: "each replayed commit gets a new SHA because its parent changed — history is rewritten, not moved",
+      source: "git-rebase(1) official manual",
+      url: "https://git-scm.com/docs/git-rebase.html",
+    },
+  ],
   citations: [
     {
       title: "Git rebase",

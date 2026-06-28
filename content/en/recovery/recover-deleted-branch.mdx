@@ -10,6 +10,21 @@ export const metadata = {
     "https://git-scm.com/docs/git-reflog",
     "https://git-scm.com/book/en/v2/Git-Internals-Maintenance-and-Data-Recovery",
   ],
+  quotes: [
+    {
+      text: "Deleting a branch only removes the ref pointer; the commits it referenced remain in the object database and are recoverable via reflog until garbage collection removes them.",
+      attribution: "git-branch(1) official manual",
+      url: "https://git-scm.com/docs/git-branch.html",
+    },
+  ],
+  stats: [
+    {
+      value: "ref only",
+      label: "git branch -d removes a 41-byte ref file — the commits themselves persist until gc expiry",
+      source: "git-branch(1) / git-gc(1) official manual",
+      url: "https://git-scm.com/docs/git-branch.html",
+    },
+  ],
   citations: [
     {
       title: "Git branch",

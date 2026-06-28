@@ -10,6 +10,21 @@ export const metadata = {
     "https://git-scm.com/docs/git-reflog",
     "https://git-scm.com/book/en/v2/Git-Branching-Rebasing",
   ],
+  quotes: [
+    {
+      text: "After a rebase, the pre-rebase HEAD is still recorded in the reflog; git reset --hard HEAD@{1} or ORIG_HEAD restores the original branch state.",
+      attribution: "git-rebase(1) official manual",
+      url: "https://git-scm.com/docs/git-rebase.html",
+    },
+  ],
+  stats: [
+    {
+      value: "ORIG_HEAD",
+      label: "rebase records the previous HEAD in ORIG_HEAD before rewriting — a one-command undo path",
+      source: "git-rebase(1) / gitglossary(7) official manual",
+      url: "https://git-scm.com/docs/git-rebase.html",
+    },
+  ],
   citations: [
     {
       title: "Git rebase",

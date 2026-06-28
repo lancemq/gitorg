@@ -10,6 +10,21 @@ export const metadata = {
     "https://git-scm.com/docs/git-merge",
     "https://git-scm.com/docs/git-rebase",
   ],
+  quotes: [
+    {
+      text: "Squash merge condenses a branch's commits into one on the target; rebase merge replays them individually, preserving granularity but rewriting the commit hashes.",
+      attribution: "Pro Git, 2nd Ed., §3.6 Rebasing / GitHub merge methods",
+      url: "https://git-scm.com/book/en/v2/Git-Branching-Rebasing",
+    },
+  ],
+  stats: [
+    {
+      value: "1 commit",
+      label: "squash produces a single clean commit per PR; rebase keeps N commits with linear history",
+      source: "GitHub Docs, About merge methods",
+      url: "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github",
+    },
+  ],
   citations: [
     {
       title: "Git Branching Rebasing",

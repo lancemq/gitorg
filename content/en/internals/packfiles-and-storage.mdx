@@ -9,6 +9,21 @@ export const metadata = {
     "https://git-scm.com/book/en/v2/Git-Internals-Packfiles",
     "https://git-scm.com/book/en/v2/Git-Internals-Git-Objects",
   ],
+  quotes: [
+    {
+      text: "Git initially writes objects out in loose format, then periodically packs many of them into a single packfile to save space and make them more efficient to transfer.",
+      attribution: "Pro Git, 2nd Ed., §10.4 Packfiles",
+      url: "https://git-scm.com/book/en/v2/Git-Internals-Packfiles",
+    },
+  ],
+  stats: [
+    {
+      value: "delta",
+      label: "packfiles store most objects as deltas against a base, dramatically shrinking repo size",
+      source: "Pro Git §10.4 / git-pack-objects(1)",
+      url: "https://git-scm.com/book/en/v2/Git-Internals-Packfiles",
+    },
+  ],
   citations: [
     {
       title: "Git Internals Packfiles",

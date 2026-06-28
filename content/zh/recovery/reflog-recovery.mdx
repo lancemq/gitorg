@@ -9,6 +9,21 @@ export const metadata = {
     "https://git-scm.com/docs/git-reflog",
     "https://git-scm.com/book/en/v2/Git-Internals-Maintenance-and-Data-Recovery",
   ],
+  quotes: [
+    {
+      text: "Every move of HEAD is recorded in the reflog, so commits that seem 'lost' after a reset or rebase remain reachable until the reflog entry expires.",
+      attribution: "git-reflog(1) official manual",
+      url: "https://git-scm.com/docs/git-reflog.html",
+    },
+  ],
+  stats: [
+    {
+      value: "90 days",
+      label: "reachable reflog entries survive for 90 days by default — a wide recovery window before gc prunes them",
+      source: "git-reflog(1) / git-gc(1) official manual",
+      url: "https://git-scm.com/docs/git-reflog.html",
+    },
+  ],
   citations: [
     {
       title: "Git reflog",
