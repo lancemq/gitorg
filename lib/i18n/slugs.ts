@@ -140,7 +140,8 @@ export type WorkflowSlug =
   | "signing-commits-workflow"
   | "pre-commit-hook-workflow"
   | "large-file-handling-workflow"
-  | "rollback-deployment-workflow";
+  | "rollback-deployment-workflow"
+  | "ai-assisted-git-workflows";
 
 export type PlatformsSlug =
   | "github-flow-basics"
@@ -232,7 +233,8 @@ export type ConceptsSlug =
   | "git-rebase-deep"
   | "git-merge-deep"
   | "git-bisect-deep"
-  | "git-rerere-deep";
+  | "git-rerere-deep"
+  | "git-for-data";
 
 export const learningPathSlugs = [
   "quick-start",
@@ -486,6 +488,7 @@ export const workflowSlugs = [
   "pre-commit-hook-workflow",
   "large-file-handling-workflow",
   "rollback-deployment-workflow",
+  "ai-assisted-git-workflows",
 ] as const satisfies readonly WorkflowSlug[];
 
 export const recoverySlugs = [
@@ -528,6 +531,7 @@ export const conceptSlugs = [
   "git-merge-deep",
   "git-bisect-deep",
   "git-rerere-deep",
+  "git-for-data",
 ] as const satisfies readonly ConceptsSlug[];
 
 export type DevopsSlug =

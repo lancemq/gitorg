@@ -1,0 +1,162 @@
+export const metadata = {
+  title: "Git for Data — DVC, lakeFS, and Large Data Versioning",
+  slug: "git-for-data",
+  locale: "en",
+  section: "concepts",
+  author: "lance-mq",
+  summary: "Why plain Git struggles with datasets and model weights, and how DVC, lakeFS, git-annex, and Git LFS each solve data versioning for ML and analytics workloads.",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Internals-Packfiles",
+    "https://dvc.org/doc",
+    "https://docs.lakefs.io/",
+  ],
+  quotes: [
+    {
+      text: "Git stores every version of every file as a separate object; for large binary data that changes often, the repository grows without bound because Git cannot delta-compress most binary formats efficiently.",
+      attribution: "Pro Git, 2nd Ed., §10.4 Packfiles",
+      url: "https://git-scm.com/book/en/v2/Git-Internals-Packfiles",
+    },
+  ],
+  stats: [
+    {
+      value: "O(n) growth",
+      label: "each committed revision of a binary dataset adds a full new object — Git's delta packing rarely helps with compressed binaries",
+      source: "Pro Git §10.4 Packfiles",
+      url: "https://git-scm.com/book/en/v2/Git-Internals-Packfiles",
+    },
+  ],
+  citations: [
+    {
+      title: "Pro Git §10.4 — Packfiles",
+      url: "https://git-scm.com/book/en/v2/Git-Internals-Packfiles",
+      kind: "book",
+    },
+    {
+      title: "DVC — Data Version Control docs",
+      url: "https://dvc.org/doc",
+      kind: "official",
+    },
+    {
+      title: "lakeFS documentation",
+      url: "https://docs.lakefs.io/",
+      kind: "official",
+    },
+    {
+      title: "Git LFS",
+      url: "https://git-lfs.com/",
+      kind: "official",
+    },
+  ],
+};
+
+# Git for Data — DVC, lakeFS, and Large Data Versioning
+
+## What you will learn
+
+- Why plain Git bloats and slows down on datasets, model weights, and parquet files
+- The four main approaches to data versioning and when each fits
+- How DVC tracks data with pointer files while Git tracks the pointers
+- How lakeFS gives you Git-like branching over object storage without cloning data
+
+## Start with a problem
+
+Your team trains an ML model. The training dataset is 8 GB of parquet. Every experiment re-saves a slightly different 8 GB file. After a month, your `.git` directory is 60 GB, `git clone` takes 20 minutes, and nobody can tell which dataset produced the model in production. Git's snapshot model — its greatest strength for source code — becomes its worst liability for large, frequently-changing binaries.
+
+## Why plain Git struggles with data
+
+Git is a content-addressable snapshot store. For source code this is ideal: text diffs small, delta compression effective, every version cheap. For data it breaks down:
+
+- **Binaries don't delta.** Git's packfiles compress by storing objects as deltas against a base. Compressed binaries (parquet, PNG, model weights) are already entropy-maximized, so each revision is stored nearly in full.
+- **History never shrinks.** A deleted 8 GB file stays in the object database forever unless you rewrite history — which is painful on shared branches.
+- **Clone cost scales with history.** Every clone fetches every version of every blob.
+
+The result: repo size grows with `O(revisions × binary_size)`, which is unbounded for active data pipelines.
+
+## The four approaches
+
+| Approach | Data lives in | Git stores | Best for |
+|---|---|---|---|
+| **Git LFS** | LFS remote (HTTP) | LFS pointer + large file | Moderately large files (media, binaries) in a normal repo |
+| **DVC** | Any cloud/object store | A small `.dvc` pointer file + the data hash | ML datasets + model artifacts tracked alongside code |
+| **git-annex** | Any remote (git-annex special remotes) | Symlink + key | Larger scientific data, file-level dedup |
+| **lakeFS** | Object storage (S3 etc.) directly | Branch metadata on the lake | Analytics/data-engineering teams who branch data in place |
+
+### Git LFS
+
+Git LFS replaces large files in the repo with tiny pointer files and stores the real bytes on a separate LFS server. Good when your large files are **static-ish** (build artifacts, design assets). It struggles when data changes every run, because every version is still stored (just on the LFS server), and LFS quotas get expensive fast.
+
+### DVC — the ML-native choice
+
+DVC keeps data **out** of Git entirely. Git tracks a small `.dvc` pointer file containing a content hash; the actual data lives in a configurable remote (S3, GCS, Azure, SSH). This means:
+
+- The Git repo stays tiny — only pointer files are committed.
+- Data is reproducible: a commit + its `.dvc` pointers uniquely identify the exact dataset.
+- `dvc push` / `dvc pull` sync data to/from the remote on demand.
+
+```bash
+# Track a dataset with DVC
+dvc init                       # one-time, creates .dvc/
+dvc add data/train.parquet     # creates train.parquet.dvc pointer
+git add train.parquet.dvc .gitignore
+git commit -m "data: add train.parquet v1"
+
+# Later: swap in a new version
+dvc add data/train.parquet     # pointer hash updates
+git commit -am "data: refresh train.parquet for run 42"
+
+# Anyone can reproduce your exact dataset
+git checkout <experiment-commit>
+dvc pull                       # fetches the matching data version
+```
+
+The key insight: **Git versions the pointer; DVC versions the bytes.** Code and data history stay in sync because both are commits, but the bytes never enter `.git`.
+
+### lakeFS — branching data in place
+
+lakeFS applies Git's branching model **directly on object storage**. Instead of copying data, a lakeFS branch is a metadata pointer over the same underlying objects. You can `lakefs branch`, commit, merge, and revert terabytes of data without copying a single byte. This fits data-engineering teams who already live in S3 and want isolated, reviewable data changes without ETL copies.
+
+### git-annex
+
+git-annex is the older, lower-level option: it stores file content in special remotes and tracks availability with keys, exposing files as symlinks in the working tree. Powerful and flexible, but a steeper learning curve than DVC for most teams.
+
+## Choosing
+
+- **Source code + occasional large static files** → Git LFS.
+- **ML: datasets + model artifacts versioned with code** → DVC.
+- **Data engineering: branch/merge large lakes in S3** → lakeFS.
+- **Scientific computing, fine-grained dedup, many remotes** → git-annex.
+
+A common real pattern: Git for code, DVC for datasets and model weights, and a model registry on top. The repo stays small, experiments are reproducible, and `git log` still tells the story.
+
+## Common mistakes
+
+- **Committing raw datasets into Git.** The repo balloons and never recovers without `git filter-repo`.
+- **Using Git LFS for data that changes every run.** LFS storage costs scale with revisions just like Git.
+- **Forgetting to commit the `.dvc` pointer.** Without it, `dvc pull` can't find the right version — the pointer is the whole point.
+- **Treating lakeFS branches as cheap copies.** They're metadata; the underlying objects are shared, so destructive operations still need care.
+
+## Try it yourself
+
+1. In a throwaway repo, `dvc init`, add a small CSV with `dvc add`, commit the `.dvc` pointer, then modify the CSV and re-add — observe how Git only sees the pointer change.
+2. Run `git count-objects -vH` on a repo before and after a large binary commit to feel the bloat firsthand.
+3. Set up a two-commit DVC history, `git checkout` the older commit, and `dvc pull` to reproduce the older dataset exactly.
+
+## Further reading
+
+- [Pro Git §10.4 — Packfiles](https://git-scm.com/book/en/v2/Git-Internals-Packfiles)
+- [DVC documentation](https://dvc.org/doc)
+- [lakeFS documentation](https://docs.lakefs.io/)
+- [Git LFS](https://git-lfs.com/)
+- [Concepts: Git LFS deep dive](/en/concepts/git-lfs-deep)
+- [Migration: git-filter-repo](/en/migration/git-filter-repo)
+
+{/* internal-links:auto */}
+
+## Further reading
+
+Keep going on the same topic:
+
+- [Git Bisect Deep Dive](/en/concepts/git-bisect-deep)
+- [Git History Explained](/en/concepts/git-history)
+- [Git Hooks Deep Dive](/en/concepts/git-hooks-deep)
+

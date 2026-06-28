@@ -1,0 +1,162 @@
+export const metadata = {
+  title: "用 Git 管理数据 —— DVC、lakeFS 与大数据版本控制",
+  slug: "git-for-data",
+  locale: "zh",
+  section: "concepts",
+  author: "lance-mq",
+  summary: "为什么纯 Git 处理数据集和模型权重会吃力，DVC、lakeFS、git-annex、Git LFS 各自如何解决 ML 与分析场景的数据版本控制。",
+  sourceUrls: [
+    "https://git-scm.com/book/en/v2/Git-Internals-Packfiles",
+    "https://dvc.org/doc",
+    "https://docs.lakefs.io/",
+  ],
+  quotes: [
+    {
+      text: "Git 把每个文件的每个版本存为独立对象；对于频繁变化的大二进制数据，仓库会无界增长，因为 Git 对多数二进制格式无法高效做 delta 压缩。",
+      attribution: "Pro Git, 2nd Ed., §10.4 Packfiles",
+      url: "https://git-scm.com/book/en/v2/Git-Internals-Packfiles",
+    },
+  ],
+  stats: [
+    {
+      value: "O(n) 增长",
+      label: "二进制数据集的每次提交都新增一个完整对象——Git 的 delta packing 对压缩过的二进制几乎无效",
+      source: "Pro Git §10.4 Packfiles",
+      url: "https://git-scm.com/book/en/v2/Git-Internals-Packfiles",
+    },
+  ],
+  citations: [
+    {
+      title: "Pro Git §10.4 — Packfiles",
+      url: "https://git-scm.com/book/en/v2/Git-Internals-Packfiles",
+      kind: "book",
+    },
+    {
+      title: "DVC — Data Version Control docs",
+      url: "https://dvc.org/doc",
+      kind: "official",
+    },
+    {
+      title: "lakeFS documentation",
+      url: "https://docs.lakefs.io/",
+      kind: "official",
+    },
+    {
+      title: "Git LFS",
+      url: "https://git-lfs.com/",
+      kind: "official",
+    },
+  ],
+};
+
+# 用 Git 管理数据 —— DVC、lakeFS 与大数据版本控制
+
+## 学完这篇你会掌握什么
+
+- 为什么纯 Git 在数据集、模型权重、parquet 文件上会膨胀变慢
+- 数据版本控制的四种主流方案及各自适用场景
+- DVC 如何用指针文件跟踪数据，而 Git 只跟踪指针
+- lakeFS 如何在不克隆数据的前提下，给对象存储加上类似 Git 的分支
+
+## 先想一个问题
+
+你的团队训练一个 ML 模型。训练数据集是 8 GB 的 parquet。每次实验都重新保存一个略有不同的 8 GB 文件。一个月后，`.git` 目录 60 GB，`git clone` 要 20 分钟，没人能说清生产环境里的模型是哪个数据集训出来的。Git 的快照模型——对源码是最大优势——对频繁变化的大二进制反而成了最大负担。
+
+## 为什么纯 Git 处理数据会吃力
+
+Git 是内容寻址的快照存储。对源码这很理想：文本 diff 小、delta 压缩有效、每个版本都很便宜。对数据它就崩了：
+
+- **二进制没法 delta。** Git 的 packfile 靠把对象存成对基线的 delta 来压缩。压缩过的二进制（parquet、PNG、模型权重）已经熵最大化，所以每次修订几乎都是全量存储。
+- **历史永不缩小。** 一个删掉的 8 GB 文件永远留在对象库里，除非你改写历史——而这在共享分支上很痛苦。
+- **克隆成本随历史增长。** 每次克隆都要拉每个版本的每个 blob。
+
+结果：仓库大小按 `O(修订数 × 二进制大小)` 增长，对活跃的数据管线来说是无界的。
+
+## 四种方案
+
+| 方案 | 数据存在哪 | Git 存什么 | 最适合 |
+|---|---|---|---|
+| **Git LFS** | LFS 远端（HTTP） | LFS 指针 + 大文件 | 普通仓库里中等大小、较静态的文件（媒体、二进制） |
+| **DVC** | 任意云/对象存储 | 一个小的 `.dvc` 指针文件 + 数据哈希 | ML 数据集 + 模型产物，和代码一起跟踪 |
+| **git-annex** | 任意远端（special remotes） | 符号链接 + key | 较大的科研数据、文件级去重 |
+| **lakeFS** | 对象存储（S3 等）直接 | 湖上的分支元数据 | 在原地分支数据的数据分析/工程团队 |
+
+### Git LFS
+
+Git LFS 用小指针文件替换仓库里的大文件，把真正的字节存在单独的 LFS 服务器上。当你的大文件**较静态**（构建产物、设计素材）时很合适。当数据每次运行都变时它就吃力，因为每个版本仍然要存（只是存在 LFS 服务器上），LFS 配额很快变贵。
+
+### DVC —— ML 原生的选择
+
+DVC 把数据**完全挡在** Git 之外。Git 跟踪一个含内容哈希的小 `.dvc` 指针文件；真正的数据存在可配置的远端（S3、GCS、Azure、SSH）。这意味着：
+
+- Git 仓库保持很小——只有指针文件被提交。
+- 数据可复现：一个提交加上它的 `.dvc` 指针能唯一确定那个确切的数据集。
+- `dvc push` / `dvc pull` 按需在远端之间同步数据。
+
+```bash
+# 用 DVC 跟踪一个数据集
+dvc init                       # 一次性，创建 .dvc/
+dvc add data/train.parquet     # 生成 train.parquet.dvc 指针
+git add train.parquet.dvc .gitignore
+git commit -m "data: add train.parquet v1"
+
+# 之后：换上新版本
+dvc add data/train.parquet     # 指针哈希更新
+git commit -am "data: refresh train.parquet for run 42"
+
+# 任何人都能复现你的确切数据集
+git checkout <experiment-commit>
+dvc pull                       # 拉取匹配的数据版本
+```
+
+关键洞察：**Git 给指针做版本，DVC 给字节做版本。** 代码和数据历史保持同步，因为两者都是提交，但字节从不进 `.git`。
+
+### lakeFS —— 在原地分支数据
+
+lakeFS 把 Git 的分支模型**直接套在对象存储上**。它不复制数据——一个 lakeFS 分支是同一批底层对象的元数据指针。你可以 `lakefs branch`、提交、合并、回退 TB 级数据，而不复制一个字节。这适合已经活在 S3 里、想要隔离的、可评审的数据改动且不想要 ETL 拷贝的数据工程团队。
+
+### git-annex
+
+git-annex 是更老、更底层的选项：它把文件内容存在 special remotes，用 key 跟踪可用性，在工作区里把文件暴露成符号链接。强大灵活，但对多数团队来说学习曲线比 DVC 陡。
+
+## 如何选择
+
+- **源码 + 偶尔的大静态文件** → Git LFS。
+- **ML：数据集 + 模型产物随代码一起版本化** → DVC。
+- **数据工程：在 S3 里分支/合并大湖** → lakeFS。
+- **科研计算、细粒度去重、多个远端** → git-annex。
+
+一个常见的真实组合：Git 管代码，DVC 管数据集和模型权重，上面再叠一个模型注册表。仓库保持小，实验可复现，`git log` 仍然讲得清故事。
+
+## 常见误区
+
+- **把原始数据集提交进 Git。** 仓库膨胀，不跑 `git filter-repo` 就恢复不了。
+- **用 Git LFS 管每次运行都变的数据。** LFS 存储成本和 Git 一样随修订数增长。
+- **忘了提交 `.dvc` 指针。** 没它 `dvc pull` 找不到对的版本——指针才是重点。
+- **把 lakeFS 分支当廉价副本。** 它们是元数据；底层对象是共享的，所以破坏性操作仍需谨慎。
+
+## 给你的练习
+
+1. 在一个临时仓库里 `dvc init`，用 `dvc add` 加一个小 CSV，提交 `.dvc` 指针，再修改 CSV 重新 add——观察 Git 只看到指针变化。
+2. 在提交大二进制前后跑 `git count-objects -vH`，亲手感受膨胀。
+3. 建一个两提交的 DVC 历史，`git checkout` 到旧提交，`dvc pull` 精确复现旧数据集。
+
+## 延伸阅读
+
+- [Pro Git §10.4 — Packfiles](https://git-scm.com/book/en/v2/Git-Internals-Packfiles)
+- [DVC 文档](https://dvc.org/doc)
+- [lakeFS 文档](https://docs.lakefs.io/)
+- [Git LFS](https://git-lfs.com/)
+- [概念：Git LFS 深入](/zh/concepts/git-lfs-deep)
+- [迁移：git-filter-repo](/zh/migration/git-filter-repo)
+
+{/* internal-links:auto */}
+
+## 延伸阅读
+
+沿着同一主题继续深入：
+
+- [Git Bisect 深入](/zh/concepts/git-bisect-deep)
+- [Git 历史说明](/zh/concepts/git-history)
+- [Git Hooks 深入](/zh/concepts/git-hooks-deep)
+

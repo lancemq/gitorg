@@ -1,0 +1,185 @@
+export const metadata = {
+  title: "AI-Assisted Git Workflows",
+  slug: "ai-assisted-git-workflows",
+  locale: "en",
+  section: "workflows",
+  author: "lance-mq",
+  summary: "How to use AI coding tools (Copilot, Claude Code, Cursor, Aider) with Git safely — reviewing AI diffs, writing verifiable commit messages, and avoiding history-rewrite disasters.",
+  sourceUrls: [
+    "https://git-scm.com/docs/git-commit",
+    "https://git-scm.com/docs/git-push",
+    "https://docs.github.com/en/copilot",
+  ],
+  quotes: [
+    {
+      text: "The commit message should explain WHY the change was made; the diff already shows WHAT changed. AI-generated messages that only paraphrase the diff add noise, not context.",
+      attribution: "Pro Git, 2nd Ed., §5.2 Commit Guidelines",
+      url: "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project",
+    },
+  ],
+  stats: [
+    {
+      value: "review the diff",
+      label: "the single most important habit: read the full diff before committing AI output, every time",
+      source: "Pro Git §2.2 Viewing Changes",
+      url: "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+    },
+  ],
+  citations: [
+    {
+      title: "git-commit(1) — Official manual",
+      url: "https://git-scm.com/docs/git-commit",
+      kind: "official",
+    },
+    {
+      title: "git-push(1) — force-with-lease",
+      url: "https://git-scm.com/docs/git-push",
+      kind: "official",
+    },
+    {
+      title: "GitHub Copilot docs",
+      url: "https://docs.github.com/en/copilot",
+      kind: "official",
+    },
+    {
+      title: "Pro Git §5.2 Contributing — Commit Guidelines",
+      url: "https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project",
+      kind: "book",
+    },
+  ],
+};
+
+# AI-Assisted Git Workflows
+
+## What you will learn
+
+- Keep AI-generated changes reviewable and reversible inside Git
+- Write commit messages that survive AI noise and stay useful to humans
+- Use `--force-with-lease` and reflog as your safety net when AI rewrites history
+- Decide what AI artifacts belong in `.gitignore` and what must never be committed
+
+## Start with a problem
+
+You let an AI agent refactor a feature branch. It touched 40 files, rewrote the commit history twice, generated a one-line commit message, and now your teammate's branch no longer merges cleanly. The changes might be great — but you can't tell what's safe, what's hallucinated, and how to get back to a known-good state. The problem isn't AI; it's that AI moves fast and Git's safety model assumes you read every change.
+
+## The core model
+
+Git is a content-addressable history you can always rewind. AI tools are fast, optimistic editors that skip the "read the diff" step humans do instinctively. The workflow that makes them safe together is simple: **let AI edit freely, but make every AI change pass through a human-reviewed checkpoint before it enters shared history.**
+
+That means three checkpoints:
+
+1. **Diff review before commit** — `git diff` and `git diff --staged` are mandatory, not optional.
+2. **Commit message verification** — never trust an AI message blindly; rewrite it if it only describes the diff.
+3. **Force-push guard** — AI rewrites use `--force-with-lease`, never `--force`.
+
+## A safe everyday rhythm
+
+```bash
+# 1. Start from a clean, up-to-date base
+git switch -c feature/ai-refactor
+git fetch origin
+git rebase origin/main
+
+# 2. Let the AI tool edit (Copilot / Claude Code / Cursor / Aider)
+# ... AI makes changes ...
+
+# 3. Review EVERYTHING before staging
+git status
+git diff
+
+# 4. Stage in logical chunks — do not commit one giant blob
+git add src/auth/
+git diff --staged          # review again, staged
+git commit                 # write/verify the message
+
+# 5. If the AI rewrote history, recover the old state first
+git reflog                 # find the pre-rewrite HEAD
+git reset --hard HEAD@{1}  # undo if the rewrite was wrong
+```
+
+## Writing commit messages AI can't fake
+
+AI tools default to messages like `refactor: update auth module` — which restates the diff and tells a reviewer nothing. A useful message answers **why**:
+
+```text
+auth: split token validation out of the login handler
+
+The login handler validated tokens, logged in, and started the
+session in one 200-line function. Token validation is reused by
+the API middleware in the next change, so this commit extracts
+it into verifyToken() without behavior change.
+
+Verified: all 47 auth tests pass.
+```
+
+If the AI's message doesn't explain the motivation, rewrite it. The diff already shows *what* changed; the message exists to capture *why*.
+
+## When AI rewrites history
+
+Tools like Aider and some agent modes rewrite commits (squash, reorder, amend). On a **local, unpushed** branch this is fine. The moment the branch is shared, rewriting creates chaos. Rules:
+
+- Only let AI rewrite commits that have **not been pushed**.
+- If you must rewrite a shared branch, coordinate and use `git push --force-with-lease` — it aborts if someone else pushed in the meantime.
+- Before any rewrite, note the current SHA: `git rev-parse HEAD` or just check `git reflog` after.
+
+`--force-with-lease` is the difference between "I overwrote my teammate's work" and "Git refused and told me to pull first."
+
+## What never goes into Git (AI artifacts)
+
+AI tools generate files that must stay out of version control:
+
+```gitignore
+# AI tooling artifacts
+.aider*
+.cursor/
+.claude/
+codeium/
+*.prompt-cache
+
+# NEVER commit secrets — AI tools can leak them into diffs
+.env
+.env.local
+*.pem
+```
+
+The risk with AI is higher than with humans: an AI may read a secret to "fix" something and paste it into a commit message, a test fixture, or a comment. Run `git diff --staged` specifically looking for anything that looks like a key or token before every commit.
+
+## Common mistakes
+
+- **Committing the AI's whole session as one commit.** Split by concern. `git add -p` lets you stage line-by-line.
+- **Trusting the AI commit message.** If it says "update files" or restates the diff, rewrite it.
+- **`--force` instead of `--force-with-lease`.** On shared branches this silently destroys others' work.
+- **Letting AI push directly.** Keep push as a human action; AI stages and commits, a human reviews and pushes.
+- **Skipping `git reflog` after a bad rewrite.** The pre-rewrite state is almost always still there.
+
+## Preconditions for a healthy AI + Git loop
+
+- A clean base branch you can rebase onto (`git fetch && git rebase origin/main`).
+- A `.gitignore` that excludes AI tooling state and secrets.
+- A habit of reading `git diff --staged` before every commit.
+- `push.default = simple` and a team rule of `--force-with-lease` only.
+
+## Try it yourself
+
+1. Create a throwaway branch, let an AI tool make three separate logical changes, and commit each one separately with a hand-written message — practice splitting AI output.
+2. Have the AI rewrite the history (`rebase -i` squash), then use `git reflog` and `git reset --hard HEAD@{1}` to undo it.
+3. Stage a change with `git add -p`, deliberately include one line you would not want, and practice un-staging just that line.
+
+## Further reading
+
+- [git-commit(1) — Official manual](https://git-scm.com/docs/git-commit)
+- [git-push(1) — force-with-lease](https://git-scm.com/docs/git-push)
+- [Pro Git §5.2 — Contributing, Commit Guidelines](https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project)
+- [Recovery: reflog recovery](/en/recovery/reflog-recovery)
+- [Best practices: atomic commits](/en/best-practices/atomic-commits)
+
+{/* internal-links:auto */}
+
+## Further reading
+
+Keep going on the same topic:
+
+- [Using git worktree as the default mode for AI coding agents](/en/workflows/ai-agent-worktree-mode)
+- [API Versioning Change Workflow](/en/workflows/api-versioning-change-workflow)
+- [Backporting with Cherry-pick](/en/workflows/backport-with-cherry-pick)
+
