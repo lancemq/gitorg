@@ -42,11 +42,9 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of Recovering with reflog
-- Master the basic usage and common options of Recovering with reflog
-- Use reflog to locate previous references and recover from reset, rebase, or lost branch states.
-- Understand key concepts: When reflog is the right first stop
-- Know when to use this feature and when to avoid it
+- Understand that reflog records how references moved, not an automatic undo of everything
+- Apply the safe recovery order: inspect reflog, create a rescue branch, then decide reset or cherry-pick
+- Know the limits (local 90-day window) and when to capture a rescue branch before trying more commands
 
 
 `git reflog` is often the most practical recovery tool in everyday Git accidents. After a bad reset, rebase, amend, or pull, what you usually lose first is not the commit object itself but the name and reference that used to point to it.
@@ -66,7 +64,7 @@ export const metadata = {
 
 ## Start with a problem
 
-You just ran a Git command and the result wasn't what you expected — maybe you even lost some commits. This has happened before, and you want a reliable set of recovery techniques.
+You ran `git reset --hard HEAD~1` to step back one commit, then realized you also dropped an important unpushed commit. The history looks shorter and your heart rate goes up — but the commit object is almost certainly still there. You only lost the name that said where the branch pointed. Reflog is the tool that helps you recover that name.
 
 ## When reflog is the right first stop
 
@@ -192,9 +190,9 @@ When Git history looks wrong, start with this:
 
 ## Try it yourself
 
-1. Practice the reflog-recovery command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Follow the PracticeLab: build a throwaway repo, deliberately run `git reset --hard HEAD~1`, then find the pre-reset entry with `git reflog --date=local` and capture it with `git switch -c rescue/recover HEAD@{1}`.
+2. Simulate a deleted branch: `git branch -D` a local branch, then use `git reflog` or `git fsck --lost-found` to relocate its commit and recreate a branch from it.
+3. Run `git commit --amend` to change the latest message, then use reflog to find the pre-amend SHA and bring the old version back via a rescue branch or cherry-pick.
 
 {/* internal-links:auto */}
 

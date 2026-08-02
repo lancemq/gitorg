@@ -27,11 +27,9 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of GitLab merge trains and merged result pipelines
-- Master the basic usage and common options of GitLab merge trains and merged result pipelines
-- Use merge trains and merged-result pipelines to validate integration reality before merge, especially under high parallel MR traffic.
-- Understand key concepts: Two core pieces
-- Know when to use this feature and when to avoid it
+- Understand the distinct roles of merged-result pipelines and merge trains, and why a green per-branch CI does not mean green after merge
+- Enable a merge train in a GitLab project, including the `.gitlab-ci.yml` config and the `$CI_MERGE_REQUEST_ID` rule
+- Recognize which high-concurrency merge scenarios call for a merge train and which lightweight cases do not
 
 
 A branch pipeline passing does not guarantee the post-merge combination will stay green. Merge trains target that integration gap.
@@ -39,7 +37,7 @@ A branch pipeline passing does not guarantee the post-merge combination will sta
 
 ## Start with a problem
 
-You're already using GitHub or GitLab to host code, but beyond push and pull, you're not fully familiar with the collaboration features these platforms offer — PR workflows, code review, and permission management.
+You and a teammate merged two MRs into `main` almost at the same time. Both pipelines were green on their own, yet CI went red right after merge — you touched the same module, and neither branch saw the other's change in isolation. The tests weren't wrong; the *combined post-merge result* was never verified. That gap is exactly what merge trains close.
 
 ## Two core pieces
 
@@ -56,6 +54,34 @@ You're already using GitHub or GitLab to host code, but beyond push and pull, yo
   Merge trains reduce merge race risk, but still depend on meaningful test coverage.
 </WarningBox>
 
+## How to enable (minimal config)
+
+A merge train requires **merged result pipelines** to be on first, then the train itself (both toggled in Settings → Merge requests).
+
+In `.gitlab-ci.yml`, make the pipeline run on the merge result rather than only on the source branch:
+
+```yaml
+# Run the pipeline on the MR's merge result (merged result pipeline)
+# With merge trains on, GitLab also folds in the results of prior queued MRs
+test:
+  script: ./run_tests.sh
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+
+# While a merge train runs, the pipeline faces the train ref:
+# refs/merge-requests/<iid>/train
+```
+
+<WarningBox title="The train ref is not your branch">
+  The Nth MR in the queue runs against a temporary combination where the previous N-1 MRs are already merged — not the branch you pushed. Don't hardcode branch names in assertions.
+</WarningBox>
+
+### Adding an MR to the train queue
+
+- In the MR page click **Start/Add to merge train** (merge permission required)
+- Or via API: `POST /projects/:id/merge_trains/merge_requests/:merge_request_iid`
+- If any MR's train pipeline fails, it and the MRs behind it are dropped from the queue and must be re-run from the failure point
+
 ## Good follow-up reads
 
 1. [`merge queue workflow`](/en/workflows/merge-queue-workflow)
@@ -64,9 +90,9 @@ You're already using GitHub or GitLab to host code, but beyond push and pull, yo
 
 ## Try it yourself
 
-1. Practice the gitlab-merge-trains-and-merge-result-pipelines command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. In a test project, turn on merged result pipelines + merge train, then create two conflicting MRs on purpose and watch how they enter the train queue instead of merging separately.
+2. Rewrite one existing pipeline in `.gitlab-ci.yml` using the `$CI_MERGE_REQUEST_ID` rule, and compare the output of "source branch only" vs "merge result".
+3. Force a train pipeline of one MR to fail, observe the trailing MRs being dropped from the queue, and practice re-running from the failure point.
 
 {/* internal-links:auto */}
 

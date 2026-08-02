@@ -33,11 +33,9 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of Commit message conventions
-- Master the basic usage and common options of Commit message conventions
-- Use a consistent commit message structure to improve log readability, release notes quality, and incident-time traceability.
-- Understand key concepts: A practical structure
-- Know when to use this feature and when to avoid it
+- Apply the Conventional Commits `<type>(<scope>): <summary>` structure, including what belongs in the body
+- Understand why good commit messages make `git bisect`, `git log`, and CHANGELOG generation actually usable
+- Spot common commit-message mistakes and know how to correct them during code review
 
 
 Commit messages are long-term operational metadata, not just local notes.
@@ -45,7 +43,7 @@ Commit messages are long-term operational metadata, not just local notes.
 
 ## Start with a problem
 
-Your team has developed some Git habits over time, but you're not sure if they are optimal — or you've just been through an incident caused by a Git mistake and want to avoid repeating it.
+After a production incident you tried to trace which commit introduced the bug, but the history was a wall of "fix bug" and "update". `git bisect` landed on a commit you couldn't interpret, so the root cause took far longer to pin down than it should have.
 
 ## A practical structure
 
@@ -87,6 +85,30 @@ Risk: may increase login retries for stale clients.
   PR context may be collapsed or lost over time. Commit history remains the durable searchable index.
 </WarningBox>
 
+## Common misconceptions
+
+1. **"The message is just for me."** The opposite is true. You and your teammates rely on `git log` and `git bisect` months later; vague messages double the cost of every future trace.
+2. **"One commit, several unrelated changes."** Mixing a login fix with a typo fix means `git revert` / `git bisect` can't isolate one concern, skewing bisection results.
+3. **"Amend a commit that's already pushed."** Rewriting shared history makes collaborators' `pull` conflict. Use `--amend` only for local, unpushed commits; for pushed ones, add a new corrective commit.
+4. **"Summary like `fix: bug`."** No scope, no reason. The conventional form `fix(auth): reject expired refresh token` tells readers the blast radius at a glance.
+
+<WarningBox title="--amend rewrites, it does not undo">
+  `git commit --amend` creates a new commit object and replaces HEAD. Once pushed, amending forks everyone else's history and forces a coordinated force-push.
+</WarningBox>
+
+### A real incident trace
+
+```text
+# Production login failure — find the offending commit
+$ git log --oneline -10
+a1b2c3d update      # no clue what changed
+e4f5g6h fix bug     # equally uninformative
+$ git bisect start <bad> <good>
+# bisection stops at "update", but the message hides a broken token check
+```
+
+Had it been `fix(auth): reject expired refresh token`, the trace would have hit immediately and saved a long investigation.
+
 ## Good follow-up reads
 
 1. [`commit hygiene`](/en/best-practices/commit-hygiene)
@@ -95,9 +117,9 @@ Risk: may increase login retries for stale clients.
 
 ## Try it yourself
 
-1. Practice the commit-message-conventions command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Rewrite the last five commits of a project into Conventional Commits format (`type(scope): summary` + body with reason), then compare the readability of `git log --oneline` before and after.
+2. Deliberately split a "login fix" and a "doc typo fix" into two commits, then run `git bisect` to feel why single-concern commits matter.
+3. During review, take a `fix: bug`-style message and rewrite it using the template, explaining why scope and reason are both required.
 
 {/* internal-links:auto */}
 

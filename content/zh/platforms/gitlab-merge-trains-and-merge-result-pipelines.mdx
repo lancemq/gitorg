@@ -27,12 +27,9 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 理解 GitLab Merge Trains 与合并结果流水线 的核心作用和适用场景
-- 掌握 GitLab Merge Trains 与合并结果流水线 的基本用法和常用参数
-- 通过 Merge Trains 与 merge result pipelines 在合并前验证“真实合并结果”，降低并发 MR 导致的主线回归。
-- 理解 两个关键组件 相关的概念
-- 掌握 适用场景 相关的操作
-- 知道在什么场景下使用该命令，什么场景下避免使用
+- 理解 merged result pipeline 与 merge train 各自的职责，以及为什么单分支 CI 绿不等于合入后绿
+- 掌握在 GitLab 项目里开启 merge train（含 `.gitlab-ci.yml` 配置与 `$CI_MERGE_REQUEST_ID` 规则）的具体步骤
+- 知道在哪些并发合并场景下该用 merge train，哪些轻量场景下不必启用
 
 
 并发 MR 场景下，单个分支 CI 绿不代表“合入主线后仍绿”。Merge trains 的目标是验证“即将进入主线的真实组合”。
@@ -40,7 +37,7 @@ export const metadata = {
 
 ## 先想一个问题
 
-你已经在用 GitHub 或 GitLab 托管代码，但除了 push 和 pull，你对平台提供的协作功能还不够熟悉——PR 流程、代码审查、权限管理这些应该怎么用才合适？
+你和同事几乎同时把两条 MR 合进了 `main`：单独的流水线都绿，可合入后 CI 立刻红了——因为你们改的是同一个模块，两条分支单独跑时谁都没看到对方的那份改动。问题不在测试，而在于“合入后的真实组合”从没被验证过。Merge train 要解决的正是这个空隙。
 
 ## 两个关键组件
 
@@ -57,6 +54,34 @@ export const metadata = {
   若测试覆盖不足，merge train 也只能把风险按顺序送入主线。
 </WarningBox>
 
+## 如何开启（最小可行配置）
+
+开启 merge train 的前提是先把 **merged result pipeline** 打开，再开启 train 本身（两者都在项目设置 → Merge requests 里勾选）。
+
+`.gitlab-ci.yml` 里要让流水线在合并结果上跑，而不是只在源分支上跑：
+
+```yaml
+# 让流水线在 MR 的合并结果上执行（merged result pipeline）
+# 启用 merge train 后，GitLab 会把队列中前序 MR 的结果一起纳入
+test:
+  script: ./run_tests.sh
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+
+# 当 merge train 运行时，流水线面对的是 train ref：
+# refs/merge-requests/<iid>/train
+```
+
+<WarningBox title="train ref 不是你的分支">
+  队列里第 N 个 MR 跑的流水线，面对的是“前面 N-1 个 MR 已合入”的临时组合，不是你推送的那个分支。断言里别写死分支名。
+</WarningBox>
+
+### 把 MR 加进 train 队列
+
+- 在 MR 页面点 **Start/Add to merge train**（需有合并权限）
+- 或用 API：`POST /projects/:id/merge_trains/merge_requests/:merge_request_iid`
+- 一旦某个 MR 的 train 流水线失败，它和排在它后面的 MR 都会被移出队列，需要从失败处重跑
+
 ## 接下来建议继续看什么
 
 1. [`merge queue workflow`](/zh/workflows/merge-queue-workflow)
@@ -65,9 +90,9 @@ export const metadata = {
 
 ## 给你的练习
 
-1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
-2. 尝试该命令的不同参数选项，对比输出结果的差异
-3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+1. 在一个测试项目里开启 merged result pipeline + merge train，故意制造两条会冲突的 MR，观察它们如何进入 train 队列而不是各自合入。
+2. 在 `.gitlab-ci.yml` 里用 `$CI_MERGE_REQUEST_ID` 规则改写一条现有流水线，对比“只在源分支跑”和“在合并结果上跑”的输出差异。
+3. 让队列中某个 MR 的 train 流水线失败，记录后面 MR 被移出队列的行为，并练习从失败处重跑。
 
 {/* internal-links:auto */}
 

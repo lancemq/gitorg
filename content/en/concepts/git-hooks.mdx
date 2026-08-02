@@ -27,17 +27,15 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of Git Hooks: Automating Git Workflows
-- Master the basic usage and common options of Git Hooks: Automating Git Workflows
-- A practical guide to Git hooks, covering client-side and server-side hooks, common use cases, and best practices for hook management.
-- Understand key concepts: What Are Git Hooks?
-- Know when to use this feature and when to avoid it
+- Understand that Git hooks are event-triggered scripts that let you intervene at key moments (commit, push, merge)
+- Enable scripts under `.git/hooks/`: remove the `.sample` suffix, add execute permission, and understand that a non-zero `pre-*` exit aborts the operation
+- Use Husky + lint-staged to bring hooks under version control, and know when a client-side vs server-side hook is the right tool
 
 
 
 ## Start with a problem
 
-You've encountered a conceptual question while using Git — you roughly know what it means, but you're not entirely sure about its precise definition and boundaries.
+You accidentally committed a `.env` file with secrets in it, and only noticed after it was already pushed. A `pre-commit` hook that scanned staged files for secrets would have blocked this before it ever happened. The question is: where do these hooks live, how do you write one, and why does it protect your machine but not necessarily your teammate's?
 
 ## What Are Git Hooks?
 
@@ -426,9 +424,9 @@ Git hooks are a powerful mechanism for automating and enforcing workflows. Use c
 
 ## Try it yourself
 
-1. Practice the git-hooks command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. In a test repo, enable `pre-commit`: remove the `.git/hooks/pre-commit.sample` suffix, write a script that scans `git diff --cached` for `.env`, make it executable, then try committing a `.env` file and confirm it is blocked.
+2. Write a `post-commit` hook using `git rev-parse --abbrev-ref HEAD` that bumps the version automatically on the `release` branch (see scenario 4), and observe the effect with `git log`.
+3. Wire `pre-commit` into version control with Husky + lint-staged: configure lint-staged to run ESLint only on staged `*.js`, then make a commit and verify the hook still works after a fresh clone.
 
 {/* internal-links:auto */}
 

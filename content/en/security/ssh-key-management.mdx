@@ -219,11 +219,16 @@ Keys can expire, and you might forget the passphrase. Check and rotate periodica
 2. **Separate keys per platform** — limit damage if one key leaks
 3. **Know what to do if a key is compromised**
 
-If you suspect a key leak:
-1. Delete the local private and public key files immediately
-2. Generate a new pair
-3. Remove the old public key from all platforms and add the new one
-4. Investigate how it leaked (public repo? shared with someone?)
+If you suspect a key leak, **the first step is always to revoke the public key on the platform, not to delete your local file** — the attacker may already hold a copy of the private key, so removing your local copy does nothing to block them.
+
+1. Immediately remove (revoke) the old public key from GitHub / GitLab and every other platform
+2. Generate a new pair and reconfigure the new public key on each platform
+3. Then delete the old local private and public key files
+4. Investigate how it leaked (public repo? shared with someone?), and verify remaining key fingerprints with `ssh-keygen -l -f ~/.ssh/id_ed25519.pub`
+
+<WarningBox title="Lock down private-key file permissions">
+  Keep `~/.ssh` at `700` and the private key at `600` (`chmod 600 ~/.ssh/id_ed25519`). Overly open permissions make the SSH client refuse the key, and can also expose the plaintext to other local users.
+</WarningBox>
 
 ## Try it yourself
 

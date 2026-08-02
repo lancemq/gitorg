@@ -42,12 +42,9 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 理解 reflog 恢复手册 的核心作用和适用场景
-- 掌握 reflog 恢复手册 的基本用法和常用参数
-- 当 reset、rebase、pull 或误删分支后找不到原来位置时，优先用 reflog 重新定位并建立恢复路径。
-- 理解 哪些场景最适合先看 reflog 相关的概念
-- 掌握 一个最稳的恢复顺序 相关的操作
-- 知道在什么场景下使用该命令，什么场景下避免使用
+- 理解 reflog 记的是“引用怎么移动”，而不是帮你直接撤销一切
+- 掌握“先看 reflog → 建救援分支 → 再决定 reset/cherry-pick”的稳妥恢复顺序
+- 知道 reflog 有本地 90 天窗口等边界，哪些场景该立刻建救援分支而不是继续试命令
 
 
 `reflog` 是很多 Git 恢复动作里最值得先看的东西。误操作之后，你最先丢掉的通常不是提交对象，而是“当前分支原来指向哪里”的名字和上下文。
@@ -67,7 +64,7 @@ export const metadata = {
 
 ## 先想一个问题
 
-你刚刚在 Git 里做了一个操作，结果发现不是你想要的效果——甚至可能弄丢了提交。这种情况不是第一次了，你想建立一套可靠的方法来应对各种误操作场景。
+你刚执行 `git reset --hard HEAD~1` 想回退一步，结果发现自己把还没推送的重要提交一起弄“丢”了。终端里历史变短了，心跳加速——但其实提交对象还在，你只是把“当前分支指向哪”这个名字弄丢了。reflog 就是帮你把那个名字重新找回来的工具。
 
 ## 哪些场景最适合先看 reflog
 
@@ -195,9 +192,9 @@ git switch -c rescue/recover HEAD@{1}
 
 ## 给你的练习
 
-1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
-2. 尝试该命令的不同参数选项，对比输出结果的差异
-3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+1. 按本文的 PracticeLab 搭一个临时仓库，故意 `git reset --hard HEAD~1`，再用 `git reflog --date=local` 找到 reset 前的记录并 `git switch -c rescue/recover HEAD@{1}` 接住它。
+2. 再模拟一次误删分支：`git branch -D` 掉一个本地分支后，用 `git reflog` 或 `git fsck --lost-found` 把它指向的提交重新定位，建一条新分支接住。
+3. 故意跑一次 `git commit --amend` 改掉最近一条 message，然后用 reflog 找到 amend 前的 SHA，用救援分支或 `git cherry-pick` 把旧版本拿回来。
 
 {/* internal-links:auto */}
 

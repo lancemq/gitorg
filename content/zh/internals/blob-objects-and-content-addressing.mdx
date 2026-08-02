@@ -21,17 +21,15 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 理解 Blob 对象与内容寻址教程 的核心作用和适用场景
-- 掌握 Blob 对象与内容寻址教程 的基本用法和常用参数
-- 解释 blob 如何只按内容存储，以及哈希为什么成为对象身份。
-- 理解 1. 为什么先理解 blob 相关的概念
-- 掌握 2. blob 到底保存什么 相关的操作
-- 知道在什么场景下使用该命令，什么场景下避免使用
+- 理解 blob 是什么：它只保存文件内容，不保存文件名、路径或历史
+- 掌握内容寻址的含义：对象身份（哈希）由内容本身推导，而非外部编号
+- 能用 `git hash-object` 与 `git cat-file` 亲手验证「相同内容 → 相同 blob」
+- 分清 blob、tree、commit 三者的分工，并据此解释 diff、重命名与去重现象
 
 
 ## 先想一个问题
 
-你每天都在用 Git 命令，但偶尔会遇到一些 '奇怪' 的行为——比如明明没改文件却被提示有改动，或者 rebase 时突然多了预期之外的冲突。你想理解 Git 底层是怎么工作的。
+你在两个目录里放了完全相同的 `README.md`，但 Git 只占用了「一份」存储；你把 `a.txt` 改名成 `b.txt`，Git 却说「没有改动内容」。为什么 Git 对「内容」和「文件名」分得这么清？读懂 blob 与内容寻址，这些现象背后的机制就一目了然了。
 
 ## 一句话理解
 
@@ -141,6 +139,61 @@ commit 不只是“记一条说明”，它会让一组内容最终通过 tree �
 - 同内容复用是自然结果
 - 文件内容和目录结构是两个层次的问题
 
+## 9. 用命令亲手验证内容寻址
+
+光看概念容易忘。下面这几条底层命令，能让你真正「看见」一个 blob 是怎么被算出来的。
+
+### 计算任意一段内容的 blob 哈希
+
+```bash
+# 只算哈希，不写入对象数据库
+echo "hello git" | git hash-object --stdin
+# 输出示例：b6fc4c620b67d95f953a5c1c1230aaab5db5a1b0
+
+# 写入对象数据库，再返回哈希
+echo "hello git" | git hash-object --stdin -w
+```
+
+注意：哈希只由「内容」决定。哪怕只是把 `hello git` 改一个字母大小写（`Hello Git`），得到的哈希也完全不同。
+
+### 相同内容 → 同一个 blob
+
+```bash
+mkdir blob-demo && cd blob-demo && git init -q
+echo "same content" > a.txt
+echo "same content" > b.txt
+git add a.txt b.txt
+git write-tree
+```
+
+用底层命令查看 tree，会看到两个文件其实指回同一个 blob 哈希——这是「内容寻址」最直观的证据：`a.txt` 与 `b.txt` 名字不同没关系，内容相同就复用同一个 blob。
+
+```bash
+git ls-tree $(git write-tree)
+# 100644 blob <同一个哈希>	a.txt
+# 100644 blob <同一个哈希>	b.txt
+```
+
+### blob 里到底存了什么
+
+```bash
+git cat-file -t <上面的 blob 哈希>   # 输出 blob
+git cat-file -p <上面的 blob 哈希>   # 输出 hello git
+git cat-file -s <上面的 blob 哈希>   # 输出内容字节数
+```
+
+对象就安静地躺在 `.git/objects/` 下，路径由哈希前两位决定：
+
+```bash
+ls .git/objects/b6/    # 看到 fc4c620b67d95f953a5c1c1230aaab5db5a1b0 这个目录
+```
+
+<PracticeBox title="亲手验证一次内容寻址">
+  1. 新建一个空仓库，写两条内容相同、名字不同的文件并 `git add`
+  2. 用 `git ls-tree $(git write-tree)` 确认两个文件指向同一个 blob 哈希
+  3. 用 `git cat-file -t / -p / -s` 比对同一个哈希，体会「内容即身份」
+</PracticeBox>
+
 ## 常见误区
 
 ### blob 等于文件
@@ -163,9 +216,9 @@ commit 不只是“记一条说明”，它会让一组内容最终通过 tree �
 
 ## 给你的练习
 
-1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
-2. 尝试该命令的不同参数选项，对比输出结果的差异
-3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+1. 在空仓库里用 `git hash-object --stdin -w` 写入 `README.md` 内容，再用 `git cat-file -p` 读回来，确认看到的就是原始字节
+2. 故意把内容改一个字符，`git hash-object --stdin` 再算一次，对比哈希为什么变了
+3. 用 `git ls-tree $(git write-tree)` 在「两个同名内容不同」和「内容相同名字不同」两种场景里，观察 blob 哈希是否复用
 
 {/* internal-links:auto */}
 

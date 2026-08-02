@@ -54,11 +54,9 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of Trunk-Based Development Workflow
-- Master the basic usage and common options of Trunk-Based Development Workflow
-- Keep main continuously releasable by using short-lived branches, frequent integration, and small merge batches.
-- Understand key concepts: What this workflow solves
-- Know when to use this feature and when to avoid it
+- Understand the core discipline of TBD: short branch lifetime and frequent small merges keep main releasable
+- Apply the operating cadence: cut short branches from main, commit in small batches, rebase/merge main, then merge fast
+- Compare TBD with GitFlow and recognize the "short-branch" traps that masquerade as TBD
 
 
 Trunk-based development is not “no branches.” It is a discipline: keep branches short-lived so main stays integratable, recoverable, and releasable.
@@ -77,7 +75,7 @@ Trunk-based development is not “no branches.” It is a discipline: keep branc
 
 ## Start with a problem
 
-Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
+You just merged a feature branch that lived for two weeks. Conflict resolution ate a full day, and CI went red because of someone else's change. All that time main kept moving while your branch sat in isolation. Had you sliced the work small and returned to main daily, today's merge nightmare would have been a dozen near-conflict-free syncs.
 
 ## What this workflow solves
 
@@ -176,9 +174,9 @@ Higher merge frequency usually requires clearer versioning and rollback policy.
 
 ## Try it yourself
 
-1. Practice the trunk-based-development-workflow command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Take a recent large feature and split it into 3–6 independently mergeable batches, defining the minimum rollback unit for each.
+2. In a test repo, simulate the TBD cadence: cut a short branch from main, use `git add -p` for small commits, then `git rebase origin/main` before merge, and feel how shorter divergence means fewer conflicts.
+3. Pick a case where your team forbids rebasing, design the equivalent "platform updates branch on PR" flow, and write the matching CI gate checklist.
 
 {/* internal-links:auto */}
 

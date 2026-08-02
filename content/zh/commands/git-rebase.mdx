@@ -40,12 +40,9 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 理解 git rebase 教程 的核心作用和适用场景
-- 掌握 git rebase 教程 的基本用法和常用参数
-- 解释 git rebase 的核心模型、推荐流程、风险边界和恢复办法。
-- 理解 什么时候应该用 相关的概念
-- 掌握 什么时候不要轻易用 相关的操作
-- 知道在什么场景下使用该命令，什么场景下避免使用
+- 理解 rebase 的脑内模型：把提交重新接到新基底上，提交 ID 会变但内容保留
+- 掌握 `git rebase origin/main`、交互式 rebase、冲突处理与 `--force-with-lease` 的安全用法
+- 知道什么情况下 rebase 合适、什么情况下该用 merge，以及出错后如何用 reflog 恢复
 
 
 ## 先想一个问题
@@ -300,9 +297,9 @@ git checkout -b rescue/rebase HEAD@{1}
 
 ## 给你的练习
 
-1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
-2. 尝试该命令的不同参数选项，对比输出结果的差异
-3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+1. 在实验分支上用 `git rebase -i HEAD~4` 把 4 个零碎提交压成 2 个逻辑块，再用 `git log --oneline` 确认历史更清晰。
+2. 故意在 rebase 中途制造一次冲突，完整走一遍 `git status → 解决 → git add → git rebase --continue`，再试一次 `git rebase --abort` 看区别。
+3. 把一次 rebase 后的分支推送到远端，分别用 `git push --force` 与 `git push --force-with-lease` 体会后者为何更安全（建议在备份分支上试）。
 
 {/* internal-links:auto */}
 

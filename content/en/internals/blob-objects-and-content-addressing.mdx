@@ -21,11 +21,10 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of Blob Objects and Content Addressing
-- Master the basic usage and common options of Blob Objects and Content Addressing
-- Explain how blobs store raw content and why hashes become the identity of Git objects.
-- Understand key concepts: How blob, tree, and commit connect
-- Know when to use this feature and when to avoid it
+- Understand what a blob is: it stores file content only, never a filename, path, or history
+- Master what content addressing means: an object's identity (its hash) is derived from the content itself, not an external ID
+- Use `git hash-object` and `git cat-file` to verify "same content → same blob" yourself
+- Tell apart the roles of blob, tree, and commit, and explain diff, renames, and dedupe from that split
 
 
 If you want to understand Git below the command surface, blobs are one of the best places to start. A blob is one of Git's most basic object types, and it explains why Git can treat content itself as the primary identity.
@@ -33,7 +32,7 @@ If you want to understand Git below the command surface, blobs are one of the be
 
 ## Start with a problem
 
-You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
+You keep two identical `README.md` files in different folders, yet Git stores only "one copy". You rename `a.txt` to `b.txt` and Git says "no content change". Why does Git distinguish content from filename so cleanly? Once you understand blobs and content addressing, these behaviors stop being mysterious.
 
 ## How blob, tree, and commit connect
 
@@ -176,6 +175,55 @@ Once blobs and content addressing click, it becomes easier to understand:
 - why renames are not baked into blob objects
 - why low-level inspection commands expose so much about Git's model
 
+## A hands-on look at content addressing
+
+Reading concepts is easy to forget. These low-level commands let you actually _see_ how a blob hash is computed.
+
+### Compute a blob hash for any content
+
+```bash
+# hash without writing to the object database
+echo "hello git" | git hash-object --stdin
+# example output: b6fc4c620b67d95f953a5c1c1230aaab5db5a1b0
+
+# write to the object database, then return the hash
+echo "hello git" | git hash-object --stdin -w
+```
+
+Note: the hash depends only on the content. Even changing one letter's case (`Hello Git`) yields a completely different hash.
+
+### Same content → same blob
+
+```bash
+mkdir blob-demo && cd blob-demo && git init -q
+echo "same content" > a.txt
+echo "same content" > b.txt
+git add a.txt b.txt
+git write-tree
+```
+
+Inspecting the resulting tree shows both files point back to the same blob hash — the most direct proof of content addressing: `a.txt` and `b.txt` differ in name, but share one blob because the content matches.
+
+### What a blob actually stores
+
+```bash
+git cat-file -t <the blob hash above>   # prints: blob
+git cat-file -p <the blob hash above>   # prints: hello git
+git cat-file -s <the blob hash above>   # prints the byte size
+```
+
+The object sits quietly under `.git/objects/`, its path decided by the first two hash chars:
+
+```bash
+ls .git/objects/b6/    # you'll see fc4c620b67d95f953a5c1c1230aaab5db5a1b0
+```
+
+<PracticeBox title="Verify content addressing yourself">
+  1. Create an empty repo, write two files with the same content but different names, then `git add`
+  2. Use `git ls-tree $(git write-tree)` to confirm both files point to the same blob hash
+  3. Use `git cat-file -t / -p / -s` on that hash to feel how "content is identity"
+</PracticeBox>
+
 ## Suggested follow-up
 
 It pairs especially well with:
@@ -188,9 +236,9 @@ It pairs especially well with:
 
 ## Try it yourself
 
-1. Practice the blob-objects-and-content-addressing command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. In an empty repo, use `git hash-object --stdin -w` to store `README.md` content, then read it back with `git cat-file -p` and confirm you see the raw bytes
+2. Change one character on purpose, run `git hash-object --stdin` again, and compare why the hash changed
+3. With `git ls-tree $(git write-tree)`, inspect a "two files, same content, different names" scenario and a "content same, names different" scenario to see blob reuse
 
 {/* internal-links:auto */}
 

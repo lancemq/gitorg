@@ -33,12 +33,9 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 理解 提交信息规范约定 的核心作用和适用场景
-- 掌握 提交信息规范约定 的基本用法和常用参数
-- 统一提交信息结构（动词、范围、原因）提升日志可读性、问题追踪效率和跨团队协作透明度。
-- 理解 一个可落地的模板 相关的概念
-- 掌握 示例 相关的操作
-- 知道在什么场景下使用该命令，什么场景下避免使用
+- 掌握 Conventional Commits 的 `<type>(<scope>): <summary>` 结构与正文该写什么
+- 理解为什么好的提交信息能让 `git bisect`、`git log`、CHANGELOG 真正可用
+- 识别常见的提交信息误区，并知道在代码评审中怎么纠偏
 
 
 高质量提交信息不是形式主义，它直接影响回溯效率和发布可读性。
@@ -46,7 +43,7 @@ export const metadata = {
 
 ## 先想一个问题
 
-你的团队在 Git 使用上积累了一些习惯，但你不确定这些习惯是否最优——或者你刚经历过一次因为 Git 操作不当造成的事故，想知道怎么避免下次再犯。
+生产事故后你想回溯是哪个 commit 引入了问题，可历史里全是 `fix bug`、`update` 这种 message。`git bisect` 最后停在一条 commit 上，你却看不出它改了什么——定位根因花的时间比本该有的长得多。问题不是你不会用 Git，而是历史本身不可读。
 
 ## 一个可落地的模板
 
@@ -88,6 +85,30 @@ Risk: may increase login retries for stale clients.
   PR 页面会被折叠或丢失上下文，commit 日志才是长期可检索的历史索引。
 </WarningBox>
 
+## 常见误区
+
+1. **“message 写给自己看就行”** —— 恰恰相反。半年后的你和同事都靠 `git log` 与 `git bisect` 回溯，模糊的 message 会让定位成本翻倍。
+2. **“一个 commit 顺手塞多个不相关改动”** —— 例如同时改了登录逻辑和文档错别字。这样 `git revert` / `git bisect` 无法只回退其中一部分，二分排查会失真。
+3. **“已推送的 commit 用 `--amend` 改”** —— 改写共享历史会让协作者 `pull` 时冲突。只改本地、未推送的 commit 才用 amend；已推送的用新 commit 修正。
+4. **“summary 写成 `fix: 修bug`”** —— 没有 scope、没有原因。规范做法是 `fix(auth): reject expired refresh token`，让人一眼知道影响面。
+
+<WarningBox title="--amend 不是撤销，是改写">
+  `git commit --amend` 会生成一个新的 commit 对象并替换当前 HEAD；已推送到远程的 commit 被改写后，他人历史会出现分叉，需要强制推送且影响所有人。
+</WarningBox>
+
+### 一次真实事故回溯
+
+```text
+# 线上登录失败，需要定位引入问题的 commit
+$ git log --oneline -10
+a1b2c3d update      # 无法判断改了什么
+e4f5g6h fix bug     # 同样没有信息
+$ git bisect start <bad> <good>
+# 二分最后停在 "update" 上，但 message 看不出它破坏了 token 校验
+```
+
+如果当初写成 `fix(auth): reject expired refresh token`，事故定位能直接命中，省下大量排查时间。
+
 ## 接下来建议继续看什么
 
 1. [`commit hygiene`](/zh/best-practices/commit-hygiene)
@@ -96,9 +117,9 @@ Risk: may increase login retries for stale clients.
 
 ## 给你的练习
 
-1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
-2. 尝试该命令的不同参数选项，对比输出结果的差异
-3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+1. 把你最近一个项目的 5 条历史 commit 改成 Conventional Commits 格式（`type(scope): summary` + 正文写原因），对比改写前后 `git log --oneline` 的可读性。
+2. 故意把一个“修登录”和一个“改文档错别字”的改动分两次提交，然后用 `git bisect` 模拟定位，体会单关注点 commit 的优势。
+3. 在团队里评审一条 `fix: 修bug` 类的 message，按本文模板给出改写建议，并说明为什么 scope 和原因缺一不可。
 
 {/* internal-links:auto */}
 
