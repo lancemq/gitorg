@@ -27,16 +27,15 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of CI/CD Deployment Strategies with Git
-- Master the basic usage and common options of CI/CD Deployment Strategies with Git
-- A comprehensive guide to Git-based deployment strategies including tag-based deployments, environment promotion (dev→staging→prod), canary releases, GitOps deployment patterns, and rollback strategies using Git revert.
-- Understand key concepts: Git Tag-Based Deployments
-- Know when to use this feature and when to avoid it
+- Understand "Git as the deployment control layer": how tags, branches, and commit history define a reversible release path
+- Trigger tag-based deploys, infer versions with `git describe`, and build a dev→staging→prod promotion pipeline
+- Compare two patterns that hand "deployment state" to Git: canary releases and GitOps (ArgoCD / Flux)
+- Know whether to use `git revert` or `git reset --force` on failure, and how to roll back safely
 
 
 ## Start with a problem
 
-Your team is adopting CI/CD pipelines, or you're configuring Git integration in your IDE — but you're unsure how Git behaves differently in automated environments compared to local manual operations.
+You shipped a release, and five minutes later production is throwing errors. What you need now is not "fix it again" but "get back to the last good state, fast and deterministically" — and to be able to say exactly what you rolled back to. If your release isn't tied to Git — no tag, no traceable commit — you're rolling back from memory and manual steps, which is risky. This article makes every release a precise, recoverable point in Git history.
 
 ## One-Sentence Understanding
 
@@ -262,11 +261,15 @@ graph TD
     E --> H[Restore previous release artifact]
 ```
 
+<WarningBox title="Never use git reset + force push to roll back on shared branches">
+  The "reset + force push" branch of the decision tree is for branches you fully own. On shared branches like `main` it rewrites public history, making collaborators' commits disappear and causing chaos. For public branches, prefer `git revert` — it adds a new inverse commit without destroying anyone's history.
+</WarningBox>
+
 ## Try it yourself
 
-1. Practice the ci-cd-deployment-strategies command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. In a test repo, tag `v0.1.0` and push it, then write a GitHub Actions workflow that triggers deployment only on `tags: v*` and computes a full version with `git describe`.
+2. Build a three-stage GitLab CI promotion pipeline (dev / staging / prod) where the prod stage is `when: manual`, and feel the "release needs human approval" gate for yourself.
+3. Deliberately push a "bad commit" to main, then `git revert` it into a new commit and push; compare that with `git reset --hard` + force push for safety on a shared branch.
 
 ## Continue Learning
 

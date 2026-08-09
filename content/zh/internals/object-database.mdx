@@ -36,12 +36,11 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 理解 Git 对象数据库 的核心作用和适用场景
-- 掌握 Git 对象数据库 的基本用法和常用参数
-- 理解 blob、tree、commit、tag 四类对象，以及 Git 为什么说自己是内容寻址的对象数据库。
-- 理解 为什么对象模型是第一层基础 相关的概念
-- 掌握 1. 什么叫内容寻址 相关的操作
-- 知道在什么场景下使用该命令，什么场景下避免使用
+- 理解 Git 为什么说自己是一个"内容寻址的对象数据库"，而不是文件版本列表
+- 区分 blob、tree、commit、tag 四类对象各自的职责，以及它们如何靠哈希 ID 互链
+- 理解为什么 blob 不保存文件名，以及内容复用为什么因此更自然
+- 用对象模型解释日常命令：`git add` / `git commit` / `git branch` / `git checkout` 底层到底在动什么
+- 建立"对象还在 ≠ 容易找到"的认知，为后续 reflog 与恢复内容打底
 
 
 ## 先想一个问题
@@ -128,6 +127,25 @@ tag 为某个对象提供更稳定、更可读的名字，常见于发布版本�
 
 所以 commit 的本质不是“改写旧历史”，而是“新增对象，再移动名字”。
 
+## 亲手拆开一次提交：用 `git cat-file` 看对象
+
+光看概念还不够，最值钱的是亲眼看一次对象长什么样。Git 自带 `git cat-file` 可以把任意对象“打开”：
+
+```bash
+# 看 HEAD 最终指向什么类型的对象
+git cat-file -t HEAD            # 通常输出 commit
+git cat-file -t HEAD^{tree}     # 看它指向的 tree
+git cat-file -p HEAD            # 打印 commit 对象的完整内容
+
+# 顺着 tree 继续往里看
+git cat-file -p $(git rev-parse HEAD^{tree})
+
+# 再看某个 blob 的真实内容
+git cat-file -p <blob-sha>
+```
+
+`-t` 打印类型（commit / tree / blob / tag），`-p` 按人类可读方式打印内容，`-s` 打印大小（字节数）。当你能顺着 `commit → tree → blob` 用自己的命令走一遍，对象模型就从“说法”变成了“你能验证的事实”。
+
 ## 5. 对象和工作区不是一回事
 
 很多混乱来自把这两层混在一起。更稳的理解是：
@@ -189,9 +207,9 @@ tag 为某个对象提供更稳定、更可读的名字，常见于发布版本�
 
 ## 给你的练习
 
-1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
-2. 尝试该命令的不同参数选项，对比输出结果的差异
-3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+1. **亲眼看到对象**：在一个仓库里改一个文件并提交，`git cat-file -t HEAD` 确认它是 commit，`git cat-file -p HEAD` 看它指向的 tree，再 `git cat-file -p <tree-sha>` 看它指向的 blob，顺着哈希把"commit → tree → blob"这条链走通一遍。
+2. **验证内容寻址**：把同一段内容放到两个不同路径的文件里分别提交，用 `git rev-parse :<path>` 确认它们最终指向同一个 blob 哈希——内容一样，哈希就一样。
+3. **观察 branch 的轻量本质**：`git branch tmp` 后 `git cat-file -t tmp`，确认它只是一个指向已有 commit 的引用；再 `git log --oneline --all --graph` 看分支指针如何移动而不复制任何对象。
 
 {/* internal-links:auto */}
 

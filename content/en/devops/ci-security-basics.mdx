@@ -27,17 +27,20 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of Git Security Basics in CI/CD
-- Master the basic usage and common options of Git Security Basics in CI/CD
-- Learn the security risks and protections for Git operations in CI/CD pipelines, including credential management, branch protection, signature verification, and auditing.
-- Understand key concepts: Overview
-- Know when to use this feature and when to avoid it
+- Understand how Git security risks in CI/CD differ from local dev (automation, credential injection, third-party dependencies)
+- Manage credentials with Secrets / Variables and least privilege, and keep tokens out of logs
+- Use branch protection, restricted CI triggers, and commit signature verification to block injection and tampering
+- Build an auditable habit for CI Git operations — what to log and what to review regularly
 
 
 
 ## Start with a problem
 
-Your team is adopting CI/CD pipelines, or you're configuring Git integration in your IDE — but you're unsure how Git behaves differently in automated environments compared to local manual operations.
+CI runs unattended on machines that can pull code, run scripts, and push or deploy with a token. If a third-party Action silently prints your `DEPLOY_KEY` to logs, or someone edits your CI config in a PR to run malicious commands, you may not notice — but an attacker may already have write access. Git security in CI comes down to two things: limiting credential exposure and guarding the trust boundary that is your pipeline config.
+
+## One-Sentence Understanding
+
+Git security in CI/CD is about limiting the credential attack surface in an automated, unattended environment and defending the trust boundary that is your pipeline configuration.
 
 ## Overview
 
@@ -87,6 +90,10 @@ deploy:
 - Rotate credentials regularly
 - Never output credentials to logs
 
+<WarningBox title="Third-party Actions can read your Secrets by default">
+  In GitHub Actions, `uses: some-org/some-action@v1` runs someone else's code. If that Action prints `${{ secrets.XXX }}` to logs, the secret leaks. Pin Actions to a specific commit SHA, prefer officially maintained ones, and mark critical secrets "Protected" so they're only available on protected branches.
+</WarningBox>
+
 ## Branch Protection
 
 ### Prevent Direct Push to Main
@@ -130,9 +137,9 @@ jobs:
 
 ## Try it yourself
 
-1. Practice the ci-security-basics command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. In a test repo, add a CI step that does `echo "$DEPLOY_KEY"`, run it, and check the logs to see whether the value is masked; if not, switch it to a protected variable and re-verify.
+2. Enable branch protection on `main` (require PR + status checks), then try a direct push and confirm it's rejected.
+3. Open a PR from a fork that edits `.github/workflows`, and observe whether your base repo's CI auto-runs the forked changes — understand why external PRs should not get repo secrets by default.
 
 ## Continue Learning
 

@@ -27,12 +27,10 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 理解 提交卫生与提交信息 的核心作用和适用场景
-- 掌握 提交卫生与提交信息 的基本用法和常用参数
-- 把提交拆成逻辑独立的 changeset，并用可读的提交信息表达意图、动机和边界，让 review、revert 和 cherry-pick 都更轻。
-- 理解 为什么这一篇应该先读 相关的概念
-- 掌握 1. 一个提交只表达一个意图 相关的操作
-- 知道在什么场景下使用该命令，什么场景下避免使用
+- 理解为什么"一个提交只表达一个意图"是 Git 协作的最小单位，也是后续 review、revert、cherry-pick 轻量的前提
+- 掌握用 `git add --patch` 拆分暂存、用 `git diff --staged` 提交前最后复核的具体动作
+- 写出"动作 + 动机"两层结构的提交信息，并知道什么时候该补正文
+- 用三个自问（能不能一句话概括 / 单独回滚安不安全 / reviewer 能不能看懂）判断提交是否够干净
 
 
 
@@ -112,6 +110,27 @@ This keeps client-side behavior aligned with server-side validation.
 - 打开完整提交时还能看到决策背景
 - 将来做 release note 或事故回溯时更容易复用
 
+### 一个反面对照
+
+同样是"处理登录重试"，三种写法差别很大：
+
+```text
+# 弱写法：读者只能猜
+update login
+
+# 稍好：有了动作
+fix login retry
+
+# 更好：动作 + 动机
+Add login retry with backoff
+
+Retries were failing immediately on transient 500s from the
+auth service. Add exponential backoff so a single blip does
+not lock the user out.
+```
+
+前两种只能靠读者去猜"为什么"，第三种把动机写进了历史，将来回滚或复盘时不必再去找人问。
+
 ## 4. 提交标题尽量写成动作，而不是结果描述
 
 更推荐：
@@ -176,9 +195,9 @@ git diff --staged
 
 ## 给你的练习
 
-1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
-2. 尝试该命令的不同参数选项，对比输出结果的差异
-3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+1. **练习拆分暂存**：在一个文件里同时做两类无关的改动（比如修一个 bug 顺手改了格式），用 `git add --patch` 只把 bugfix 部分暂存并提交，剩下的改动留到第二个提交，体会"一个提交一件事"。
+2. **建立提交前三问习惯**：连续提交三次，每次提交前先问自己"能不能一句话概括 / 单独回滚安不安全 / reviewer 只看这个提交能不能懂"，把答不上的那次拆开重做。
+3. **重写一条烂提交信息**：找一条你过去的提交，按"动作 + 动机"两层结构重写它的正文（用 `git commit --amend` 或交互式 rebase 的 reword），对比重写前后 reviewer 的理解成本。
 
 {/* internal-links:auto */}
 

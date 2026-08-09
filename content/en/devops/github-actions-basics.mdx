@@ -293,9 +293,17 @@ Not necessarily. Failures can come from network issues, cache expiry, or depende
 
 ## Continue Learning
 
-1. `security/ssh-key-management` — SSH keys & deploy keys
-2. `best-practices/security-with-git` — Git security practices
-3. GitHub Actions official documentation
+1. [SSH key management and deploy keys](/en/security/ssh-key-management) — how CI authenticates to Git hosts
+2. [Git security practices](/en/best-practices/security-with-git) — keeping CI and signing aligned
+3. [GitHub Actions documentation](https://docs.github.com/en/actions) — events, contexts, and reusable actions
+
+## A common trap: caches vs Git history
+
+Steps outside `actions/checkout` often use dependency caches (such as `actions/cache` or a package manager's native cache). A frequent misunderstanding is assuming that because `node_modules` is cached, "CI already has the full repo." The cache only speeds up dependency installation — it does **not** fill in the history missing from a `fetch-depth: 1` checkout.
+
+If your lint or tests need `git diff` to see "which files this PR changed," but checkout was shallow, you get an empty diff or an error. The fix is not to drop the cache, but to raise checkout's `fetch-depth` to `0` (or at least `2`) so the history is sufficient, while keeping the cache for dependency speed.
+
+> In one line: the cache solves "install fast," fetch-depth solves "is the history enough." They cover different problems and should not substitute for each other.
 
 {/* internal-links:auto */}
 

@@ -54,12 +54,10 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 理解 Gitflow 工作流教程 的核心作用和适用场景
-- 掌握 Gitflow 工作流教程 的基本用法和常用参数
-- 基于 Atlassian 对 Gitflow 的说明，梳理 main、develop、feature、release、hotfix 的职责，以及它在现代团队中的适用边界。
-- 理解 这篇内容适合什么人 相关的概念
-- 掌握 先说结论 相关的操作
-- 知道在什么场景下使用该命令，什么场景下避免使用
+- 说清 Gitflow 里 `main` / `develop` / `feature` / `release` / `hotfix` 五类分支各自的职责与合并规则
+- 理解为什么 release 和 hotfix 必须"回流"到 `main` 和 `develop` 两条线，漏掉会有什么后果
+- 判断自己的团队到底适不适合 Gitflow，而不是把它当成默认最佳实践
+- 区分 Gitflow 与 trunk-based 的本质差别：问题是在"分支车道"里解决，还是在"更早集成"里解决
 
 
 
@@ -129,6 +127,32 @@ git push -u origin develop
 ```
 
 或者如果团队在使用 `git-flow` 扩展，也可以通过 `git flow init` 创建基础结构。
+
+### 用 git-flow 扩展怎么落地
+
+不想每次手敲分支和合并，可以用社区维护的 `git-flow`（AVH 扩展）把流程固化成命令：
+
+```bash
+# 安装（macOS）
+brew install git-flow-avh
+
+# 初始化（交互式设置各分支前缀）
+git flow init
+
+# 开一个 feature：自动从 develop 切出
+git flow feature start login-audit
+git flow feature finish login-audit      # 自动合并回 develop 并删除分支
+
+# 准备发布
+git flow release start 2.4.0
+git flow release finish 2.4.0            # 自动合并回 main + develop 并打 tag
+
+# 生产热修
+git flow hotfix start login-timeout
+git flow hotfix finish login-timeout     # 自动合并回 main + develop 并打 tag
+```
+
+扩展的价值，是把"回流 main + develop"这类容易忘的动作变成命令自动完成。但它不改变模型本身——你仍然要理解为什么这些回流必须存在，否则工具帮你合并了，你也不知道自己丢了什么。
 
 ### 2. 功能从 `develop` 切出，再回到 `develop`
 
@@ -357,9 +381,9 @@ Atlassian 现在明确提醒：Gitflow 在现代持续软件开发里已经没�
 
 ## 给你的练习
 
-1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
-2. 尝试该命令的不同参数选项，对比输出结果的差异
-3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+1. **搭一套最小 Gitflow 骨架**：在测试仓库里 `git switch main` 后 `git branch develop` 并 `git push -u origin develop`，再切出 `feature/login-audit` 提交两次，最后 merge 回 `develop`，确认 `main` 始终没被直接碰。
+2. **故意漏一次回流，看后果**：从 `develop` 切 `release/2.4.0`，在里面修一个 bug 并合并回 `main` + 打 tag，但故意忘了合回 `develop`；再在 `develop` 上新建功能分支，用 `git log` 确认这个修复没有进入后续开发线。
+3. **用最近一次真实发布做复盘**：画出你们团队"功能开发 / 发布准备 / 线上修复"三条线，对照文章里的四个误区，判断 Gitflow 是真的解决你们的痛点，还是你们其实更需要更轻的流程。
 
 {/* internal-links:auto */}
 

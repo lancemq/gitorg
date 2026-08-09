@@ -46,10 +46,10 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 理解 Git 初学的正确顺序——先闭环、再深入
-- 知道从环境配置、暂存提交、远端同步到特性分支的完整路径
+- 理解 Git 初学的正确顺序——先走通最小闭环，再深入高级话题
+- 知道从环境配置、暂存提交、远端同步到第一个特性分支的完整路径
 - 建立起"先看状态、再做动作"的稳定习惯
-- 知道哪些高级话题可以先放一放、以后再说
+- 明确哪些高风险话题（rebase、reset --hard、reflog 恢复）应该等基础节奏稳定后再碰
 
 ## 这个专题解决什么问题
 
@@ -81,19 +81,19 @@ export const metadata = {
 
 ## 推荐阅读顺序
 
-### 1. [环境与 clone](/zh/docs/learning-path/setup-and-clone)
+### 1. [环境与 clone](/zh/learning-path/setup-and-clone)
 
 先完成身份配置、仓库获取和首次状态检查，搞清楚“仓库是怎么来到本地的”。
 
-### 2. [暂存与 commit](/zh/docs/learning-path/stage-and-commit)
+### 2. [暂存与 commit](/zh/learning-path/stage-and-commit)
 
 重点建立工作区、暂存区和提交历史三层模型，学会把文件改动变成清晰提交。
 
-### 3. [远端同步](/zh/docs/learning-path/sync-with-remote)
+### 3. [远端同步](/zh/learning-path/sync-with-remote)
 
 把 `fetch`、`pull`、`push` 的职责拆开理解，先学观察，再学整合，再学发布。
 
-### 4. [第一个特性分支](/zh/docs/learning-path/first-feature-branch)
+### 4. [第一个特性分支](/zh/learning-path/first-feature-branch)
 
 开始进入最简单的协作节奏：创建分支、提交改动、同步主分支、准备合并。
 
@@ -152,9 +152,9 @@ git log --oneline --decorate -5
 
 ## 给你的练习
 
-1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
-2. 尝试该命令的不同参数选项，对比输出结果的差异
-3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+1. **跑通最小闭环**：新建一个本地仓库，依次完成 `git init` → 修改文件 → `git add` → `git commit` → `git log --oneline` 看历史，确认你能独立走完"改文件 → 提交"这一步。
+2. **养成先看状态的习惯**：每次提交前先运行 `git status` 和 `git log --oneline --decorate -5`，连续做三天，体会"先看状态、再做动作"如何减少误操作。
+3. **按推荐顺序读四篇子页面**：从《环境与 clone》到《第一个特性分支》依次读完，每读完一篇就在自己的测试仓库里照做一遍，而不是一次性全看完。
 
 {/* internal-links:auto */}
 

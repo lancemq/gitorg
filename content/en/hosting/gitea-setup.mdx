@@ -27,17 +27,20 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of Gitea Self-Hosted Git Service
-- Master the basic usage and common options of Gitea Self-Hosted Git Service
-- Set up a lightweight self-hosted Git service with Gitea, including installation, configuration, backup, and daily administration.
-- Understand key concepts: Overview
-- Know when to use this feature and when to avoid it
+- Understand Gitea's positioning: a lightweight self-hosted Git service for small teams / individuals, far lighter than GitLab CE
+- Install via binary or Docker and complete the key settings on the first-run setup page
+- Back up daily with `gitea dump` and run a basic upgrade without losing data
+- Make a preliminary choice between Gitea, GitLab CE, and GitHub based on team size
 
 
 
 ## Start with a problem
 
-You're choosing or configuring a Git hosting solution — whether self-hosting Gitea or comparing GitHub, GitLab, and Gitee features. You're not sure which option best fits your team's needs.
+You want code hosting on a machine you fully control — maybe to keep data inside your network, or because GitHub's private repos feel limiting while GitLab CE feels too heavy. Gitea sits in the middle: one binary runs, 128MB of RAM is enough. But can it really support your team's daily collaboration? This guide gets it installed, configured, and helps you know when to switch to something heavier.
+
+## One-Sentence Understanding
+
+Gitea is a lightweight, Go-written self-hosted Git service that runs from a single binary, lowering the barrier to "your own code repository" to almost nothing.
 
 ## Overview
 
@@ -143,6 +146,10 @@ ENABLED = true
 SMTP_ADDR = smtp.example.com
 ```
 
+<TipBox title="Put Gitea behind a reverse proxy and force HTTPS in production">
+  Using `http://` in `ROOT_URL` is for demo only. In production, place Gitea behind Nginx / Caddy, terminate TLS there, and set `ROOT_URL` to `https://`. If you map SSH via Docker (`222:22`), keep `SSH_DOMAIN` consistent with the clone URL or others will connect to the wrong port.
+</TipBox>
+
 ## Comparison
 
 | Feature | Gitea | GitLab CE | GitHub |
@@ -156,9 +163,9 @@ SMTP_ADDR = smtp.example.com
 
 ## Try it yourself
 
-1. Practice the gitea-setup command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Launch Gitea with Docker Compose (map `3000` for HTTP, `222` for SSH), finish the first-run setup in the browser, create a test repo, and clone it successfully.
+2. Run a `gitea dump` backup and confirm the artifact includes the database and repo data; then simulate an upgrade (swap the binary + restart) and verify the data survived.
+3. Create an organization and a member account in Gitea, compare permissions with a pure personal repo, and use the comparison table to judge whether it fits your team size.
 
 ## Continue Learning
 

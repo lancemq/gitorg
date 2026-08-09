@@ -27,11 +27,10 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of GPG Signing & Git Commit Verification
-- Master the basic usage and common options of GPG Signing & Git Commit Verification
-- A systematic guide to signing Git commits and tags with GPG, configuring verification, and enforcing signing policies in teams.
-- Understand key concepts: Why GPG Signing?
-- Know when to use this feature and when to avoid it
+- Understand why Git's author field can be forged by anyone, while a GPG/SSH signature cryptographically proves the commit came from you
+- Generate a key, set `user.signingkey`, and sign commits with `-S` and tags with `-s`
+- Verify signatures locally with `git log --show-signature` and the `%G?` status codes, and know what `G / B / U / N` mean
+- Enforce signing through branch protection and CI, and weigh GPG against SSH signing
 
 
 ## Start with a problem
@@ -186,17 +185,34 @@ Git 2.34+ supports SSH signing as a lighter alternative:
 | Platform support | Universal | Newer only |
 | Best for | Open source, compliance | Internal teams |
 
+### How to switch to SSH signing
+
+If you already use an SSH key to authenticate with your Git host, Git 2.34+ can reuse it for signing and spare you a separate GPG keyring:
+
+```bash
+# Tell Git to use ssh instead of gpg as the signing backend
+git config --global gpg.format ssh
+
+# Point at the SSH public key you want to sign with
+git config --global user.signingkey ~/.ssh/id_ed25519.pub
+
+# From here, -S behaves exactly as before
+git commit -S -m "signed with ssh key"
+```
+
+One easy trap: the host only marks a commit Verified if it recognizes the public key. So in GitHub/GitLab SSH key settings, register the same key as a signing key, not only as an authentication key.
+
 ## Try it yourself
 
-1. Practice the gpg-signing command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. **Sign end to end**: generate a GPG key, set `git config --global user.signingkey <id>`, make a commit with `git commit -S -m "..."`, then confirm `git log --show-signature -1` shows a Good signature.
+2. **Compare the signature status**: with a throwaway identity (temporarily change `user.name`/`user.email` but keep the same signingkey), make another commit and run `git log --format="%H %G? %GS"` to see the unsigned one show `N` — the author is forgeable, the signature is not.
+3. **Enforce signing in a test repo**: turn on Require signed commits in branch protection (or block unsigned commits with a local `pre-commit`/`pre-push` hook), then try to push an unsigned commit and confirm it is rejected.
 
 ## Continue Learning
 
-1. `best-practices/security-with-git` — Git security best practices
-2. SSH key management
-3. `workflows/signing-commits-workflow` — Signed commit workflow
+1. [Git security best practices](/en/best-practices/security-with-git) — put signing into an overall security strategy
+2. [SSH key management and Git authentication](/en/security/ssh-key-management) — GPG signing vs SSH authentication
+3. [Secure Git collaboration workflows](/en/security/secure-git-workflows) — signed commit workflows
 
 {/* internal-links:auto */}
 

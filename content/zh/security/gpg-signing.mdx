@@ -27,12 +27,10 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 理解 GPG 签名与 Git 提交验证 的核心作用和适用场景
-- 掌握 GPG 签名与 Git 提交验证 的基本用法和常用参数
-- 系统介绍如何使用 GPG 签名 Git 提交和标签，配置签名验证，以及团队中强制签名策略的最佳实践。
-- 理解 为什么需要 GPG 签名 相关的概念
-- 掌握 快速开始 相关的操作
-- 知道在什么场景下使用该命令，什么场景下避免使用
+- 理解为什么 Git 的作者字段可以被任意伪造，而 GPG/SSH 签名能从密码学上证明"提交确实来自你"
+- 掌握生成密钥、配置 `user.signingkey`、用 `-S` 签名提交与 `-s` 签名标签的全流程
+- 用 `git log --show-signature` 和 `%G?` 状态位本地验证签名，并知道 `G / B / U / N` 各自含义
+- 在团队里通过分支保护和 CI 强制签名，并理解 GPG 与 SSH 签名各自的取舍
 
 
 ## 先想一个问题
@@ -202,17 +200,34 @@ Git 2.34+ 开始支持 SSH 签名作为 GPG 的轻量替代：
 | 平台支持 | 全部支持 | 较新支持 |
 | 适用场景 | 开源项目、合规要求 | 团队内部 |
 
+### 如何改用 SSH 签名（轻量替代）
+
+如果你已经在用 SSH 密钥登录 Git 平台，Git 2.34+ 可以直接复用它来签名，省去维护一套 GPG 密钥：
+
+```bash
+# 告诉 Git 用 ssh 而不是 gpg 作为签名后端
+git config --global gpg.format ssh
+
+# 指定用来签名的 SSH 公钥路径
+git config --global user.signingkey ~/.ssh/id_ed25519.pub
+
+# 之后照常用 -S 签名，行为完全一致
+git commit -S -m "signed with ssh key"
+```
+
+一个容易踩的坑：平台要"认得"这把公钥才能把提交标成 Verified。所以需要在 GitHub / GitLab 的 SSH key 设置里，把同一把公钥同时标记为"可用于签名"（Signing key），而不只是"可用于认证"（Authentication key）。
+
 ## 给你的练习
 
-1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
-2. 尝试该命令的不同参数选项，对比输出结果的差异
-3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+1. **端到端签一次**：生成 GPG 密钥并 `git config --global user.signingkey <id>`，用 `git commit -S -m "..."` 签一条提交，再用 `git log --show-signature -1` 确认它显示 `Good signature`。
+2. **对比签名状态位**：故意用另一个身份（临时改 `user.name`/`user.email`，但不改 signingkey）提交，再用 `git log --format="%H %G? %GS"` 观察这条未签名的提交显示 `N`，理解"作者可伪造、签名不可伪造"的差别。
+3. **在测试仓库强制签名**：在分支保护里开启 Require signed commits（或在本地用 `pre-commit`/`pre-push` 钩子拦截未签名提交），尝试推一条没签名的提交，确认它被拦下。
 
 ## 继续学习建议
 
-1. `best-practices/security-with-git` — Git 安全最佳实践
-2. SSH 密钥管理与 Git 认证
-3. `workflows/signing-commits-workflow` — 签名提交工作流
+1. [Git 安全最佳实践](/zh/best-practices/security-with-git) — 把签名放进整体安全策略
+2. [SSH 密钥管理与 Git 认证](/zh/security/ssh-key-management) — 对比 SSH 签名与认证的区别
+3. [Git 安全协作工作流](/zh/security/secure-git-workflows) — 签名提交工作流
 
 {/* internal-links:auto */}
 

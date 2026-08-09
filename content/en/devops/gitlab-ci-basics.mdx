@@ -27,16 +27,15 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of GitLab CI & Git Integration
-- Master the basic usage and common options of GitLab CI & Git Integration
-- Understanding how GitLab CI/CD integrates with Git, including pipeline triggers, CI_JOB_TOKEN, Git strategy, and workflow rules based on Git data.
-- Understand key concepts: Pipeline Triggers
-- Know when to use this feature and when to avoid it
+- Understand how GitLab CI keeps pipeline definitions in `.gitlab-ci.yml`, so build config lives in the repo alongside code
+- Control pipeline triggers from Git events (push / MR / tag / schedule) and branch-specific behavior with `workflow: rules`
+- Know what built-in variables and strategies like `CI_JOB_TOKEN`, `GIT_STRATEGY`, and `GIT_DEPTH` actually change
+- Recognize common CI Git security mistakes (leaked credentials, careless force-push from CI) and how to avoid them
 
 
 ## Start with a problem
 
-Your team is adopting CI/CD pipelines, or you're configuring Git integration in your IDE — but you're unsure how Git behaves differently in automated environments compared to local manual operations.
+You push locally, and moments later GitLab automatically runs tests, builds, even deploys. But have you ever asked how the pipeline's Git actually gets the code — where its credentials come from, where it can push, and how that differs from typing commands in your terminal? Those differences are exactly where CI pipelines go wrong, and exactly what's worth understanding.
 
 ## One-Sentence Understanding
 
@@ -137,6 +136,11 @@ script:
   - git push target main
 ```
 
+<WarningBox title="Never commit long-lived credentials in .gitlab-ci.yml">
+  `CI_JOB_TOKEN` is short-lived and auto-rotated — use it only inside the pipeline. Real deploy keys and cloud secrets belong in protected, masked CI/CD Variables, never in the repo. Anything written into the repo enters Git history and is hard to fully erase.
+</WarningBox>
+
+
 ### Token Scope
 
 | Scope | Permission |
@@ -192,9 +196,9 @@ deploy_production:
 
 ## Try it yourself
 
-1. Practice the gitlab-ci-basics command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. In a test repo, add a minimal `.gitlab-ci.yml` with one `build` stage running `npm ci && npm test`, push, and watch the pipeline trigger automatically.
+2. Add `workflow: rules` so `main` gets production variables and `develop` gets staging variables; verify the injected variables really differ per branch.
+3. Set `GIT_DEPTH` very small (e.g. `5`), then run a script that depends on an older commit beyond that depth — see how "not enough history" breaks history-dependent steps.
 
 ## Continue Learning
 

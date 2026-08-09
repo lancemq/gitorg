@@ -54,11 +54,10 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of Gitflow Workflow
-- Master the basic usage and common options of Gitflow Workflow
-- Use Atlassian's Gitflow explanation to clarify the roles of main, develop, feature, release, and hotfix branches, plus where Gitflow still fits today.
-- Understand key concepts: Who this is for
-- Know when to use this feature and when to avoid it
+- Name the five Gitflow branch roles — main, develop, feature, release, hotfix — and their merge rules
+- Understand why release and hotfix branches must flow back into both main and develop, and what breaks when you forget
+- Judge whether your own team actually fits Gitflow instead of treating it as the default best practice
+- Tell Gitflow apart from trunk-based development: does it solve complexity in branch lanes, or by integrating earlier
 
 
 ## Who this is for
@@ -127,6 +126,32 @@ git push -u origin develop
 ```
 
 Teams using the `git-flow` extension can also initialize the structure with `git flow init`.
+
+### Running Gitflow with the git-flow extension
+
+If you would rather not type every branch and merge by hand, the community-maintained `git-flow` (AVH) extension turns the model into commands:
+
+```bash
+# Install (macOS)
+brew install git-flow-avh
+
+# Initialize (interactively sets the branch prefixes)
+git flow init
+
+# Start and finish a feature (finish merges back into develop and deletes the branch)
+git flow feature start login-audit
+git flow feature finish login-audit
+
+# Prepare a release (finish merges into main + develop and creates the tag)
+git flow release start 2.4.0
+git flow release finish 2.4.0
+
+# Production hotfix (finish merges into main + develop and tags)
+git flow hotfix start login-timeout
+git flow hotfix finish login-timeout
+```
+
+The extension's value is automating the easy-to-forget back-merges into main and develop. It does not change the model itself — you still need to understand why those back-merges exist, or the tool will merge for you while you have no idea what you would have lost.
 
 ### 2. Features branch from `develop`, then merge back into `develop`
 
@@ -357,9 +382,9 @@ Gitflow is basically those workflows combined into a heavier, more opinionated r
 
 ## Try it yourself
 
-1. Practice the gitflow-workflow command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. **Build a minimal Gitflow skeleton**: from `main`, run `git branch develop` and `git push -u origin develop`, then cut `feature/login-audit`, commit twice, and merge it back into `develop` — confirming `main` was never touched directly.
+2. **Skip a back-merge on purpose and see the cost**: cut `release/2.4.0` from `develop`, fix a bug, merge it into `main` and tag, but deliberately forget to merge back into `develop`. Then create a new feature branch and use `git log` to confirm the fix never reached the active development line.
+3. **Retro your last real release**: draw the three streams — feature work, release prep, production fixes — and check them against the four common mistakes to decide whether Gitflow solves your pain or whether you really need a lighter model.
 
 {/* internal-links:auto */}
 

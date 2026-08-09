@@ -36,11 +36,11 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of Git Object Database
-- Master the basic usage and common options of Git Object Database
-- Understand blob, tree, commit, and tag objects, and why Git describes itself as a content-addressable object database.
-- Understand key concepts: Why the object model is the first layer of foundation
-- Know when to use this feature and when to avoid it
+- Understand why Git describes itself as a content-addressable object database, not a list of file versions
+- Distinguish the four object types — blob, tree, commit, tag — and how they link through hash IDs
+- Understand why a blob does not store a filename, and why that makes content reuse natural
+- Use the object model to explain what `git add` / `git commit` / `git branch` / `git checkout` really move
+- Build the insight that an object still existing is not the same as being easy to find, which sets up reflog and recovery later
 
 
 ## Start with a problem
@@ -48,6 +48,8 @@ export const metadata = {
 You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
 
 ## The short version
+
+At the lowest level, Git is not a list of file versions. It is a database that stores objects and locates them again by IDs derived from their content.
 
 ## Why the object model is the first layer of foundation
 
@@ -59,9 +61,6 @@ You use Git commands daily, but occasionally encounter 'strange' behavior — li
   rewriteLabel="Commit → history snapshot | Tag → named reference"
   pointerLabel="Ref points to"
 />
-
-At the lowest level, Git is not a list of file versions.
- It is a database that stores objects and locates them again by IDs derived from their content.
 
 <MentalModelBox title="Do not picture Git as cloud storage">
   <p>A steadier model is this: Git stores objects first, then uses refs, HEAD, and tags as names that point at those objects. Most day-to-day commands move names around durable objects.</p>
@@ -129,6 +128,27 @@ From the object-database perspective, commit is roughly:
 
 So commit is not “edit old history.” It is “add a new object and move a name.”
 
+## Inspect an object yourself: `git cat-file`
+
+Reading the categories is one thing; opening an object yourself is where it clicks. Git ships `git cat-file` for exactly this:
+
+```bash
+# What type is this object? (blob / tree / commit / tag)
+git cat-file -t <sha>
+
+# Print the object's content
+git cat-file -p <sha>
+
+# Print its size in bytes
+git cat-file -s <sha>
+
+# Walk a commit down to its content: commit -> tree -> blob
+git cat-file -p HEAD
+git cat-file -p HEAD^{tree}
+```
+
+Once you can take a commit apart into `commit → tree → blob` with your own commands, the object database stops being a description and becomes something you have verified.
+
 ## 5. Objects are not the same as the working tree
 
 A useful separation is:
@@ -180,9 +200,9 @@ That mental split makes later topics like refs, rebase, reset, and recovery much
 
 ## Try it yourself
 
-1. Practice the object-database command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. **See an object directly**: in a repo, edit a file and commit. Run `git cat-file -t HEAD` to confirm it is a commit, `git cat-file -p HEAD` to see the tree it points to, then `git cat-file -p <tree-sha>` to reach a blob. Walk the `commit → tree → blob` chain using the hashes.
+2. **Verify content addressing**: put the same content into two differently named files and commit both, then use `git rev-parse :<path>` to confirm they resolve to the same blob hash — same content, same hash.
+3. **See how light a branch is**: after `git branch tmp`, run `git cat-file -t tmp` to confirm it is just a ref to an existing commit, then `git log --oneline --all --graph` to watch branch pointers move without copying objects.
 
 {/* internal-links:auto */}
 

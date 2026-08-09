@@ -42,12 +42,10 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 理解 git merge 教程 的核心作用和适用场景
-- 掌握 git merge 教程 的基本用法和常用参数
-- 解释 git merge 的核心作用、fast-forward 与 merge commit 的区别，以及冲突处理策略。
-- 理解 什么时候应该用 相关的概念
-- 掌握 两种常见结果 相关的操作
-- 知道在什么场景下使用该命令，什么场景下避免使用
+- 理解 `git merge` 的核心作用：把另一个分支的历史整合进当前分支，且不改写已有提交
+- 区分 fast-forward 与 merge commit 两种结果，并知道 `--ff-only` / `--no-ff` 如何影响它们
+- 掌握冲突时 `--continue` 与 `--abort` 的取舍
+- 知道在什么场景下 merge 比 rebase 更合适（共享分支、想保留汇合关系时）
 
 
 ## 先想一个问题
@@ -206,9 +204,9 @@ git merge --abort
 
 ## 给你的练习
 
-1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
-2. 尝试该命令的不同参数选项，对比输出结果的差异
-3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+1. **观察两种结果**：在一个测试仓库里，先让 `main` 和 `feature` 不分叉，执行 `git merge feature` 看它是否 fast-forward；再制造分叉后执行 `git merge feature`，用 `git log --oneline --graph --decorate -8` 确认出现了 merge commit。
+2. **对比策略开关**：在同一个分叉场景下分别用 `git merge --ff-only feature`（应当失败）和 `git merge --no-ff feature`（强制产生 merge commit），体会两者表达的历史语义差异。
+3. **安全地练习冲突**：故意让 main 和 feature 修改同一行，触发冲突后用 `git status` 定位、`git merge --abort` 撤掉，再换一种策略重试，直到你能从容区分"保留哪一侧历史"而不是"保留哪几行"。
 
 ## 继续学习建议
 

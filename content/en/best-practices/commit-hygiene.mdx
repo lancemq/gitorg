@@ -27,11 +27,10 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of Commit Hygiene and Messages
-- Master the basic usage and common options of Commit Hygiene and Messages
-- Keep commits as logically separate changesets and write messages that explain intent and motivation, so review, revert, and cherry-pick stay lightweight.
-- Understand key concepts: Why this topic comes first
-- Know when to use this feature and when to avoid it
+- Understand why "one commit, one intent" is the smallest unit of Git collaboration and the precondition for lightweight review, revert, and cherry-pick
+- Use `git add --patch` to split staging and `git diff --staged` as a final pre-commit check
+- Write commit messages in a two-layer "action + motivation" structure, and know when a body is worth adding
+- Judge whether a commit is clean enough with three questions (one-sentence summary, safe to revert alone, understandable to a reviewer)
 
 
 
@@ -100,6 +99,27 @@ Prevent the login form from submitting when the email field is blank.
 This keeps client-side behavior aligned with server-side validation.
 ```
 
+### A concrete contrast
+
+The same "add login retry" change can be written three very different ways:
+
+```text
+# Weak: the reader has to guess
+update login
+
+# Better: at least the action is clear
+fix login retry
+
+# Best: action + motivation
+Add login retry with backoff
+
+Retries were failing immediately on transient 500s from the
+auth service. Add exponential backoff so a single blip does
+not lock the user out.
+```
+
+The first two leave the "why" for someone to guess later. The third bakes the motivation into history, so a future rollback or incident review does not require tracking down the original author.
+
 ## 4. Prefer action-oriented subjects
 
 Better:
@@ -156,9 +176,9 @@ git diff --staged
 
 ## Try it yourself
 
-1. Practice the commit-hygiene command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. **Practice split staging**: make two unrelated changes in one file (say a bugfix plus a stray formatting tweak), then use `git add --patch` to stage only the bugfix, commit it, and leave the rest for a second commit.
+2. **Adopt the three-question habit**: make three commits in a row, and before each one ask yourself whether it has a one-sentence summary, is safe to revert alone, and is understandable on its own. Re-split any commit that fails two of the three.
+3. **Rewrite a weak message**: find one of your past commits and rewrite its body into the action + motivation structure using `git commit --amend` or an interactive reword, then compare the reviewer's cost before and after.
 
 {/* internal-links:auto */}
 

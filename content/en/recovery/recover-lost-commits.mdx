@@ -33,11 +33,10 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of Recovering lost commits
-- Master the basic usage and common options of Recovering lost commits
-- Recovery strategies for 'lost' commits across scenarios: detached HEAD commits, post-filter-branch, deleted branches, and over-reset. Core tools are reflog and fsck.
-- Understand key concepts: Why commits appear to be "lost"
-- Know when to use this feature and when to avoid it
+- Build the core insight: commits in Git are rarely truly deleted — usually the reference path is lost while the object still sits in `.git/objects/`
+- Use `git reflog` to recover most local mistakes (over-reset, switching away from a detached HEAD, deleting a branch)
+- Use `git fsck --lost-found` to dig up dangling commits after the reflog has expired or been cleaned
+- Know which cases are genuinely unrecoverable (expired reflog + gc, a fresh clone, remotes usually have no reflog) and how to prevent loss with backup branches, pushes, and bundles
 
 
 ## Start with a problem
@@ -434,9 +433,13 @@ Commit "lost"?
 
 ## Try it yourself
 
-1. Practice the recover-lost-commits command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. **Cause an over-reset and rescue it**: make five commits, then `git reset --hard HEAD~3` to "lose" the middle three. Use `git reflog` to find the pre-reset position and `git branch recovered/reset-demo <sha>` to catch it — prefer a branch over `reset --hard` straight back, it is safer.
+2. **Lose a detached HEAD commit**: `git checkout <old-sha>`, commit once, switch back to `main`, then use `git reflog` to find the nameless commit and `git cherry-pick` it back onto `main`.
+3. **Drill the fsck fallback**: run `git reflog expire --expire=now --all` to wipe the reflog, then `git fsck --lost-found` to surface the dangling commit — feel how fsck is the last net once the reflog is gone.
+
+## One rule that saves commits
+
+As long as the object is still there, the reflog has not expired, and you have not run `git gc --prune=now` — **almost every "lost" commit can still be recovered. Do not panic, run `git reflog` first.**
 
 {/* internal-links:auto */}
 

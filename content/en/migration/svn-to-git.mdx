@@ -27,11 +27,10 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of SVN to Git Migration Guide
-- Master the basic usage and common options of SVN to Git Migration Guide
-- A complete guide to migrating from Subversion (SVN) to Git, covering history conversion, branch mapping, team training, and common pitfalls.
-- Understand key concepts: Before Migration
-- Know when to use this feature and when to avoid it
+- Understand that SVN-to-Git is not "copying files" but shifting from centralized to distributed-snapshot thinking
+- Run a full `git svn clone` migration: author mapping, tag conversion, branch mapping, push to remote
+- Handle the three SVN-specific problems — large files, empty dirs, binaries — with BFG / .gitkeep / LFS
+- Plan a phased team migration that lowers the risk of a big-bang switch
 
 
 ## Start with a problem
@@ -64,6 +63,10 @@ Create `authors.txt`:
 svn_username = Full Name <email@example.com>
 jdoe = John Doe <john@example.com>
 ```
+
+<WarningBox title="Incomplete author map turns commits anonymous after migration">
+  When `git svn` hits a username missing from `authors.txt`, it either stops or records the author as `svn_username <svn_username@...>`. Export every username from `svn log` and complete the map before migrating, or author history will be corrupted and hard to fix in bulk afterward.
+</WarningBox>
 
 ### Tool Selection
 
@@ -182,9 +185,9 @@ git lfs migrate import --include="*.dll,*.exe" --everything
 
 ## Try it yourself
 
-1. Practice the svn-to-git command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Set up a local SVN repo (trunk/branches/tags with a few commits), migrate with `git svn clone --stdlayout --authors-file`, and verify branches and tags converted correctly.
+2. Intentionally add a 50MB "large file" to SVN history, find it after migration with the article's command, then strip it with BFG and compare repo size before/after.
+3. Following the four phases, draft a migration schedule for your own team (assess → pilot → switchover → transition), noting who owns each phase, its duration, and the rollback condition.
 
 ## Continue Learning
 

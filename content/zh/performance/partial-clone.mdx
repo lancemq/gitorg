@@ -188,9 +188,13 @@ git config --unset extensions.partialClone
 
 ## 给你的练习
 
-1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
-2. 尝试该命令的不同参数选项，对比输出结果的差异
-3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+1. **对比三种 filter 的首次下载**：分别用 `--filter=blob:none`、`--filter=tree:0`、`--filter=blob:limit=1m` 克隆同一个大仓库，记录各自的初始下载体积，再 `git checkout main` 观察哪些操作会触发按需请求。
+2. **组合 partial clone 与稀疏检出**：用 `git clone --filter=blob:none --sparse <url>` 后 `git sparse-checkout set src/my-team`，确认本地既没下全量文件、工作区也只展开你关心的目录——这是对 monorepo 最直接的加速。
+3. **演练回退到完整仓库**：在一个 partial clone 仓库里 `git fetch --unshallow` 拉全对象，再 `git config --unset extensions.partialClone` 关闭部分克隆，用 `git fsck` 确认所有对象都已本地化。
+
+## 一个容易忽略的点：partial clone 不影响历史命令
+
+`--filter=blob:none` 只过滤"文件内容（blob）"，commit、tree、tag 这些历史对象依然完整下载。所以 `git log`、`git branch --contains`、`git rev-list` 这类**只看历史、不看文件内容**的命令，在 partial clone 里速度和完整仓库几乎一样。真正会变慢的是"需要把内容落到工作区"的动作：`git checkout`、`git diff`（对比工作区）、`git grep` 全仓搜索等。理解这一点，你就能判断"我的场景到底省不省得下来"。
 
 ## 继续学习建议
 

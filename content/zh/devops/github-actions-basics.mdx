@@ -278,9 +278,17 @@ steps:
 
 ## 继续学习建议
 
-1. `workflows/merge-queue-workflow` — GitHub Merge Queue 的工作流
-2. `workflows/ci-optimization-with-git` — CI 中的 Git 优化策略
-3. GitHub Actions 官方文档
+1. [GitHub Merge Queue 工作流](/zh/workflows/merge-queue-workflow) — 把"等 CI 通过再合并"变成队列自动合入
+2. [CI 中的 Git 优化策略](/zh/workflows/ci-optimization-with-git) — fetch-depth、缓存与浅克隆的进一步权衡
+3. [GitHub Actions 官方文档](https://docs.github.com/en/actions) — 事件、上下文与可复用 Action 的完整参考
+
+## 一个容易踩的坑：缓存与 Git 历史
+
+`actions/checkout` 之外的步骤经常用到依赖缓存（如 `actions/cache` 或包管理器的原生缓存）。一个常见误会：把 `node_modules` 这类目录缓存下来后，以为"CI 已经拿到了完整仓库"。其实缓存只加速依赖安装，**不会**补全 `fetch-depth: 1` 缺失的历史。
+
+如果你的 lint 或测试需要 `git diff` 比较"本次 PR 改了哪些文件"，而 checkout 又是浅克隆，就会拿到空 diff 或报错。此时正确的做法不是关掉缓存，而是把 checkout 的 `fetch-depth` 调成 `0`（或至少 `2`），让 Git 历史够用，缓存继续留着加速依赖。
+
+> 一句话：缓存解决"装得快"，fetch-depth 解决"历史够不够"。两者各管各的，别互相替代。
 
 {/* internal-links:auto */}
 

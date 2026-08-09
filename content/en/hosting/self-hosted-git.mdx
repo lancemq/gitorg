@@ -33,16 +33,15 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of Self-Hosted Git Service Comparison
-- Master the basic usage and common options of Self-Hosted Git Service Comparison
-- A comparison of self-hosted Git solutions including GitLab CE, Gitea, Gogs, and others — covering features, deployment, and maintenance.
-- Understand key concepts: Why Self-Host?
-- Know when to use this feature and when to avoid it
+- Understand why self-host: the trade-off between data sovereignty, compliance, customization vs. operations cost and availability
+- Grasp how GitLab CE, Gitea, and Gogs differ in completeness, resource usage, and CI/CD maturity
+- Know the essentials of Docker quick-start and backup (gitlab-rake / rsync / mirror clone)
+- Choose by team size and compliance instead of blindly chasing "most features"
 
 
 ## Start with a problem
 
-You're choosing or configuring a Git hosting solution — whether self-hosting Gitea or comparing GitHub, GitLab, and Gitee features. You're not sure which option best fits your team's needs.
+Company compliance keeps code inside the network, or you simply don't trust a third-party cloud with your core repos. Self-hosting comes up — but it's not an install button. GitLab CE is complete but heavy, Gitea is light but young, and then there's backup, upgrade, and availability — the debt that arrives after install. This article helps you decide "whether to self-host and with what" before you touch a terminal.
 
 ## One-Sentence Understanding
 
@@ -183,11 +182,15 @@ git clone --mirror <url> backup.git
 | 100+ | GitLab EE / GitHub ES | Enterprise features |
 | High compliance | GitLab EE / Bitbucket DC | Audit and management |
 
+<TipBox title="Self-hosting is not "zero-ops" — make sure someone can own it">
+  Every option here says "needs dedicated maintenance." Before choosing, ask: who upgrades, who handles a 3am outage, has the backup ever been tested? Many teams overestimate "free" and underestimate "nobody understands it when it breaks." If you have no dedicated ops, starting on a hosted platform is usually safer.
+</TipBox>
+
 ## Try it yourself
 
-1. Practice the self-hosted-git command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Use the same `docker-compose.yml` to launch both Gitea and GitLab CE; compare first-boot time, memory, and initial setup complexity, and record your experience.
+2. Back up the running Gitea with `rsync`, delete its data directory, restore from backup, and verify repos and issues recover.
+3. Draw your team's "selection decision table" (size, need for built-in CI, compliance level), apply the article's recommendation, and write how you'd adjust if the team doubles in six months.
 
 ## Continue Learning
 

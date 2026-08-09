@@ -27,11 +27,10 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of Partial Clone: On-Demand Git Object Fetching
-- Master the basic usage and common options of Partial Clone: On-Demand Git Object Fetching
-- An in-depth look at Git partial clone — how filters and promisor remotes work, and how to speed up clone and fetch in large repositories.
-- Understand key concepts: How It Works
-- Know when to use this feature and when to avoid it
+- Explain what a partial clone is: download only the objects you need, fetch the rest on demand from a promisor remote
+- Use `--filter=blob:none`, `--filter=tree:0`, and `--filter=blob:limit=<size>` and pick the right trade-off
+- Combine partial clone with sparse checkout to shrink a monorepo's initial footprint
+- Know when partial clone helps (large repos, slow clones) and when it hurts (offline work, tools that need all blobs)
 
 
 ## Start with a problem
@@ -165,15 +164,19 @@ git config --unset extensions.partialClone
 
 ## Try it yourself
 
-1. Practice the partial-clone command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. **Compare the three filters on first clone**: clone the same large repo with `--filter=blob:none`, `--filter=tree:0`, and `--filter=blob:limit=1m`, record the initial download size of each, then `git checkout main` and watch which operations trigger on-demand fetches.
+2. **Combine partial clone with sparse checkout**: `git clone --filter=blob:none --sparse <url>` then `git sparse-checkout set src/my-team`, and confirm the local repo neither downloaded all blobs nor expanded directories you do not care about — the most direct speed-up for a monorepo.
+3. **Drill the rollback to a full clone**: in a partial clone, run `git fetch --unshallow` to pull every object, then `git config --unset extensions.partialClone` to turn partial cloning off, and use `git fsck` to confirm all objects are now local.
+
+## A detail easy to miss: partial clone does not slow down history commands
+
+`--filter=blob:none` only filters file contents (blobs); commit, tree, and tag history objects are still downloaded in full. So commands that only read history — `git log`, `git branch --contains`, `git rev-list` — run at almost the same speed as in a full clone. What actually gets slower are operations that must materialize content into the working tree: `git checkout`, `git diff` against the working tree, or a full `git grep`. Understand this and you can judge whether partial clone will actually help your scenario.
 
 ## Continue Learning
 
-1. `performance/large-repo-optimization` — Comprehensive optimization
-2. `commands/git-sparse-checkout` — Sparse checkout
-3. `internals/packfiles-and-storage` — Object storage & packfiles
+1. [Large repository performance optimization](/en/performance/large-repo-optimization) — comprehensive optimization
+2. [Sparse checkout](/en/commands/git-sparse-checkout) — sparse checkout
+3. [Object storage & packfiles](/en/internals/packfiles-and-storage) — how objects are stored
 
 {/* internal-links:auto */}
 

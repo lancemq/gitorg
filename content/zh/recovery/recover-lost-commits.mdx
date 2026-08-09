@@ -33,12 +33,10 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 理解 提交丢失后怎么找回 的核心作用和适用场景
-- 掌握 提交丢失后怎么找回 的基本用法和常用参数
-- 各种场景下提交“丢失”后的恢复策略：detached HEAD 提交、filter-branch 后、误删分支、reset 过头。核心工具是 reflog 和 fsck。
-- 理解 提交为什么会"丢失" 相关的概念
-- 掌握 关键认知：提交对象通常还在 相关的操作
-- 知道在什么场景下使用该命令，什么场景下避免使用
+- 建立核心认知：Git 里的提交很少被真正删除，多数是"引用路径丢了"，对象还躺在 `.git/objects/` 里
+- 用 `git reflog` 找回绝大多数本地误操作（reset 过头、切走 detached HEAD、误删分支）
+- 在 reflog 过期或被清理后，用 `git fsck --lost-found` 挖出 dangling 提交
+- 知道哪些情况真的不可恢复（reflog 过期 + gc、克隆新仓库、远端通常无 reflog），以及提前用备份分支 / push / bundle 预防
 
 
 ## 先想一个问题
@@ -435,9 +433,13 @@ git clone backup-20260414.bundle recovered-repo
 
 ## 给你的练习
 
-1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
-2. 尝试该命令的不同参数选项，对比输出结果的差异
-3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+1. **制造一次 reset 过头并救回来**：在测试仓库里连续提交 5 次，然后 `git reset --hard HEAD~3`"误删"中间 3 个，用 `git reflog` 找到 reset 前的位置，`git branch recovered/reset-demo <sha>` 接住它（不要直接 `--hard` 回去，先建分支最安全）。
+2. **模拟 detached HEAD 丢失**：`git checkout <老提交>` 后提交一次再切回 `main`，用 `git reflog` 找到那条"没有名字"的提交并 `git cherry-pick` 回 `main`，确认内容回来了。
+3. **演练 fsck 兜底**：`git reflog expire --expire=now --all` 清空 reflog 后，再 `git fsck --lost-found` 找出 dangling commit，体会 reflog 没了之后 fsck 是最后一道网。
+
+## 一句话保命原则
+
+只要对象还在、reflog 没过期、你还没跑 `git gc --prune=now`——**绝大多数"丢了"的提交都还能找回来，先别慌，先用 `git reflog`**。
 
 {/* internal-links:auto */}
 

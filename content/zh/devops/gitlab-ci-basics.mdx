@@ -27,17 +27,15 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 理解 GitLab CI/CD 与 Git 协同 的核心作用和适用场景
-- 掌握 GitLab CI/CD 与 Git 协同 的基本用法和常用参数
-- 系统介绍 GitLab CI/CD 如何与 Git 仓库深度集成，包括 .gitlab-ci.yml 配置、流水线触发策略和最佳实践。
-- 理解 核心概念 相关的概念
-- 掌握 分支策略与流水线 相关的操作
-- 知道在什么场景下使用该命令，什么场景下避免使用
+- 理解 GitLab CI 如何用 `.gitlab-ci.yml` 把"流水线定义"放进仓库，实现代码与构建配置同源
+- 掌握基于 Git 事件（push / MR / tag / 定时）的流水线触发方式与 `workflow: rules` 分支策略
+- 知道 `CI_JOB_TOKEN`、`GIT_STRATEGY`、`GIT_DEPTH` 等内置变量与策略对实际构建的影响
+- 识别 CI 中常见的 Git 安全误区（凭据泄露、在 CI 里随意 force push），知道如何规避
 
 
 ## 先想一个问题
 
-你的团队正在引入 CI/CD，或者你正在配置 IDE 中的 Git 集成——但你不确定在自动化的场景下，Git 的行为和本地手动操作有什么不同，需要注意什么安全问题。
+你本地 `git push` 一下，几秒后 GitLab 就自动跑起了测试、构建甚至部署。可你有没有想过：流水线里的 Git 是怎么拿到代码的？它的凭据从哪来、能推送到哪里、和你在终端敲命令有什么不同？这些差异正是 CI 里最容易踩坑、也最值得弄懂的地方。
 
 ## 一句话理解
 
@@ -137,6 +135,11 @@ git-push-job:
     - git push origin auto-release/$CI_COMMIT_SHORT_SHA
 ```
 
+<WarningBox title="不要把长期凭据写进 .gitlab-ci.yml">
+  `CI_JOB_TOKEN` 是临时、自动轮换的，只应在流水线内部使用。真正的部署密钥、云凭证等要放进受保护的 CI/CD Variables（并勾选 "Masked" / "Protected"），切勿明文写进仓库。任何写进仓库的字符串都会进入 Git 历史，难以彻底清除。
+</WarningBox>
+
+
 ### 合并结果流水线（Merge Result Pipeline）
 
 在 MR 的合并结果上运行流水线，比仅在源分支上运行更准确：
@@ -184,9 +187,9 @@ variables:
 
 ## 给你的练习
 
-1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
-2. 尝试该命令的不同参数选项，对比输出结果的差异
-3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+1. 在一个测试仓库根目录写一份最小 `.gitlab-ci.yml`（一个 `build` 阶段跑 `npm ci && npm test`），push 后观察流水线自动触发。
+2. 给同一份配置加上 `workflow: rules`，让 `main` 走生产变量、`develop` 走预发变量，验证不同分支注入的变量确实不同。
+3. 故意把 `GIT_DEPTH` 设得很小（如 `5`），然后在一个超过该深度的老提交上跑依赖上一次提交的脚本，观察"历史不够长"会如何破坏构建。
 
 ## 继续学习建议
 

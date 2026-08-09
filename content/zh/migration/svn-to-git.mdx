@@ -27,10 +27,10 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 了解 SVN 到 Git 迁移前的准备工作（作者映射、工具选择）
-- 掌握 `git svn clone` 迁移完整流程
-- 处理大文件、空目录、二进制文件等常见迁移问题
-- 制定团队迁移计划，降低切换风险
+- 理解 SVN 到 Git 迁移不只是"复制文件"，而是中心化思维到分布式快照思维的转换
+- 掌握 `git svn clone` 迁移的完整流程：作者映射、标签转换、分支映射、推送到远端
+- 知道大文件、空目录、二进制文件这三类 SVN 特有问题的处理方式（BFG / .gitkeep / LFS）
+- 能制定分阶段团队迁移计划，降低"一刀切切换"的风险
 
 ## 先想一个问题
 
@@ -66,6 +66,10 @@ svn_username = Full Name <email@example.com>
 zhangsan = 张三 <zhangsan@example.com>
 lisi = 李四 <lisi@example.com>
 ```
+
+<WarningBox title="作者映射不全，迁移后提交会变成匿名">
+  `git svn` 遇到 `authors.txt` 里没有的用户名时会中断，或把作者记为 `svn_username <svn_username@...>`。迁移前务必从 `svn log` 导出所有出现过的用户名并补全映射，否则历史里的作者会错乱、且难以事后批量修正。
+</WarningBox>
 
 ### 工具选择
 
@@ -204,9 +208,9 @@ git lfs migrate import --include="*.dll,*.exe" --everything
 
 ## 给你的练习
 
-1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
-2. 尝试该命令的不同参数选项，对比输出结果的差异
-3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+1. 搭一个本地 SVN 仓库（含 trunk/branches/tags 和几个提交），用 `git svn clone --stdlayout --authors-file` 迁到 Git，验证分支和标签都正确转换。
+2. 在 SVN 历史里故意放一个 50MB 的"大文件"，迁移后用文中命令找出它，再用 BFG 把它从历史中剥离，对比仓库体积变化。
+3. 按文中四阶段计划，给你自己的团队起草一份迁移排期（评估 → 试运行 → 正式切换 → 过渡期），标出每个阶段谁负责、多久、回退条件是什么。
 
 ## 继续学习建议
 
