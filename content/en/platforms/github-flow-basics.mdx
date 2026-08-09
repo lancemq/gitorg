@@ -27,11 +27,10 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of GitHub Flow Basics
-- Master the basic usage and common options of GitHub Flow Basics
-- Use GitHub's own lightweight collaboration model to understand branches, pull requests, reviews, and merges as one practical loop.
-- Understand key concepts: What it actually is
-- Know when to use this feature and when to avoid it
+- State the minimum GitHub Flow loop: `main` stays deployable → cut a branch → open a PR → review → merge
+- Understand why the pull request is the real collaboration center here, not just a final merge button
+- Recognize which teams fit it best (mainline always releasable, small batches, review/CI as gates) and which actually need Gitflow
+- Avoid three common misunderstandings: lightweight ≠ no rules, longer branches ≠ safer, opening a PR ≠ frozen branch
 
 
 
@@ -170,16 +169,16 @@ If GitHub Flow becomes your default, write down at least these rules:
 
 ## Good follow-up reads
 
-- prepare commits before a pull request
-- shared history boundaries
-- pull requests and reviews
-- feature-branch collaboration
+- [Prepare commits before a pull request](/en/platforms/pull-requests-and-reviews) — clean up commits on the branch before review
+- [Shared history boundaries](/en/commands/git-rebase) — why rewriting shared history needs care
+- [Pull requests and reviews](/en/platforms/pull-requests-and-reviews) — review density and merge rhythm
+- [Feature-branch collaboration](/en/workflows/feature-branch-collaboration) — extending this loop into shared work
 
 ## Try it yourself
 
-1. Practice the github-flow-basics command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Run the minimum loop in a test repo: cut a feature branch from `main`, commit a change, push, open a PR, and write the intent clearly in the PR description — feel how the PR is a discussion entry point, not just a merge button.
+2. Deliberately let one branch live longer (more commits, falling behind main) and observe how review cost and conflicts accumulate on merge, to feel why GitHub Flow favors small batches and fast merges.
+3. Turn on branch protection for `main` in a test repo so it can only be merged through a PR, then confirm a direct push is rejected — make that rule real, not just stated.
 
 {/* internal-links:auto */}
 
