@@ -1300,9 +1300,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/github/github-flow-basics",
-    "path": "github/github-flow-basics",
-    "section": "github",
+    "href": "/en/docs/platforms/github-flow-basics",
+    "path": "platforms/github-flow-basics",
+    "section": "platforms",
     "tier": "recommended",
     "slug": "github-flow-basics",
     "title": "GitHub Flow Basics",
@@ -1310,9 +1310,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/github/pull-requests-and-reviews",
-    "path": "github/pull-requests-and-reviews",
-    "section": "github",
+    "href": "/en/docs/platforms/pull-requests-and-reviews",
+    "path": "platforms/pull-requests-and-reviews",
+    "section": "platforms",
     "tier": "recommended",
     "slug": "pull-requests-and-reviews",
     "title": "Pull Requests and Code Review",
@@ -1320,9 +1320,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/github/forks-and-open-source-contribution",
-    "path": "github/forks-and-open-source-contribution",
-    "section": "github",
+    "href": "/en/docs/platforms/forks-and-open-source-contribution",
+    "path": "platforms/forks-and-open-source-contribution",
+    "section": "platforms",
     "tier": "extended",
     "slug": "forks-and-open-source-contribution",
     "title": "Forks and Open Source Contribution",
@@ -1330,9 +1330,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/github/issues-projects-and-discussions",
-    "path": "github/issues-projects-and-discussions",
-    "section": "github",
+    "href": "/en/docs/platforms/issues-projects-and-discussions",
+    "path": "platforms/issues-projects-and-discussions",
+    "section": "platforms",
     "tier": "extended",
     "slug": "issues-projects-and-discussions",
     "title": "Issues, Projects, and Discussions",
@@ -1340,9 +1340,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/github/github-actions-and-skills",
-    "path": "github/github-actions-and-skills",
-    "section": "github",
+    "href": "/en/docs/platforms/github-actions-and-skills",
+    "path": "platforms/github-actions-and-skills",
+    "section": "platforms",
     "tier": "extended",
     "slug": "github-actions-and-skills",
     "title": "GitHub Actions and GitHub Skills",
@@ -1350,9 +1350,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/github/github-branch-protection-and-rulesets",
-    "path": "github/github-branch-protection-and-rulesets",
-    "section": "github",
+    "href": "/en/docs/platforms/github-branch-protection-and-rulesets",
+    "path": "platforms/github-branch-protection-and-rulesets",
+    "section": "platforms",
     "tier": "recommended",
     "slug": "github-branch-protection-and-rulesets",
     "title": "GitHub branch protection and rulesets",
@@ -1360,9 +1360,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/github/github-codeowners-and-review-ownership",
-    "path": "github/github-codeowners-and-review-ownership",
-    "section": "github",
+    "href": "/en/docs/platforms/github-codeowners-and-review-ownership",
+    "path": "platforms/github-codeowners-and-review-ownership",
+    "section": "platforms",
     "tier": "recommended",
     "slug": "github-codeowners-and-review-ownership",
     "title": "GitHub CODEOWNERS and review ownership",
@@ -1370,9 +1370,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/gitlab/gitlab-flow-and-merge-requests",
-    "path": "gitlab/gitlab-flow-and-merge-requests",
-    "section": "gitlab",
+    "href": "/en/docs/platforms/gitlab-flow-and-merge-requests",
+    "path": "platforms/gitlab-flow-and-merge-requests",
+    "section": "platforms",
     "tier": "recommended",
     "slug": "gitlab-flow-and-merge-requests",
     "title": "GitLab Flow and Merge Requests",
@@ -1380,9 +1380,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/gitlab/gitlab-forks-and-contributions",
-    "path": "gitlab/gitlab-forks-and-contributions",
-    "section": "gitlab",
+    "href": "/en/docs/platforms/gitlab-forks-and-contributions",
+    "path": "platforms/gitlab-forks-and-contributions",
+    "section": "platforms",
     "tier": "extended",
     "slug": "gitlab-forks-and-contributions",
     "title": "GitLab Forks and Contribution Flow",
@@ -1390,9 +1390,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/gitlab/gitlab-issues-boards-and-milestones",
-    "path": "gitlab/gitlab-issues-boards-and-milestones",
-    "section": "gitlab",
+    "href": "/en/docs/platforms/gitlab-issues-boards-and-milestones",
+    "path": "platforms/gitlab-issues-boards-and-milestones",
+    "section": "platforms",
     "tier": "extended",
     "slug": "gitlab-issues-boards-and-milestones",
     "title": "GitLab Issues, Boards, and Milestones",
@@ -1400,9 +1400,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/gitlab/gitlab-groups-projects-and-permissions",
-    "path": "gitlab/gitlab-groups-projects-and-permissions",
-    "section": "gitlab",
+    "href": "/en/docs/platforms/gitlab-groups-projects-and-permissions",
+    "path": "platforms/gitlab-groups-projects-and-permissions",
+    "section": "platforms",
     "tier": "extended",
     "slug": "gitlab-groups-projects-and-permissions",
     "title": "GitLab Groups, Projects, and Permissions",
@@ -1410,9 +1410,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/gitlab/gitlab-ci-and-runners",
-    "path": "gitlab/gitlab-ci-and-runners",
-    "section": "gitlab",
+    "href": "/en/docs/platforms/gitlab-ci-and-runners",
+    "path": "platforms/gitlab-ci-and-runners",
+    "section": "platforms",
     "tier": "recommended",
     "slug": "gitlab-ci-and-runners",
     "title": "GitLab CI/CD and Runners",
@@ -1420,9 +1420,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/gitlab/gitlab-protected-branches-and-approval-rules",
-    "path": "gitlab/gitlab-protected-branches-and-approval-rules",
-    "section": "gitlab",
+    "href": "/en/docs/platforms/gitlab-protected-branches-and-approval-rules",
+    "path": "platforms/gitlab-protected-branches-and-approval-rules",
+    "section": "platforms",
     "tier": "recommended",
     "slug": "gitlab-protected-branches-and-approval-rules",
     "title": "GitLab protected branches and approval rules",
@@ -1430,9 +1430,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/gitlab/gitlab-merge-trains-and-merge-result-pipelines",
-    "path": "gitlab/gitlab-merge-trains-and-merge-result-pipelines",
-    "section": "gitlab",
+    "href": "/en/docs/platforms/gitlab-merge-trains-and-merge-result-pipelines",
+    "path": "platforms/gitlab-merge-trains-and-merge-result-pipelines",
+    "section": "platforms",
     "tier": "recommended",
     "slug": "gitlab-merge-trains-and-merge-result-pipelines",
     "title": "GitLab merge trains and merged result pipelines",
@@ -2030,6 +2030,56 @@
     "suggestions": []
   },
   {
+    "href": "/en/docs/concepts/git-rebase-deep",
+    "path": "concepts/git-rebase-deep",
+    "section": "concepts",
+    "tier": "recommended",
+    "slug": "git-rebase-deep",
+    "title": "Git Rebase Deep Dive",
+    "summary": "Understand Git Rebase internals, interactive rebasing, conflict resolution strategies, and best practices.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/docs/concepts/git-merge-deep",
+    "path": "concepts/git-merge-deep",
+    "section": "concepts",
+    "tier": "recommended",
+    "slug": "git-merge-deep",
+    "title": "Git Merge Deep Dive",
+    "summary": "Understand Git merge strategies, recursive merge, ours/theirs, octopus merge, and conflict resolution.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/docs/concepts/git-bisect-deep",
+    "path": "concepts/git-bisect-deep",
+    "section": "concepts",
+    "tier": "recommended",
+    "slug": "git-bisect-deep",
+    "title": "Git Bisect Deep Dive",
+    "summary": "Master Git bisect's binary search, automation with run mode, visualization, and large repo optimization.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/docs/concepts/git-rerere-deep",
+    "path": "concepts/git-rerere-deep",
+    "section": "concepts",
+    "tier": "recommended",
+    "slug": "git-rerere-deep",
+    "title": "Git Rerere Deep Dive",
+    "summary": "Master Git Rerere (reuse recorded resolution): config, workflow integration, storage, and team sharing.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/docs/concepts/git-for-data",
+    "path": "concepts/git-for-data",
+    "section": "concepts",
+    "tier": "extended",
+    "slug": "git-for-data",
+    "title": "Git for Data — DVC, lakeFS, and Large Data Versioning",
+    "summary": "Why plain Git struggles with datasets and model weights, and how DVC, lakeFS, git-annex, and Git LFS each solve data versioning for ML and analytics workloads.",
+    "suggestions": []
+  },
+  {
     "href": "/en/commands/git-rerere",
     "path": "commands/git-rerere",
     "section": "commands",
@@ -2130,6 +2180,16 @@
     "suggestions": []
   },
   {
+    "href": "/en/workflows/ai-assisted-git-workflows",
+    "path": "workflows/ai-assisted-git-workflows",
+    "section": "workflows",
+    "tier": "extended",
+    "slug": "ai-assisted-git-workflows",
+    "title": "AI-Assisted Git Workflows",
+    "summary": "How to use AI coding tools (Copilot, Claude Code, Cursor, Aider) with Git safely — reviewing AI diffs, writing verifiable commit messages, and avoiding history-rewrite disasters.",
+    "suggestions": []
+  },
+  {
     "href": "/en/best-practices/tagging-and-versioning",
     "path": "best-practices/tagging-and-versioning",
     "section": "best-practices",
@@ -2160,9 +2220,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/ci-cd/github-actions-basics",
-    "path": "ci-cd/github-actions-basics",
-    "section": "ci-cd",
+    "href": "/en/docs/devops/github-actions-basics",
+    "path": "devops/github-actions-basics",
+    "section": "devops",
     "tier": "extended",
     "slug": "github-actions-basics",
     "title": "Git Actions & CI/CD Basics",
@@ -2170,9 +2230,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/ci-cd/gitlab-ci-basics",
-    "path": "ci-cd/gitlab-ci-basics",
-    "section": "ci-cd",
+    "href": "/en/docs/devops/gitlab-ci-basics",
+    "path": "devops/gitlab-ci-basics",
+    "section": "devops",
     "tier": "extended",
     "slug": "gitlab-ci-basics",
     "title": "GitLab CI & Git Integration",
@@ -2180,9 +2240,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/ci-cd/jenkins-integration",
-    "path": "ci-cd/jenkins-integration",
-    "section": "ci-cd",
+    "href": "/en/docs/devops/jenkins-integration",
+    "path": "devops/jenkins-integration",
+    "section": "devops",
     "tier": "recommended",
     "slug": "jenkins-integration",
     "title": "Jenkins Git Integration",
@@ -2190,9 +2250,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/ci-cd/ci-security-basics",
-    "path": "ci-cd/ci-security-basics",
-    "section": "ci-cd",
+    "href": "/en/docs/devops/ci-security-basics",
+    "path": "devops/ci-security-basics",
+    "section": "devops",
     "tier": "recommended",
     "slug": "ci-security-basics",
     "title": "Git Security Basics in CI/CD",
@@ -2200,9 +2260,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/ide/vscode-git",
-    "path": "ide/vscode-git",
-    "section": "ide",
+    "href": "/en/docs/devops/vscode-git",
+    "path": "devops/vscode-git",
+    "section": "devops",
     "tier": "extended",
     "slug": "vscode-git",
     "title": "VS Code Git Integration",
@@ -2210,9 +2270,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/ide/jetbrains-git",
-    "path": "ide/jetbrains-git",
-    "section": "ide",
+    "href": "/en/docs/devops/jetbrains-git",
+    "path": "devops/jetbrains-git",
+    "section": "devops",
     "tier": "extended",
     "slug": "jetbrains-git",
     "title": "JetBrains IDE Git Integration",
@@ -2220,9 +2280,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/ide/github-desktop",
-    "path": "ide/github-desktop",
-    "section": "ide",
+    "href": "/en/docs/devops/github-desktop",
+    "path": "devops/github-desktop",
+    "section": "devops",
     "tier": "recommended",
     "slug": "github-desktop",
     "title": "GitHub Desktop Guide",
@@ -2230,9 +2290,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/ide/terminal-git-ui",
-    "path": "ide/terminal-git-ui",
-    "section": "ide",
+    "href": "/en/docs/devops/terminal-git-ui",
+    "path": "devops/terminal-git-ui",
+    "section": "devops",
     "tier": "recommended",
     "slug": "terminal-git-ui",
     "title": "Terminal Git UI Tools Guide",
@@ -2330,6 +2390,36 @@
     "suggestions": []
   },
   {
+    "href": "/en/performance/commit-graph-deep",
+    "path": "performance/commit-graph-deep",
+    "section": "performance",
+    "tier": "recommended",
+    "slug": "commit-graph-deep",
+    "title": "Commit Graph Deep Dive",
+    "summary": "Understand Git Commit Graph's layered structure, Generation Numbers, Bloom Filters, and large repo acceleration.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/performance/bundle-uri",
+    "path": "performance/bundle-uri",
+    "section": "performance",
+    "tier": "recommended",
+    "slug": "bundle-uri",
+    "title": "Bundle URI Deep Dive",
+    "summary": "Master Git Bundle URI: pre-packed objects for fast clones and incremental sync in offline/bandwidth-constrained environments.",
+    "suggestions": []
+  },
+  {
+    "href": "/en/performance/scalar-git",
+    "path": "performance/scalar-git",
+    "section": "performance",
+    "tier": "recommended",
+    "slug": "scalar-git",
+    "title": "Scalar Git Deep Dive",
+    "summary": "Understand Scalar (formerly GVFS): Microsoft's virtual filesystem and background sync for massive repos, enabling on-demand downloads with standard Git compatibility.",
+    "suggestions": []
+  },
+  {
     "href": "/en/migration/svn-to-git",
     "path": "migration/svn-to-git",
     "section": "migration",
@@ -2410,9 +2500,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/ci-cd/circleci-git",
-    "path": "ci-cd/circleci-git",
-    "section": "ci-cd",
+    "href": "/en/docs/devops/circleci-git",
+    "path": "devops/circleci-git",
+    "section": "devops",
     "tier": "recommended",
     "slug": "circleci-git",
     "title": "CircleCI with Git Integration",
@@ -2420,9 +2510,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/ci-cd/ci-cd-testing-strategies",
-    "path": "ci-cd/ci-cd-testing-strategies",
-    "section": "ci-cd",
+    "href": "/en/docs/devops/ci-cd-testing-strategies",
+    "path": "devops/ci-cd-testing-strategies",
+    "section": "devops",
     "tier": "recommended",
     "slug": "ci-cd-testing-strategies",
     "title": "CI/CD Testing Strategies with Git",
@@ -2430,9 +2520,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/ci-cd/ci-cd-deployment-strategies",
-    "path": "ci-cd/ci-cd-deployment-strategies",
-    "section": "ci-cd",
+    "href": "/en/docs/devops/ci-cd-deployment-strategies",
+    "path": "devops/ci-cd-deployment-strategies",
+    "section": "devops",
     "tier": "recommended",
     "slug": "ci-cd-deployment-strategies",
     "title": "CI/CD Deployment Strategies with Git",
@@ -2440,9 +2530,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/ide/vim-neovim-git",
-    "path": "ide/vim-neovim-git",
-    "section": "ide",
+    "href": "/en/docs/devops/vim-neovim-git",
+    "path": "devops/vim-neovim-git",
+    "section": "devops",
     "tier": "recommended",
     "slug": "vim-neovim-git",
     "title": "Vim/Neovim Git Integration Guide",
@@ -2450,9 +2540,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/ide/intellij-git-deep",
-    "path": "ide/intellij-git-deep",
-    "section": "ide",
+    "href": "/en/docs/devops/intellij-git-deep",
+    "path": "devops/intellij-git-deep",
+    "section": "devops",
     "tier": "recommended",
     "slug": "intellij-git-deep",
     "title": "IntelliJ IDEA Git Deep Dive",
@@ -2460,9 +2550,9 @@
     "suggestions": []
   },
   {
-    "href": "/en/ide/terminal-git-productivity",
-    "path": "ide/terminal-git-productivity",
-    "section": "ide",
+    "href": "/en/docs/devops/terminal-git-productivity",
+    "path": "devops/terminal-git-productivity",
+    "section": "devops",
     "tier": "recommended",
     "slug": "terminal-git-productivity",
     "title": "Terminal Git Productivity",

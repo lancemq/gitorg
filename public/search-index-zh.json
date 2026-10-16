@@ -85,8 +85,8 @@
     "section": "learning-path",
     "tier": "core",
     "slug": "handle-review-feedback",
-    "title": "处理评审反馈",
-    "summary": "掌握评审反馈处理节奏：区分必须修改与讨论项、按批次提交修订、维持 PR 可审查性与上下文连续性。",
+    "title": "处理 Review 反馈",
+    "summary": "PR 收到 review 反馈后如何正确处理：区分反馈类型、做出对应修改、安全地更新 PR，避免常见错误操作。",
     "suggestions": []
   },
   {
@@ -96,7 +96,7 @@
     "tier": "core",
     "slug": "merge-and-close-task",
     "title": "合并并关闭任务闭环",
-    "summary": "完成一次完整协作闭环：选择合并策略、确认主线状态、清理分支并更新任务状态，避免“代码已合并但流程未收口”。",
+    "summary": "完成一次完整协作闭环：选择合并策略、确认主线状态、清理分支并更新任务状态，避免\\u201c代码已合并但流程未收口\\u201d。",
     "suggestions": []
   },
   {
@@ -1300,9 +1300,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/github/github-flow-basics",
-    "path": "github/github-flow-basics",
-    "section": "github",
+    "href": "/zh/docs/platforms/github-flow-basics",
+    "path": "platforms/github-flow-basics",
+    "section": "platforms",
     "tier": "recommended",
     "slug": "github-flow-basics",
     "title": "GitHub Flow 基础教程",
@@ -1310,9 +1310,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/github/pull-requests-and-reviews",
-    "path": "github/pull-requests-and-reviews",
-    "section": "github",
+    "href": "/zh/docs/platforms/pull-requests-and-reviews",
+    "path": "platforms/pull-requests-and-reviews",
+    "section": "platforms",
     "tier": "recommended",
     "slug": "pull-requests-and-reviews",
     "title": "Pull Request 与 Code Review 教程",
@@ -1320,9 +1320,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/github/forks-and-open-source-contribution",
-    "path": "github/forks-and-open-source-contribution",
-    "section": "github",
+    "href": "/zh/docs/platforms/forks-and-open-source-contribution",
+    "path": "platforms/forks-and-open-source-contribution",
+    "section": "platforms",
     "tier": "extended",
     "slug": "forks-and-open-source-contribution",
     "title": "Fork 与开源贡献教程",
@@ -1330,9 +1330,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/github/issues-projects-and-discussions",
-    "path": "github/issues-projects-and-discussions",
-    "section": "github",
+    "href": "/zh/docs/platforms/issues-projects-and-discussions",
+    "path": "platforms/issues-projects-and-discussions",
+    "section": "platforms",
     "tier": "extended",
     "slug": "issues-projects-and-discussions",
     "title": "Issues、Projects 与 Discussions 教程",
@@ -1340,9 +1340,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/github/github-actions-and-skills",
-    "path": "github/github-actions-and-skills",
-    "section": "github",
+    "href": "/zh/docs/platforms/github-actions-and-skills",
+    "path": "platforms/github-actions-and-skills",
+    "section": "platforms",
     "tier": "extended",
     "slug": "github-actions-and-skills",
     "title": "GitHub Actions 与 GitHub Skills 入门",
@@ -1350,9 +1350,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/github/github-branch-protection-and-rulesets",
-    "path": "github/github-branch-protection-and-rulesets",
-    "section": "github",
+    "href": "/zh/docs/platforms/github-branch-protection-and-rulesets",
+    "path": "platforms/github-branch-protection-and-rulesets",
+    "section": "platforms",
     "tier": "recommended",
     "slug": "github-branch-protection-and-rulesets",
     "title": "GitHub 分支保护与 Rulesets",
@@ -1360,9 +1360,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/github/github-codeowners-and-review-ownership",
-    "path": "github/github-codeowners-and-review-ownership",
-    "section": "github",
+    "href": "/zh/docs/platforms/github-codeowners-and-review-ownership",
+    "path": "platforms/github-codeowners-and-review-ownership",
+    "section": "platforms",
     "tier": "recommended",
     "slug": "github-codeowners-and-review-ownership",
     "title": "GitHub CODEOWNERS 与评审归属",
@@ -1370,9 +1370,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/gitlab/gitlab-flow-and-merge-requests",
-    "path": "gitlab/gitlab-flow-and-merge-requests",
-    "section": "gitlab",
+    "href": "/zh/docs/platforms/gitlab-flow-and-merge-requests",
+    "path": "platforms/gitlab-flow-and-merge-requests",
+    "section": "platforms",
     "tier": "recommended",
     "slug": "gitlab-flow-and-merge-requests",
     "title": "GitLab Flow 与 Merge Request 教程",
@@ -1380,9 +1380,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/gitlab/gitlab-forks-and-contributions",
-    "path": "gitlab/gitlab-forks-and-contributions",
-    "section": "gitlab",
+    "href": "/zh/docs/platforms/gitlab-forks-and-contributions",
+    "path": "platforms/gitlab-forks-and-contributions",
+    "section": "platforms",
     "tier": "extended",
     "slug": "gitlab-forks-and-contributions",
     "title": "GitLab Fork 与贡献流程",
@@ -1390,9 +1390,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/gitlab/gitlab-issues-boards-and-milestones",
-    "path": "gitlab/gitlab-issues-boards-and-milestones",
-    "section": "gitlab",
+    "href": "/zh/docs/platforms/gitlab-issues-boards-and-milestones",
+    "path": "platforms/gitlab-issues-boards-and-milestones",
+    "section": "platforms",
     "tier": "extended",
     "slug": "gitlab-issues-boards-and-milestones",
     "title": "GitLab Issues、Boards 与 Milestones",
@@ -1400,9 +1400,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/gitlab/gitlab-groups-projects-and-permissions",
-    "path": "gitlab/gitlab-groups-projects-and-permissions",
-    "section": "gitlab",
+    "href": "/zh/docs/platforms/gitlab-groups-projects-and-permissions",
+    "path": "platforms/gitlab-groups-projects-and-permissions",
+    "section": "platforms",
     "tier": "extended",
     "slug": "gitlab-groups-projects-and-permissions",
     "title": "GitLab Groups、Projects 与权限模型",
@@ -1410,9 +1410,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/gitlab/gitlab-ci-and-runners",
-    "path": "gitlab/gitlab-ci-and-runners",
-    "section": "gitlab",
+    "href": "/zh/docs/platforms/gitlab-ci-and-runners",
+    "path": "platforms/gitlab-ci-and-runners",
+    "section": "platforms",
     "tier": "recommended",
     "slug": "gitlab-ci-and-runners",
     "title": "GitLab CI/CD 与 Runners 入门",
@@ -1420,9 +1420,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/gitlab/gitlab-protected-branches-and-approval-rules",
-    "path": "gitlab/gitlab-protected-branches-and-approval-rules",
-    "section": "gitlab",
+    "href": "/zh/docs/platforms/gitlab-protected-branches-and-approval-rules",
+    "path": "platforms/gitlab-protected-branches-and-approval-rules",
+    "section": "platforms",
     "tier": "recommended",
     "slug": "gitlab-protected-branches-and-approval-rules",
     "title": "GitLab 受保护分支与审批规则",
@@ -1430,9 +1430,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/gitlab/gitlab-merge-trains-and-merge-result-pipelines",
-    "path": "gitlab/gitlab-merge-trains-and-merge-result-pipelines",
-    "section": "gitlab",
+    "href": "/zh/docs/platforms/gitlab-merge-trains-and-merge-result-pipelines",
+    "path": "platforms/gitlab-merge-trains-and-merge-result-pipelines",
+    "section": "platforms",
     "tier": "recommended",
     "slug": "gitlab-merge-trains-and-merge-result-pipelines",
     "title": "GitLab Merge Trains 与合并结果流水线",
@@ -2030,6 +2030,56 @@
     "suggestions": []
   },
   {
+    "href": "/zh/docs/concepts/git-rebase-deep",
+    "path": "concepts/git-rebase-deep",
+    "section": "concepts",
+    "tier": "recommended",
+    "slug": "git-rebase-deep",
+    "title": "Git Rebase 深入",
+    "summary": "深入理解 Git Rebase 的内部机制、交互式变基、冲突解决策略与最佳实践。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/concepts/git-merge-deep",
+    "path": "concepts/git-merge-deep",
+    "section": "concepts",
+    "tier": "recommended",
+    "slug": "git-merge-deep",
+    "title": "Git Merge 深入",
+    "summary": "深入理解 Git Merge 策略、递归合并、Ours/Theirs、Octopus 合并与冲突解决机制。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/concepts/git-bisect-deep",
+    "path": "concepts/git-bisect-deep",
+    "section": "concepts",
+    "tier": "recommended",
+    "slug": "git-bisect-deep",
+    "title": "Git Bisect 深入",
+    "summary": "深入掌握 Git Bisect 的二分查找原理、自动化脚本、run 模式、可视化与大型仓库优化。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/concepts/git-rerere-deep",
+    "path": "concepts/git-rerere-deep",
+    "section": "concepts",
+    "tier": "recommended",
+    "slug": "git-rerere-deep",
+    "title": "Git Rerere 深入",
+    "summary": "掌握 Git Rerere（重用记录的冲突解决）的配置、工作流集成、存储机制与团队共享策略。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/docs/concepts/git-for-data",
+    "path": "concepts/git-for-data",
+    "section": "concepts",
+    "tier": "extended",
+    "slug": "git-for-data",
+    "title": "用 Git 管理数据 —— DVC、lakeFS 与大数据版本控制",
+    "summary": "为什么纯 Git 处理数据集和模型权重会吃力，DVC、lakeFS、git-annex、Git LFS 各自如何解决 ML 与分析场景的数据版本控制。",
+    "suggestions": []
+  },
+  {
     "href": "/zh/commands/git-rerere",
     "path": "commands/git-rerere",
     "section": "commands",
@@ -2130,6 +2180,16 @@
     "suggestions": []
   },
   {
+    "href": "/zh/workflows/ai-assisted-git-workflows",
+    "path": "workflows/ai-assisted-git-workflows",
+    "section": "workflows",
+    "tier": "extended",
+    "slug": "ai-assisted-git-workflows",
+    "title": "AI 辅助 Git 工作流",
+    "summary": "如何安全地把 AI 编程工具（Copilot、Claude Code、Cursor、Aider）和 Git 结合：审查 AI diff、写出可验证的提交信息、避免改写历史的事故。",
+    "suggestions": []
+  },
+  {
     "href": "/zh/best-practices/tagging-and-versioning",
     "path": "best-practices/tagging-and-versioning",
     "section": "best-practices",
@@ -2160,9 +2220,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/ci-cd/github-actions-basics",
-    "path": "ci-cd/github-actions-basics",
-    "section": "ci-cd",
+    "href": "/zh/docs/devops/github-actions-basics",
+    "path": "devops/github-actions-basics",
+    "section": "devops",
     "tier": "extended",
     "slug": "github-actions-basics",
     "title": "GitHub Actions 与 Git 协同",
@@ -2170,9 +2230,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/ci-cd/gitlab-ci-basics",
-    "path": "ci-cd/gitlab-ci-basics",
-    "section": "ci-cd",
+    "href": "/zh/docs/devops/gitlab-ci-basics",
+    "path": "devops/gitlab-ci-basics",
+    "section": "devops",
     "tier": "extended",
     "slug": "gitlab-ci-basics",
     "title": "GitLab CI/CD 与 Git 协同",
@@ -2180,9 +2240,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/ci-cd/jenkins-integration",
-    "path": "ci-cd/jenkins-integration",
-    "section": "ci-cd",
+    "href": "/zh/docs/devops/jenkins-integration",
+    "path": "devops/jenkins-integration",
+    "section": "devops",
     "tier": "recommended",
     "slug": "jenkins-integration",
     "title": "Jenkins 与 Git 集成",
@@ -2190,9 +2250,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/ci-cd/ci-security-basics",
-    "path": "ci-cd/ci-security-basics",
-    "section": "ci-cd",
+    "href": "/zh/docs/devops/ci-security-basics",
+    "path": "devops/ci-security-basics",
+    "section": "devops",
     "tier": "recommended",
     "slug": "ci-security-basics",
     "title": "CI/CD 中的 Git 安全基础",
@@ -2200,9 +2260,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/ide/vscode-git",
-    "path": "ide/vscode-git",
-    "section": "ide",
+    "href": "/zh/docs/devops/vscode-git",
+    "path": "devops/vscode-git",
+    "section": "devops",
     "tier": "extended",
     "slug": "vscode-git",
     "title": "VS Code Git 集成深度指南",
@@ -2210,9 +2270,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/ide/jetbrains-git",
-    "path": "ide/jetbrains-git",
-    "section": "ide",
+    "href": "/zh/docs/devops/jetbrains-git",
+    "path": "devops/jetbrains-git",
+    "section": "devops",
     "tier": "extended",
     "slug": "jetbrains-git",
     "title": "JetBrains IDE Git 操作深度指南",
@@ -2220,9 +2280,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/ide/github-desktop",
-    "path": "ide/github-desktop",
-    "section": "ide",
+    "href": "/zh/docs/devops/github-desktop",
+    "path": "devops/github-desktop",
+    "section": "devops",
     "tier": "recommended",
     "slug": "github-desktop",
     "title": "GitHub Desktop 使用指南",
@@ -2230,9 +2290,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/ide/terminal-git-ui",
-    "path": "ide/terminal-git-ui",
-    "section": "ide",
+    "href": "/zh/docs/devops/terminal-git-ui",
+    "path": "devops/terminal-git-ui",
+    "section": "devops",
     "tier": "recommended",
     "slug": "terminal-git-ui",
     "title": "终端 Git UI 工具指南",
@@ -2330,6 +2390,36 @@
     "suggestions": []
   },
   {
+    "href": "/zh/performance/commit-graph-deep",
+    "path": "performance/commit-graph-deep",
+    "section": "performance",
+    "tier": "recommended",
+    "slug": "commit-graph-deep",
+    "title": "Commit Graph 深入",
+    "summary": "深入理解 Git Commit Graph 的分层结构、Generation Number、Bloom Filter 与大型仓库加速原理。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/performance/bundle-uri",
+    "path": "performance/bundle-uri",
+    "section": "performance",
+    "tier": "recommended",
+    "slug": "bundle-uri",
+    "title": "Bundle URI 深入",
+    "summary": "掌握 Git Bundle URI 机制：通过预打包对象实现离线/带宽受限环境下的快速克隆与增量同步。",
+    "suggestions": []
+  },
+  {
+    "href": "/zh/performance/scalar-git",
+    "path": "performance/scalar-git",
+    "section": "performance",
+    "tier": "recommended",
+    "slug": "scalar-git",
+    "title": "Scalar Git 深入",
+    "summary": "了解 Scalar（原 GVFS）：微软为超大型仓库设计的虚拟文件系统与后台同步工具，实现按需下载与标准 Git 兼容。",
+    "suggestions": []
+  },
+  {
     "href": "/zh/migration/svn-to-git",
     "path": "migration/svn-to-git",
     "section": "migration",
@@ -2410,9 +2500,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/ci-cd/circleci-git",
-    "path": "ci-cd/circleci-git",
-    "section": "ci-cd",
+    "href": "/zh/docs/devops/circleci-git",
+    "path": "devops/circleci-git",
+    "section": "devops",
     "tier": "recommended",
     "slug": "circleci-git",
     "title": "CircleCI 与 Git 集成",
@@ -2420,9 +2510,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/ci-cd/ci-cd-testing-strategies",
-    "path": "ci-cd/ci-cd-testing-strategies",
-    "section": "ci-cd",
+    "href": "/zh/docs/devops/ci-cd-testing-strategies",
+    "path": "devops/ci-cd-testing-strategies",
+    "section": "devops",
     "tier": "recommended",
     "slug": "ci-cd-testing-strategies",
     "title": "CI/CD 测试策略与 Git 集成",
@@ -2430,9 +2520,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/ci-cd/ci-cd-deployment-strategies",
-    "path": "ci-cd/ci-cd-deployment-strategies",
-    "section": "ci-cd",
+    "href": "/zh/docs/devops/ci-cd-deployment-strategies",
+    "path": "devops/ci-cd-deployment-strategies",
+    "section": "devops",
     "tier": "recommended",
     "slug": "ci-cd-deployment-strategies",
     "title": "CI/CD 部署策略与 Git 版本管理",
@@ -2440,9 +2530,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/ide/vim-neovim-git",
-    "path": "ide/vim-neovim-git",
-    "section": "ide",
+    "href": "/zh/docs/devops/vim-neovim-git",
+    "path": "devops/vim-neovim-git",
+    "section": "devops",
     "tier": "recommended",
     "slug": "vim-neovim-git",
     "title": "Vim/Neovim Git 集成指南",
@@ -2450,9 +2540,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/ide/intellij-git-deep",
-    "path": "ide/intellij-git-deep",
-    "section": "ide",
+    "href": "/zh/docs/devops/intellij-git-deep",
+    "path": "devops/intellij-git-deep",
+    "section": "devops",
     "tier": "recommended",
     "slug": "intellij-git-deep",
     "title": "IntelliJ IDEA Git 深度指南",
@@ -2460,9 +2550,9 @@
     "suggestions": []
   },
   {
-    "href": "/zh/ide/terminal-git-productivity",
-    "path": "ide/terminal-git-productivity",
-    "section": "ide",
+    "href": "/zh/docs/devops/terminal-git-productivity",
+    "path": "devops/terminal-git-productivity",
+    "section": "devops",
     "tier": "recommended",
     "slug": "terminal-git-productivity",
     "title": "终端 Git 效率提升",
