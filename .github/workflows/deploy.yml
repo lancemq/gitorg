@@ -52,6 +52,7 @@ jobs:
       - name: Verify public site
         run: |
           sleep 3
-          CODE=$(curl -s -o /dev/null -w '%{http_code}' -m 15 https://gitorg.xyz/zh)
-          echo "https://gitorg.xyz/zh -> $CODE"
+          # 强制解析到服务器 IP，避免 DNS 传播期误报
+          CODE=$(curl -s -o /dev/null -w '%{http_code}' -m 15 --resolve gitorg.xyz:443:106.54.23.93 https://gitorg.xyz/zh)
+          echo "https://gitorg.xyz/zh (via server IP) -> $CODE"
           [ "$CODE" = "200" ] || exit 1
