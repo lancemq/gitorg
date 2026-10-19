@@ -41,7 +41,7 @@ jobs:
               cp package-lock.json ~/apps/.last-lock
             fi
             echo '[build] starting'
-            NEXT_PUBLIC_SITE_URL=https://gitorg.xyz npm run build
+            NEXT_PUBLIC_SITE_URL=https://git.aiqo.top npm run build
             sudo systemctl restart gitorg
             sleep 4
             CODE=\$(curl -s -o /dev/null -w '%{http_code}' -m 15 http://127.0.0.1:3000/zh)
@@ -53,6 +53,6 @@ jobs:
         run: |
           sleep 3
           # IP + Host 头方式验证（避开域名备案 SNI 拦截）
-          CODE=$(curl -sk -o /dev/null -w '%{http_code}' -m 15 -H "Host: gitorg.xyz" https://106.54.23.93/zh)
+          CODE=$(curl -sk -o /dev/null -w '%{http_code}' -m 15 -H "Host: git.aiqo.top" https://106.54.23.93/zh)
           echo "https://106.54.23.93/zh (Host: gitorg.xyz) -> $CODE"
           [ "$CODE" = "200" ] || exit 1
