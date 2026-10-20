@@ -357,11 +357,11 @@
 }
 
 .doc-callout-practice::before {
-  background: linear-gradient(180deg, rgba(232, 89, 12, 0.24), rgba(232, 89, 12, 0.78));
+  background: linear-gradient(180deg, rgba(24, 24, 27, 0.1), rgba(232, 89, 12, 0.78));
 }
 
 .doc-callout-practice .doc-callout-icon {
-  background: rgba(232, 89, 12, 0.12);
+  background: rgba(24, 24, 27, 0.05);
   color: #9a3412;
 }
 
@@ -464,8 +464,8 @@
 }
 
 .history-node-accent {
-  border-color: rgba(232, 89, 12, 0.28);
-  background: rgba(232, 89, 12, 0.12);
+  border-color: rgba(24, 24, 27, 0.12);
+  background: rgba(24, 24, 27, 0.05);
   color: #9a3412;
 }
 
@@ -544,8 +544,8 @@
 }
 
 .split-pill-accent {
-  background: rgba(232, 89, 12, 0.1);
-  border-color: rgba(232, 89, 12, 0.22);
+  background: rgba(24, 24, 27, 0.05);
+  border-color: rgba(24, 24, 27, 0.1);
   color: #9a3412;
 }
 
@@ -582,7 +582,7 @@
 }
 
 .repo-layout-box-accent {
-  background: rgba(232, 89, 12, 0.08);
+  background: rgba(24, 24, 27, 0.04);
   border-color: rgba(232, 89, 12, 0.2);
   color: #9a3412;
 }
@@ -636,7 +636,7 @@
 }
 
 .platform-hierarchy-card-accent {
-  border-color: rgba(232, 89, 12, 0.18);
+  border-color: rgba(24, 24, 27, 0.08);
   background: linear-gradient(180deg, rgba(255, 251, 246, 0.99), rgba(255, 244, 226, 0.95));
 }
 
@@ -729,7 +729,7 @@
 }
 
 .transfer-arrow-accent {
-  background: rgba(232, 89, 12, 0.12);
+  background: rgba(24, 24, 27, 0.05);
   color: #9a3412;
 }
 
@@ -868,8 +868,8 @@
 }
 
 .reset-impact-on {
-  border-color: rgba(232, 89, 12, 0.24);
-  background: rgba(232, 89, 12, 0.1);
+  border-color: rgba(24, 24, 27, 0.1);
+  background: rgba(24, 24, 27, 0.05);
   color: #9a3412;
 }
 
@@ -906,8 +906,8 @@
 }
 
 .stash-box-accent {
-  border-color: rgba(232, 89, 12, 0.24);
-  background: rgba(232, 89, 12, 0.08);
+  border-color: rgba(24, 24, 27, 0.1);
+  background: rgba(24, 24, 27, 0.04);
 }
 
 .stash-arrow-group {
@@ -984,8 +984,8 @@
 
 .reflog-node-current,
 .reflog-branch-pill {
-  border-color: rgba(232, 89, 12, 0.24);
-  background: rgba(232, 89, 12, 0.1);
+  border-color: rgba(24, 24, 27, 0.1);
+  background: rgba(24, 24, 27, 0.05);
   color: #9a3412;
 }
 
@@ -1025,8 +1025,8 @@
 }
 
 .command-flow-item-accent {
-  border-color: rgba(232, 89, 12, 0.24);
-  background: rgba(232, 89, 12, 0.1);
+  border-color: rgba(24, 24, 27, 0.1);
+  background: rgba(24, 24, 27, 0.05);
   color: #9a3412;
 }
 
@@ -1083,7 +1083,7 @@
   left: 8px;
   width: 3px;
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(232, 89, 12, 0.22), rgba(232, 89, 12, 0.74));
+  background: linear-gradient(180deg, rgba(24, 24, 27, 0.1), rgba(232, 89, 12, 0.74));
 }
 
 .commit-graph-label,
@@ -1171,8 +1171,8 @@
 }
 
 .refs-pill-accent {
-  border-color: rgba(232, 89, 12, 0.24);
-  background: rgba(232, 89, 12, 0.1);
+  border-color: rgba(24, 24, 27, 0.1);
+  background: rgba(24, 24, 27, 0.05);
   color: #9a3412;
 }
 
@@ -1200,8 +1200,8 @@
 }
 
 .layers-card-accent {
-  border-color: rgba(232, 89, 12, 0.24);
-  background: rgba(232, 89, 12, 0.08);
+  border-color: rgba(24, 24, 27, 0.1);
+  background: rgba(24, 24, 27, 0.04);
 }
 
 .layers-arrow-stack {
@@ -1322,7 +1322,7 @@
   width: 220px;
   height: 220px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(232, 89, 12, 0.14), transparent 66%);
+  background: radial-gradient(circle, rgba(24, 24, 27, 0.06), transparent 66%);
   pointer-events: none;
 }
 
