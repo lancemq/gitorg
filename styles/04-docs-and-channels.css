@@ -88,15 +88,15 @@
 }
 
 .doc-primer-card:nth-child(1)::before {
-  background: linear-gradient(180deg, rgba(24, 24, 27, 0.24), rgba(24, 24, 27, 0.72));
+  background: rgba(24, 24, 27, 0.14);
 }
 
 .doc-primer-card:nth-child(2)::before {
-  background: linear-gradient(180deg, rgba(24, 24, 27, 0.24), rgba(24, 24, 27, 0.72));
+  background: rgba(24, 24, 27, 0.14);
 }
 
 .doc-primer-card:nth-child(3)::before {
-  background: linear-gradient(180deg, rgba(24, 24, 27, 0.24), rgba(24, 24, 27, 0.72));
+  background: rgba(24, 24, 27, 0.14);
 }
 
 .doc-primer-label {
