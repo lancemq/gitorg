@@ -21,16 +21,13 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of git-prune Tutorial
-- Master the basic usage and common options of git-prune Tutorial
 - Clean up unreachable Git objects, working with gc and reflog to manage repository object lifecycle.
-- Understand key concepts: When it is a good fit
-- Know when to use this feature and when to avoid it
-
+- Explain what problem git prune solves and where it applies
+- Walk through the key usages of `git prune` and understand what each step changes
 
 ## Start with a problem
 
-You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+Next time you're about to type `git prune`, pause for a second: does this command touch the working tree, the index, or rewrite history? If the output surprises you, what do you check first? This article clears up the boundaries and risks of git prune before you act.
 
 ## The short version
 
@@ -108,15 +105,11 @@ Git's object database only grows (under normal operations). Rebase, reset, amend
 - In team collaboration, prune only affects the local repository; it does not delete objects on remotes
 - If disk space is extremely tight, consider `git gc --aggressive` for deeper compression
 
-## Related reading
-
-Read it alongside `git gc`, `git fsck`, `git count-objects`, and `git reflog` to understand the complete mechanism of object lifecycle, reachability, and garbage collection.
-
 ## Try it yourself
 
-1. Practice the git-prune command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Run the core usage of `git prune` in a test repository, checking `git status` and `git log` before and after every step
+2. Deliberately trigger one of the mistakes described in the article (see the "What to watch most closely" section), then recover following the article's steps
+3. Write a five-bullet note on when git prune applies and when it doesn't, and add it to your team wiki
 
 {/* internal-links:auto */}
 

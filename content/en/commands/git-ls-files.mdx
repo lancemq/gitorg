@@ -21,16 +21,13 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of git-ls-files Tutorial
-- Master the basic usage and common options of git-ls-files Tutorial
 - Explains how to use git-ls-files to list tracked paths from the index and working tree.
-- Understand key concepts: When it is a good fit
-- Know when to use this feature and when to avoid it
-
+- Explain what problem git ls-files solves and where it applies
+- Walk through the key usages of `git ls-files` and understand what each step changes
 
 ## Start with a problem
 
-You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+Many Git incident post-mortems trace back to "using git ls-files with half an understanding". Can you clearly state what `git ls-files` changes and what it leaves untouched? If not, spend a few minutes here first.
 
 ## The short version
 
@@ -61,11 +58,6 @@ Treat it as a read-only inspection tool first, then move to write-oriented usage
 - Inspect lower-level objects and refs
 - Write scripts or debug advanced issues
 - Verify internal repository state
-
-## Related reading
-
-Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.
-
 
 ## What problem this command solves in a workflow
 
@@ -100,9 +92,9 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 
 ## Try it yourself
 
-1. Practice the git-ls-files command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Run the core usage of `git ls-files` in a test repository, checking `git status` and `git log` before and after every step
+2. Deliberately trigger one of the mistakes described in the article (see the "What to watch most closely" section), then recover following the article's steps
+3. Write a five-bullet note on when git ls-files applies and when it doesn't, and add it to your team wiki
 
 {/* internal-links:auto */}
 

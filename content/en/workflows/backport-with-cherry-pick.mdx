@@ -36,14 +36,10 @@ export const metadata = {
 - Understand the core purpose of Backporting with Cherry-pick
 - Master the basic usage and common options of Backporting with Cherry-pick
 - Backport precise fixes onto maintenance branches without merging an entire feature branch.
-- Understand key concepts: Where this workflow fits
-- Know when to use this feature and when to avoid it
-
-
 
 ## Start with a problem
 
-Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
+Picture this: everyone on the team handles Backporting with Cherry-pick differently — some by gut feeling, some by an old wiki page, some by asking in chat. When something breaks, nobody can pinpoint which step went wrong. This article turns Backporting with Cherry-pick into a rhythm the whole team can reuse.
 
 ## Where this workflow fits
 
@@ -110,9 +106,9 @@ Backporting works best when the order is fixed:
 
 ## Try it yourself
 
-1. Practice the backport-with-cherry-pick command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Walk through `git cherry-pick` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
+2. Run a comparison experiment between Backporting with Cherry-pick and its most easily confused neighbor command, recording the difference with `git log --graph`
+3. Write a three-sentence summary of the single most important safety boundary of Backporting with Cherry-pick
 
 {/* internal-links:auto */}
 

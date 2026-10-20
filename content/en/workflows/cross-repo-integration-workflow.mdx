@@ -36,27 +36,10 @@ export const metadata = {
 - Understand the core purpose of Cross-Repository Integration Workflow
 - Master the basic usage and common options of Cross-Repository Integration Workflow
 - Coordinate multi-repo changes with shared task IDs, dependency-aware release order, and integrated validation to reduce cross-repo breakage.
-- Understand key concepts: Recommended practices
-- Know when to use this feature and when to avoid it
-
-
-For multi-repo initiatives, failure usually comes from sequencing and version alignment, not from one repository’s local code quality.
-
-<CommandFlowFigure
-  title="Multi-repo coordination chain"
-  caption="Use one traceable chain across repositories: shared task identity, per-repo branches, integration environment validation, and coordinated release order."
-  inputsLabel="Inputs"
-  inputs="cross-repo requirement|changes in multiple repos|shared acceptance criteria"
-  commandLabel="align scope → branch per repo → integrate test → coordinated release"
-  outputsLabel="Outputs"
-  outputs="clear integration path|controlled release order|faster rollback diagnosis"
-  note="Most cross-repo failures look green in each repo but red in integration."
-/>
-
 
 ## Start with a problem
 
-Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
+Picture this: everyone on the team handles Cross-Repository Integration Workflow differently — some by gut feeling, some by an old wiki page, some by asking in chat. When something breaks, nobody can pinpoint which step went wrong. This article turns Cross-Repository Integration Workflow into a rhythm the whole team can reuse.
 
 ## Recommended practices
 
@@ -124,9 +107,9 @@ Cross-repo changes often require coordinated rollback or compatibility bridges.
 
 ## Try it yourself
 
-1. Practice the cross-repo-integration-workflow command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Run the core usage of Cross-Repository Integration Workflow in a test repository, checking `git status` and `git log` before and after every step
+2. Deliberately trigger one of the mistakes described in the article (see the "Common mistakes" section), then recover following the article's steps
+3. Write a five-bullet note on when Cross-Repository Integration Workflow applies and when it doesn't, and add it to your team wiki
 
 {/* internal-links:auto */}
 

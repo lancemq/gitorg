@@ -21,16 +21,13 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of git-archive Tutorial
-- Master the basic usage and common options of git-archive Tutorial
 - Explains how to use git-archive to export an archive from a commit or tree object.
-- Understand key concepts: When it is a good fit
-- Know when to use this feature and when to avoid it
-
+- Explain what problem git archive solves and where it applies
+- Walk through the key usages of `git archive` and understand what each step changes
 
 ## Start with a problem
 
-You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+Next time you're about to type `git archive`, pause for a second: does this command touch the working tree, the index, or rewrite history? If the output surprises you, what do you check first? This article clears up the boundaries and risks of git archive before you act.
 
 ## The short version
 
@@ -61,11 +58,6 @@ Test the flow in a small sandbox repository before rolling it into the main repo
 - Distribute code or history
 - Reduce clone or checkout scope
 - Coordinate multi-repo or multi-worktree setups
-
-## Related reading
-
-Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.
-
 
 ## What problem this command solves in a workflow
 
@@ -304,9 +296,9 @@ dist:
 
 ## Try it yourself
 
-1. Practice the git-archive command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Run the core usage of `git archive` in a test repository, checking `git status` and `git log` before and after every step
+2. Deliberately trigger one of the mistakes described in the article (see the "What to watch most closely" section), then recover following the article's steps
+3. Write a five-bullet note on when git archive applies and when it doesn't, and add it to your team wiki
 
 {/* internal-links:auto */}
 

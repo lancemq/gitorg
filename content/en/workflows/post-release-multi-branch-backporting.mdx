@@ -30,32 +30,14 @@ export const metadata = {
 - Understand the core purpose of Post-release Multi-branch Backporting
 - Master the basic usage and common options of Post-release Multi-branch Backporting
 - Control order, validation, and branch boundaries when one fix must be backported into multiple released maintenance lines.
-- Understand key concepts: What this workflow really solves
-- Know when to use this feature and when to avoid it
-
-
-After release, a single fix may need to land on several maintained versions. At that point the question is no longer just “can we backport it?” It becomes:
-
 - which maintained lines actually need it
 - which line should receive it first
 - whether the same patch still means the same thing on every line
 - how to record which versions now carry the fix
 
-<CommandFlowFigure
-  title="How to think about multi-line backporting"
-  caption="Backporting is not copy-paste history reuse. It is branch-by-branch validation of whether the fix still applies cleanly and meaningfully."
-  inputsLabel="Confirm first"
-  inputs="affected versions|maintenance branch priority|fix dependencies"
-  commandLabel="select → backport → verify"
-  outputsLabel="Aim for"
-  outputs="clear branch state|traceable fix coverage|clean release communication"
-  note="The hard part is rarely the command itself. It is choosing and validating well."
-/>
-
-
 ## Start with a problem
 
-Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
+Picture this: everyone on the team handles Post-release Multi-branch Backporting differently — some by gut feeling, some by an old wiki page, some by asking in chat. When something breaks, nobody can pinpoint which step went wrong. This article turns Post-release Multi-branch Backporting into a rhythm the whole team can reuse.
 
 ## What this workflow really solves
 
@@ -164,9 +146,9 @@ A backport that is not reflected in release notes, support docs, or changelog co
 
 ## Try it yourself
 
-1. Practice the post-release-multi-branch-backporting command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Without looking at the article, complete the main `git cherry-pick` flow from memory, then compare against the article for missed steps
+2. Rehearse one of the risk scenarios (see the "Common mistakes" section) and note where your actual output differs from what the article describes
+3. Next time a teammate hits a Post-release Multi-branch Backporting issue, walk them through the diagnosis using this article
 
 {/* internal-links:auto */}
 

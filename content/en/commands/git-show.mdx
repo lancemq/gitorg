@@ -30,16 +30,10 @@ export const metadata = {
 - Understand the core purpose of git show
 - Master the basic usage and common options of git show
 - Inspect a specific commit, tag, or object in detail, making it one of the most useful commands for reading history precisely.
-- Understand key concepts: Common uses
-- Know when to use this feature and when to avoid it
-
-
-`git show` expands a single object into readable detail. Most often that means commit metadata plus diff, but it can also be used with tags and other Git objects.
-
 
 ## Start with a problem
 
-You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+Many Git incident post-mortems trace back to "using git show with half an understanding". Can you clearly state what `git show` changes and what it leaves untouched? If not, spend a few minutes here first.
 
 ## Common uses
 
@@ -102,9 +96,9 @@ In the workflow, `git show` is mostly a “inspect first, decide second” comma
 
 ## Try it yourself
 
-1. Practice the git-show command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Walk through `git show` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
+2. Run a comparison experiment between git show and its most easily confused neighbor command, recording the difference with `git log --graph`
+3. Write a three-sentence summary of the single most important safety boundary of git show
 
 {/* internal-links:auto */}
 

@@ -30,28 +30,16 @@ export const metadata = {
 - Understand the core purpose of Transfer Protocols and Negotiation
 - Master the basic usage and common options of Transfer Protocols and Negotiation
 - Understanding fetch, clone, and push as negotiated object exchange helps explain why Git sync is not just copying whole repositories back and forth.
-- Understand key concepts: What Git is actually exchanging
-- Know when to use this feature and when to avoid it
-
-
-Many new Git users imagine network operations like this:
-
 - clone downloads “the whole repo”
 - fetch copies “whatever changed”
 - push uploads “all my commits”
-
-That picture is too blunt. Git is really concerned with:
-
 - which refs exist and where they point
 - which objects each side already has
 - which objects still need to be transferred
 
-That is a major reason Git stays efficient even with large histories.
-
-
 ## Start with a problem
 
-You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
+You use Git every day — but could you explain what Git actually does at the Transfer Protocols and Negotiation layer? Most people stop at "it works". This article digs one level deeper; once you understand the mechanics, the "weird behaviors" stop being weird.
 
 ## What Git is actually exchanging
 
@@ -143,9 +131,9 @@ This view makes it easier to understand:
 
 ## Try it yourself
 
-1. Practice the transfer-protocols-and-negotiation command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Walk through Transfer Protocols and Negotiation in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
+2. Run a comparison experiment between Transfer Protocols and Negotiation and its most easily confused neighbor command, recording the difference with `git log --graph`
+3. Write a three-sentence summary of the single most important safety boundary of Transfer Protocols and Negotiation
 
 {/* internal-links:auto */}
 

@@ -30,16 +30,10 @@ export const metadata = {
 - Understand the core purpose of git rm
 - Master the basic usage and common options of git rm
 - Remove tracked files and stage that removal, which makes it easier to separate filesystem deletion from Git history changes.
-- Understand key concepts: Common patterns
-- Know when to use this feature and when to avoid it
-
-
-`git rm` does more than delete a file. It removes the tracked path and stages that deletion for the next commit.
-
 
 ## Start with a problem
 
-You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+Many Git incident post-mortems trace back to "using git rm with half an understanding". Can you clearly state what `git rm` changes and what it leaves untouched? If not, spend a few minutes here first.
 
 ## Common patterns
 
@@ -96,9 +90,9 @@ Once committed and shared, the deletion becomes part of project history, so use 
 
 ## Try it yourself
 
-1. Practice the git-rm command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Run the core usage of `git rm` in a test repository, checking `git status` and `git log` before and after every step
+2. Deliberately trigger one of the mistakes described in the article, then recover following the article's steps
+3. Write a five-bullet note on when git rm applies and when it doesn't, and add it to your team wiki
 
 {/* internal-links:auto */}
 

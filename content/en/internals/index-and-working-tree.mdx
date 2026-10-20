@@ -45,31 +45,13 @@ export const metadata = {
 - Understand the core purpose of Working Tree, Index, and Object Store
 - Master the basic usage and common options of Working Tree, Index, and Object Store
 - Separating the working tree, index, and object database is the clearest way to understand add, commit, restore, and reset.
-- Understand key concepts: Why this matters
-- Know when to use this feature and when to avoid it
-
-
-Many Git problems become easier once these three layers are separated:
-
 - working tree: files you are editing now
 - index: the next snapshot being prepared
 - object store: durable Git objects already written
 
-<ThreeLayersFigure
-  title="Working tree, index, and object store"
-  caption="Most Git confusion is really layer confusion. Once you know which command touches which layer, the behavior becomes much easier to predict."
-  worktreeLabel="Working tree"
-  indexLabel="Index"
-  objectsLabel="Object store"
-  addLabel="git add"
-  commitLabel="git commit"
-  restoreLabel="git restore / reset"
-/>
-
-
 ## Start with a problem
 
-You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
+You use Git every day — but could you explain what Git actually does at the Working Tree, Index, and Object Store layer? Most people stop at "it works". This article digs one level deeper; once you understand the mechanics, the "weird behaviors" stop being weird.
 
 ## Why this matters
 
@@ -204,9 +186,9 @@ It pairs especially well with:
 
 ## Try it yourself
 
-1. Practice the index-and-working-tree command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Without looking at the article, complete the main `git add` flow from memory, then compare against the article for missed steps
+2. Rehearse one of the risk scenarios (see the "Common misconceptions" section) and note where your actual output differs from what the article describes
+3. Next time a teammate hits a Working Tree, Index, and Object Store issue, walk them through the diagnosis using this article
 
 {/* internal-links:auto */}
 

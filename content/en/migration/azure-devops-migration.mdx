@@ -17,7 +17,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Your team is migrating from another version control system to Git, or moving code and history between different Git platforms. You're worried about losing commit history or author information during the process.
+Your understanding of Azure DevOps (TFS) to Git Migration may stop at "I know how to run it" — but not why it's designed this way or where its boundaries are. Those blurry spots are exactly where things break. This article moves you from "can use" to "understands" Azure DevOps (TFS) to Git Migration.
 
 ## One-Sentence Understanding
 
@@ -47,19 +47,6 @@ TFVC (Team Foundation Version Control) is a centralized system where the server 
 - Understand the core purpose of Clone a TFVC branch into a Git repo (full history)
 - Master the basic usage and common options of Clone a TFVC branch into a Git repo (full history)
 - A comprehensive guide for migrating from Team Foundation Server (TFS/TFVC) to Git, covering tool selection, history migration, branch mapping, and team transition strategies.
-- Understand key concepts: TFVC vs Git Core Differences
-- Know when to use this feature and when to avoid it
-
-git tfs clone https://tfs.company.com/tfs/collection $/project/trunk --branches
-
-# Pull all changesets and convert to Git commits
-git tfs pull
-
-# Clean and optimize the local repository
-git gc --aggressive
-```
-
-Key options: `--branches` auto-detects TFVC branching and maps it to Git branches; `--changeset=1234` starts an incremental clone from a specific changeset.
 
 ## Handling Work Item Links
 
@@ -147,9 +134,9 @@ git lfs track "*.zip"
 
 ## Try it yourself
 
-1. Practice the azure-devops-migration command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Walk through `git tfs` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
+2. Run a comparison experiment between Azure DevOps (TFS) to Git Migration and its most easily confused neighbor command, recording the difference with `git log --graph`
+3. Write a three-sentence summary of the single most important safety boundary of Azure DevOps (TFS) to Git Migration
 
 ## Continue Learning
 

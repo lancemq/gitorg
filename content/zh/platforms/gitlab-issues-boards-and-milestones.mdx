@@ -33,18 +33,13 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 理解 GitLab Issues、Boards 与 Milestones 的核心作用和适用场景
-- 掌握 GitLab Issues、Boards 与 Milestones 的基本用法和常用参数
 - 理解 GitLab 如何用 issue、board 和 milestone 把计划、流转和交付组织起来，而不是把所有上下文都塞进 Merge Request。
 - 理解 为什么不能只看 Merge Request 相关的概念
 - 掌握 这三层分别负责什么 相关的操作
-- 知道在什么场景下使用该命令，什么场景下避免使用
-
-
 
 ## 先想一个问题
 
-你已经在用 GitHub 或 GitLab 托管代码，但除了 push 和 pull，你对平台提供的协作功能还不够熟悉——PR 流程、代码审查、权限管理这些应该怎么用才合适？
+关于 GitLab Issues、Boards 与 Milestones，你的理解可能停留在"知道怎么操作"，但说不清它为什么这样设计、边界在哪里。恰恰是这些说不清的地方，最容易在关键时刻出问题。这篇把 GitLab Issues、Boards 与 Milestones 从"会用"推进到"理解"。
 
 ## 为什么不能只看 Merge Request
 
@@ -149,9 +144,9 @@ GitLab 的 issue、board 和 milestone，就是为了把这些语义从 diff 页
 
 ## 给你的练习
 
-1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
-2. 尝试该命令的不同参数选项，对比输出结果的差异
-3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+1. 按正文把GitLab Issues、Boards 与 Milestones在测试仓库里走一遍，重点观察它对工作区、暂存区和历史分别做了什么
+2. 把 GitLab Issues、Boards 与 Milestones 和它最容易混淆的相邻命令做一次对比实验，用 `git log --graph` 记录两者的差异
+3. 写一段 3 句话的总结，讲清 GitLab Issues、Boards 与 Milestones 最关键的一条安全边界，存进你的片段库
 
 {/* internal-links:auto */}
 

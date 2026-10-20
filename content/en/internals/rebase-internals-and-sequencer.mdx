@@ -51,16 +51,10 @@ export const metadata = {
 - Understand the core purpose of Rebase internals and the sequencer
 - Master the basic usage and common options of Rebase internals and the sequencer
 - Understand rebase as commit replay managed by the sequencer, making conflict handling and recovery decisions more predictable.
-- Understand key concepts: What the sequencer does
-- Know when to use this feature and when to avoid it
-
-
-Rebase is ordered commit replay. The sequencer coordinates replay state and pause/resume behavior.
-
 
 ## Start with a problem
 
-You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
+You use Git every day — but could you explain what Git actually does at the Rebase internals and the sequencer layer? Most people stop at "it works". This article digs one level deeper; once you understand the mechanics, the "weird behaviors" stop being weird.
 
 ## What the sequencer does
 
@@ -109,9 +103,9 @@ git switch -c rescue/pre-rebase HEAD@{n}
 
 ## Try it yourself
 
-1. Practice the rebase-internals-and-sequencer command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Walk through `git reflog` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
+2. Run a comparison experiment between Rebase internals and the sequencer and its most easily confused neighbor command, recording the difference with `git log --graph`
+3. Write a three-sentence summary of the single most important safety boundary of Rebase internals and the sequencer
 
 {/* internal-links:auto */}
 

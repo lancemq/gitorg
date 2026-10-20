@@ -21,16 +21,13 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of git-rerere Tutorial
-- Master the basic usage and common options of git-rerere Tutorial
 - Enable and reuse conflict resolutions to reduce repeated manual work for the same conflicts.
-- Understand key concepts: When it is a good fit
-- Know when to use this feature and when to avoid it
-
+- Explain what problem git rerere solves and where it applies
+- Walk through the key usages of `git rerere` and understand what each step changes
 
 ## Start with a problem
 
-You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+Many Git incident post-mortems trace back to "using git rerere with half an understanding". Can you clearly state what `git rerere` changes and what it leaves untouched? If not, spend a few minutes here first.
 
 ## The short version
 
@@ -114,15 +111,11 @@ rerere solves the "repetitive work" problem. In rebase-heavy or long-branch main
 - In team collaboration, rerere is a personal local feature; each developer must enable it individually
 - Deleting `.git/rr-cache/` or running `git rerere clear` will lose all recorded resolutions
 
-## Related reading
-
-Read it alongside `git rebase`, `git merge`, and `git mergetool` to understand which high-frequency conflict scenarios are most worth enabling rerere for.
-
 ## Try it yourself
 
-1. Practice the git-rerere command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Run the core usage of `git rerere` in a test repository, checking `git status` and `git log` before and after every step
+2. Deliberately trigger one of the mistakes described in the article (see the "What to watch most closely" section), then recover following the article's steps
+3. Write a five-bullet note on when git rerere applies and when it doesn't, and add it to your team wiki
 
 {/* internal-links:auto */}
 

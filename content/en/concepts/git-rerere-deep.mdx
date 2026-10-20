@@ -30,14 +30,10 @@ export const metadata = {
 - Understand the core purpose of Git Rerere Deep Dive
 - Master the basic usage and common options of Git Rerere Deep Dive
 - Master Git Rerere (reuse recorded resolution): config, workflow integration, storage, and team sharing.
-- Understand key concepts: Overview
-- Know when to use this feature and when to avoid it
-
-
 
 ## Start with a problem
 
-You've encountered a conceptual question while using Git — you roughly know what it means, but you're not entirely sure about its precise definition and boundaries.
+Your understanding of Git Rerere may stop at "I know how to run it" — but not why it's designed this way or where its boundaries are. Those blurry spots are exactly where things break. This article moves you from "can use" to "understands" Git Rerere.
 
 ## Overview
 
@@ -289,9 +285,9 @@ cat .git/rr-cache/<hash>/postimage
 
 ## Try it yourself
 
-1. Practice the git-rerere-deep command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Run the core usage of `git rerere` in a test repository, checking `git status` and `git log` before and after every step
+2. Deliberately trigger one of the mistakes described in the article, then recover following the article's steps
+3. Write a five-bullet note on when Git Rerere applies and when it doesn't, and add it to your team wiki
 
 ## Continue Learning
 

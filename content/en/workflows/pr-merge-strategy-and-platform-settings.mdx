@@ -30,28 +30,10 @@ export const metadata = {
 - Understand the core purpose of PR Merge Strategy and Platform Settings
 - Master the basic usage and common options of PR Merge Strategy and Platform Settings
 - Make pull request merge policy and platform configuration part of the same decision so history shape and repository settings stay aligned.
-- Understand key concepts: Why these two decisions belong together
-- Know when to use this feature and when to avoid it
-
-
-Teams often debate squash versus rebase merge in abstract terms, but the real outcome depends on what the hosting platform actually allows.  
-This topic is therefore not only about Git semantics. It is about whether your repository settings truly enforce the history shape your team claims to want.
-
-<CommandFlowFigure
-  title="Choose history policy before choosing settings"
-  caption="First decide what main should preserve, then expose only the merge methods that match that policy, together with branch protection and queue rules."
-  inputsLabel="Decide first"
-  inputs="main history shape|shared-history boundaries|review style"
-  commandLabel="policy → settings → enforcement"
-  outputsLabel="Platform should reflect"
-  outputs="allowed merge methods|branch protections|consistent defaults"
-  note="If platform settings disagree with team policy, platform settings will win in practice."
-/>
-
 
 ## Start with a problem
 
-Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
+Picture this: everyone on the team handles PR Merge Strategy and Platform Settings differently — some by gut feeling, some by an old wiki page, some by asking in chat. When something breaks, nobody can pinpoint which step went wrong. This article turns PR Merge Strategy and Platform Settings into a rhythm the whole team can reuse.
 
 ## Why these two decisions belong together
 
@@ -156,9 +138,9 @@ PR merge strategy is a platform workflow question as much as a Git theory questi
 
 ## Try it yourself
 
-1. Practice the pr-merge-strategy-and-platform-settings command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Without looking at the article, complete the main PR Merge Strategy and Platform Settings flow from memory, then compare against the article for missed steps
+2. Rehearse one of the risk scenarios (see the "Common mistakes" section) and note where your actual output differs from what the article describes
+3. Next time a teammate hits a PR Merge Strategy and Platform Settings issue, walk them through the diagnosis using this article
 
 {/* internal-links:auto */}
 

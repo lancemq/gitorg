@@ -30,13 +30,10 @@ export const metadata = {
 - Understand the core purpose of Recovering from a broken interactive rebase
 - Master the basic usage and common options of Recovering from a broken interactive rebase
 - Common errors during interactive rebase (wrong actions, conflicts, editor issues) and how to recover, including --abort, --edit-todo, and reflog-based recovery.
-- Understand key concepts: What interactive rebase does
-- Know when to use this feature and when to avoid it
-
 
 ## Start with a problem
 
-You just ran a Git command and the result wasn't what you expected — maybe you even lost some commits. This has happened before, and you want a reliable set of recovery techniques.
+The mistake already happened: the command ran, the output looks wrong. The real danger isn't the loss itself — it's panic-follow-ups that destroy the recoverable state. This article walks the recovery path for Recovering from a broken interactive rebase ahead of time: what to do first, what next, and what never to do.
 
 ## The short version
 
@@ -382,9 +379,9 @@ Rebase went wrong?
 
 ## Try it yourself
 
-1. Practice the fix-broken-interactive-rebase command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Walk through `git rebase` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
+2. Run a comparison experiment between Recovering from a broken interactive rebase and its most easily confused neighbor command, recording the difference with `git log --graph`
+3. Write a three-sentence summary of the single most important safety boundary of Recovering from a broken interactive rebase
 
 {/* internal-links:auto */}
 

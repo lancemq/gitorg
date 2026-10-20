@@ -21,16 +21,13 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of git-range-diff Tutorial
-- Master the basic usage and common options of git-range-diff Tutorial
 - Compare two patch series (not just final file states), especially useful after rebase or commit reshaping when reviewers ask what changed between v1 and v2.
-- Understand key concepts: Best-fit scenarios
-- Know when to use this feature and when to avoid it
-
+- Explain what problem git range-diff solves and where it applies
+- Walk through the key usages of `git range-diff` and understand what each step changes
 
 ## Start with a problem
 
-You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+Many Git incident post-mortems trace back to "using git range-diff with half an understanding". Can you clearly state what `git range-diff` changes and what it leaves untouched? If not, spend a few minutes here first.
 
 ## The short version
 
@@ -67,11 +64,6 @@ They answer different questions and are often complementary.
 git fetch origin
 git range-diff origin/main...feature-v1 origin/main...feature-v2
 ```
-## Related reading
-
-Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.
-
-
 ## What problem this command solves in a workflow
 
 `git range-diff` is a read-only comparison tool that shows the differences between two versions of a commit series (e.g., v1 and v2 of a patch series submitted for review). Unlike `git diff` which compares two commits, range-diff compares two ranges of commits, mapping corresponding patches and showing how each one changed between versions. It is essential for code review workflows where patch series get revised.
@@ -131,9 +123,9 @@ You may miss unintended patch drift.
 
 ## Try it yourself
 
-1. Practice the git-range-diff command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Run the core usage of `git range-diff` in a test repository, checking `git status` and `git log` before and after every step
+2. Deliberately trigger one of the mistakes described in the article (see the "Common mistakes" section), then recover following the article's steps
+3. Write a five-bullet note on when git range-diff applies and when it doesn't, and add it to your team wiki
 
 {/* internal-links:auto */}
 

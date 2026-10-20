@@ -36,28 +36,10 @@ export const metadata = {
 - Understand the core purpose of Sync Boundaries on Shared Branches
 - Master the basic usage and common options of Sync Boundaries on Shared Branches
 - Define what is safe and unsafe on a branch shared by multiple people so sync stays predictable and history rewrites do not turn into team-wide incidents.
-- Understand key concepts: Why shared branches are different
-- Know when to use this feature and when to avoid it
-
-
-Once multiple people depend on the same branch, actions that feel harmless on a personal branch can become destructive at team scale.  
-On a solo branch, rebase and reset may be cleanup. On a shared branch, they may change the synchronization baseline for everyone else.
-
-<CommandFlowFigure
-  title="The safer sequence on a shared branch"
-  caption="Identify that the branch is shared, then prefer append-style history operations unless the team explicitly coordinates a rewrite."
-  inputsLabel="Recognize first"
-  inputs="main|release branch|multi-person feature branch"
-  commandLabel="observe → align → append"
-  outputsLabel="Prefer"
-  outputs="safe sync|explainable history|controlled risk"
-  note="Shared branches optimize for collective predictability, not personal cleanup speed."
-/>
-
 
 ## Start with a problem
 
-Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
+Picture this: everyone on the team handles Sync Boundaries on Shared Branches differently — some by gut feeling, some by an old wiki page, some by asking in chat. When something breaks, nobody can pinpoint which step went wrong. This article turns Sync Boundaries on Shared Branches into a rhythm the whole team can reuse.
 
 ## Why shared branches are different
 
@@ -162,9 +144,9 @@ Main, release, and multi-person feature branches do not all deserve identical ru
 
 ## Try it yourself
 
-1. Practice the shared-branch-sync-boundaries command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Run the core usage of `git fetch` in a test repository, checking `git status` and `git log` before and after every step
+2. Deliberately trigger one of the mistakes described in the article (see the "Common mistakes" section), then recover following the article's steps
+3. Write a five-bullet note on when Sync Boundaries on Shared Branches applies and when it doesn't, and add it to your team wiki
 
 {/* internal-links:auto */}
 

@@ -36,32 +36,12 @@ export const metadata = {
 - Understand the core purpose of Submodule Update Flow
 - Master the basic usage and common options of Submodule Update Flow
 - Outline a safe routine for updating submodules, locking revisions, and syncing the parent repository.
-- Understand key concepts: Why this workflow is easy to misread
-- Know when to use this feature and when to avoid it
-
-
-A submodule update often looks like “changing a directory,” but that is misleading. You are really handling two repositories at once:
-
 - the submodule repository itself
 - the parent repository that records which submodule commit should be used
 
-If those two layers are not kept separate in your head, submodule work quickly becomes confusing.
-
-<CommandFlowFigure
-  title="The two layers of a submodule update"
-  caption="First move the child repository to the intended commit. Then commit the parent repository’s pointer change. Both layers matter if the team is supposed to reproduce the same state."
-  inputsLabel="Handle first"
-  inputs="submodule repo|target commit|recursive init state"
-  commandLabel="update child → record pointer"
-  outputsLabel="End state"
-  outputs="child at target SHA|parent records new pointer|others can sync recursively"
-  note="The parent repository records a submodule commit reference, not the child repository’s full file history."
-/>
-
-
 ## Start with a problem
 
-Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
+Picture this: everyone on the team handles Submodule Update Flow differently — some by gut feeling, some by an old wiki page, some by asking in chat. When something breaks, nobody can pinpoint which step went wrong. This article turns Submodule Update Flow into a rhythm the whole team can reuse.
 
 ## Why this workflow is easy to misread
 
@@ -177,9 +157,9 @@ They do. A pointer change is a dependency baseline change and should be reviewed
 
 ## Try it yourself
 
-1. Practice the submodule-update-flow command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Walk through `git submodule` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
+2. Run a comparison experiment between Submodule Update Flow and its most easily confused neighbor command, recording the difference with `git log --graph`
+3. Write a three-sentence summary of the single most important safety boundary of Submodule Update Flow
 
 {/* internal-links:auto */}
 

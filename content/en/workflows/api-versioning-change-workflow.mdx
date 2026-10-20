@@ -36,27 +36,10 @@ export const metadata = {
 - Understand the core purpose of API Versioning Change Workflow
 - Master the basic usage and common options of API Versioning Change Workflow
 - Handle breaking API changes with parallel version support, migration windows, and controlled deprecation to avoid client outages.
-- Understand key concepts: Recommended sequence
-- Know when to use this feature and when to avoid it
-
-
-The hard part of API versioning is not shipping v2. The hard part is migrating clients safely without large compatibility incidents.
-
-<CommandFlowFigure
-  title="Breaking-change migration path"
-  caption="Introduce a new version while old version remains available, migrate clients with visibility, then deprecate on a scheduled window."
-  inputsLabel="Inputs"
-  inputs="breaking-change scope|client inventory|deprecation policy"
-  commandLabel="introduce v2 → migrate clients → deprecate v1"
-  outputsLabel="Outputs"
-  outputs="reduced compatibility incidents|predictable migration cadence|enforceable deprecation"
-  note="Versioning is governance and migration discipline, not just URL design."
-/>
-
 
 ## Start with a problem
 
-Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
+Picture this: everyone on the team handles API Versioning Change Workflow differently — some by gut feeling, some by an old wiki page, some by asking in chat. When something breaks, nobody can pinpoint which step went wrong. This article turns API Versioning Change Workflow into a rhythm the whole team can reuse.
 
 ## Recommended sequence
 
@@ -113,9 +96,9 @@ Long-lived legacy versions accumulate maintenance and security debt.
 
 ## Try it yourself
 
-1. Practice the api-versioning-change-workflow command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Without looking at the article, complete the main `git worktree` flow from memory, then compare against the article for missed steps
+2. Rehearse one of the risk scenarios (see the "Common mistakes" section) and note where your actual output differs from what the article describes
+3. Next time a teammate hits a API Versioning Change Workflow issue, walk them through the diagnosis using this article
 
 {/* internal-links:auto */}
 

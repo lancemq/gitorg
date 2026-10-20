@@ -21,16 +21,13 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of git-replace Tutorial
-- Master the basic usage and common options of git-replace Tutorial
 - Replace a commit object without rewriting history, useful for repository splitting or fixing specific nodes in history.
-- Understand key concepts: When it is a good fit
-- Know when to use this feature and when to avoid it
-
+- Build a complete mental model of git replace instead of memorizing commands
+- Reproduce the core scenario in a test repository and compare before/after state
 
 ## Start with a problem
 
-You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+Next time you're about to type `git replace`, pause for a second: does this command touch the working tree, the index, or rewrite history? If the output surprises you, what do you check first? This article clears up the boundaries and risks of git replace before you act.
 
 ## The short version
 
@@ -108,15 +105,11 @@ replace solves a core contradiction: you need to "modify" a node in history, but
 - If you want to make replacements permanent, you will still need tools like `git filter-repo` to actually rewrite history
 - Signed commits that are replaced will usually fail signature verification because the replacement changed the content
 
-## Related reading
-
-Read it alongside `git filter-repo`, `git commit-tree`, and `git hash-object` to understand the essential difference between object replacement and history rewriting, as well as migration paths between them.
-
 ## Try it yourself
 
-1. Practice the git-replace command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Without looking at the article, complete the main `git replace` flow from memory, then compare against the article for missed steps
+2. Rehearse one of the risk scenarios (see the "What to watch most closely" section) and note where your actual output differs from what the article describes
+3. Next time a teammate hits a git replace issue, walk them through the diagnosis using this article
 
 {/* internal-links:auto */}
 

@@ -36,31 +36,10 @@ export const metadata = {
 - Understand the core purpose of Rollback a failed hotfix after release
 - Master the basic usage and common options of Rollback a failed hotfix after release
 - When a production hotfix causes new problems, first choose the rollback scope and stabilize the branch model before layering on more fixes.
-- Understand key concepts: First define the incident boundary
-- Know when to use this feature and when to avoid it
-
-
-When a hotfix goes wrong, the real danger is often not the defect alone. It is the panic-driven tendency to keep patching directly on production branches until nobody can clearly explain what happened.
-
-<CommandFlowFigure
-  title="A calmer hotfix rollback flow"
-  caption="Assess the blast radius, revert the smallest safe scope, rebuild the fix on an isolated branch, then deliberately feed it back into the main and release lines."
-  inputsLabel="Assess first"
-  inputs="production symptoms|hotfix commit scope|release tag|main / release branch state"
-  commandLabel="assess → revert → rebuild"
-  outputsLabel="Aim for"
-  outputs="stable production|clear branch state|controlled follow-up fix"
-  note="In incidents, stable and explainable beats elegant and fast-looking."
-/>
-
-<WarningBox title="If the hotfix is shared, do not start with reset">
-  Once a hotfix has been pushed, deployed, or referenced by release tooling, `reset` often causes more context loss than value. In those cases, `git revert` is usually the safer first move because it preserves the incident trail.
-</WarningBox>
-
 
 ## Start with a problem
 
-Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
+Picture this: everyone on the team handles Rollback a failed hotfix after release differently — some by gut feeling, some by an old wiki page, some by asking in chat. When something breaks, nobody can pinpoint which step went wrong. This article turns Rollback a failed hotfix after release into a rhythm the whole team can reuse.
 
 ## First define the incident boundary
 
@@ -175,9 +154,9 @@ Stability first, beauty second, explainability throughout.
 
 ## Try it yourself
 
-1. Practice the hotfix-rollback-after-release command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Run the core usage of `git revert` in a test repository, checking `git status` and `git log` before and after every step
+2. Deliberately trigger one of the mistakes described in the article (see the "Common mistakes" section), then recover following the article's steps
+3. Write a five-bullet note on when Rollback a failed hotfix after release applies and when it doesn't, and add it to your team wiki
 
 {/* internal-links:auto */}
 

@@ -21,17 +21,13 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 理解 git-interpret-trailers 教程 的核心作用和适用场景
-- 掌握 git-interpret-trailers 教程 的基本用法和常用参数
 - 解析、添加或规范化提交信息中的尾部字段（trailers），如 Co-authored-by、Signed-off-by。
-- 理解 什么时候适合用 相关的概念
-- 掌握 基本示例 相关的操作
-- 知道在什么场景下使用该命令，什么场景下避免使用
-
+- 理解 git interpret-trailers 在日常 Git 工作流里的位置和作用
+- 对照正文把「什么时候适合用」和「基本示例」两个部分各操作一遍
 
 ## 先想一个问题
 
-你正在 Git 仓库里工作，遇到了一个具体的操作需求——但你不确定用哪个命令、用哪个参数最合适，也不知道这个命令到底能做什么、不能做什么。
+很多 Git 事故复盘到最后，发现根源都是"对 git interpret-trailers 一知半解就上了手"。你真的说得清 `git interpret-trailers` 会改变什么、不会改变什么吗？如果不确定，先花几分钟把这篇看完。
 
 ## 一句话理解
 
@@ -112,15 +108,11 @@ trailers 必须放在提交信息的**最后**，格式是 `Key: Value`，且前
 - 过于复杂的 trailer 操作可能需要配合 `git config trailer.*` 系列配置
 - 某些 Git 平台（如 GitHub）只识别特定的 trailer 名称（如 `Co-authored-by`），自定义 trailer 不会显示在 UI 上
 
-## 延伸阅读
-
-继续搭配 `git commit`、`git log --format`、`.gitconfig` 中的 `trailer.*` 配置一起看，理解如何把 trailers 融入日常提交工作流。
-
 ## 给你的练习
 
-1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
-2. 尝试该命令的不同参数选项，对比输出结果的差异
-3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+1. 按正文把`git interpret-trailers`在测试仓库里走一遍，重点观察它对工作区、暂存区和历史分别做了什么
+2. 把 git interpret-trailers 和它最容易混淆的相邻命令做一次对比实验，用 `git log --graph` 记录两者的差异
+3. 写一段 3 句话的总结，讲清 git interpret-trailers 最关键的一条安全边界，存进你的片段库
 
 {/* internal-links:auto */}
 

@@ -30,13 +30,10 @@ export const metadata = {
 - Understand the core purpose of How to recover from a failed cherry-pick
 - Master the basic usage and common options of How to recover from a failed cherry-pick
 - Complete recovery workflow when cherry-pick encounters conflicts, gets aborted, or produces unexpected results. Covers --abort, --continue, --skip, and post-cherry-pick remediation.
-- Understand key concepts: What cherry-pick actually does
-- Know when to use this feature and when to avoid it
-
 
 ## Start with a problem
 
-You just ran a Git command and the result wasn't what you expected — maybe you even lost some commits. This has happened before, and you want a reliable set of recovery techniques.
+The mistake already happened: the command ran, the output looks wrong. The real danger isn't the loss itself — it's panic-follow-ups that destroy the recoverable state. This article walks the recovery path for How to recover from a failed cherry-pick ahead of time: what to do first, what next, and what never to do.
 
 ## The short version
 
@@ -328,9 +325,9 @@ git cherry-pick A^..B
 
 ## Try it yourself
 
-1. Practice the recover-after-cherry-pick command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Walk through `git cherry-pick` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
+2. Run a comparison experiment between How to recover from a failed cherry-pick and its most easily confused neighbor command, recording the difference with `git log --graph`
+3. Write a three-sentence summary of the single most important safety boundary of How to recover from a failed cherry-pick
 
 {/* internal-links:auto */}
 

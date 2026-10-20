@@ -36,28 +36,10 @@ export const metadata = {
 - Understand the core purpose of Prepare commit history before opening a pull request
 - Master the basic usage and common options of Prepare commit history before opening a pull request
 - Build a stable pre-PR routine around syncing, commit cleanup, risk checks, and review-friendly history.
-- Understand key concepts: Why pre-PR cleanup matters
-- Know when to use this feature and when to avoid it
-
-
-Pre-PR cleanup is not about making history look clever. It is about making review easier, rollback cleaner, and future debugging less painful.  
-The best pull requests often feel clear because the history was shaped before review started.
-
-<CommandFlowFigure
-  title="A stable pre-PR cleanup sequence"
-  caption="Sync first, clean obvious noise, verify commit boundaries, then confirm there is no shared-history risk."
-  inputsLabel="Confirm first"
-  inputs="latest main state|local commit list|working tree boundaries"
-  commandLabel="sync → clean up → verify"
-  outputsLabel="A good PR should give"
-  outputs="clear intent|clean diff scope|controlled history risk"
-  note="History cleanup is not performance art. It is preparation for better review."
-/>
-
 
 ## Start with a problem
 
-Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
+Picture this: everyone on the team handles Prepare commit history before opening a pull request differently — some by gut feeling, some by an old wiki page, some by asking in chat. When something breaks, nobody can pinpoint which step went wrong. This article turns Prepare commit history before opening a pull request into a rhythm the whole team can reuse.
 
 ## Why pre-PR cleanup matters
 
@@ -169,9 +151,9 @@ Commit history is written for future review, rollback, and debugging, not just f
 
 ## Try it yourself
 
-1. Practice the prepare-commits-before-pull-request command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Run the core usage of `git fetch` in a test repository, checking `git status` and `git log` before and after every step
+2. Deliberately trigger one of the mistakes described in the article (see the "Common mistakes" section), then recover following the article's steps
+3. Write a five-bullet note on when Prepare commit history before opening a pull request applies and when it doesn't, and add it to your team wiki
 
 {/* internal-links:auto */}
 

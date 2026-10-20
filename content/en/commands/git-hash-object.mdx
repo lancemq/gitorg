@@ -21,16 +21,13 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of git-hash-object Tutorial
-- Master the basic usage and common options of git-hash-object Tutorial
 - Compute the Git object ID (SHA-1) for a file or stdin, helping understand Git's content-addressing model.
-- Understand key concepts: When it is a good fit
-- Know when to use this feature and when to avoid it
-
+- Explain what problem git hash-object solves and where it applies
+- Walk through the key usages of `git hash-object` and understand what each step changes
 
 ## Start with a problem
 
-You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+Next time you're about to type `git hash-object`, pause for a second: does this command touch the working tree, the index, or rewrite history? If the output surprises you, what do you check first? This article clears up the boundaries and risks of git hash-object before you act.
 
 ## The short version
 
@@ -112,15 +109,11 @@ hash-object is one of the core **plumbing commands** in Git. It reveals Git's mo
 - Computing a commit object ID requires following the strict commit object format (including tree, parent, author, committer, etc.)
 - Computing the hash-object for large files may be slow because the entire content must be read
 
-## Related reading
-
-Read it alongside `git cat-file`, `git mktree`, and `git commit-tree` — these form the core combination of Git plumbing commands and can give you a complete understanding of Git's object model.
-
 ## Try it yourself
 
-1. Practice the git-hash-object command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Run the core usage of `git hash-object` in a test repository, checking `git status` and `git log` before and after every step
+2. Deliberately trigger one of the mistakes described in the article (see the "What to watch most closely" section), then recover following the article's steps
+3. Write a five-bullet note on when git hash-object applies and when it doesn't, and add it to your team wiki
 
 {/* internal-links:auto */}
 

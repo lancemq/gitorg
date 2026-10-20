@@ -33,43 +33,17 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 理解 GitLab Groups、Projects 与权限模型 的核心作用和适用场景
-- 掌握 GitLab Groups、Projects 与权限模型 的基本用法和常用参数
 - 理解 GitLab 里 group、project、role 和权限继承的关系，避免团队协作一开始就把访问边界做乱。
 - 理解 先分清 group、subgroup 和 project 相关的概念
 - 掌握 为什么权限继承既方便又危险 相关的操作
-- 知道在什么场景下使用该命令，什么场景下避免使用
-
-
-很多团队刚开始用 GitLab 时，最容易忽视的不是代码流程，而是组织结构。  
-但在 GitLab 里，group、subgroup、project 和 role 会直接决定：
-
 - 谁能看仓库
 - 谁能 push
 - 谁能改受保护分支
 - 谁能动 CI/CD 变量、环境和部署配置
 
-所以权限模型并不是后台配置问题，而是协作模型的一部分。
-
-<PlatformHierarchyFigure
-  title="GitLab 的组织与权限继承"
-  caption="通常先有 group，再在 group 下组织 subgroup 和 project。权限可以沿层级继承，这正是它强大但也容易混乱的地方。"
-  topLabel="组织层"
-  middleLabel="团队 / 业务层"
-  bottomLabel="项目层"
-  topItems="top-level group|共享成员|统一策略"
-  middleItems="subgroup|团队边界|可继承权限"
-  bottomItems="project|仓库|MR / CI / 环境"
-/>
-
-<MentalModelBox title="先设计边界，再添加成员">
-  GitLab 的组织模型不是“为了放仓库而放仓库”。它更像权限和协作策略的承载结构。group 放错了位置，后面项目、环境、受保护分支和自动化账户的边界都会一起变乱。
-</MentalModelBox>
-
-
 ## 先想一个问题
 
-你已经在用 GitHub 或 GitLab 托管代码，但除了 push 和 pull，你对平台提供的协作功能还不够熟悉——PR 流程、代码审查、权限管理这些应该怎么用才合适？
+关于 GitLab Groups、Projects 与权限模型，你的理解可能停留在"知道怎么操作"，但说不清它为什么这样设计、边界在哪里。恰恰是这些说不清的地方，最容易在关键时刻出问题。这篇把 GitLab Groups、Projects 与权限模型从"会用"推进到"理解"。
 
 ## 先分清 group、subgroup 和 project
 
@@ -186,9 +160,9 @@ Maintainer 或更高权限给太多人，短期会觉得方便，长期会让责
 
 ## 给你的练习
 
-1. 在一个测试仓库中练习该命令的基本用法，观察执行前后的状态变化
-2. 尝试该命令的不同参数选项，对比输出结果的差异
-3. 模拟一个需要使用该命令的实际场景，完整走一遍操作流程
+1. 按正文把GitLab Groups、Projects 与权限模型在测试仓库里走一遍，重点观察它对工作区、暂存区和历史分别做了什么
+2. 把 GitLab Groups、Projects 与权限模型和它最容易混淆的相邻命令做一次对比实验，用 `git log --graph` 记录两者的差异
+3. 写一段 3 句话的总结，讲清 GitLab Groups、Projects 与权限模型最关键的一条安全边界，存进你的片段库
 
 {/* internal-links:auto */}
 

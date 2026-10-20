@@ -42,27 +42,10 @@ export const metadata = {
 - Understand the core purpose of Code Freeze and Release Candidate Workflow
 - Master the basic usage and common options of Code Freeze and Release Candidate Workflow
 - Use freeze boundaries and release-candidate iterations to stabilize release scope and expose risk before production rollout.
-- Understand key concepts: What this workflow solves
-- Know when to use this feature and when to avoid it
-
-
-A code freeze is not “stop all coding.” It means restricting what can enter the release line. An RC is not final release; it is a testable candidate snapshot.
-
-<CommandFlowFigure
-  title="Freeze + RC convergence path"
-  caption="Cut a release branch, tag RC builds, and admit only high-priority fixes. Each failed validation round produces a new RC until release gates are met."
-  inputsLabel="Inputs"
-  inputs="release scope|quality gates|rollback policy"
-  commandLabel="cut release branch → tag rc → accept only fixes"
-  outputsLabel="Outputs"
-  outputs="auditable candidate versions|clear defect-convergence path|safer production release"
-  note="The core objective is scope convergence, not endless patch accumulation."
-/>
-
 
 ## Start with a problem
 
-Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
+Picture this: everyone on the team handles Code Freeze and Release Candidate Workflow differently — some by gut feeling, some by an old wiki page, some by asking in chat. When something breaks, nobody can pinpoint which step went wrong. This article turns Code Freeze and Release Candidate Workflow into a rhythm the whole team can reuse.
 
 ## What this workflow solves
 
@@ -158,9 +141,9 @@ That creates long-term divergence between release and trunk.
 
 ## Try it yourself
 
-1. Practice the code-freeze-and-release-candidate-workflow command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Run the core usage of `git switch` in a test repository, checking `git status` and `git log` before and after every step
+2. Deliberately trigger one of the mistakes described in the article (see the "Common mistakes" section), then recover following the article's steps
+3. Write a five-bullet note on when Code Freeze and Release Candidate Workflow applies and when it doesn't, and add it to your team wiki
 
 {/* internal-links:auto */}
 

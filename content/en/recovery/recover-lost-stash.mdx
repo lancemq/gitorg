@@ -36,16 +36,10 @@ export const metadata = {
 - Understand the core purpose of Recover a lost stash
 - Master the basic usage and common options of Recover a lost stash
 - When stash entries seem to disappear, determine whether they were popped, dropped, or detached from refs, then recover via reflog or dangling commits.
-- Understand key concepts: Identify the loss type first
-- Know when to use this feature and when to avoid it
-
-
-A “missing stash” is often a missing reference, not immediate data destruction.
-
 
 ## Start with a problem
 
-You just ran a Git command and the result wasn't what you expected — maybe you even lost some commits. This has happened before, and you want a reliable set of recovery techniques.
+The mistake already happened: the command ran, the output looks wrong. The real danger isn't the loss itself — it's panic-follow-ups that destroy the recoverable state. This article walks the recovery path for Recover a lost stash ahead of time: what to do first, what next, and what never to do.
 
 ## Identify the loss type first
 
@@ -104,9 +98,9 @@ git switch -c rescue/stash-recovery <commit>
 
 ## Try it yourself
 
-1. Practice the recover-lost-stash command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Run the core usage of `git reflog` in a test repository, checking `git status` and `git log` before and after every step
+2. Deliberately trigger one of the mistakes described in the article, then recover following the article's steps
+3. Write a five-bullet note on when Recover a lost stash applies and when it doesn't, and add it to your team wiki
 
 {/* internal-links:auto */}
 

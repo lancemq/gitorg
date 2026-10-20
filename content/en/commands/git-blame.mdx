@@ -30,16 +30,10 @@ export const metadata = {
 - Understand the core purpose of git blame
 - Master the basic usage and common options of git blame
 - Track which commit last changed each line in a file, making it useful for recovering context around why a line looks the way it does now.
-- Understand key concepts: Common examples
-- Know when to use this feature and when to avoid it
-
-
-`git blame` annotates a file line by line with the commit, author, and timestamp that most recently changed each line.
-
 
 ## Start with a problem
 
-You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+Many Git incident post-mortems trace back to "using git blame with half an understanding". Can you clearly state what `git blame` changes and what it leaves untouched? If not, spend a few minutes here first.
 
 ## Common examples
 
@@ -96,9 +90,9 @@ In the workflow, `git blame` is mostly a “inspect first, decide second” comm
 
 ## Try it yourself
 
-1. Practice the git-blame command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Run the core usage of `git blame` in a test repository, checking `git status` and `git log` before and after every step
+2. Deliberately trigger one of the mistakes described in the article, then recover following the article's steps
+3. Write a five-bullet note on when git blame applies and when it doesn't, and add it to your team wiki
 
 {/* internal-links:auto */}
 

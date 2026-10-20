@@ -36,28 +36,10 @@ export const metadata = {
 - Understand the core purpose of A sync routine for multi-person collaboration
 - Master the basic usage and common options of A sync routine for multi-person collaboration
 - Use a fetch-first, inspect-first sync rhythm in team collaboration so pull does not become a source of surprise or silent history mutation.
-- Understand key concepts: Why not let pull do everything
-- Know when to use this feature and when to avoid it
-
-
-In team Git work, the real problem is often not command knowledge. It is sync behavior that is too implicit.  
-When several people move the same branches, “just pull and see what happens” creates more confusion than speed.
-
-<CommandFlowFigure
-  title="A safer team sync loop"
-  caption="Separate observation from integration. Teams stay calmer when fetch, inspection, and actual branch mutation are not collapsed into one reflex."
-  inputsLabel="Inspect first"
-  inputs="origin/main|current branch|local unpublished commits"
-  commandLabel="fetch → inspect → integrate"
-  outputsLabel="Then choose"
-  outputs="merge|rebase|wait"
-  note="The best sync action is one you can still explain five minutes later."
-/>
-
 
 ## Start with a problem
 
-Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
+Picture this: everyone on the team handles A sync routine for multi-person collaboration differently — some by gut feeling, some by an old wiki page, some by asking in chat. When something breaks, nobody can pinpoint which step went wrong. This article turns A sync routine for multi-person collaboration into a rhythm the whole team can reuse.
 
 ## Why not let pull do everything
 
@@ -168,9 +150,9 @@ If you cannot explain why the history looks the way it does after syncing, the r
 
 ## Try it yourself
 
-1. Practice the multi-person-sync-routine command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Run the core usage of `git pull` in a test repository, checking `git status` and `git log` before and after every step
+2. Deliberately trigger one of the mistakes described in the article (see the "Common mistakes" section), then recover following the article's steps
+3. Write a five-bullet note on when A sync routine for multi-person collaboration applies and when it doesn't, and add it to your team wiki
 
 {/* internal-links:auto */}
 

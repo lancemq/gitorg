@@ -30,16 +30,10 @@ export const metadata = {
 - Understand the core purpose of Merge Bases and Ancestry
 - Master the basic usage and common options of Merge Bases and Ancestry
 - Explain how Git uses common ancestors to reason about branch differences, merge inputs, and reachability.
-- Understand key concepts: Start with the core idea
-- Know when to use this feature and when to avoid it
-
-
-Many branch operations feel confusing because we see two branch names, but Git sees a graph and asks a more precise question first: where did these histories last agree?
-
 
 ## Start with a problem
 
-You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
+You use Git every day — but could you explain what Git actually does at the Merge Bases and Ancestry layer? Most people stop at "it works". This article digs one level deeper; once you understand the mechanics, the "weird behaviors" stop being weird.
 
 ## Start with the core idea
 
@@ -234,9 +228,9 @@ It pairs especially well with:
 
 ## Try it yourself
 
-1. Practice the merge-base-and-ancestry command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Walk through `git rebase` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
+2. Run a comparison experiment between Merge Bases and Ancestry and its most easily confused neighbor command, recording the difference with `git log --graph`
+3. Write a three-sentence summary of the single most important safety boundary of Merge Bases and Ancestry
 
 {/* internal-links:auto */}
 

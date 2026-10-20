@@ -39,28 +39,10 @@ export const metadata = {
 - Understand the core purpose of Merge Queue Workflow
 - Master the basic usage and common options of Merge Queue Workflow
 - Use merge queues to control high-throughput PR merges, reduce stale-base retries, and make protected-branch integration more predictable.
-- Understand key concepts: Where this workflow fits
-- Know when to use this feature and when to avoid it
-
-
-When many pull requests compete for the same protected branch, the bottleneck is often no longer review quality alone. It becomes branch freshness, merge ordering, and repeated CI reruns on a moving base.  
-Merge queue matters because it turns that chaos into a controlled integration lane.
-
-<CommandFlowFigure
-  title="What merge queue actually coordinates"
-  caption="Approved pull requests enter a managed queue, are revalidated against an up-to-date base, and then merged in a predictable order."
-  inputsLabel="Before queueing"
-  inputs="approved PR|protected branch rules|required checks"
-  commandLabel="enqueue → revalidate → merge"
-  outputsLabel="Main branch gets"
-  outputs="predictable order|fresh base|less merge-window contention"
-  note="Queue coordinates integration. It does not replace review, ownership, or CI quality."
-/>
-
 
 ## Start with a problem
 
-Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
+Picture this: everyone on the team handles Merge Queue Workflow differently — some by gut feeling, some by an old wiki page, some by asking in chat. When something breaks, nobody can pinpoint which step went wrong. This article turns Merge Queue Workflow into a rhythm the whole team can reuse.
 
 ## Where this workflow fits
 
@@ -157,9 +139,9 @@ That breaks the very predictability the queue was introduced to provide.
 
 ## Try it yourself
 
-1. Practice the merge-queue-workflow command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Without looking at the article, complete the main Merge Queue Workflow flow from memory, then compare against the article for missed steps
+2. Rehearse one of the risk scenarios (see the "Common mistakes" section) and note where your actual output differs from what the article describes
+3. Next time a teammate hits a Merge Queue Workflow issue, walk them through the diagnosis using this article
 
 {/* internal-links:auto */}
 

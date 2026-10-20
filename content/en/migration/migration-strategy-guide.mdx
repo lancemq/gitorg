@@ -17,7 +17,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Your team is migrating from another version control system to Git, or moving code and history between different Git platforms. You're worried about losing commit history or author information during the process.
+Your understanding of Repository Migration Strategy Guide may stop at "I know how to run it" — but not why it's designed this way or where its boundaries are. Those blurry spots are exactly where things break. This article moves you from "can use" to "understands" Repository Migration Strategy Guide.
 
 ## One-Sentence Understanding
 
@@ -84,13 +84,6 @@ git svn clone --authors-file=authors.txt
 - Understand the core purpose of Find unmapped authors
 - Master the basic usage and common options of Find unmapped authors
 - A complete migration framework covering assessment, trial, cutover, and transition phases, plus tool selection matrix, author mapping, history tradeoffs, and team communication plans.
-- Understand key concepts: Four-Phase Migration Framework
-- Know when to use this feature and when to avoid it
-
-git log --format="%an <%ae>" | sort -u
-# Batch-fill
-git log --format="%an" | sort -u | while read a; do echo "${a} = ${a} <${a}@company.com>"; done >> authors.txt
-```
 
 ## History Preservation vs Cleanup Tradeoffs
 
@@ -128,9 +121,9 @@ Rollback triggers: CI/CD failing, core functionality broken, dev blocked >1 day.
 
 ## Try it yourself
 
-1. Practice the migration-strategy-guide command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Walk through `git filter-repo` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
+2. Run a comparison experiment between Repository Migration Strategy Guide and its most easily confused neighbor command, recording the difference with `git log --graph`
+3. Write a three-sentence summary of the single most important safety boundary of Repository Migration Strategy Guide
 
 ## Continue Learning
 

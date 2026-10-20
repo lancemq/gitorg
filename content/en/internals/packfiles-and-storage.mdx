@@ -45,13 +45,10 @@ export const metadata = {
 - Understand the core purpose of Git Packfiles and Object Storage
 - Master the basic usage and common options of Git Packfiles and Object Storage
 - Learn how Git uses packfiles, compression, and object reuse to store and transfer history efficiently instead of copying full project snapshots every time.
-- Understand key concepts: 1. Why packfiles matter at all
-- Know when to use this feature and when to avoid it
-
 
 ## Start with a problem
 
-You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
+You use Git every day — but could you explain what Git actually does at the Git Packfiles and Object Storage layer? Most people stop at "it works". This article digs one level deeper; once you understand the mechanics, the "weird behaviors" stop being weird.
 
 ## The short version
 
@@ -139,9 +136,9 @@ Git is powerful not only because it stores history, but because it stores histor
 
 ## Try it yourself
 
-1. Practice the packfiles-and-storage command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Run the core usage of `git gc` in a test repository, checking `git status` and `git log` before and after every step
+2. Deliberately trigger one of the mistakes described in the article, then recover following the article's steps
+3. Write a five-bullet note on when Git Packfiles and Object Storage applies and when it doesn't, and add it to your team wiki
 
 {/* internal-links:auto */}
 

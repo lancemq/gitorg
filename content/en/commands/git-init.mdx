@@ -27,16 +27,13 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of git init Tutorial
-- Master the basic usage and common options of git init Tutorial
 - Explains how git init creates a repository, how the initial branch is defined, and how it is used for both new and existing directories.
-- Understand key concepts: Common use cases
-- Know when to use this feature and when to avoid it
-
+- Understand where git init fits in the daily Git workflow
+- Work through both "Common use cases" and "Basic usage" sections hands-on
 
 ## Start with a problem
 
-You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+Next time you're about to type `git init`, pause for a second: does this command touch the working tree, the index, or rewrite history? If the output surprises you, what do you check first? This article clears up the boundaries and risks of git init before you act.
 
 ## The short version
 
@@ -91,9 +88,9 @@ git init -b main
 
 ## Try it yourself
 
-1. Practice the git-init command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Walk through `git init` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
+2. Run a comparison experiment between git init and its most easily confused neighbor command, recording the difference with `git log --graph`
+3. Write a three-sentence summary of the single most important safety boundary of git init
 
 {/* internal-links:auto */}
 

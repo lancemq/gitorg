@@ -51,27 +51,10 @@ export const metadata = {
 - Understand the core purpose of Stacked Pull Requests Workflow
 - Master the basic usage and common options of Stacked Pull Requests Workflow
 - Split a large change into dependency-ordered PR layers to improve review throughput and reduce oversized review fatigue.
-- Understand key concepts: Where this fits best
-- Know when to use this feature and when to avoid it
-
-
-A stacked PR workflow breaks one large initiative into smaller, dependency-ordered pull requests instead of one giant review unit.
-
-<CommandFlowFigure
-  title="How stacked PRs are structured"
-  caption="Each layer has one clear purpose. As lower layers merge, upper layers shrink naturally, making later reviews faster and cleaner."
-  inputsLabel="Inputs"
-  inputs="one large initiative|dependency-aware decomposition|consistent branch naming"
-  commandLabel="base branch → stack branches → merge in order"
-  outputsLabel="Outputs"
-  outputs="smaller review units|higher review throughput|lower rework cost"
-  note="The point is review throughput and clarity, not branch-count vanity."
-/>
-
 
 ## Start with a problem
 
-Your team is collaborating on a project, branches are growing, merges are becoming more frequent — but there's no stable collaboration rhythm. Everyone syncs code their own way, and conflicts are piling up.
+Picture this: everyone on the team handles Stacked Pull Requests Workflow differently — some by gut feeling, some by an old wiki page, some by asking in chat. When something breaks, nobody can pinpoint which step went wrong. This article turns Stacked Pull Requests Workflow into a rhythm the whole team can reuse.
 
 ## Where this fits best
 
@@ -160,9 +143,9 @@ Dependency order is mandatory; out-of-order merges create missing-base or duplic
 
 ## Try it yourself
 
-1. Practice the stacked-pull-requests-workflow command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Walk through `git switch` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
+2. Run a comparison experiment between Stacked Pull Requests Workflow and its most easily confused neighbor command, recording the difference with `git log --graph`
+3. Write a three-sentence summary of the single most important safety boundary of Stacked Pull Requests Workflow
 
 {/* internal-links:auto */}
 

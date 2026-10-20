@@ -21,16 +21,13 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of git-fsck Tutorial
-- Master the basic usage and common options of git-fsck Tutorial
 - Explains how to use git-fsck to verify the integrity of objects and refs.
-- Understand key concepts: When it is a good fit
-- Know when to use this feature and when to avoid it
-
+- Understand where git fsck fits in the daily Git workflow
+- Work through both "When it is a good fit" and "Basic example" sections hands-on
 
 ## Start with a problem
 
-You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+Many Git incident post-mortems trace back to "using git fsck with half an understanding". Can you clearly state what `git fsck` changes and what it leaves untouched? If not, spend a few minutes here first.
 
 ## The short version
 
@@ -61,11 +58,6 @@ Rehearse the flow on a small reproducible history before running it in a product
 - Handle more complex collaboration or history-analysis tasks
 - Turn one-off steps into repeatable routines
 - Reduce the risk of advanced operations
-
-## Related reading
-
-Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.
-
 
 ## What problem this command solves in a workflow
 
@@ -98,9 +90,9 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 
 ## Try it yourself
 
-1. Practice the git-fsck command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Walk through `git fsck` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
+2. Run a comparison experiment between git fsck and its most easily confused neighbor command, recording the difference with `git log --graph`
+3. Write a three-sentence summary of the single most important safety boundary of git fsck
 
 {/* internal-links:auto */}
 

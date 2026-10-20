@@ -36,13 +36,10 @@ export const metadata = {
 - Understand the core purpose of Git Repository Security Audit
 - Master the basic usage and common options of Git Repository Security Audit
 - Auditing Git repository access, git-fsck for integrity, scanning history for exposed secrets, audit logging with GitHub/GitLab, verifying author identities, and compliance considerations.
-- Understand key concepts: Auditing Git Repository Access
-- Know when to use this feature and when to avoid it
-
 
 ## Start with a problem
 
-You're concerned about Git repository security — maybe key management isn't ideal, or commits aren't signed. You're not sure if your security setup is sufficient or where to start hardening it.
+Your understanding of Git Repository Security Audit may stop at "I know how to run it" — but not why it's designed this way or where its boundaries are. Those blurry spots are exactly where things break. This article moves you from "can use" to "understands" Git Repository Security Audit.
 
 ## One-Sentence Understanding
 
@@ -281,9 +278,9 @@ git log --all --format='%an <%ae>' | sort -u
 
 ## Try it yourself
 
-1. Practice the git-security-audit command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Walk through `git fsck` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
+2. Run a comparison experiment between Git Repository Security Audit and its most easily confused neighbor command, recording the difference with `git log --graph`
+3. Write a three-sentence summary of the single most important safety boundary of Git Repository Security Audit
 
 ## Continue Learning
 

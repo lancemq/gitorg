@@ -21,16 +21,13 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of git-difftool Tutorial
-- Master the basic usage and common options of git-difftool Tutorial
 - Use an external graphical tool to view diffs, improving code review and conflict comprehension efficiency.
-- Understand key concepts: When it is a good fit
-- Know when to use this feature and when to avoid it
-
+- Explain what problem git difftool solves and where it applies
+- Walk through the key usages of `git difftool` and understand what each step changes
 
 ## Start with a problem
 
-You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+Many Git incident post-mortems trace back to "using git difftool with half an understanding". Can you clearly state what `git difftool` changes and what it leaves untouched? If not, spend a few minutes here first.
 
 ## The short version
 
@@ -112,15 +109,11 @@ Command-line diff is efficient for simple changes, but when dealing with multipl
 - In CI/CD environments difftool is usually not suitable because there is no graphical interface
 - `difftool` does not modify any files; it is a read-only viewing tool
 
-## Related reading
-
-Read it alongside `git diff`, `git mergetool`, and `git log -p` to understand the boundaries between command-line and graphical diff viewing.
-
 ## Try it yourself
 
-1. Practice the git-difftool command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Run the core usage of `git difftool` in a test repository, checking `git status` and `git log` before and after every step
+2. Deliberately trigger one of the mistakes described in the article (see the "What to watch most closely" section), then recover following the article's steps
+3. Write a five-bullet note on when git difftool applies and when it doesn't, and add it to your team wiki
 
 {/* internal-links:auto */}
 

@@ -36,16 +36,10 @@ export const metadata = {
 - Understand the core purpose of Reachability and Garbage Collection
 - Master the basic usage and common options of Reachability and Garbage Collection
 - Whether objects can still be recovered often depends more on reachability and garbage collection than on the command that made them harder to find.
-- Understand key concepts: What reachability means
-- Know when to use this feature and when to avoid it
-
-
-An object still existing in the repository is not the same as that object still being easy to reach.
-
 
 ## Start with a problem
 
-You use Git commands daily, but occasionally encounter 'strange' behavior — like being told a file changed when you didn't touch it, or unexpected conflicts during a rebase. You want to understand how Git works under the hood.
+You use Git every day — but could you explain what Git actually does at the Reachability and Garbage Collection layer? Most people stop at "it works". This article digs one level deeper; once you understand the mechanics, the "weird behaviors" stop being weird.
 
 ## What reachability means
 
@@ -220,9 +214,9 @@ It pairs especially well with:
 
 ## Try it yourself
 
-1. Practice the reachability-and-garbage-collection command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Walk through `git reset` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
+2. Run a comparison experiment between Reachability and Garbage Collection and its most easily confused neighbor command, recording the difference with `git log --graph`
+3. Write a three-sentence summary of the single most important safety boundary of Reachability and Garbage Collection
 
 {/* internal-links:auto */}
 

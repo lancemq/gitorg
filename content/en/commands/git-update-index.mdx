@@ -21,16 +21,13 @@ export const metadata = {
 
 ## What you will learn
 
-- Understand the core purpose of git-update-index Tutorial
-- Master the basic usage and common options of git-update-index Tutorial
 - Explains how to use git-update-index to update index entries and attributes directly.
-- Understand key concepts: When it is a good fit
-- Know when to use this feature and when to avoid it
-
+- Understand where git update-index fits in the daily Git workflow
+- Work through both "When it is a good fit" and "Basic example" sections hands-on
 
 ## Start with a problem
 
-You're working in a Git repository and need to perform a specific task — but you're not sure which command or option is the right fit, or what this command can and cannot do.
+Next time you're about to type `git update-index`, pause for a second: does this command touch the working tree, the index, or rewrite history? If the output surprises you, what do you check first? This article clears up the boundaries and risks of git update-index before you act.
 
 ## The short version
 
@@ -61,11 +58,6 @@ Treat it as a read-only inspection tool first, then move to write-oriented usage
 - Inspect lower-level objects and refs
 - Write scripts or debug advanced issues
 - Verify internal repository state
-
-## Related reading
-
-Read it alongside git status, git log, and git show so it is easier to see how the command changes history, refs, the index, or the working tree.
-
 
 ## What problem this command solves in a workflow
 
@@ -100,9 +92,9 @@ Read it alongside git status, git log, and git show so it is easier to see how t
 
 ## Try it yourself
 
-1. Practice the git-update-index command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Walk through `git update-index` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
+2. Run a comparison experiment between git update-index and its most easily confused neighbor command, recording the difference with `git log --graph`
+3. Write a three-sentence summary of the single most important safety boundary of git update-index
 
 {/* internal-links:auto */}
 

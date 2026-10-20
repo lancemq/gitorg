@@ -30,14 +30,10 @@ export const metadata = {
 - Understand the core purpose of Git Rebase Deep Dive
 - Master the basic usage and common options of Git Rebase Deep Dive
 - Understand Git Rebase internals, interactive rebasing, conflict resolution strategies, and best practices.
-- Understand key concepts: Overview
-- Know when to use this feature and when to avoid it
-
-
 
 ## Start with a problem
 
-You've encountered a conceptual question while using Git — you roughly know what it means, but you're not entirely sure about its precise definition and boundaries.
+Your understanding of Git Rebase may stop at "I know how to run it" — but not why it's designed this way or where its boundaries are. Those blurry spots are exactly where things break. This article moves you from "can use" to "understands" Git Rebase.
 
 ## Overview
 
@@ -193,9 +189,9 @@ git rebase --signoff main
 
 ## Try it yourself
 
-1. Practice the git-rebase-deep command in a test repository and observe state changes before and after
-2. Experiment with different options and compare the output differences
-3. Simulate a real scenario where you would need to use this, and walk through the full process
+1. Walk through `git rebase` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
+2. Run a comparison experiment between Git Rebase and its most easily confused neighbor command, recording the difference with `git log --graph`
+3. Write a three-sentence summary of the single most important safety boundary of Git Rebase
 
 ## Continue Learning
 
