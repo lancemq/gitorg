@@ -26,27 +26,27 @@
 }
 
 .channel-page-workflows::before {
-  background: radial-gradient(circle, rgba(15, 118, 110, 0.14), transparent 68%);
+  background: radial-gradient(circle, rgba(24, 24, 27, 0.14), transparent 68%);
 }
 
 .channel-page-best-practices::before {
-  background: radial-gradient(circle, rgba(255, 167, 72, 0.14), transparent 68%);
+  background: radial-gradient(circle, rgba(232, 89, 12, 0.14), transparent 68%);
 }
 
 .channel-page-internals::before {
-  background: radial-gradient(circle, rgba(90, 77, 58, 0.12), transparent 68%);
+  background: radial-gradient(circle, rgba(82, 82, 91, 0.12), transparent 68%);
 }
 
 .channel-page-github::before {
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.11), transparent 68%);
+  background: radial-gradient(circle, rgba(24, 24, 27, 0.11), transparent 68%);
 }
 
 .channel-page-gitlab::before {
-  background: radial-gradient(circle, rgba(198, 94, 33, 0.11), transparent 68%);
+  background: radial-gradient(circle, rgba(154, 52, 18, 0.11), transparent 68%);
 }
 
 .channel-page-recovery::before {
-  background: radial-gradient(circle, rgba(180, 64, 32, 0.12), transparent 68%);
+  background: radial-gradient(circle, rgba(24, 24, 27, 0.12), transparent 68%);
 }
 
 .doc-page > .doc-content {
@@ -72,7 +72,7 @@
   border: 1px solid rgba(24, 24, 27, 0.08);
   border-radius: 20px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(250, 247, 240, 0.88));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.88));
   box-shadow: 0 14px 24px rgba(24, 24, 27, 0.04);
   overflow: hidden;
 }
@@ -88,15 +88,15 @@
 }
 
 .doc-primer-card:nth-child(1)::before {
-  background: linear-gradient(180deg, rgba(15, 118, 110, 0.24), rgba(15, 118, 110, 0.72));
+  background: linear-gradient(180deg, rgba(24, 24, 27, 0.24), rgba(24, 24, 27, 0.72));
 }
 
 .doc-primer-card:nth-child(2)::before {
-  background: linear-gradient(180deg, rgba(99, 102, 241, 0.24), rgba(99, 102, 241, 0.72));
+  background: linear-gradient(180deg, rgba(24, 24, 27, 0.24), rgba(24, 24, 27, 0.72));
 }
 
 .doc-primer-card:nth-child(3)::before {
-  background: linear-gradient(180deg, rgba(180, 64, 32, 0.24), rgba(180, 64, 32, 0.72));
+  background: linear-gradient(180deg, rgba(24, 24, 27, 0.24), rgba(24, 24, 27, 0.72));
 }
 
 .doc-primer-label {
@@ -159,27 +159,27 @@
 
 .channel-page-best-practices .docs-group {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(252, 248, 241, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 0.94));
 }
 
 .channel-page-internals .docs-group {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(249, 247, 242, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 0.94));
 }
 
 .channel-page-github .docs-group {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(243, 247, 252, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 0.94));
 }
 
 .channel-page-gitlab .docs-group {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(252, 246, 241, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 0.94));
 }
 
 .channel-page-recovery .docs-group {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(252, 243, 239, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 0.94));
 }
 
 .docs-group-head {
@@ -218,7 +218,7 @@
   border: 1px solid rgba(24, 24, 27, 0.08);
   border-radius: 18px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 248, 245, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(250, 250, 250, 0.94));
   box-shadow: 0 14px 24px rgba(24, 24, 27, 0.04);
   transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
 }
@@ -241,31 +241,31 @@
 .channel-page-workflows .channel-highlight-card,
 .channel-page-workflows .docs-card {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(241, 249, 247, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 0.94));
 }
 
 .channel-page-best-practices .channel-highlight-card,
 .channel-page-best-practices .docs-card {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 249, 242, 0.95));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 0.95));
 }
 
 .channel-page-internals .channel-highlight-card,
 .channel-page-internals .docs-card {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(251, 248, 243, 0.95));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 0.95));
 }
 
 .channel-page-github .channel-highlight-card,
 .channel-page-github .docs-card {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(245, 249, 255, 0.95));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 0.95));
 }
 
 .channel-page-gitlab .channel-highlight-card,
 .channel-page-gitlab .docs-card {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 248, 243, 0.95));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 0.95));
 }
 
 .channel-page-recovery .channel-highlight-card,
@@ -285,10 +285,10 @@
   display: inline-flex;
   align-items: center;
   padding: 8px 12px;
-  border: 1px solid rgba(37, 99, 235, 0.12);
+  border: 1px solid rgba(24, 24, 27, 0.12);
   border-radius: 999px;
-  background: rgba(248, 250, 255, 0.92);
-  color: #24446d;
+  background: rgba(255, 255, 255, 0.92);
+  color: #3f3f46;
   font-size: 0.8rem;
   font-weight: 600;
   line-height: 1.45;
@@ -422,7 +422,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  color: rgba(141, 76, 0, 0.82);
+  color: rgba(154, 52, 18, 0.82);
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -431,7 +431,7 @@
 .learning-path-sequence {
   border-radius: 28px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(252, 249, 244, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.94));
 }
 
 .learning-track-grid {
@@ -484,7 +484,7 @@
   padding: 10px 12px;
   border: 1px solid rgba(24, 24, 27, 0.08);
   border-radius: 16px;
-  background: rgba(248, 248, 245, 0.72);
+  background: rgba(250, 250, 250, 0.72);
   transition: border-color 0.18s ease, background-color 0.18s ease, transform 0.18s ease;
 }
 
@@ -650,7 +650,7 @@
   border: 1px solid rgba(24, 24, 27, 0.08);
   border-radius: 999px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(250, 247, 241, 0.98));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.98));
   box-shadow: none;
   overflow: hidden;
   transition: transform 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
@@ -707,7 +707,7 @@
 }
 
 .doc-tier-recommended {
-  background: rgba(241, 244, 255, 0.96);
+  background: rgba(255, 255, 255, 0.96);
 }
 
 .doc-tier-extended {
