@@ -243,7 +243,7 @@
   padding: 18px 20px 16px;
   border-bottom: 1px solid var(--border);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 247, 238, 0.78));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.85));
 }
 
 .doc-figure-header strong {
@@ -268,7 +268,7 @@
   border: 1px solid rgba(24, 24, 27, 0.08);
   border-radius: 24px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 246, 239, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 1));
   box-shadow: 0 16px 26px rgba(24, 24, 27, 0.05);
   overflow: hidden;
 }
@@ -325,7 +325,7 @@
 
 .doc-callout-tip {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(240, 248, 246, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 1));
 }
 
 .doc-callout-warning::before {
@@ -339,7 +339,7 @@
 
 .doc-callout-warning {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(253, 244, 240, 0.95));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 1));
 }
 
 .doc-callout-mental-model::before {
@@ -353,7 +353,7 @@
 
 .doc-callout-mental-model {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(245, 244, 255, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 1));
 }
 
 .doc-callout-practice::before {
@@ -460,7 +460,7 @@
   font-weight: 600;
   position: relative;
   z-index: 1;
-  box-shadow: 0 0 0 4px rgba(248, 244, 237, 0.92);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 1);
 }
 
 .history-node-accent {
@@ -757,12 +757,12 @@
 
 .gitflow-lane-main {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(251, 247, 240, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 1));
 }
 
 .gitflow-lane-develop {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(245, 249, 247, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 1));
 }
 
 .gitflow-lane-header {
@@ -808,7 +808,7 @@
 .gitflow-support-card-hotfix,
 .gitflow-release-card-hotfix {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(253, 244, 240, 0.95));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 1));
 }
 
 .gitflow-release-figure {
@@ -820,7 +820,7 @@
 
 .gitflow-release-card-soft {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(245, 249, 247, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 1));
 }
 
 .gitflow-release-arrow-stack {
@@ -1070,7 +1070,7 @@
   padding: 16px 16px 16px 18px;
   border-radius: 22px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 246, 239, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 1));
   box-shadow: 0 14px 24px rgba(24, 24, 27, 0.04);
   overflow: hidden;
 }
@@ -1281,8 +1281,8 @@
   overflow-x: auto;
   padding: 12px 14px;
   border-radius: 14px;
-  border: 1px solid #e6e8ef;
-  background: #f6f7fb;
+  border: 1px solid #ececef;
+  background: #f7f7f8;
   font-size: 12px;
   line-height: 1.6;
 }
@@ -1311,7 +1311,7 @@
   position: relative;
   overflow: hidden;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 244, 237, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 1));
 }
 
 .doc-hero::after {
@@ -1328,7 +1328,7 @@
 
 .doc-content {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(250, 248, 243, 0.96));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 1));
 }
 
 .doc-sources ul {
@@ -1379,7 +1379,7 @@
 
 .sequence-card-next {
   background:
-    linear-gradient(135deg, rgba(255, 247, 238, 0.96), rgba(255, 255, 255, 0.98));
+    linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.98));
 }
 
 .sequence-card em {
@@ -1454,8 +1454,8 @@
   overflow-x: auto;
   padding: 16px;
   border-radius: 14px;
-  background: #f6f7fb;
-  border: 1px solid #e6e8ef;
+  background: #f7f7f8;
+  border: 1px solid #ececef;
   font-size: 13px;
   line-height: 1.6;
 }
@@ -1483,8 +1483,8 @@
   margin: 0 0 24px;
   padding: 20px;
   border-radius: 14px;
-  background: #fafbff;
-  border: 1px solid #e6e8ef;
+  background: #fafafa;
+  border: 1px solid #ececef;
 }
 
 .geo-block-title {
@@ -1511,7 +1511,7 @@
   gap: 4px;
   padding: 12px 14px;
   background: #ffffff;
-  border: 1px solid #e6e8ef;
+  border: 1px solid #ececef;
   border-radius: 10px;
 }
 
@@ -1636,8 +1636,8 @@
 .lp-next-card {
   padding: 16px 18px;
   border-radius: 14px;
-  background: #fafbff;
-  border: 1px solid #e6e8ef;
+  background: #fafafa;
+  border: 1px solid #ececef;
 }
 
 .lp-next-title {

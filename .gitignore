@@ -41,3 +41,6 @@ Thumbs.db
 
 # Dev.to mirror output (regenerated from scripts/export-to-devto.mjs)
 /content/_devto
+
+# Local tool working directory
+/.workbuddy/

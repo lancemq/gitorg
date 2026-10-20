@@ -560,7 +560,7 @@ h3 {
 .entry-card:focus-visible {
   transform: translateY(-2px);
   border-color: rgba(24, 24, 27, 0.16);
-  background: #fffdf9;
+  background: #ffffff;
   box-shadow: 0 20px 34px rgba(24, 24, 27, 0.08);
 }
 
@@ -591,7 +591,7 @@ h3 {
 
 .section-recovery .scenario-link {
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(253, 244, 240, 0.98));
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 1));
 }
 
 .section-commands .roadmap-item {
@@ -736,7 +736,7 @@ h3 {
   padding: 18px 20px;
   align-items: start;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 244, 237, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 1));
 }
 
 .roadmap-link {
@@ -783,7 +783,7 @@ h3 {
 .updates-section {
   padding-top: 20px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(250, 246, 239, 0.96));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 1));
 }
 
 .updates-timeline {
@@ -795,7 +795,7 @@ h3 {
 .updates-hero {
   background:
     radial-gradient(circle at top right, rgba(255, 162, 66, 0.12), transparent 30%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(250, 246, 239, 0.96));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 1));
 }
 
 .updates-hero-meta {

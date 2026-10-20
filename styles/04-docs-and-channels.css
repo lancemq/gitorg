@@ -59,7 +59,7 @@
   gap: 12px;
   padding: 12px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 244, 237, 0.9));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 1));
 }
 
 .doc-primer-card {
@@ -144,7 +144,7 @@
 
 .channel-page .docs-group {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 244, 237, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 1));
 }
 
 .channel-page-commands .docs-group {
@@ -154,7 +154,7 @@
 
 .channel-page-workflows .docs-group {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(240, 248, 246, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 1));
 }
 
 .channel-page-best-practices .docs-group {
@@ -271,7 +271,7 @@
 .channel-page-recovery .channel-highlight-card,
 .channel-page-recovery .docs-card {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(253, 244, 240, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 1));
 }
 
 .github-topic-highlights {
@@ -529,7 +529,7 @@
   bottom: 22px;
   left: 28px;
   width: 2px;
-  background: linear-gradient(180deg, rgba(24, 24, 27, 0.1), rgba(232, 89, 12, 0.02));
+  background: linear-gradient(180deg, rgba(24, 24, 27, 0.1), rgba(24, 24, 27, 0.02));
 }
 
 .learning-path-step-card {
@@ -563,7 +563,7 @@
   min-height: 100%;
   border-right: 1px solid rgba(24, 24, 27, 0.08);
   background:
-    linear-gradient(180deg, rgba(24, 24, 27, 0.05), rgba(232, 89, 12, 0.03));
+    linear-gradient(180deg, rgba(24, 24, 27, 0.05), rgba(24, 24, 27, 0.02));
   color: #9a3412;
   font-size: 1rem;
   font-weight: 700;
@@ -622,7 +622,7 @@
   border: 1px solid rgba(24, 24, 27, 0.08);
   border-radius: 18px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 244, 237, 0.94));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 1));
   box-shadow: 0 14px 24px rgba(24, 24, 27, 0.04);
   transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
 }
