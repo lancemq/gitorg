@@ -2,13 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/breadcrumbs";
-import { DocPrimer } from "@/components/doc-primer";
 import { DocSupport } from "@/components/doc-support";
 import { AuthorByline } from "@/components/author-byline";
 import { GeoBlock } from "@/components/geo-block";
 import { SiteShell } from "@/components/site-shell";
 import { buildBreadcrumbData, StructuredData } from "@/components/structured-data";
-import { getCommandDoc, getDocLastModified, getDocNeighbors, getDocPrimer, getDocTier, getRelatedDocs } from "@/lib/content";
+import { getCommandDoc, getDocLastModified, getDocNeighbors, getDocTier } from "@/lib/content";
 import {
   commandSlugs,
   getDictionary,
@@ -73,12 +72,10 @@ export default async function CommandPage({ params }: Props) {
   const commandSlug = slug as CommandSlug;
   const doc = await getCommandDoc(locale, commandSlug);
   const docPath = `commands/${commandSlug}` as const;
-  const [neighbors, relatedDocs, lastModified] = await Promise.all([
+  const [neighbors, lastModified] = await Promise.all([
     getDocNeighbors(locale, docPath),
-    getRelatedDocs(locale, docPath),
     getDocLastModified(locale, docPath),
   ]);
-  const primer = getDocPrimer(locale, docPath);
   const DocBody = doc.Component;
   const siteUrl = getSiteUrl();
   const pageUrl = `${siteUrl}/${locale}/commands/${commandSlug}`;
@@ -144,8 +141,6 @@ export default async function CommandPage({ params }: Props) {
         </aside>
       </section>
 
-      <DocPrimer locale={locale} primer={primer} />
-
       {/* GEO block: quotes / stats / citations from MDX frontmatter. */}
       <GeoBlock
         locale={locale}
@@ -161,7 +156,7 @@ export default async function CommandPage({ params }: Props) {
       </section>
 
       <div className="doc-support-stack">
-        <DocSupport locale={locale} relatedDocs={relatedDocs} neighbors={neighbors} />
+        <DocSupport locale={locale} neighbors={neighbors} />
       </div>
     </SiteShell>
   );

@@ -184,7 +184,6 @@ h3 {
 [data-locale="en"] .search-group-header h3,
 [data-locale="en"] .search-helper,
 [data-locale="en"] .search-empty-hint,
-[data-locale="en"] .doc-primer-label,
 [data-locale="en"] .practice-lab-label,
 [data-locale="en"] .learning-path-step-label,
 [data-locale="en"] .learning-path-aside-kicker,
@@ -311,7 +310,6 @@ h3 {
 
 [data-locale="zh"] .learning-track-link strong,
 [data-locale="zh"] .learning-path-step-head h3,
-[data-locale="zh"] .doc-related-title,
 [data-locale="zh"] .sequence-card strong {
   font-weight: 760;
 }
@@ -322,7 +320,6 @@ h3 {
 [data-locale="zh"] .search-result-copy p,
 [data-locale="zh"] .docs-card p,
 [data-locale="zh"] .channel-highlight-card p,
-[data-locale="zh"] .doc-primer-card li,
 [data-locale="zh"] .doc-figure-header span,
 [data-locale="zh"] .practice-lab-header p,
 [data-locale="zh"] .sequence-card em {
@@ -345,7 +342,6 @@ h3 {
 
 [data-locale="en"] .learning-track-link strong,
 [data-locale="en"] .learning-path-step-head h3,
-[data-locale="en"] .doc-related-title,
 [data-locale="en"] .sequence-card strong {
   font-weight: 640;
 }

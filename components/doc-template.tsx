@@ -2,7 +2,6 @@ import type { ComponentType } from "react";
 
 import { AuthorByline } from "@/components/author-byline";
 import { Breadcrumbs } from "@/components/breadcrumbs";
-import { DocPrimer } from "@/components/doc-primer";
 import { DocSupport } from "@/components/doc-support";
 import { GeoBlock } from "@/components/geo-block";
 import { LearningPathMeta } from "@/components/learning-path-meta";
@@ -12,11 +11,9 @@ import { buildDocStructuredData } from "@/lib/structured-seo";
 import type { Locale, SidebarContent } from "@/lib/i18n";
 import {
   getDocTier,
-  type DocCard,
   type DocCitation,
   type DocNeighbors,
   type DocPath,
-  type DocPrimer as DocPrimerType,
   type DocQuote,
   type DocSection,
   type DocStat,
@@ -39,9 +36,7 @@ type DocTemplateProps = {
   sourceUrls: string[];
   lastModified?: string;
   Body: ComponentType;
-  primer?: DocPrimerType;
   showSources?: boolean;
-  relatedDocs?: DocCard[];
   neighbors?: DocNeighbors;
   /** GEO signals from MDX frontmatter — all optional, see lib/content.ts. */
   quotes?: DocQuote[];
@@ -66,9 +61,7 @@ export function DocTemplate({
   sourceUrls,
   lastModified,
   Body,
-  primer,
   showSources = false,
-  relatedDocs = [],
   neighbors,
   quotes,
   stats,
@@ -122,10 +115,8 @@ export function DocTemplate({
           <LearningPathMeta locale={locale} step={step} next={neighbors?.next} />
         </header>
 
-        {primer ? <DocPrimer locale={locale} primer={primer} /> : null}
-
         {/*
-          GEO block: rendered between primer and body so quotes/stats/citations
+          GEO block: rendered between hero and body so quotes/stats/citations
           appear high on the page where LLM scrapers and Google snippet pickers
           both look. Returns null when no GEO frontmatter is present, so older
           articles render unchanged until backfilled.
@@ -144,7 +135,7 @@ export function DocTemplate({
         </section>
 
         <div className="doc-support-stack">
-          <DocSupport locale={locale} relatedDocs={relatedDocs} neighbors={neighbors} />
+          <DocSupport locale={locale} neighbors={neighbors} />
         </div>
 
         {showSources ? (

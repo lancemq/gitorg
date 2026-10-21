@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { DocTemplate } from "@/components/doc-template";
-import { getDocLastModified, getDocNeighbors, getDocPaths, getDocPrimer, getInternalDoc, getRelatedDocs, type DocPath } from "@/lib/content";
+import { getDocLastModified, getDocNeighbors, getDocPaths, getInternalDoc, type DocPath } from "@/lib/content";
 import {
   getDictionary,
   getSidebarContent,
@@ -63,10 +63,8 @@ export default async function InternalDetailPage({ params }: Props) {
 
   const dict = getDictionary(locale);
   const doc = await getInternalDoc(locale, slug as InternalsSlug);
-  const primer = getDocPrimer(locale, docPath);
-  const [neighbors, relatedDocs, lastModified] = await Promise.all([
+  const [neighbors, lastModified] = await Promise.all([
     getDocNeighbors(locale, docPath),
-    getRelatedDocs(locale, docPath),
     getDocLastModified(locale, docPath),
   ]);
   const DocBody = doc.Component;
@@ -92,10 +90,8 @@ export default async function InternalDetailPage({ params }: Props) {
       citations={doc.metadata.citations}
       authorSlug={doc.metadata.author}
       step={doc.metadata.step}
-      primer={primer}
       lastModified={lastModified.toISOString()}
       Body={DocBody}
-      relatedDocs={relatedDocs}
       neighbors={neighbors}
     />
   );
