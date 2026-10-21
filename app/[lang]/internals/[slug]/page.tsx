@@ -37,7 +37,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const locale = lang as Locale;
-  const doc = await getInternalDoc(locale, slug as InternalsSlug);
+  let doc;
+  try {
+    doc = await getInternalDoc(locale, slug as InternalsSlug);
+  } catch {
+    notFound();
+  }
 
   return buildPageMetadata({
     locale,
@@ -62,7 +67,12 @@ export default async function InternalDetailPage({ params }: Props) {
   }
 
   const dict = getDictionary(locale);
-  const doc = await getInternalDoc(locale, slug as InternalsSlug);
+  let doc;
+  try {
+    doc = await getInternalDoc(locale, slug as InternalsSlug);
+  } catch {
+    notFound();
+  }
   const [neighbors, lastModified] = await Promise.all([
     getDocNeighbors(locale, docPath),
     getDocLastModified(locale, docPath),

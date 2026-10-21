@@ -377,7 +377,7 @@ export const docPathRegistry = [
 ] as const;
 
 export type DocPath = (typeof docPathRegistry)[number];
-import { contentModules } from "./content-modules";
+import { getDocModule } from "./content-modules";
 
 export type SearchDoc = {
   href: string;
@@ -726,9 +726,119 @@ function getDocAbsolutePath(locale: Locale, docPath: DocPath) {
   return path.join(process.cwd(), "content", locale, `${docPath}.mdx`);
 }
 
+/* EN-only offline docs (low-quality template skeletons, archived under content/_archive/en/). ZH counterparts remain online. */
+export const enOfflineDocPaths: ReadonlySet<string> = new Set([
+  "best-practices/atomic-commits",
+  "best-practices/backup-before-rewrite",
+  "best-practices/bisect-friendly-commits",
+  "best-practices/branch-naming",
+  "best-practices/code-review-handoff-quality",
+  "best-practices/conflict-resolution-routine",
+  "best-practices/fetch-first-sync",
+  "best-practices/git-aliases",
+  "best-practices/pull-request-prep",
+  "best-practices/release-checklist-discipline",
+  "best-practices/release-hygiene",
+  "best-practices/review-and-safe-push",
+  "best-practices/safe-cherry-picks",
+  "best-practices/safe-force-push-protocol",
+  "best-practices/security-with-git",
+  "best-practices/shared-history-boundaries",
+  "best-practices/small-batch-review",
+  "best-practices/tagging-and-versioning",
+  "best-practices/topic-branches",
+  "commands/git-blame",
+  "commands/git-mv",
+  "commands/git-reflog",
+  "commands/git-rm",
+  "commands/git-show",
+  "concepts/git-bisect-deep",
+  "concepts/git-hooks-deep",
+  "concepts/git-lfs-deep",
+  "concepts/git-merge-deep",
+  "concepts/git-rebase-deep",
+  "concepts/git-rerere-deep",
+  "devops/ci-cd-testing-strategies",
+  "devops/circleci-git",
+  "devops/github-desktop",
+  "devops/intellij-git-deep",
+  "devops/jenkins-integration",
+  "devops/terminal-git-productivity",
+  "devops/terminal-git-ui",
+  "devops/vim-neovim-git",
+  "hosting/aws-codecommit",
+  "hosting/gerrit-code-review",
+  "hosting/platform-comparison",
+  "internals/hooks-and-policy-enforcement",
+  "internals/rebase-internals-and-sequencer",
+  "internals/rename-detection-and-diff-algorithms",
+  "internals/three-way-merge-mechanics",
+  "learning-path/first-safe-hotfix",
+  "learning-path/handle-review-feedback",
+  "learning-path/merge-and-close-task",
+  "learning-path/open-first-pull-request",
+  "learning-path/view-history-and-changes",
+  "migration/azure-devops-migration",
+  "migration/git-filter-repo",
+  "migration/git-p4-perforce",
+  "migration/hg-to-git",
+  "migration/migration-strategy-guide",
+  "migration/platform-migration",
+  "performance/bundle-uri",
+  "performance/commit-graph-deep",
+  "performance/gc-repack-strategies",
+  "performance/git-maintenance",
+  "performance/large-repo-optimization",
+  "performance/scalar-git",
+  "performance/shallow-clone-deep",
+  "platforms/github-branch-protection-and-rulesets",
+  "platforms/github-codeowners-and-review-ownership",
+  "platforms/gitlab-ci-and-runners",
+  "platforms/gitlab-protected-branches-and-approval-rules",
+  "recovery/detached-head-rescue",
+  "recovery/recover-after-accidental-merge",
+  "recovery/recover-after-git-clean",
+  "recovery/recover-after-rebase",
+  "recovery/recover-after-wrong-cherry-pick",
+  "recovery/recover-deleted-branch",
+  "recovery/recover-lost-stash",
+  "recovery/undo-after-pull",
+  "security/credential-helper",
+  "security/secret-scanning",
+  "security/secure-git-workflows",
+  "security/signing-advanced",
+  "workflows/api-versioning-change-workflow",
+  "workflows/backport-with-cherry-pick",
+  "workflows/bisect-regression-triage-workflow",
+  "workflows/canary-release-workflow",
+  "workflows/code-freeze-and-release-candidate-workflow",
+  "workflows/cross-repo-integration-workflow",
+  "workflows/database-migration-safety-workflow",
+  "workflows/feature-branch-collaboration",
+  "workflows/feature-flag-rollout-workflow",
+  "workflows/incident-retro-to-guardrail-workflow",
+  "workflows/large-file-handling-workflow",
+  "workflows/long-lived-branch-conflict-governance",
+  "workflows/monorepo-sparse-checkout-workflow",
+  "workflows/pre-commit-hook-workflow",
+  "workflows/pre-release-checklist",
+  "workflows/release-branch-workflow",
+  "workflows/release-train-workflow",
+  "workflows/rerere-for-recurring-conflicts",
+  "workflows/revert-first-stabilization-workflow",
+  "workflows/rollback-deployment-workflow",
+  "workflows/signing-commits-workflow",
+  "workflows/squash-vs-rebase-merge",
+  "workflows/stacked-pull-requests-workflow",
+]);
+
 const getIndexedDocs = cache(async (locale: Locale): Promise<IndexedDoc[]> => {
+  const registry =
+    locale === "en"
+      ? docPathRegistry.filter((docPath) => !enOfflineDocPaths.has(docPath))
+      : docPathRegistry;
   const docs = await Promise.all(
-    docPathRegistry.map(async (docPath) => ({
+    registry.map(async (docPath) => ({
       path: docPath,
       metadata: await readDocMetadata(locale, docPath),
     })),
@@ -737,13 +847,23 @@ const getIndexedDocs = cache(async (locale: Locale): Promise<IndexedDoc[]> => {
   return docs.sort((a, b) => a.metadata.title.localeCompare(b.metadata.title));
 });
 
-export function getDocPaths(_locale: Locale) {
-  void _locale;
+export function getDocPaths(locale: Locale) {
+  if (locale === "en") {
+    return ([...docPathRegistry] as DocPath[]).filter(
+      (docPath) => !enOfflineDocPaths.has(docPath),
+    );
+  }
   return [...docPathRegistry] as DocPath[];
 }
 
 export async function getDocByPath(locale: Locale, docPath: DocPath) {
-  const mdxModule = (await contentModules[locale][docPath]()) as {
+  // EN offline docs (archived MDX) have no module — the loader returns
+  // undefined and callers treat that as "doc not found".
+  const load = getDocModule(locale, docPath);
+  if (!load) {
+    throw new Error(`Doc module not found: ${locale}/${docPath}`);
+  }
+  const mdxModule = (await load()) as {
     default: ComponentType;
     // MDX modules declare `metadata` with a literal shape based on what each
     // file happens to set. We widen to DocMetadata here so callers can read
@@ -1015,9 +1135,13 @@ export async function getLatestDocLastModified(
   locale: Locale,
   section?: DocSection,
 ) {
-  const paths = section
+  let paths = section
     ? docPathRegistry.filter((docPath) => docPath.startsWith(`${section}/`))
     : docPathRegistry;
+
+  if (locale === "en") {
+    paths = paths.filter((docPath) => !enOfflineDocPaths.has(docPath));
+  }
 
   const modifiedTimes = await Promise.all(
     paths.map(async (docPath) => getDocLastModified(locale, docPath)),
@@ -1029,8 +1153,16 @@ export async function getLatestDocLastModified(
   );
 }
 
-export async function getDocNeighbors(locale: Locale, docPath: DocPath): Promise<DocNeighbors> {
-  const doc = await getDocByPath(locale, docPath);
+/** Like getDocByPath but returns null instead of throwing for archived/offline docs. */
+export async function getDocByPathIfAvailable(locale: Locale, docPath: DocPath) {
+  try {
+    return await getDocByPath(locale, docPath);
+  } catch {
+    return null;
+  }
+}
+
+export async function getDocNeighbors(locale: Locale, docPath: DocPath): Promise<DocNeighbors> {  const doc = await getDocByPath(locale, docPath);
   const series = getOrderedPathSeries(doc.metadata.section);
   const index = series.indexOf(docPath);
 
@@ -1042,8 +1174,8 @@ export async function getDocNeighbors(locale: Locale, docPath: DocPath): Promise
   const nextPath = series[index + 1];
 
   const [prevDoc, nextDoc] = await Promise.all([
-    prevPath ? getDocByPath(locale, prevPath) : Promise.resolve(null),
-    nextPath ? getDocByPath(locale, nextPath) : Promise.resolve(null),
+    prevPath ? getDocByPathIfAvailable(locale, prevPath) : Promise.resolve(null),
+    nextPath ? getDocByPathIfAvailable(locale, nextPath) : Promise.resolve(null),
   ]);
 
   return {
@@ -1158,13 +1290,18 @@ export async function getRepresentativeSectionDocs(
   section: Extract<DocSection, "learning-path" | "commands" | "best-practices" | "workflows" | "platforms" | "internals" | "recovery" | "devops" | "security" | "performance" | "migration" | "hosting" | "concepts">,
   limit = 3,
 ): Promise<DocCard[]> {
-  const paths = representativeSectionPaths[section] ?? [];
+  const allPaths = representativeSectionPaths[section] ?? [];
+  const paths =
+    locale === "en"
+      ? allPaths.filter((docPath) => !enOfflineDocPaths.has(docPath))
+      : allPaths;
   const docs = await Promise.all(paths.slice(0, limit).map((docPath) => getDocByPath(locale, docPath)));
   return docs.map((doc) => toDocCard(locale, doc));
 }
 
 export async function getLatestHomeDocs(locale: Locale, limit = 4): Promise<DocCard[]> {
-  const candidatePaths: DocPath[] = [
+  // Skip EN offline docs so the home page never stats archived files.
+  const allCandidatePaths: DocPath[] = [
     "workflows/gitflow-workflow",
     "workflows/ai-agent-worktree-mode",
     "workflows/stacked-pull-requests-workflow",
@@ -1206,6 +1343,11 @@ export async function getLatestHomeDocs(locale: Locale, limit = 4): Promise<DocC
     "performance/bundle-uri",
     "performance/scalar-git",
   ];
+
+  const candidatePaths =
+    locale === "en"
+      ? allCandidatePaths.filter((docPath) => !enOfflineDocPaths.has(docPath))
+      : allCandidatePaths;
 
   const modifiedTimes = await Promise.all(
     candidatePaths.map(async (docPath) => ({

@@ -103,6 +103,15 @@ async function main() {
       extractArrayBlock(contentSource, "const recommendedDocPaths = new Set<DocPath>([", "]);"),
     ),
   );
+  const enOfflineDocPaths = new Set(
+    extractQuotedStrings(
+      extractArrayBlock(
+        contentSource,
+        "export const enOfflineDocPaths: ReadonlySet<string> = new Set([",
+        "]);",
+      ),
+    ),
+  );
 
   const locales = ["zh", "en"];
 
@@ -111,7 +120,12 @@ async function main() {
   for (const locale of locales) {
     const index = [];
 
-    for (const docPath of docPathRegistry) {
+    const localeRegistry =
+      locale === "en"
+        ? docPathRegistry.filter((docPath) => !enOfflineDocPaths.has(docPath))
+        : docPathRegistry;
+
+    for (const docPath of localeRegistry) {
       const filePath = path.join(contentRoot, locale, `${docPath}.mdx`);
       const source = await fs.readFile(filePath, "utf8");
       const metadataBlock = source.match(/export const metadata = \{([\s\S]*?)\n\};/)?.[1] ?? "";

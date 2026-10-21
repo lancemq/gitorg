@@ -30,16 +30,6 @@
     "suggestions": []
   },
   {
-    "href": "/en/docs/learning-path/view-history-and-changes",
-    "path": "learning-path/view-history-and-changes",
-    "section": "learning-path",
-    "tier": "core",
-    "slug": "view-history-and-changes",
-    "title": "Viewing History and Changes",
-    "summary": "Learn how to use git status, git diff, and git log to inspect your working tree state, file differences, and commit history — the three most essential inspection tools for every Git user.",
-    "suggestions": []
-  },
-  {
     "href": "/en/docs/learning-path/undo-local-basics",
     "path": "learning-path/undo-local-basics",
     "section": "learning-path",
@@ -67,46 +57,6 @@
     "slug": "first-feature-branch",
     "title": "First Feature Branch",
     "summary": "Move from a solo Git loop into the simplest collaboration rhythm: create a feature branch, commit work there, and keep an eye on the main branch.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/docs/learning-path/open-first-pull-request",
-    "path": "learning-path/open-first-pull-request",
-    "section": "learning-path",
-    "tier": "core",
-    "slug": "open-first-pull-request",
-    "title": "Open your first pull request",
-    "summary": "Move from branch commits to team review by preparing scope, context, and validation details for your first merge-ready pull request.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/docs/learning-path/handle-review-feedback",
-    "path": "learning-path/handle-review-feedback",
-    "section": "learning-path",
-    "tier": "core",
-    "slug": "handle-review-feedback",
-    "title": "Handle review feedback",
-    "summary": "Learn a practical review-feedback loop: classify comments, apply focused updates in batches, and keep PR context easy to re-evaluate.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/docs/learning-path/merge-and-close-task",
-    "path": "learning-path/merge-and-close-task",
-    "section": "learning-path",
-    "tier": "core",
-    "slug": "merge-and-close-task",
-    "title": "Merge and close the task loop",
-    "summary": "Close the full delivery loop by merging with the right strategy, confirming mainline state, cleaning branches, and updating task status.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/docs/learning-path/first-safe-hotfix",
-    "path": "learning-path/first-safe-hotfix",
-    "section": "learning-path",
-    "tier": "core",
-    "slug": "first-safe-hotfix",
-    "title": "First safe hotfix",
-    "summary": "Learn a low-risk emergency fix routine: stabilize quickly, ship minimal change, backport to mainline, and avoid incident amplification.",
     "suggestions": []
   },
   {
@@ -170,16 +120,6 @@
     "suggestions": []
   },
   {
-    "href": "/en/commands/git-show",
-    "path": "commands/git-show",
-    "section": "commands",
-    "tier": "recommended",
-    "slug": "git-show",
-    "title": "git show",
-    "summary": "Inspect a specific commit, tag, or object in detail, making it one of the most useful commands for reading history precisely.",
-    "suggestions": []
-  },
-  {
     "href": "/en/commands/git-log",
     "path": "commands/git-log",
     "section": "commands",
@@ -187,26 +127,6 @@
     "slug": "git-log",
     "title": "git log Tutorial",
     "summary": "Shows how git log inspects commit history, graph structure, authorship, and filtered history for debugging, review, and recovery.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/commands/git-rm",
-    "path": "commands/git-rm",
-    "section": "commands",
-    "tier": "extended",
-    "slug": "git-rm",
-    "title": "git rm",
-    "summary": "Remove tracked files and stage that removal, which makes it easier to separate filesystem deletion from Git history changes.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/commands/git-mv",
-    "path": "commands/git-mv",
-    "section": "commands",
-    "tier": "extended",
-    "slug": "git-mv",
-    "title": "git mv",
-    "summary": "Rename or move tracked files while keeping the index in sync, which makes large refactors easier to stage consistently.",
     "suggestions": []
   },
   {
@@ -350,16 +270,6 @@
     "suggestions": []
   },
   {
-    "href": "/en/commands/git-reflog",
-    "path": "commands/git-reflog",
-    "section": "commands",
-    "tier": "core",
-    "slug": "git-reflog",
-    "title": "git reflog",
-    "summary": "Read reference movement history, which makes reflog one of the most important commands for recovery after reset, rebase, and branch mistakes.",
-    "suggestions": []
-  },
-  {
     "href": "/en/commands/git-bisect",
     "path": "commands/git-bisect",
     "section": "commands",
@@ -367,16 +277,6 @@
     "slug": "git-bisect",
     "title": "git bisect",
     "summary": "Use binary search across history to locate the commit that introduced a regression, making it one of the most valuable debugging commands in Git.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/commands/git-blame",
-    "path": "commands/git-blame",
-    "section": "commands",
-    "tier": "recommended",
-    "slug": "git-blame",
-    "title": "git blame",
-    "summary": "Track which commit last changed each line in a file, making it useful for recovering context around why a line looks the way it does now.",
     "suggestions": []
   },
   {
@@ -760,16 +660,6 @@
     "suggestions": []
   },
   {
-    "href": "/en/best-practices/topic-branches",
-    "path": "best-practices/topic-branches",
-    "section": "best-practices",
-    "tier": "recommended",
-    "slug": "topic-branches",
-    "title": "Topic Branch Strategy",
-    "summary": "Use topic branches to isolate units of work so parallel development, review, rollback, and history cleanup all stay easier to manage.",
-    "suggestions": []
-  },
-  {
     "href": "/en/best-practices/branch-workflow-and-lifecycle",
     "path": "best-practices/branch-workflow-and-lifecycle",
     "section": "best-practices",
@@ -777,46 +667,6 @@
     "slug": "branch-workflow-and-lifecycle",
     "title": "Branch Workflows and Branch Lifecycle",
     "summary": "Teams move faster when mainline, release lines, hotfix lines, and topic branches each have a clear job and a clear exit condition.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/best-practices/fetch-first-sync",
-    "path": "best-practices/fetch-first-sync",
-    "section": "best-practices",
-    "tier": "core",
-    "slug": "fetch-first-sync",
-    "title": "Fetch-First Sync",
-    "summary": "Separate observing remote state from mutating your local branch so integration choices stay explicit instead of being hidden inside default pull behavior.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/best-practices/shared-history-boundaries",
-    "path": "best-practices/shared-history-boundaries",
-    "section": "best-practices",
-    "tier": "core",
-    "slug": "shared-history-boundaries",
-    "title": "Shared History Boundaries",
-    "summary": "Know which history can still be cleaned up freely and which history should be treated as shared, so rebase, amend, reset, and force-push do not break other people.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/best-practices/review-and-safe-push",
-    "path": "best-practices/review-and-safe-push",
-    "section": "best-practices",
-    "tier": "core",
-    "slug": "review-and-safe-push",
-    "title": "Review-Ready History and Safe Push",
-    "summary": "Before review or push, clean up the commit stack, inspect the actual diff range, and prefer safer push defaults so you publish history intentionally.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/best-practices/atomic-commits",
-    "path": "best-practices/atomic-commits",
-    "section": "best-practices",
-    "tier": "core",
-    "slug": "atomic-commits",
-    "title": "Atomic Commits",
-    "summary": "Keep each commit focused on one logical change to simplify review and rollback.",
     "suggestions": []
   },
   {
@@ -830,26 +680,6 @@
     "suggestions": []
   },
   {
-    "href": "/en/best-practices/branch-naming",
-    "path": "best-practices/branch-naming",
-    "section": "best-practices",
-    "tier": "recommended",
-    "slug": "branch-naming",
-    "title": "Branch Naming Conventions",
-    "summary": "Adopt predictable branch naming patterns to improve collaboration, automation, and debugging.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/best-practices/pull-request-prep",
-    "path": "best-practices/pull-request-prep",
-    "section": "best-practices",
-    "tier": "recommended",
-    "slug": "pull-request-prep",
-    "title": "Preparing a Branch for Review",
-    "summary": "Clean up commits, sync with the latest base, and remove noise before asking for review.",
-    "suggestions": []
-  },
-  {
     "href": "/en/best-practices/pull-request-review-readiness",
     "path": "best-practices/pull-request-review-readiness",
     "section": "best-practices",
@@ -857,56 +687,6 @@
     "slug": "pull-request-review-readiness",
     "title": "Pull Request Review Readiness",
     "summary": "Review quality depends heavily on whether the author prepared branch scope, change narrative, validation notes, and follow-up behavior before requesting feedback.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/best-practices/conflict-resolution-routine",
-    "path": "best-practices/conflict-resolution-routine",
-    "section": "best-practices",
-    "tier": "recommended",
-    "slug": "conflict-resolution-routine",
-    "title": "Conflict Resolution Routine",
-    "summary": "Turn conflict handling into a repeatable routine so fewer steps are missed under pressure.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/best-practices/release-hygiene",
-    "path": "best-practices/release-hygiene",
-    "section": "best-practices",
-    "tier": "extended",
-    "slug": "release-hygiene",
-    "title": "Release Hygiene",
-    "summary": "Use a small set of Git checks before release to reduce mistakes around tags, branches, and version state.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/best-practices/safe-cherry-picks",
-    "path": "best-practices/safe-cherry-picks",
-    "section": "best-practices",
-    "tier": "extended",
-    "slug": "safe-cherry-picks",
-    "title": "Safe Cherry-picks",
-    "summary": "Use cherry-pick safely when backporting fixes or selectively reusing commits.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/best-practices/small-batch-review",
-    "path": "best-practices/small-batch-review",
-    "section": "best-practices",
-    "tier": "extended",
-    "slug": "small-batch-review",
-    "title": "Small-batch Review",
-    "summary": "Use smaller commit batches and shorter branch lifecycles to keep review fast and clear.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/best-practices/safe-force-push-protocol",
-    "path": "best-practices/safe-force-push-protocol",
-    "section": "best-practices",
-    "tier": "recommended",
-    "slug": "safe-force-push-protocol",
-    "title": "Safe force-push protocol",
-    "summary": "When history rewrite is necessary, use explicit communication, freeze windows, and `--force-with-lease` to reduce overwrite risk.",
     "suggestions": []
   },
   {
@@ -920,26 +700,6 @@
     "suggestions": []
   },
   {
-    "href": "/en/best-practices/release-checklist-discipline",
-    "path": "best-practices/release-checklist-discipline",
-    "section": "best-practices",
-    "tier": "recommended",
-    "slug": "release-checklist-discipline",
-    "title": "Release checklist discipline",
-    "summary": "Use a fixed release checklist with owners and evidence-based validation to reduce launch omissions and avoid memory-driven failures.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/best-practices/code-review-handoff-quality",
-    "path": "best-practices/code-review-handoff-quality",
-    "section": "best-practices",
-    "tier": "recommended",
-    "slug": "code-review-handoff-quality",
-    "title": "Code review handoff quality",
-    "summary": "Improve review throughput by handing off pull requests with clear context, scope, risks, and verification evidence.",
-    "suggestions": []
-  },
-  {
     "href": "/en/workflows/fetch-vs-pull",
     "path": "workflows/fetch-vs-pull",
     "section": "workflows",
@@ -947,16 +707,6 @@
     "slug": "fetch-vs-pull",
     "title": "fetch vs pull",
     "summary": "Explains why fetch-first workflows are often more controllable than pulling directly.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/workflows/feature-branch-collaboration",
-    "path": "workflows/feature-branch-collaboration",
-    "section": "workflows",
-    "tier": "core",
-    "slug": "feature-branch-collaboration",
-    "title": "Feature Branch Collaboration",
-    "summary": "A practical feature-branch workflow for day-to-day teamwork, from cutting the branch and syncing main to cleaning the stack before review.",
     "suggestions": []
   },
   {
@@ -1007,26 +757,6 @@
     "slug": "ai-agent-worktree-mode",
     "title": "Using git worktree as the default mode for AI coding agents",
     "summary": "Turn git worktree into the default parallel-task mode for AI coding agents so implementation, review, validation, and hotfix work stay isolated and recoverable.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/workflows/monorepo-sparse-checkout-workflow",
-    "path": "workflows/monorepo-sparse-checkout-workflow",
-    "section": "workflows",
-    "tier": "extended",
-    "slug": "monorepo-sparse-checkout-workflow",
-    "title": "Sparse-checkout and worktree flow for monorepos",
-    "summary": "Use sparse-checkout and worktree together in a monorepo to reduce context load and support parallel task work without loading the whole tree every time.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/workflows/rerere-for-recurring-conflicts",
-    "path": "workflows/rerere-for-recurring-conflicts",
-    "section": "workflows",
-    "tier": "extended",
-    "slug": "rerere-for-recurring-conflicts",
-    "title": "Rerere for Recurring Conflicts",
-    "summary": "Use rerere to record and reuse conflict resolutions when the same merge or rebase conflicts appear again and again.",
     "suggestions": []
   },
   {
@@ -1100,26 +830,6 @@
     "suggestions": []
   },
   {
-    "href": "/en/workflows/release-branch-workflow",
-    "path": "workflows/release-branch-workflow",
-    "section": "workflows",
-    "tier": "core",
-    "slug": "release-branch-workflow",
-    "title": "Release Branch Workflow",
-    "summary": "Explain when to cut a release branch, when to freeze features, and how to flow fixes back to main.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/workflows/backport-with-cherry-pick",
-    "path": "workflows/backport-with-cherry-pick",
-    "section": "workflows",
-    "tier": "recommended",
-    "slug": "backport-with-cherry-pick",
-    "title": "Backporting with Cherry-pick",
-    "summary": "Backport precise fixes onto maintenance branches without merging an entire feature branch.",
-    "suggestions": []
-  },
-  {
     "href": "/en/workflows/post-release-multi-branch-backporting",
     "path": "workflows/post-release-multi-branch-backporting",
     "section": "workflows",
@@ -1140,16 +850,6 @@
     "suggestions": []
   },
   {
-    "href": "/en/workflows/squash-vs-rebase-merge",
-    "path": "workflows/squash-vs-rebase-merge",
-    "section": "workflows",
-    "tier": "extended",
-    "slug": "squash-vs-rebase-merge",
-    "title": "Choosing Squash Merge vs Rebase Merge",
-    "summary": "Compare how squash merge and rebase merge affect readability, traceability, and rollback options.",
-    "suggestions": []
-  },
-  {
     "href": "/en/workflows/long-lived-branch-maintenance",
     "path": "workflows/long-lived-branch-maintenance",
     "section": "workflows",
@@ -1157,16 +857,6 @@
     "slug": "long-lived-branch-maintenance",
     "title": "Maintaining Long-lived Branches",
     "summary": "Show how long-lived branches can stay aligned with main and avoid painful late merges.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/workflows/long-lived-branch-conflict-governance",
-    "path": "workflows/long-lived-branch-conflict-governance",
-    "section": "workflows",
-    "tier": "extended",
-    "slug": "long-lived-branch-conflict-governance",
-    "title": "Conflict Governance for Long-lived Branches",
-    "summary": "Turn repeated long-branch conflicts from ad hoc firefighting into a managed process with sync cadence, hotspot tracking, and reusable conflict resolution.",
     "suggestions": []
   },
   {
@@ -1187,116 +877,6 @@
     "slug": "trunk-based-development-workflow",
     "title": "Trunk-Based Development Workflow",
     "summary": "Keep main continuously releasable by using short-lived branches, frequent integration, and small merge batches.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/workflows/stacked-pull-requests-workflow",
-    "path": "workflows/stacked-pull-requests-workflow",
-    "section": "workflows",
-    "tier": "recommended",
-    "slug": "stacked-pull-requests-workflow",
-    "title": "Stacked Pull Requests Workflow",
-    "summary": "Split a large change into dependency-ordered PR layers to improve review throughput and reduce oversized review fatigue.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/workflows/bisect-regression-triage-workflow",
-    "path": "workflows/bisect-regression-triage-workflow",
-    "section": "workflows",
-    "tier": "recommended",
-    "slug": "bisect-regression-triage-workflow",
-    "title": "Bisect Regression Triage Workflow",
-    "summary": "When something recently broke but ownership is unclear, use git bisect to isolate the first bad commit quickly and reproducibly.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/workflows/code-freeze-and-release-candidate-workflow",
-    "path": "workflows/code-freeze-and-release-candidate-workflow",
-    "section": "workflows",
-    "tier": "recommended",
-    "slug": "code-freeze-and-release-candidate-workflow",
-    "title": "Code Freeze and Release Candidate Workflow",
-    "summary": "Use freeze boundaries and release-candidate iterations to stabilize release scope and expose risk before production rollout.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/workflows/revert-first-stabilization-workflow",
-    "path": "workflows/revert-first-stabilization-workflow",
-    "section": "workflows",
-    "tier": "recommended",
-    "slug": "revert-first-stabilization-workflow",
-    "title": "Revert-First Stabilization Workflow",
-    "summary": "In high-impact regressions, restore service stability first and separate root-cause fixes afterward to reduce incident duration and secondary risk.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/workflows/feature-flag-rollout-workflow",
-    "path": "workflows/feature-flag-rollout-workflow",
-    "section": "workflows",
-    "tier": "recommended",
-    "slug": "feature-flag-rollout-workflow",
-    "title": "Feature Flag Rollout Workflow",
-    "summary": "Decouple code merge from user exposure by rolling features out gradually behind flags, reducing one-shot release risk.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/workflows/release-train-workflow",
-    "path": "workflows/release-train-workflow",
-    "section": "workflows",
-    "tier": "recommended",
-    "slug": "release-train-workflow",
-    "title": "Release Train Workflow",
-    "summary": "Ship on a fixed cadence so releases are schedule-driven rather than feature-driven, improving predictability across teams.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/workflows/cross-repo-integration-workflow",
-    "path": "workflows/cross-repo-integration-workflow",
-    "section": "workflows",
-    "tier": "recommended",
-    "slug": "cross-repo-integration-workflow",
-    "title": "Cross-Repository Integration Workflow",
-    "summary": "Coordinate multi-repo changes with shared task IDs, dependency-aware release order, and integrated validation to reduce cross-repo breakage.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/workflows/canary-release-workflow",
-    "path": "workflows/canary-release-workflow",
-    "section": "workflows",
-    "tier": "recommended",
-    "slug": "canary-release-workflow",
-    "title": "Canary Release Workflow",
-    "summary": "Validate new versions on a small slice of real production traffic before broad rollout to reduce blast radius.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/workflows/database-migration-safety-workflow",
-    "path": "workflows/database-migration-safety-workflow",
-    "section": "workflows",
-    "tier": "recommended",
-    "slug": "database-migration-safety-workflow",
-    "title": "Database Migration Safety Workflow",
-    "summary": "Reduce schema-change risk by splitting migrations into reversible, observable stages instead of one irreversible release step.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/workflows/api-versioning-change-workflow",
-    "path": "workflows/api-versioning-change-workflow",
-    "section": "workflows",
-    "tier": "recommended",
-    "slug": "api-versioning-change-workflow",
-    "title": "API Versioning Change Workflow",
-    "summary": "Handle breaking API changes with parallel version support, migration windows, and controlled deprecation to avoid client outages.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/workflows/incident-retro-to-guardrail-workflow",
-    "path": "workflows/incident-retro-to-guardrail-workflow",
-    "section": "workflows",
-    "tier": "recommended",
-    "slug": "incident-retro-to-guardrail-workflow",
-    "title": "Incident Retro to Guardrail Workflow",
-    "summary": "Turn postmortem findings into enforceable CI, release, and runtime guardrails so lessons reduce future incident probability.",
     "suggestions": []
   },
   {
@@ -1350,26 +930,6 @@
     "suggestions": []
   },
   {
-    "href": "/en/docs/platforms/github-branch-protection-and-rulesets",
-    "path": "platforms/github-branch-protection-and-rulesets",
-    "section": "platforms",
-    "tier": "recommended",
-    "slug": "github-branch-protection-and-rulesets",
-    "title": "GitHub branch protection and rulesets",
-    "summary": "Use branch protection and rulesets to enforce merge policy at platform level instead of relying on informal team habits.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/docs/platforms/github-codeowners-and-review-ownership",
-    "path": "platforms/github-codeowners-and-review-ownership",
-    "section": "platforms",
-    "tier": "recommended",
-    "slug": "github-codeowners-and-review-ownership",
-    "title": "GitHub CODEOWNERS and review ownership",
-    "summary": "Use CODEOWNERS to route pull-request review to responsible maintainers and reduce ownership gaps on critical code paths.",
-    "suggestions": []
-  },
-  {
     "href": "/en/docs/platforms/gitlab-flow-and-merge-requests",
     "path": "platforms/gitlab-flow-and-merge-requests",
     "section": "platforms",
@@ -1407,26 +967,6 @@
     "slug": "gitlab-groups-projects-and-permissions",
     "title": "GitLab Groups, Projects, and Permissions",
     "summary": "Understand how groups, projects, roles, and inherited permissions shape collaboration boundaries in GitLab before those boundaries become messy.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/docs/platforms/gitlab-ci-and-runners",
-    "path": "platforms/gitlab-ci-and-runners",
-    "section": "platforms",
-    "tier": "recommended",
-    "slug": "gitlab-ci-and-runners",
-    "title": "GitLab CI/CD and Runners",
-    "summary": "Build a stronger mental model for GitLab CI/CD, pipelines, jobs, and runners, and understand how they shape merge request readiness.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/docs/platforms/gitlab-protected-branches-and-approval-rules",
-    "path": "platforms/gitlab-protected-branches-and-approval-rules",
-    "section": "platforms",
-    "tier": "recommended",
-    "slug": "gitlab-protected-branches-and-approval-rules",
-    "title": "GitLab protected branches and approval rules",
-    "summary": "Combine protected branches with merge-request approval rules to reduce risky direct writes and improve merge accountability.",
     "suggestions": []
   },
   {
@@ -1610,46 +1150,6 @@
     "suggestions": []
   },
   {
-    "href": "/en/internals/three-way-merge-mechanics",
-    "path": "internals/three-way-merge-mechanics",
-    "section": "internals",
-    "tier": "recommended",
-    "slug": "three-way-merge-mechanics",
-    "title": "Three-way merge mechanics",
-    "summary": "Understand how Git computes merges from base, ours, and theirs so conflicts and merge outcomes are easier to reason about.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/internals/rename-detection-and-diff-algorithms",
-    "path": "internals/rename-detection-and-diff-algorithms",
-    "section": "internals",
-    "tier": "recommended",
-    "slug": "rename-detection-and-diff-algorithms",
-    "title": "Rename detection and diff algorithms",
-    "summary": "Learn how Git infers renames and how diff algorithm choices affect review readability and change interpretation.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/internals/rebase-internals-and-sequencer",
-    "path": "internals/rebase-internals-and-sequencer",
-    "section": "internals",
-    "tier": "recommended",
-    "slug": "rebase-internals-and-sequencer",
-    "title": "Rebase internals and the sequencer",
-    "summary": "Understand rebase as commit replay managed by the sequencer, making conflict handling and recovery decisions more predictable.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/internals/hooks-and-policy-enforcement",
-    "path": "internals/hooks-and-policy-enforcement",
-    "section": "internals",
-    "tier": "recommended",
-    "slug": "hooks-and-policy-enforcement",
-    "title": "Hooks and policy enforcement",
-    "summary": "Use local and server-side hooks with clear responsibility boundaries to turn collaboration policy from convention into enforcement.",
-    "suggestions": []
-  },
-  {
     "href": "/en/recovery/reflog-recovery",
     "path": "recovery/reflog-recovery",
     "section": "recovery",
@@ -1670,46 +1170,6 @@
     "suggestions": []
   },
   {
-    "href": "/en/recovery/recover-after-rebase",
-    "path": "recovery/recover-after-rebase",
-    "section": "recovery",
-    "tier": "core",
-    "slug": "recover-after-rebase",
-    "title": "Recover after a bad rebase",
-    "summary": "When rebase introduces conflicts, missing commits, or a result you no longer trust, stop rewriting history and recover control with abort, reflog, and rescue branches.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/recovery/recover-deleted-branch",
-    "path": "recovery/recover-deleted-branch",
-    "section": "recovery",
-    "tier": "recommended",
-    "slug": "recover-deleted-branch",
-    "title": "Recover a deleted branch",
-    "summary": "When a branch disappears, first determine whether only the name is gone or whether the commits have become hard to reach, then restore it from reflog or another surviving reference.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/recovery/detached-head-rescue",
-    "path": "recovery/detached-head-rescue",
-    "section": "recovery",
-    "tier": "core",
-    "slug": "detached-head-rescue",
-    "title": "Rescue work from detached HEAD",
-    "summary": "Detached HEAD is not an error by itself. The real risk is creating commits there and leaving them without a branch name that preserves them.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/recovery/undo-after-pull",
-    "path": "recovery/undo-after-pull",
-    "section": "recovery",
-    "tier": "core",
-    "slug": "undo-after-pull",
-    "title": "Undo after a pull you regret",
-    "summary": "When a pull leaves your branch in an unexpected state, first determine what pull actually did, then recover with ORIG_HEAD, reflog, or a rescue branch.",
-    "suggestions": []
-  },
-  {
     "href": "/en/recovery/assess-force-push-impact",
     "path": "recovery/assess-force-push-impact",
     "section": "recovery",
@@ -1717,46 +1177,6 @@
     "slug": "assess-force-push-impact",
     "title": "Assess the impact after a force push",
     "summary": "After a force push, the urgent task is not another push. First identify which refs were replaced, who may still depend on the old history, and what recovery window still exists.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/recovery/recover-lost-stash",
-    "path": "recovery/recover-lost-stash",
-    "section": "recovery",
-    "tier": "extended",
-    "slug": "recover-lost-stash",
-    "title": "Recover a lost stash",
-    "summary": "When stash entries seem to disappear, determine whether they were popped, dropped, or detached from refs, then recover via reflog or dangling commits.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/recovery/recover-after-wrong-cherry-pick",
-    "path": "recovery/recover-after-wrong-cherry-pick",
-    "section": "recovery",
-    "tier": "extended",
-    "slug": "recover-after-wrong-cherry-pick",
-    "title": "Recover after a wrong cherry-pick",
-    "summary": "If the wrong commit was cherry-picked, choose reset or revert based on whether the history is already shared, then replay the correct patch sequence.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/recovery/recover-after-accidental-merge",
-    "path": "recovery/recover-after-accidental-merge",
-    "section": "recovery",
-    "tier": "extended",
-    "slug": "recover-after-accidental-merge",
-    "title": "Recover after an accidental merge",
-    "summary": "When the wrong branch was merged, decide between reset and revert -m based on sharing state, and undo the merge safely without damaging collaboration history.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/recovery/recover-after-git-clean",
-    "path": "recovery/recover-after-git-clean",
-    "section": "recovery",
-    "tier": "extended",
-    "slug": "recover-after-git-clean",
-    "title": "Recover after an accidental git clean",
-    "summary": "After `git clean` removes untracked files, recovery usually depends on external history sources; prevent recurrence with dry-run and stash -u safeguards.",
     "suggestions": []
   },
   {
@@ -1830,16 +1250,6 @@
     "suggestions": []
   },
   {
-    "href": "/en/best-practices/git-aliases",
-    "path": "best-practices/git-aliases",
-    "section": "best-practices",
-    "tier": "extended",
-    "slug": "git-aliases",
-    "title": "Git aliases and productivity tips",
-    "summary": "Efficient Git alias configuration, common alias catalog, shell aliases, team-shared alias configuration, and best practices.",
-    "suggestions": []
-  },
-  {
     "href": "/en/best-practices/commit-message-advanced",
     "path": "best-practices/commit-message-advanced",
     "section": "best-practices",
@@ -1847,26 +1257,6 @@
     "slug": "commit-message-advanced",
     "title": "Advanced commit message conventions",
     "summary": "Conventional Commits, semantic commits, Co-authored-by, Breaking Changes, and tooling support including commitlint, husky, and commitizen.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/best-practices/security-with-git",
-    "path": "best-practices/security-with-git",
-    "section": "best-practices",
-    "tier": "extended",
-    "slug": "security-with-git",
-    "title": "Security best practices with Git",
-    "summary": "Handling sensitive info leaks, key management, .env security, git-secrets, GPG-signed commits, and SSH key management.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/workflows/pre-release-checklist",
-    "path": "workflows/pre-release-checklist",
-    "section": "workflows",
-    "tier": "extended",
-    "slug": "pre-release-checklist",
-    "title": "Pre-release Git checklist",
-    "summary": "Complete pre-release Git checklist: branch status, tag creation, changelog generation, version numbers, and CI verification.",
     "suggestions": []
   },
   {
@@ -2010,66 +1400,6 @@
     "suggestions": []
   },
   {
-    "href": "/en/docs/concepts/git-lfs-deep",
-    "path": "concepts/git-lfs-deep",
-    "section": "concepts",
-    "tier": "recommended",
-    "slug": "git-lfs-deep",
-    "title": "Git LFS Deep Dive",
-    "summary": "Understand Git LFS architecture, performance tuning, server configuration, and large-scale migration strategies.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/docs/concepts/git-hooks-deep",
-    "path": "concepts/git-hooks-deep",
-    "section": "concepts",
-    "tier": "recommended",
-    "slug": "git-hooks-deep",
-    "title": "Git Hooks Deep Dive",
-    "summary": "Understand Git Hooks types, lifecycle, sharing mechanisms, and CI/CD integration practices.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/docs/concepts/git-rebase-deep",
-    "path": "concepts/git-rebase-deep",
-    "section": "concepts",
-    "tier": "recommended",
-    "slug": "git-rebase-deep",
-    "title": "Git Rebase Deep Dive",
-    "summary": "Understand Git Rebase internals, interactive rebasing, conflict resolution strategies, and best practices.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/docs/concepts/git-merge-deep",
-    "path": "concepts/git-merge-deep",
-    "section": "concepts",
-    "tier": "recommended",
-    "slug": "git-merge-deep",
-    "title": "Git Merge Deep Dive",
-    "summary": "Understand Git merge strategies, recursive merge, ours/theirs, octopus merge, and conflict resolution.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/docs/concepts/git-bisect-deep",
-    "path": "concepts/git-bisect-deep",
-    "section": "concepts",
-    "tier": "recommended",
-    "slug": "git-bisect-deep",
-    "title": "Git Bisect Deep Dive",
-    "summary": "Master Git bisect's binary search, automation with run mode, visualization, and large repo optimization.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/docs/concepts/git-rerere-deep",
-    "path": "concepts/git-rerere-deep",
-    "section": "concepts",
-    "tier": "recommended",
-    "slug": "git-rerere-deep",
-    "title": "Git Rerere Deep Dive",
-    "summary": "Master Git Rerere (reuse recorded resolution): config, workflow integration, storage, and team sharing.",
-    "suggestions": []
-  },
-  {
     "href": "/en/docs/concepts/git-for-data",
     "path": "concepts/git-for-data",
     "section": "concepts",
@@ -2140,46 +1470,6 @@
     "suggestions": []
   },
   {
-    "href": "/en/workflows/signing-commits-workflow",
-    "path": "workflows/signing-commits-workflow",
-    "section": "workflows",
-    "tier": "extended",
-    "slug": "signing-commits-workflow",
-    "title": "Signing Commits Workflow",
-    "summary": "Use GPG or SSH to sign commits, establishing verifiable commit identity and a trusted collaboration chain.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/workflows/pre-commit-hook-workflow",
-    "path": "workflows/pre-commit-hook-workflow",
-    "section": "workflows",
-    "tier": "extended",
-    "slug": "pre-commit-hook-workflow",
-    "title": "Pre-commit Hook Workflow",
-    "summary": "Use pre-commit hooks to automatically run checks before code enters the repository, guarding the first gate of code quality.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/workflows/large-file-handling-workflow",
-    "path": "workflows/large-file-handling-workflow",
-    "section": "workflows",
-    "tier": "extended",
-    "slug": "large-file-handling-workflow",
-    "title": "Large File Handling Workflow",
-    "summary": "Use Git LFS, sparse checkout, and repository-splitting strategies to manage large files while keeping clone speed and history maintainable.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/workflows/rollback-deployment-workflow",
-    "path": "workflows/rollback-deployment-workflow",
-    "section": "workflows",
-    "tier": "extended",
-    "slug": "rollback-deployment-workflow",
-    "title": "Rollback Deployment Workflow",
-    "summary": "Combine Git tags, revert, and fast branch switching to build a safe and controllable deployment rollback process.",
-    "suggestions": []
-  },
-  {
     "href": "/en/workflows/ai-assisted-git-workflows",
     "path": "workflows/ai-assisted-git-workflows",
     "section": "workflows",
@@ -2187,36 +1477,6 @@
     "slug": "ai-assisted-git-workflows",
     "title": "AI-Assisted Git Workflows",
     "summary": "How to use AI coding tools (Copilot, Claude Code, Cursor, Aider) with Git safely — reviewing AI diffs, writing verifiable commit messages, and avoiding history-rewrite disasters.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/best-practices/tagging-and-versioning",
-    "path": "best-practices/tagging-and-versioning",
-    "section": "best-practices",
-    "tier": "extended",
-    "slug": "tagging-and-versioning",
-    "title": "Tagging and Versioning",
-    "summary": "Use Semantic Versioning (SemVer) and annotated tags to establish clear, traceable release conventions.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/best-practices/bisect-friendly-commits",
-    "path": "best-practices/bisect-friendly-commits",
-    "section": "best-practices",
-    "tier": "extended",
-    "slug": "bisect-friendly-commits",
-    "title": "Bisect-Friendly Commits",
-    "summary": "Keep every commit independently buildable and testable so git bisect can efficiently locate the commit that introduced a problem.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/best-practices/backup-before-rewrite",
-    "path": "best-practices/backup-before-rewrite",
-    "section": "best-practices",
-    "tier": "extended",
-    "slug": "backup-before-rewrite",
-    "title": "Backup Before Rewriting",
-    "summary": "Establish a safety net before executing history-rewriting operations like rebase or filter-repo so mistakes are recoverable.",
     "suggestions": []
   },
   {
@@ -2237,16 +1497,6 @@
     "slug": "gitlab-ci-basics",
     "title": "GitLab CI & Git Integration",
     "summary": "Understanding how GitLab CI/CD integrates with Git, including pipeline triggers, CI_JOB_TOKEN, Git strategy, and workflow rules based on Git data.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/docs/devops/jenkins-integration",
-    "path": "devops/jenkins-integration",
-    "section": "devops",
-    "tier": "recommended",
-    "slug": "jenkins-integration",
-    "title": "Jenkins Git Integration",
-    "summary": "Set up Git integration with Jenkins including webhook triggers, Multibranch Pipeline, credential management, and security best practices.",
     "suggestions": []
   },
   {
@@ -2280,26 +1530,6 @@
     "suggestions": []
   },
   {
-    "href": "/en/docs/devops/github-desktop",
-    "path": "devops/github-desktop",
-    "section": "devops",
-    "tier": "recommended",
-    "slug": "github-desktop",
-    "title": "GitHub Desktop Guide",
-    "summary": "Learn to use GitHub Desktop's graphical interface for common Git operations — a great fit for developers who prefer visual tools over the command line.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/docs/devops/terminal-git-ui",
-    "path": "devops/terminal-git-ui",
-    "section": "devops",
-    "tier": "recommended",
-    "slug": "terminal-git-ui",
-    "title": "Terminal Git UI Tools Guide",
-    "summary": "Explore terminal-based Git UI tools like lazygit and tig that bring visual Git operations right into your terminal.",
-    "suggestions": []
-  },
-  {
     "href": "/en/security/ssh-key-management",
     "path": "security/ssh-key-management",
     "section": "security",
@@ -2320,36 +1550,6 @@
     "suggestions": []
   },
   {
-    "href": "/en/security/credential-helper",
-    "path": "security/credential-helper",
-    "section": "security",
-    "tier": "recommended",
-    "slug": "credential-helper",
-    "title": "Git Credential Helper Setup",
-    "summary": "Configure Git credential helpers to avoid typing usernames and passwords repeatedly while keeping credentials secure.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/security/signing-advanced",
-    "path": "security/signing-advanced",
-    "section": "security",
-    "tier": "recommended",
-    "slug": "signing-advanced",
-    "title": "Advanced Commit Signing",
-    "summary": "Deep dive into Git commit signing techniques including SSH signing, auto-signing configuration, verification policies, and team signing conventions.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/performance/large-repo-optimization",
-    "path": "performance/large-repo-optimization",
-    "section": "performance",
-    "tier": "extended",
-    "slug": "large-repo-optimization",
-    "title": "Large Repository Performance Optimization",
-    "summary": "Strategies for optimizing Git performance in large repositories, including partial clone, sparse checkout, shallow clone, git gc, and Git LFS.",
-    "suggestions": []
-  },
-  {
     "href": "/en/performance/partial-clone",
     "path": "performance/partial-clone",
     "section": "performance",
@@ -2360,66 +1560,6 @@
     "suggestions": []
   },
   {
-    "href": "/en/performance/shallow-clone-deep",
-    "path": "performance/shallow-clone-deep",
-    "section": "performance",
-    "tier": "recommended",
-    "slug": "shallow-clone-deep",
-    "title": "Deep Dive into Shallow Clone",
-    "summary": "Understand how git clone --depth and --shallow-since work, their use cases, limitations, and how to convert a shallow clone to a full one.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/performance/gc-repack-strategies",
-    "path": "performance/gc-repack-strategies",
-    "section": "performance",
-    "tier": "recommended",
-    "slug": "gc-repack-strategies",
-    "title": "Git gc and repack Strategies",
-    "summary": "Master git gc, git repack, and git maintenance to keep your repository healthy and performant through proper object management.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/performance/git-maintenance",
-    "path": "performance/git-maintenance",
-    "section": "performance",
-    "tier": "recommended",
-    "slug": "git-maintenance",
-    "title": "Git Maintenance Deep Dive",
-    "summary": "Master git maintenance's automated repository upkeep, including task scheduling, incremental repacking, and multi-repo management.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/performance/commit-graph-deep",
-    "path": "performance/commit-graph-deep",
-    "section": "performance",
-    "tier": "recommended",
-    "slug": "commit-graph-deep",
-    "title": "Commit Graph Deep Dive",
-    "summary": "Understand Git Commit Graph's layered structure, Generation Numbers, Bloom Filters, and large repo acceleration.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/performance/bundle-uri",
-    "path": "performance/bundle-uri",
-    "section": "performance",
-    "tier": "recommended",
-    "slug": "bundle-uri",
-    "title": "Bundle URI Deep Dive",
-    "summary": "Master Git Bundle URI: pre-packed objects for fast clones and incremental sync in offline/bandwidth-constrained environments.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/performance/scalar-git",
-    "path": "performance/scalar-git",
-    "section": "performance",
-    "tier": "recommended",
-    "slug": "scalar-git",
-    "title": "Scalar Git Deep Dive",
-    "summary": "Understand Scalar (formerly GVFS): Microsoft's virtual filesystem and background sync for massive repos, enabling on-demand downloads with standard Git compatibility.",
-    "suggestions": []
-  },
-  {
     "href": "/en/migration/svn-to-git",
     "path": "migration/svn-to-git",
     "section": "migration",
@@ -2427,46 +1567,6 @@
     "slug": "svn-to-git",
     "title": "SVN to Git Migration Guide",
     "summary": "A complete guide to migrating from Subversion (SVN) to Git, covering history conversion, branch mapping, team training, and common pitfalls.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/migration/hg-to-git",
-    "path": "migration/hg-to-git",
-    "section": "migration",
-    "tier": "extended",
-    "slug": "hg-to-git",
-    "title": "Mercurial to Git Migration Guide",
-    "summary": "A guide to migrating from Mercurial (Hg) to Git, including hg-fast-export, branch/tag conversion, and common difference handling.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/migration/git-p4-perforce",
-    "path": "migration/git-p4-perforce",
-    "section": "migration",
-    "tier": "recommended",
-    "slug": "git-p4-perforce",
-    "title": "Perforce to Git Migration",
-    "summary": "Migrate Perforce repositories to Git using git-p4, preserving branch structure, commit history, and author information.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/migration/platform-migration",
-    "path": "migration/platform-migration",
-    "section": "migration",
-    "tier": "recommended",
-    "slug": "platform-migration",
-    "title": "Cross-Platform Git Migration",
-    "summary": "Migrate repositories between GitHub, GitLab, Bitbucket, and other Git hosting platforms while preserving full commit history and all refs.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/hosting/platform-comparison",
-    "path": "hosting/platform-comparison",
-    "section": "hosting",
-    "tier": "extended",
-    "slug": "platform-comparison",
-    "title": "Git Platform Comparison: GitHub vs GitLab vs Bitbucket",
-    "summary": "A systematic comparison of GitHub, GitLab, and Bitbucket's features, pricing, CI/CD integration, and collaboration models to help you choose the right platform.",
     "suggestions": []
   },
   {
@@ -2500,26 +1600,6 @@
     "suggestions": []
   },
   {
-    "href": "/en/docs/devops/circleci-git",
-    "path": "devops/circleci-git",
-    "section": "devops",
-    "tier": "recommended",
-    "slug": "circleci-git",
-    "title": "CircleCI with Git Integration",
-    "summary": "A comprehensive guide to integrating CircleCI with Git, including configuration, trigger strategies, checkout optimization, dependency caching, pipeline parameterization with Git tags, and orb usage for Git operations.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/docs/devops/ci-cd-testing-strategies",
-    "path": "devops/ci-cd-testing-strategies",
-    "section": "devops",
-    "tier": "recommended",
-    "slug": "ci-cd-testing-strategies",
-    "title": "CI/CD Testing Strategies with Git",
-    "summary": "Explore how to design efficient testing strategies in CI/CD pipelines using Git metadata, including PR vs push testing, matrix testing across branches, test parallelization, snapshot testing, and branch-based integration test environments.",
-    "suggestions": []
-  },
-  {
     "href": "/en/docs/devops/ci-cd-deployment-strategies",
     "path": "devops/ci-cd-deployment-strategies",
     "section": "devops",
@@ -2530,56 +1610,6 @@
     "suggestions": []
   },
   {
-    "href": "/en/docs/devops/vim-neovim-git",
-    "path": "devops/vim-neovim-git",
-    "section": "devops",
-    "tier": "recommended",
-    "slug": "vim-neovim-git",
-    "title": "Vim/Neovim Git Integration Guide",
-    "summary": "Complete guide to Git integration in Vim and Neovim, covering fugitive.vim, gitsigns.nvim, lazygit integration, and telescope Git extensions.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/docs/devops/intellij-git-deep",
-    "path": "devops/intellij-git-deep",
-    "section": "devops",
-    "tier": "recommended",
-    "slug": "intellij-git-deep",
-    "title": "IntelliJ IDEA Git Deep Dive",
-    "summary": "Go beyond basic JetBrains Git usage — master Annotate/Blame, Shelving vs Stashing, interactive rebase UI, conflict resolution, Changelists, and platform integrations.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/docs/devops/terminal-git-productivity",
-    "path": "devops/terminal-git-productivity",
-    "section": "devops",
-    "tier": "recommended",
-    "slug": "terminal-git-productivity",
-    "title": "Terminal Git Productivity",
-    "summary": "Supercharge your terminal Git workflow with aliases, shell completion, lazygit, tig, delta diff viewer, git-prompt customization, and git-branchless.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/security/secret-scanning",
-    "path": "security/secret-scanning",
-    "section": "security",
-    "tier": "recommended",
-    "slug": "secret-scanning",
-    "title": "Secret Scanning & Leak Prevention in Git",
-    "summary": "How secrets end up in Git, automated scanning with git-secrets, truffleHog, Gitleaks, platform-level detection, BFG cleanup, and pre-commit prevention.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/security/secure-git-workflows",
-    "path": "security/secure-git-workflows",
-    "section": "security",
-    "tier": "recommended",
-    "slug": "secure-git-workflows",
-    "title": "Secure Git Collaboration Workflows",
-    "summary": "Signed commits with GPG/SSH, verified commits on GitHub/GitLab, branch protection rules, required status checks, signed tags, and secure supply chain practices.",
-    "suggestions": []
-  },
-  {
     "href": "/en/security/git-security-audit",
     "path": "security/git-security-audit",
     "section": "security",
@@ -2587,56 +1617,6 @@
     "slug": "git-security-audit",
     "title": "Git Repository Security Audit",
     "summary": "Auditing Git repository access, git-fsck for integrity, scanning history for exposed secrets, audit logging with GitHub/GitLab, verifying author identities, and compliance considerations.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/migration/azure-devops-migration",
-    "path": "migration/azure-devops-migration",
-    "section": "migration",
-    "tier": "recommended",
-    "slug": "azure-devops-migration",
-    "title": "Azure DevOps (TFS) to Git Migration",
-    "summary": "A comprehensive guide for migrating from Team Foundation Server (TFS/TFVC) to Git, covering tool selection, history migration, branch mapping, and team transition strategies.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/migration/git-filter-repo",
-    "path": "migration/git-filter-repo",
-    "section": "migration",
-    "tier": "recommended",
-    "slug": "git-filter-repo",
-    "title": "git filter-repo Repository Rewriting Deep Dive",
-    "summary": "An in-depth look at git filter-repo, covering repository splitting, file cleanup, author info rewriting, and advanced usage compared to filter-branch and BFG.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/migration/migration-strategy-guide",
-    "path": "migration/migration-strategy-guide",
-    "section": "migration",
-    "tier": "recommended",
-    "slug": "migration-strategy-guide",
-    "title": "Repository Migration Strategy Guide",
-    "summary": "A complete migration framework covering assessment, trial, cutover, and transition phases, plus tool selection matrix, author mapping, history tradeoffs, and team communication plans.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/hosting/aws-codecommit",
-    "path": "hosting/aws-codecommit",
-    "section": "hosting",
-    "tier": "recommended",
-    "slug": "aws-codecommit",
-    "title": "AWS CodeCommit Integration Guide",
-    "summary": "AWS CodeCommit is a fully-managed Git repository service by AWS. This guide covers setup, authentication, CI/CD integration, and comparisons with other platforms.",
-    "suggestions": []
-  },
-  {
-    "href": "/en/hosting/gerrit-code-review",
-    "path": "hosting/gerrit-code-review",
-    "section": "hosting",
-    "tier": "recommended",
-    "slug": "gerrit-code-review",
-    "title": "Gerrit Code Review System",
-    "summary": "Gerrit is a Git-based code review system widely used by open-source projects like Android and OpenStack. This guide covers its unique workflow and review mechanisms.",
     "suggestions": []
   },
   {

@@ -1,17 +1,23 @@
 import type { MetadataRoute } from "next";
 
-import { getDocHref, getDocLastModified, getDocPaths, getLatestDocLastModified } from "@/lib/content";
+import { getDocHref, getDocLastModified, getDocPaths, getLatestDocLastModified, enOfflineDocPaths } from "@/lib/content";
 import { locales } from "@/lib/i18n";
 import { getSiteUrl } from "@/lib/site";
 
-function buildLocaleAlternates(siteUrl: string, pathname: string) {
-  return {
-    languages: {
-      "zh-CN": `${siteUrl}/zh${pathname}`,
-      en: `${siteUrl}/en${pathname}`,
-      "x-default": pathname ? `${siteUrl}${pathname}` : `${siteUrl}/`,
-    },
+function buildLocaleAlternates(
+  siteUrl: string,
+  pathname: string,
+  enOffline = false,
+) {
+  const languages: Record<string, string> = {
+    "zh-CN": `${siteUrl}/zh${pathname}`,
+    "x-default": pathname ? `${siteUrl}${pathname}` : `${siteUrl}/`,
   };
+  // EN counterpart archived → don't advertise an en alternate that 404s.
+  if (!enOffline) {
+    languages.en = `${siteUrl}/en${pathname}`;
+  }
+  return { languages };
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -144,7 +150,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: entry.priority,
     alternates:
       entry.pathname === "/" || entry.pathname.startsWith("/zh") || entry.pathname.startsWith("/en")
-        ? buildLocaleAlternates(siteUrl, entry.pathname === "/" ? "" : entry.pathname.replace(/^\/(zh|en)/, ""))
+        ? buildLocaleAlternates(
+            siteUrl,
+            entry.pathname === "/" ? "" : entry.pathname.replace(/^\/(zh|en)/, ""),
+            entry.pathname.startsWith("/zh/") &&
+              enOfflineDocPaths.has(entry.pathname.replace(/^\/zh\//, "")),
+          )
         : undefined,
   }));
 }

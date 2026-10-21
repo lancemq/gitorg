@@ -109,6 +109,22 @@ const docPathRegistry = extractQuotedStrings(
 );
 const registeredPaths = new Set(docPathRegistry);
 
+// EN docs in enOfflineDocPaths are archived under content/_archive/en/ and
+// intentionally absent from content/en/ — they must not fail validation.
+const enOfflineDocPaths = new Set(
+  extractQuotedStrings(
+    extractArrayBlock(
+      contentSource,
+      "export const enOfflineDocPaths: ReadonlySet<string> = new Set([",
+      "]);",
+    ),
+  ),
+);
+const expectedOnDisk = {
+  zh: new Set(docPathRegistry),
+  en: new Set(docPathRegistry.filter((docPath) => !enOfflineDocPaths.has(docPath))),
+};
+
 for (const duplicate of getDuplicateValues(docPathRegistry)) {
   errors.push(`docPathRegistry contains duplicate path: ${duplicate}`);
 }
@@ -117,7 +133,7 @@ for (const locale of locales) {
   const mdxPaths = await collectMdxPaths(locale);
   const mdxPathSet = new Set(mdxPaths);
 
-  for (const docPath of docPathRegistry) {
+  for (const docPath of expectedOnDisk[locale]) {
     if (!mdxPathSet.has(docPath)) {
       errors.push(`${locale}/${docPath}.mdx is registered but missing.`);
     }

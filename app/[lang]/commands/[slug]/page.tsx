@@ -46,7 +46,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return {};
   }
 
-  const doc = await getCommandDoc(locale, slug as CommandSlug);
+  let doc;
+  try {
+    doc = await getCommandDoc(locale, slug as CommandSlug);
+  } catch {
+    notFound();
+  }
 
   return buildPageMetadata({
     locale,
@@ -70,7 +75,12 @@ export default async function CommandPage({ params }: Props) {
   }
 
   const commandSlug = slug as CommandSlug;
-  const doc = await getCommandDoc(locale, commandSlug);
+  let doc;
+  try {
+    doc = await getCommandDoc(locale, commandSlug);
+  } catch {
+    notFound();
+  }
   const docPath = `commands/${commandSlug}` as const;
   const [neighbors, lastModified] = await Promise.all([
     getDocNeighbors(locale, docPath),

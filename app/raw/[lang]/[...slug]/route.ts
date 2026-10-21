@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-import { docPathRegistry, type DocPath } from "@/lib/content";
+import { docPathRegistry, enOfflineDocPaths, type DocPath } from "@/lib/content";
 import { isValidLocale, type Locale } from "@/lib/i18n";
 
 /**
@@ -33,7 +33,12 @@ type RouteParams = {
 export async function generateStaticParams() {
   const params: Array<{ lang: Locale; slug: string[] }> = [];
   for (const lang of ["zh", "en"] as const) {
-    for (const docPath of docPathRegistry) {
+    // EN offline docs are archived away — skip prerendering their raw pages.
+    const paths =
+      lang === "en"
+        ? docPathRegistry.filter((docPath) => !enOfflineDocPaths.has(docPath))
+        : docPathRegistry;
+    for (const docPath of paths) {
       params.push({ lang, slug: docPath.split("/") });
     }
   }
@@ -49,6 +54,9 @@ export async function GET(_req: Request, { params }: RouteParams) {
 
   const docPath = slug.join("/");
   if (!docPathSet.has(docPath)) {
+    return new Response("Not found", { status: 404 });
+  }
+  if (lang === "en" && enOfflineDocPaths.has(docPath)) {
     return new Response("Not found", { status: 404 });
   }
 

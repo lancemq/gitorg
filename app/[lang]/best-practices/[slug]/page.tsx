@@ -37,7 +37,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const locale = lang as Locale;
-  const doc = await getDocByPath(locale, getBestPracticePath(slug));
+  let doc;
+  try {
+    doc = await getDocByPath(locale, getBestPracticePath(slug));
+  } catch {
+    notFound();
+  }
 
   return buildPageMetadata({
     locale,
