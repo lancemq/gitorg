@@ -5,15 +5,11 @@ import {
   buildWorkflowNavItem,
   buildCommandNavItem,
   buildBestPracticeNavItem,
-  buildInternalsNavItem,
   buildRecoveryNavItem,
-  buildPlatformsNavItem,
-  buildDevopsNavItem,
-  buildSecurityNavItem,
-  buildPerformanceNavItem,
-  buildMigrationNavItem,
-  buildHostingNavItem,
-  buildConceptsNavItem,
+  buildInternalsConceptsNavItem,
+  buildPlatformsDevopsNavItem,
+  buildSecurityPerformanceNavItem,
+  buildMigrationHostingNavItem,
 } from "./index";
 import { commandSlugs } from "./slugs";
 
@@ -37,25 +33,16 @@ export const enDictionary: Dictionary = {
           title: "Topics",
           items: [
             buildBestPracticeNavItem("en", activePath),
-            buildInternalsNavItem("en", activePath),
-            buildPlatformsNavItem("en", activePath),
-            buildDevopsNavItem("en", activePath),
-            buildSecurityNavItem("en", activePath),
-            buildPerformanceNavItem("en", activePath),
-            buildMigrationNavItem("en", activePath),
-            buildHostingNavItem("en", activePath),
-            buildConceptsNavItem("en", activePath),
+            buildInternalsConceptsNavItem("en", activePath),
+            buildPlatformsDevopsNavItem("en", activePath),
+            buildSecurityPerformanceNavItem("en", activePath),
+            buildMigrationHostingNavItem("en", activePath),
             buildRecoveryNavItem("en", activePath),
           ],
         },
         {
           title: "Resources",
           items: [
-            {
-              label: "Git History",
-              href: "/en/history",
-              active: activePath === "concepts/git-history",
-            },
             {
               label: "Changelog",
               href: "/en/updates",

@@ -5,15 +5,11 @@ import {
   buildWorkflowNavItem,
   buildCommandNavItem,
   buildBestPracticeNavItem,
-  buildInternalsNavItem,
   buildRecoveryNavItem,
-  buildPlatformsNavItem,
-  buildDevopsNavItem,
-  buildSecurityNavItem,
-  buildPerformanceNavItem,
-  buildMigrationNavItem,
-  buildHostingNavItem,
-  buildConceptsNavItem,
+  buildInternalsConceptsNavItem,
+  buildPlatformsDevopsNavItem,
+  buildSecurityPerformanceNavItem,
+  buildMigrationHostingNavItem,
 } from "./index";
 import { commandSlugs } from "./slugs";
 
@@ -37,25 +33,16 @@ export const zhDictionary: Dictionary = {
           title: "Topics",
           items: [
             buildBestPracticeNavItem("zh", activePath),
-            buildInternalsNavItem("zh", activePath),
-            buildPlatformsNavItem("zh", activePath),
-            buildDevopsNavItem("zh", activePath),
-            buildSecurityNavItem("zh", activePath),
-            buildPerformanceNavItem("zh", activePath),
-            buildMigrationNavItem("zh", activePath),
-            buildHostingNavItem("zh", activePath),
-            buildConceptsNavItem("zh", activePath),
+            buildInternalsConceptsNavItem("zh", activePath),
+            buildPlatformsDevopsNavItem("zh", activePath),
+            buildSecurityPerformanceNavItem("zh", activePath),
+            buildMigrationHostingNavItem("zh", activePath),
             buildRecoveryNavItem("zh", activePath),
           ],
         },
         {
           title: "Resources",
           items: [
-            {
-              label: "Git 历史",
-              href: "/zh/history",
-              active: activePath === "concepts/git-history",
-            },
             {
               label: "更新日志",
               href: "/zh/updates",

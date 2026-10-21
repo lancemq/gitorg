@@ -458,6 +458,50 @@ export function buildConceptsNavItem(locale: Locale, activePath?: string): NavIt
   };
 }
 
+function mergeNavItems(
+  primary: NavItem,
+  secondary: NavItem,
+  label: string,
+): NavItem {
+  return {
+    label,
+    href: primary.href,
+    active: primary.active || secondary.active,
+  };
+}
+
+export function buildInternalsConceptsNavItem(locale: Locale, activePath?: string): NavItem {
+  return mergeNavItems(
+    buildInternalsNavItem(locale, activePath),
+    buildConceptsNavItem(locale, activePath),
+    locale === "zh" ? "原理与概念" : "Internals & Concepts",
+  );
+}
+
+export function buildPlatformsDevopsNavItem(locale: Locale, activePath?: string): NavItem {
+  return mergeNavItems(
+    buildPlatformsNavItem(locale, activePath),
+    buildDevopsNavItem(locale, activePath),
+    locale === "zh" ? "平台与 DevOps" : "Platforms & DevOps",
+  );
+}
+
+export function buildSecurityPerformanceNavItem(locale: Locale, activePath?: string): NavItem {
+  return mergeNavItems(
+    buildSecurityNavItem(locale, activePath),
+    buildPerformanceNavItem(locale, activePath),
+    locale === "zh" ? "安全与性能" : "Security & Performance",
+  );
+}
+
+export function buildMigrationHostingNavItem(locale: Locale, activePath?: string): NavItem {
+  return mergeNavItems(
+    buildMigrationNavItem(locale, activePath),
+    buildHostingNavItem(locale, activePath),
+    locale === "zh" ? "迁移与托管" : "Migration & Hosting",
+  );
+}
+
 export function buildLearningPathNavItem(locale: Locale, activePath?: string): NavItem {
   const parentActive = learningPathSlugs.some((slug) => activePath === `learning-path/${slug}`);
 
