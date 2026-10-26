@@ -90,15 +90,6 @@ git verify-pack -v .git/objects/pack/pack-*.idx
 - 输出中带有 `chain depth` 的是 delta 对象，depth 为 0 表示基础对象，值越大说明 delta 链越深。
 - 它更适合验证 pack 文件完整性和分析，不是日常协作主流程；输出里关注对象大小、delta 链和偏移关系会更有价值。
 
-
-## 给你的练习
-
-1. 不看正文，凭记忆在测试仓库里完成`git verify-pack`的主流程，再对照正文找漏掉的步骤
-2. 针对文中提到的风险场景做一次演练，记录你实际遇到的输出和正文的差异
-3. 下次团队里有人踩到 git verify-pack 相关的坑，试着用这篇的内容帮他排查一次
-
-{/* internal-links:auto */}
-
 ## 延伸阅读
 
 沿着同一主题继续深入：

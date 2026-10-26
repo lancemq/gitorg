@@ -151,24 +151,6 @@ git log --oneline -5
 <WarningBox title="Do not use commits as a dumping ground">
   <p>If the commit message sounds vague because the change set is vague, the usual fix is not a better sentence. The usual fix is splitting the commit.</p>
 </WarningBox>
-
-## Try it yourself
-
-<PracticeLab
-  title="Exercise: compare a messy commit with a clean one"
-  intro="This helps you see why staging and commit messages matter together."
-  setupLabel="Setup"
-  setup={`git switch -c lab/commit-demo\n# make one real fix and one unrelated cleanup`}
-  stepsLabel="Try it"
-  steps="Stage everything and imagine the resulting commit message.|Reset the index, then stage only the real fix.|Create a focused commit.|Stage the cleanup separately and write a second message."
-  outcomesLabel="What happens next"
-  outcomes="You can compare one mixed commit with two focused commits.|The branch history becomes easier to review.|Future revert or cherry-pick actions become safer because each commit has one job."
-  mistakesLabel="Common mistake checks"
-  mistakes="If you amend after pushing, make sure you understand whether the branch is shared.|If the message feels generic, inspect whether the staged diff is too broad.|If you are unsure what will be committed, run `git diff --staged` before committing."
-/>
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

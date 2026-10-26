@@ -132,24 +132,6 @@ External contribution feels much smoother when maintainers and contributors both
 <WarningBox title="Do not assume CI parity across forks">
   <p>Some GitLab setups intentionally limit variables, runners, or sensitive jobs for fork-based pipelines. Treat that as a security boundary, not a bug.</p>
 </WarningBox>
-
-## Try it yourself
-
-<PracticeLab
-  title="Exercise: rehearse a clean fork-to-MR flow"
-  intro="The goal is to practice contribution with the right mental model for upstream ownership and sync."
-  setupLabel="Setup"
-  setup={`Fork a small GitLab project.\nClone your fork locally.\nAdd the original repository as \`upstream\`.`}
-  stepsLabel="Try it"
-  steps="Fetch from upstream and sync your local main branch.|Create a feature branch in your fork.|Make a small change and push it to your fork.|Open a merge request to the upstream project.|Check whether the MR and pipeline behavior differ from internal branch workflows."
-  outcomesLabel="What happens next"
-  outcomes="You learn which repository owns the contribution and which one owns the final merge.|You get practice keeping the fork synchronized before review.|You see GitLab's permission and CI boundaries in a real contribution flow."
-  mistakesLabel="Common mistake checks"
-  mistakes="If the MR diff is unexpectedly large, your fork may be stale relative to upstream.|If CI behaves differently from an internal branch, inspect fork restrictions before drawing conclusions.|If you lose track of remotes, verify `origin` versus `upstream` before pushing."
-/>
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

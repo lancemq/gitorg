@@ -105,15 +105,6 @@ Bundle is better for batch snapshots than high-frequency bidirectional collabora
 - Use `git bundle verify <file>` to check whether a bundle is complete and can be applied to the current repository.
 - A bundle created with `--all` includes all refs, but you can limit the scope to specific branches or commit ranges for smaller files.
 - The receiving repository must already contain any prerequisite commits referenced by the bundle; otherwise, you need to transfer those first.
-
-## Try it yourself
-
-1. Run the core usage of `git bundle` in a test repository, checking `git status` and `git log` before and after every step
-2. Deliberately trigger one of the mistakes described in the article (see the "Common mistakes" section), then recover following the article's steps
-3. Write a five-bullet note on when git bundle applies and when it doesn't, and add it to your team wiki
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

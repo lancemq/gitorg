@@ -239,13 +239,6 @@ curl -H "Authorization: token YOUR_TOKEN" https://api.github.com/user/keys
 <WarningBox title="私钥文件权限也要锁死">
   确保 `~/.ssh` 目录权限为 `700`、私钥为 `600`（`chmod 600 ~/.ssh/id_ed25519`）。权限过宽时 SSH 客户端会直接拒绝使用密钥，甚至把明文暴露给同机其他用户。
 </WarningBox>
-
-## 给你的练习
-
-1. 生成一对 Ed25519 密钥并配置到 GitHub，然后执行一次 `git push` 确认不再需要输入密码
-2. 如果你的公司也在用 Git 平台，配置第二个密钥并在 `~/.ssh/config` 中做区分
-3. 查看 GitHub 上当前有哪些已授权的 SSH 密钥，检查是否有不认识的项目
-
 ## 继续学习建议
 
 1. `best-practices/security-with-git` — Git 安全最佳实践

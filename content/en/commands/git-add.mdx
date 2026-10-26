@@ -160,24 +160,6 @@ That is exactly what the index is for.
 <WarningBox title="Do not confuse staging with backup">
   <p>Staging content does not publish it anywhere. It only changes the local index. If you need a recovery point, create a commit or a stash rather than assuming staged changes are “safe enough”.</p>
 </WarningBox>
-
-## Try it yourself
-
-<PracticeLab
-  title="Exercise: create one clean commit from a messy edit session"
-  intro="This exercise helps you feel the difference between the working tree and the index."
-  setupLabel="Setup"
-  setup={`git switch -c lab/add-demo\n# edit one file with both a real fix and a temporary debug line`}
-  stepsLabel="Try it"
-  steps="Run `git diff` to see all edits.|Run `git add --patch` and stage only the real fix.|Run `git diff --staged` and confirm the staged change is clean.|Leave the debug line unstaged and create the commit."
-  outcomesLabel="What happens next"
-  outcomes="The commit contains only the staged change.|The working tree can still keep extra unstaged edits.|You end up with cleaner history without losing the unfinished work."
-  mistakesLabel="Common mistake checks"
-  mistakes="If `git diff` looks empty, check `git diff --staged` because the change may already be in the index.|If your commit still contains mixed work, you probably staged too broadly.|If you resolved a conflict, remember that the resolution is not complete until the file is staged."
-/>
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

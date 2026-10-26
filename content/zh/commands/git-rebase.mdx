@@ -294,15 +294,6 @@ git checkout -b rescue/rebase HEAD@{1}
   mistakesLabel="常见错误判断"
   mistakes="如果这条分支已经被同事基于其继续开发，就不该直接 rebase 后强推。|如果 rebase 一半发现不对，不要继续乱试，先用 `git rebase --abort` 或 `git reflog` 找回原位置。|如果你只是想把别人改动合进来而不改写自己的共享历史，merge 往往更合适。"
 />
-
-## 给你的练习
-
-1. 在实验分支上用 `git rebase -i HEAD~4` 把 4 个零碎提交压成 2 个逻辑块，再用 `git log --oneline` 确认历史更清晰。
-2. 故意在 rebase 中途制造一次冲突，完整走一遍 `git status → 解决 → git add → git rebase --continue`，再试一次 `git rebase --abort` 看区别。
-3. 把一次 rebase 后的分支推送到远端，分别用 `git push --force` 与 `git push --force-with-lease` 体会后者为何更安全（建议在备份分支上试）。
-
-{/* internal-links:auto */}
-
 ## 延伸阅读
 
 沿着同一主题继续深入：

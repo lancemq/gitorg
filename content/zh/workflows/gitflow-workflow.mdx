@@ -378,15 +378,6 @@ Atlassian 现在明确提醒：Gitflow 在现代持续软件开发里已经没�
 1. [`release branch workflow`](/zh/workflows/release-branch-workflow)
 2. [`hotfix and urgent fixes`](/zh/workflows/hotfix-and-urgent-fixes)
 3. [`shared-branch-sync-boundaries`](/zh/workflows/shared-branch-sync-boundaries)
-
-## 给你的练习
-
-1. **搭一套最小 Gitflow 骨架**：在测试仓库里 `git switch main` 后 `git branch develop` 并 `git push -u origin develop`，再切出 `feature/login-audit` 提交两次，最后 merge 回 `develop`，确认 `main` 始终没被直接碰。
-2. **故意漏一次回流，看后果**：从 `develop` 切 `release/2.4.0`，在里面修一个 bug 并合并回 `main` + 打 tag，但故意忘了合回 `develop`；再在 `develop` 上新建功能分支，用 `git log` 确认这个修复没有进入后续开发线。
-3. **用最近一次真实发布做复盘**：画出你们团队"功能开发 / 发布准备 / 线上修复"三条线，对照文章里的四个误区，判断 Gitflow 是真的解决你们的痛点，还是你们其实更需要更轻的流程。
-
-{/* internal-links:auto */}
-
 ## 延伸阅读
 
 沿着同一主题继续深入：

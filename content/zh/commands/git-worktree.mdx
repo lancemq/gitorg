@@ -310,15 +310,6 @@ git branch -D experiment-xyz
 - 删除 worktree 目录后，需要用 `git worktree prune` 清理残留的 worktree 元数据。
 - worktree 中的未提交改动属于各自独立的工作区，不会互相影响，但都存储在同一个对象数据库中。
 
-
-## 给你的练习
-
-1. 在测试仓库里把`git worktree`的核心用法完整跑一遍，每一步前后用 `git status` 和 `git log` 对照状态变化
-2. 故意制造一次文中提到的典型失误（参考「常见误区」一节），再按正文思路把现场恢复回去
-3. 把 git worktree 的"适用 / 不适用"场景写成不超过 5 条的笔记，放进你的团队 Wiki
-
-{/* internal-links:auto */}
-
 ## 延伸阅读
 
 沿着同一主题继续深入：

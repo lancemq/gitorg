@@ -153,24 +153,6 @@ But blind `--force` ignores whether the remote has moved since you last checked.
 <WarningBox title="Shared branches change the risk model">
   <p>Once the target branch is used by teammates, CI, or deployment, push is no longer only your local action. It becomes part of system coordination.</p>
 </WarningBox>
-
-## Try it yourself
-
-<PracticeLab
-  title="Exercise: publish a feature branch and inspect the upstream relationship"
-  intro="The goal is to understand the difference between first publication, later updates, and risky rewrites."
-  setupLabel="Setup"
-  setup={`git switch -c lab/push-demo\n# create one or two local commits`}
-  stepsLabel="Try it"
-  steps="Run `git push -u origin lab/push-demo` on a throwaway branch.|Inspect `git status` and notice the upstream relationship.|Add another commit and run `git push` again.|Then ask what would change if you had rewritten local history before the second push."
-  outcomesLabel="What happens next"
-  outcomes="You learn what first-time publication does differently from later updates.|You see how upstream tracking simplifies normal sync flow.|You build a stronger intuition for when a later push would become a rewrite decision."
-  mistakesLabel="Common mistake checks"
-  mistakes="Verify the remote and branch before publishing if multiple remotes exist.|Do not use force to fix unclear local history unless you have checked the remote impact.|If a push is rejected, confirm whether the issue is auth, protection, or non-fast-forward history."
-/>
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

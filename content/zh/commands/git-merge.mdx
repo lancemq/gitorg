@@ -201,13 +201,6 @@ git merge --abort
   mistakes="如果你以为 merge commit 一定是“脏历史”，往往忽略了它保留协作过程的价值。|遇到冲突时不要只问“哪个文件该保留”，还要问“这次整合想保留哪种历史关系”。|如果团队已经要求线性历史，就要先确认平台合并策略。"
 />
 
-
-## 给你的练习
-
-1. **观察两种结果**：在一个测试仓库里，先让 `main` 和 `feature` 不分叉，执行 `git merge feature` 看它是否 fast-forward；再制造分叉后执行 `git merge feature`，用 `git log --oneline --graph --decorate -8` 确认出现了 merge commit。
-2. **对比策略开关**：在同一个分叉场景下分别用 `git merge --ff-only feature`（应当失败）和 `git merge --no-ff feature`（强制产生 merge commit），体会两者表达的历史语义差异。
-3. **安全地练习冲突**：故意让 main 和 feature 修改同一行，触发冲突后用 `git status` 定位、`git merge --abort` 撤掉，再换一种策略重试，直到你能从容区分"保留哪一侧历史"而不是"保留哪几行"。
-
 ## 继续学习建议
 
 如果你已经理解 merge，下一步建议连着学：

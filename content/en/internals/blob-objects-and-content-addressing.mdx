@@ -233,15 +233,6 @@ It pairs especially well with:
 - `git ls-tree`
 - `git show`
 - `git rev-parse`
-
-## Try it yourself
-
-1. In an empty repo, use `git hash-object --stdin -w` to store `README.md` content, then read it back with `git cat-file -p` and confirm you see the raw bytes
-2. Change one character on purpose, run `git hash-object --stdin` again, and compare why the hash changed
-3. With `git ls-tree $(git write-tree)`, inspect a "two files, same content, different names" scenario and a "content same, names different" scenario to see blob reuse
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

@@ -173,15 +173,6 @@ That last step is often enough to catch accidental noise:
 ```bash
 git diff --staged
 ```
-
-## Try it yourself
-
-1. **Practice split staging**: make two unrelated changes in one file (say a bugfix plus a stray formatting tweak), then use `git add --patch` to stage only the bugfix, commit it, and leave the rest for a second commit.
-2. **Adopt the three-question habit**: make three commits in a row, and before each one ask yourself whether it has a one-sentence summary, is safe to revert alone, and is understandable on its own. Re-split any commit that fails two of the three.
-3. **Rewrite a weak message**: find one of your past commits and rewrite its body into the action + motivation structure using `git commit --amend` or an interactive reword, then compare the reviewer's cost before and after.
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

@@ -213,15 +213,6 @@ ls .git/objects/b6/    # 看到 fc4c620b67d95f953a5c1c1230aaab5db5a1b0 这个目
 如果只记一句话，可以记：
 
 **blob 只回答“内容是什么”，从来不回答“它叫什么、放在哪里”。**
-
-## 给你的练习
-
-1. 在空仓库里用 `git hash-object --stdin -w` 写入 `README.md` 内容，再用 `git cat-file -p` 读回来，确认看到的就是原始字节
-2. 故意把内容改一个字符，`git hash-object --stdin` 再算一次，对比哈希为什么变了
-3. 用 `git ls-tree $(git write-tree)` 在「两个同名内容不同」和「内容相同名字不同」两种场景里，观察 blob 哈希是否复用
-
-{/* internal-links:auto */}
-
 ## 延伸阅读
 
 沿着同一主题继续深入：

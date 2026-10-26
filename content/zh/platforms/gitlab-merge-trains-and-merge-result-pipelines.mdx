@@ -87,15 +87,6 @@ test:
 1. [`merge queue workflow`](/zh/workflows/merge-queue-workflow)
 2. [`gitlab ci and runners`](/zh/platforms/gitlab-ci-and-runners)
 3. [`sync before review`](/zh/workflows/sync-before-review)
-
-## 给你的练习
-
-1. 在一个测试项目里开启 merged result pipeline + merge train，故意制造两条会冲突的 MR，观察它们如何进入 train 队列而不是各自合入。
-2. 在 `.gitlab-ci.yml` 里用 `$CI_MERGE_REQUEST_ID` 规则改写一条现有流水线，对比“只在源分支跑”和“在合并结果上跑”的输出差异。
-3. 让队列中某个 MR 的 train 流水线失败，记录后面 MR 被移出队列的行为，并练习从失败处重跑。
-
-{/* internal-links:auto */}
-
 ## 延伸阅读
 
 沿着同一主题继续深入：

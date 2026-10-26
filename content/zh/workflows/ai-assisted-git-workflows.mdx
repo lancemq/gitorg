@@ -157,13 +157,6 @@ AI 的风险比人类更高：AI 可能为了「修」某个东西读到密钥�
 - 一个排除 AI 工具状态和密钥的 `.gitignore`。
 - 每次提交前读 `git diff --staged` 的习惯。
 - `push.default = simple` 加上一条团队规则：只用 `--force-with-lease`。
-
-## 给你的练习
-
-1. 建一个临时分支，让 AI 工具做三个独立逻辑改动，分别用自己写的提交信息提交——练习拆分 AI 产出。
-2. 让 AI 改写历史（`rebase -i` squash），然后用 `git reflog` 和 `git reset --hard HEAD@{1}` 撤销。
-3. 用 `git add -p` 暂存改动，故意包含一行你不想要的，练习只把那一行取消暂存。
-
 ## 延伸阅读
 
 沿着同一主题继续深入：

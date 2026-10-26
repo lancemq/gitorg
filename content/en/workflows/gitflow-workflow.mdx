@@ -379,15 +379,6 @@ Gitflow is basically those workflows combined into a heavier, more opinionated r
 1. [`release branch workflow`](/en/workflows/release-branch-workflow)
 2. [`hotfix and urgent fixes`](/en/workflows/hotfix-and-urgent-fixes)
 3. [`shared-branch-sync-boundaries`](/en/workflows/shared-branch-sync-boundaries)
-
-## Try it yourself
-
-1. **Build a minimal Gitflow skeleton**: from `main`, run `git branch develop` and `git push -u origin develop`, then cut `feature/login-audit`, commit twice, and merge it back into `develop` — confirming `main` was never touched directly.
-2. **Skip a back-merge on purpose and see the cost**: cut `release/2.4.0` from `develop`, fix a bug, merge it into `main` and tag, but deliberately forget to merge back into `develop`. Then create a new feature branch and use `git log` to confirm the fix never reached the active development line.
-3. **Retro your last real release**: draw the three streams — feature work, release prep, production fixes — and check them against the four common mistakes to decide whether Gitflow solves your pain or whether you really need a lighter model.
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

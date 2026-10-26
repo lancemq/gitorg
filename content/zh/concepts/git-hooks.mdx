@@ -456,13 +456,6 @@ fi
 3. **钩子脚本的解释器**：第一行的 shebang（如 `#!/bin/bash`）决定使用哪个解释器
 4. **Windows 兼容性**：Windows 上 `.sh` 文件可能无法直接运行，考虑使用 Node.js 脚本或 `.bat` 文件
 5. **钩子不在版本控制中**：除非使用 Husky 等工具，否则 `.git/hooks/` 不会被 `git clone`
-
-## 给你的练习
-
-1. 在测试仓库里启用 `pre-commit`：去掉 `.git/hooks/pre-commit.sample` 后缀，写一个检查 `git diff --cached` 是否包含 `.env` 的脚本，加执行权限后故意提交 `.env`，确认被中断。
-2. 用 `git rev-parse --abbrev-ref HEAD` 写一个 `post-commit` 钩子，在 `release` 分支自动打版本号（参考本文第 4 个场景），并用 `git log` 观察效果。
-3. 用 Husky + lint-staged 把 `pre-commit` 接入版本控制：配置 `lint-staged` 只对暂存区的 `*.js` 跑 ESLint，然后模拟一次提交验证钩子随仓库 clone 后仍然生效。
-
 ## 继续学习建议
 
 1. [`git lfs`](/zh/concepts/git-lfs) —— 大文件管理

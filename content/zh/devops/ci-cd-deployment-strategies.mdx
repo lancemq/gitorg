@@ -268,13 +268,6 @@ graph TD
 <WarningBox title="共享分支上不要用 git reset + force push 回滚">
   回滚决策树里那一支"reset + force push"只适用于你完全私有的分支。在 `main` 这类被多人依赖的分支上，它会改写公共历史，让协作者已有的提交"消失"并可能引发混乱。公开分支的回滚首选 `git revert`——它用一个新的反向提交抵消变更，不破坏任何人的历史。
 </WarningBox>
-
-## 给你的练习
-
-1. 在一个测试仓库打一个 `v0.1.0` 标签并 push，写一条 GitHub Actions 工作流：只在 `tags: v*` 时触发部署，并用 `git describe` 计算完整版本号。
-2. 用 GitLab CI 搭一个三阶段晋升流水线（dev / staging / prod），让 prod 阶段 `when: manual`，亲自体验"发布需要人工确认"这道闸门。
-3. 故意往 main 推一个"坏提交"，然后用 `git revert` 生成一个反向提交并 push，对比它与 `git reset --hard` + force push 在共享分支上的安全性差异。
-
 ## 继续学习建议
 
 1. `ci-cd/ci-cd-testing-strategies` — CI/CD 测试策略与 Git 集成

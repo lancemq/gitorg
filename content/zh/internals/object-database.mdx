@@ -204,15 +204,6 @@ git cat-file -p <blob-sha>
 4. branch 和 HEAD 只是指向这些对象的名字
 
 后面理解 refs、历史图、rebase、reset 就会容易很多。
-
-## 给你的练习
-
-1. **亲眼看到对象**：在一个仓库里改一个文件并提交，`git cat-file -t HEAD` 确认它是 commit，`git cat-file -p HEAD` 看它指向的 tree，再 `git cat-file -p <tree-sha>` 看它指向的 blob，顺着哈希把"commit → tree → blob"这条链走通一遍。
-2. **验证内容寻址**：把同一段内容放到两个不同路径的文件里分别提交，用 `git rev-parse :<path>` 确认它们最终指向同一个 blob 哈希——内容一样，哈希就一样。
-3. **观察 branch 的轻量本质**：`git branch tmp` 后 `git cat-file -t tmp`，确认它只是一个指向已有 commit 的引用；再 `git log --oneline --all --graph` 看分支指针如何移动而不复制任何对象。
-
-{/* internal-links:auto */}
-
 ## 延伸阅读
 
 沿着同一主题继续深入：

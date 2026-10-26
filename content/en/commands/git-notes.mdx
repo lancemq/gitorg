@@ -123,15 +123,6 @@ Unstructured notes quickly become noisy and hard to trust.
 - Because notes don't change commit hashes, they are safe to add to shared/published commits — no history rewrite is involved.
 - `git log --show-notes` displays notes inline with commit messages. Without this flag, notes are hidden from normal log output.
 - Removing notes requires `git notes remove` or direct manipulation of the notes ref. Accidentally deleting notes is recoverable via reflog.
-
-## Try it yourself
-
-1. Walk through `git notes` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
-2. Run a comparison experiment between git notes and its most easily confused neighbor command, recording the difference with `git log --graph`
-3. Write a three-sentence summary of the single most important safety boundary of git notes
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

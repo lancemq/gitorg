@@ -238,22 +238,6 @@ git worktree add ../repo-agent-review review/fix-copy
 git worktree add ../repo-agent-hotfix hotfix/login-timeout
 git worktree remove ../repo-agent-review
 ```
-
-## Try it yourself
-
-<PracticeLab
-  title="Exercise: open separate worktrees for implementation, review, and hotfix"
-  intro="The value of this exercise is not memorizing the command. It is feeling how much calmer agent collaboration becomes when each task gets its own directory."
-  setupLabel="Setup"
-  setup={`git status\n# confirm the repository is healthy\n# assume you have feature, review, and hotfix style tasks`}
-  stepsLabel="Try it"
-  steps="Keep the current directory for the main task.|Run `git worktree add ../repo-agent-review review/fix-copy` for a review context.|Run `git worktree add ../repo-agent-hotfix hotfix/login-timeout` for an urgent-fix context.|Enter each directory and compare `git status` plus `git branch -vv`."
-  outcomesLabel="What happens next"
-  outcomes="You get multiple independent working directories backed by the same Git object database.|Each directory can stay attached to a different task and branch.|The main workspace no longer has to survive repeated stash and switch cycles."
-  mistakesLabel="Common mistake checks"
-  mistakes="Do not keep unrelated tasks inside one worktree just because it already exists.|Do not forget to remove finished worktrees.|If you are about to run a risky history rewrite, putting it in a separate worktree is often safer than experimenting in the main task directory."
-/>
-
 ## What to read next
 
 Recommended follow-ups:

@@ -112,15 +112,6 @@ Small metadata mistakes create large review friction.
 - The URL you provide should point to a repository the maintainer can actually fetch from; otherwise the summary is not actionable.
 - If the base ref does not exist in the target repository, the summary may describe changes the maintainer cannot apply cleanly.
 - `request-pull` verifies that the specified commits are reachable from your repository before generating the summary, catching mismatches early.
-
-## Try it yourself
-
-1. Walk through `git request-pull` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
-2. Run a comparison experiment between git request-pull and its most easily confused neighbor command, recording the difference with `git log --graph`
-3. Write a three-sentence summary of the single most important safety boundary of git request-pull
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

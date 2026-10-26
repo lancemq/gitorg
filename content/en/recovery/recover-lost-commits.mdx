@@ -430,13 +430,6 @@ Commit "lost"?
   cherry-pick
   or merge
 ```
-
-## Try it yourself
-
-1. **Cause an over-reset and rescue it**: make five commits, then `git reset --hard HEAD~3` to "lose" the middle three. Use `git reflog` to find the pre-reset position and `git branch recovered/reset-demo <sha>` to catch it — prefer a branch over `reset --hard` straight back, it is safer.
-2. **Lose a detached HEAD commit**: `git checkout <old-sha>`, commit once, switch back to `main`, then use `git reflog` to find the nameless commit and `git cherry-pick` it back onto `main`.
-3. **Drill the fsck fallback**: run `git reflog expire --expire=now --all` to wipe the reflog, then `git fsck --lost-found` to surface the dangling commit — feel how fsck is the last net once the reflog is gone.
-
 ## One rule that saves commits
 
 As long as the object is still there, the reflog has not expired, and you have not run `git gc --prune=now` — **almost every "lost" commit can still be recovered. Do not panic, run `git reflog` first.**

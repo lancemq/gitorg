@@ -87,15 +87,6 @@ Treat it as a read-only inspection tool first, then move to write-oriented usage
 - The real risk in plumbing commands is not just that they can fail, but that they can successfully perform the wrong low-level action.
 - Before running `git cat-file` in a real repo, test it in a tiny disposable repository and verify whether a safer porcelain command would do the job.
 - If arguments contain refs, trees, index paths, or raw object IDs, inspect those inputs independently before performing writes.
-
-## Try it yourself
-
-1. Walk through `git cat-file` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
-2. Run a comparison experiment between git cat-file and its most easily confused neighbor command, recording the difference with `git log --graph`
-3. Write a three-sentence summary of the single most important safety boundary of git cat-file
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

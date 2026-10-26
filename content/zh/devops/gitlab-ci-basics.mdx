@@ -184,13 +184,6 @@ variables:
 2. **Review Apps**：每次 MR 自动创建预览环境
 3. **Merge Trains**：自动排序 MR 并验证合并结果
 4. **GitLab Pages**：直接从 CI 部署静态站点
-
-## 给你的练习
-
-1. 在一个测试仓库根目录写一份最小 `.gitlab-ci.yml`（一个 `build` 阶段跑 `npm ci && npm test`），push 后观察流水线自动触发。
-2. 给同一份配置加上 `workflow: rules`，让 `main` 走生产变量、`develop` 走预发变量，验证不同分支注入的变量确实不同。
-3. 故意把 `GIT_DEPTH` 设得很小（如 `5`），然后在一个超过该深度的老提交上跑依赖上一次提交的脚本，观察"历史不够长"会如何破坏构建。
-
 ## 继续学习建议
 
 1. `gitlab/gitlab-ci-and-runners` — GitLab CI 与 Runner 详解

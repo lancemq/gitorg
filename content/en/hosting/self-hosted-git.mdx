@@ -185,13 +185,6 @@ git clone --mirror <url> backup.git
 <TipBox title={"Self-hosting is not “zero-ops” — make sure someone can own it"}>
   Every option here says "needs dedicated maintenance." Before choosing, ask: who upgrades, who handles a 3am outage, has the backup ever been tested? Many teams overestimate "free" and underestimate "nobody understands it when it breaks." If you have no dedicated ops, starting on a hosted platform is usually safer.
 </TipBox>
-
-## Try it yourself
-
-1. Use the same `docker-compose.yml` to launch both Gitea and GitLab CE; compare first-boot time, memory, and initial setup complexity, and record your experience.
-2. Back up the running Gitea with `rsync`, delete its data directory, restore from backup, and verify repos and issues recover.
-3. Draw your team's "selection decision table" (size, need for built-in CI, compliance level), apply the article's recommendation, and write how you'd adjust if the team doubles in six months.
-
 ## Continue Learning
 
 1. `hosting/platform-comparison` — Platform comparison

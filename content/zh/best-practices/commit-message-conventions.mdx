@@ -114,15 +114,6 @@ $ git bisect start <bad> <good>
 1. [`commit hygiene`](/zh/best-practices/commit-hygiene)
 2. [`prepare commits before pull request`](/zh/workflows/prepare-commits-before-pull-request)
 3. [`small batch review`](/zh/best-practices/small-batch-review)
-
-## 给你的练习
-
-1. 把你最近一个项目的 5 条历史 commit 改成 Conventional Commits 格式（`type(scope): summary` + 正文写原因），对比改写前后 `git log --oneline` 的可读性。
-2. 故意把一个“修登录”和一个“改文档错别字”的改动分两次提交，然后用 `git bisect` 模拟定位，体会单关注点 commit 的优势。
-3. 在团队里评审一条 `fix: 修bug` 类的 message，按本文模板给出改写建议，并说明为什么 scope 和原因缺一不可。
-
-{/* internal-links:auto */}
-
 ## 延伸阅读
 
 沿着同一主题继续深入：

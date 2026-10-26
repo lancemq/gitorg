@@ -88,15 +88,6 @@ Rehearse the flow on a small reproducible history before running it in a product
 - The `--prune` parameter controls how long unreachable objects are kept (default is 2 weeks); using `--prune=now` removes them immediately, so use with caution.
 - If you are worried about accidentally deleting objects, first check the state with `git fsck`, or back up the repository before running `git gc`.
 - Garbage collection can reorganize objects, packs, and reachability — confirm whether you still depend on temporarily unreachable objects before cleanup.
-
-## Try it yourself
-
-1. Walk through `git gc` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
-2. Run a comparison experiment between git gc and its most easily confused neighbor command, recording the difference with `git log --graph`
-3. Write a three-sentence summary of the single most important safety boundary of git gc
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

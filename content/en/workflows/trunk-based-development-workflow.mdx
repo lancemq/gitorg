@@ -171,15 +171,6 @@ Higher merge frequency usually requires clearer versioning and rollback policy.
 1. [`Feature branch collaboration`](/en/workflows/feature-branch-collaboration)
 2. [`Sync before review`](/en/workflows/sync-before-review)
 3. [`Merge queue workflow`](/en/workflows/merge-queue-workflow)
-
-## Try it yourself
-
-1. Take a recent large feature and split it into 3–6 independently mergeable batches, defining the minimum rollback unit for each.
-2. In a test repo, simulate the TBD cadence: cut a short branch from main, use `git add -p` for small commits, then `git rebase origin/main` before merge, and feel how shorter divergence means fewer conflicts.
-3. Pick a case where your team forbids rebasing, design the equivalent "platform updates branch on PR" flow, and write the matching CI gate checklist.
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

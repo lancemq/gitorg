@@ -134,13 +134,6 @@ jobs:
 - Enable Git operation audit logs (supported by GitHub/GitLab)
 - Log all Git operations triggered by CI
 - Review CI config modification permissions regularly
-
-## Try it yourself
-
-1. In a test repo, add a CI step that does `echo "$DEPLOY_KEY"`, run it, and check the logs to see whether the value is masked; if not, switch it to a protected variable and re-verify.
-2. Enable branch protection on `main` (require PR + status checks), then try a direct push and confirm it's rejected.
-3. Open a PR from a fork that edits `.github/workflows`, and observe whether your base repo's CI auto-runs the forked changes — understand why external PRs should not get repo secrets by default.
-
 ## Continue Learning
 
 1. `ci-cd/jenkins-integration` — Jenkins Git integration

@@ -111,15 +111,6 @@ git send-email --dry-run *.patch
 - SMTP credentials and server settings must be configured in `.gitconfig` or via command-line flags before sending.
 - `send-email` preserves the threading structure from `format-patch`, so patches arrive as a coherent email thread.
 - Some projects have specific patch submission guidelines (subject prefixes, sign-off requirements) — check the project's contribution guide before sending.
-
-## Try it yourself
-
-1. Run the core usage of `git send-email` in a test repository, checking `git status` and `git log` before and after every step
-2. Deliberately trigger one of the mistakes described in the article, then recover following the article's steps
-3. Write a five-bullet note on when git send-email applies and when it doesn't, and add it to your team wiki
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

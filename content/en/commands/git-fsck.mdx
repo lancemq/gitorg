@@ -87,15 +87,6 @@ Rehearse the flow on a small reproducible history before running it in a product
 - This is a read-only integrity check command — running it at any time will never affect repository state.
 - The `--lost-found` flag writes the content of dangling objects into `.git/lost-found/`, making them easier to inspect later.
 - Dangling objects themselves are not errors — they may be unreferenced commits, old blobs, etc., and need to be evaluated in context to determine whether action is needed.
-
-## Try it yourself
-
-1. Walk through `git fsck` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
-2. Run a comparison experiment between git fsck and its most easily confused neighbor command, recording the difference with `git log --graph`
-3. Write a three-sentence summary of the single most important safety boundary of git fsck
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

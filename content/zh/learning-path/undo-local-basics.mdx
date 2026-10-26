@@ -192,13 +192,6 @@ git restore <deleted-file>
 | 补充文件到上次提交 | `git add <file> && git commit --amend --no-edit` |
 | 恢复误删的文件 | `git restore <file>` |
 | 不确定是否要丢弃 | 先 `git stash` 再决定 |
-
-## 给你的练习
-
-1. 不看正文，凭记忆在测试仓库里完成`git restore`的主流程，再对照正文找漏掉的步骤
-2. 针对文中提到的风险场景做一次演练，记录你实际遇到的输出和正文的差异
-3. 下次团队里有人踩到撤销本地改动的安全方法相关的坑，试着用这篇的内容帮他排查一次
-
 ## 继续学习建议
 
 1. `recovery/reflog-recovery` — 用 reflog 恢复丢失的提交

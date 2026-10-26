@@ -257,15 +257,6 @@ Bisecting: 12 revisions left to test after this (roughly 4 steps)
 - 如果中间的某个提交无法测试（比如构建失败），用 `git bisect skip` 跳过。
 - `git bisect run <script>` 可以自动执行测试脚本，脚本返回 0 = good，返回 1-127 = bad。
 - 结束后必须运行 `git bisect reset`，否则会留在中间提交状态。
-
-## 给你的练习
-
-1. 不看正文，凭记忆在测试仓库里完成`git bisect`的主流程，再对照正文找漏掉的步骤
-2. 针对文中提到的风险场景做一次演练，记录你实际遇到的输出和正文的差异
-3. 下次团队里有人踩到 git bisect 相关的坑，试着用这篇的内容帮他排查一次
-
-{/* internal-links:auto */}
-
 ## 延伸阅读
 
 沿着同一主题继续深入：

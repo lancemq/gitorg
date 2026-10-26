@@ -285,13 +285,6 @@ Not at all. You can push changes to `.github/workflows/` and GitHub Actions will
 ### Misconception 3: CI failure always means a code bug
 
 Not necessarily. Failures can come from network issues, cache expiry, or dependency changes. Always check the logs first.
-
-## Try it yourself
-
-1. Create `.github/workflows/pr-check.yml` in one of your projects that runs lint and test on every PR
-2. Change `fetch-depth` from `1` to `0` and observe the difference in CI time
-3. Add a matrix configuration to test across Node.js 18, 20, and 22
-
 ## Continue Learning
 
 1. [SSH key management and deploy keys](/en/security/ssh-key-management) — how CI authenticates to Git hosts

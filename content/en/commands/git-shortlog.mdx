@@ -94,15 +94,6 @@ Pair it with status, log, or diff so you can confirm what actually changed.
 - It only reads commit history and does not modify anything in the repository — it is a purely read-only command.
 - With `-s` only the count is shown; without it, each commit's subject line is also displayed.
 - Merge commits are also counted; to exclude them, pair with `--no-merges` (usually via `git log --no-merges | git shortlog`).
-
-## Try it yourself
-
-1. Walk through `git shortlog` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
-2. Run a comparison experiment between git shortlog and its most easily confused neighbor command, recording the difference with `git log --graph`
-3. Write a three-sentence summary of the single most important safety boundary of git shortlog
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

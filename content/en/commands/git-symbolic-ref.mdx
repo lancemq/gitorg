@@ -89,15 +89,6 @@ Treat it as a read-only inspection tool first, then move to write-oriented usage
 - Write operations modify reference files directly, bypassing the safety protections of `git checkout` or `git switch`, and can cause the working tree to become inconsistent with HEAD.
 - `symbolic-ref` can still create a symbolic reference pointing to a non-existent target, but this may cause errors in subsequent commands.
 - Use `-d` to delete a symbolic reference — deleting HEAD leaves the repository in a no-HEAD state, which should normally be avoided.
-
-## Try it yourself
-
-1. Run the core usage of `git symbolic-ref` in a test repository, checking `git status` and `git log` before and after every step
-2. Deliberately trigger one of the mistakes described in the article (see the "What to watch most closely" section), then recover following the article's steps
-3. Write a five-bullet note on when git symbolic-ref applies and when it doesn't, and add it to your team wiki
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

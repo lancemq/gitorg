@@ -104,15 +104,6 @@ Git's object database only grows (under normal operations). Rebase, reset, amend
 - `git gc --prune=now` is more commonly used; it packs first and then cleans up, making it safer and more efficient than running `git prune` alone
 - In team collaboration, prune only affects the local repository; it does not delete objects on remotes
 - If disk space is extremely tight, consider `git gc --aggressive` for deeper compression
-
-## Try it yourself
-
-1. Run the core usage of `git prune` in a test repository, checking `git status` and `git log` before and after every step
-2. Deliberately trigger one of the mistakes described in the article (see the "What to watch most closely" section), then recover following the article's steps
-3. Write a five-bullet note on when git prune applies and when it doesn't, and add it to your team wiki
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

@@ -454,13 +454,6 @@ git bisect start
 3. **大型仓库考虑部分克隆**：`--filter=blob:none` 比浅克隆更灵活
 4. **Submodule 也使用浅克隆**：`--shallow-submodules` 减少嵌套仓库的下载量
 5. **监控仓库大小**：定期使用 `git count-objects -vH` 检查仓库状态
-
-## 给你的练习
-
-1. 不看正文，凭记忆在测试仓库里完成`git clone`的主流程，再对照正文找漏掉的步骤
-2. 针对文中提到的风险场景做一次演练，记录你实际遇到的输出和正文的差异
-3. 下次团队里有人踩到 Git 浅克隆与浅操作相关的坑，试着用这篇的内容帮他排查一次
-
 ## 继续学习建议
 
 1. [`git sparse-checkout`](/zh/commands/git-sparse-checkout) —— 只检出部分目录

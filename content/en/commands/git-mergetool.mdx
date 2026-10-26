@@ -91,15 +91,6 @@ Rehearse the flow on a small reproducible history before running it in a product
 - After all conflicts are resolved, you must still complete the operation — run `git commit` (for merge) or `git rebase --continue` (for rebase).
 - Mergetool modifies the working tree and index as you save resolved files. Unlike the read-only tools above, it does change repository state — but only within the scope of the ongoing merge/rebase operation.
 - If the external tool crashes or you close it without saving, the conflict markers remain and you can re-run mergetool.
-
-## Try it yourself
-
-1. Walk through `git mergetool` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
-2. Run a comparison experiment between git mergetool and its most easily confused neighbor command, recording the difference with `git log --graph`
-3. Write a three-sentence summary of the single most important safety boundary of git mergetool
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

@@ -107,15 +107,6 @@ A commit message is not just a description of what was done; it is also a carrie
 - `git commit --trailer` is a higher-level shortcut that also relies on interpret-trailers under the hood
 - Complex trailer operations may require coordination with the `git config trailer.*` configuration family
 - Some Git platforms (e.g., GitHub) only recognize specific trailer names (such as `Co-authored-by`); custom trailers will not appear in the UI
-
-## Try it yourself
-
-1. Walk through `git interpret-trailers` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
-2. Run a comparison experiment between git interpret-trailers and its most easily confused neighbor command, recording the difference with `git log --graph`
-3. Write a three-sentence summary of the single most important safety boundary of git interpret-trailers
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

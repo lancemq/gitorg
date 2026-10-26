@@ -78,13 +78,6 @@ git push origin --delete feature/first-pr
 <WarningBox title="不要合并后就离开">
   若不更新任务状态与回归验证结果，团队会出现"代码合了但没人确认上线效果"的盲区。
 </WarningBox>
-
-## 给你的练习
-
-1. 在你的第一个 PR 合并后，依次执行 git switch main、git pull --ff-only、git branch -d 和 git push origin --delete
-2. 故意不删除分支，一周后观察远端分支列表的混乱程度
-3. 在团队中约定一条规则：合并后立即删除源分支，持续执行一周
-
 ## 接下来建议继续学什么
 
 1. [`first safe hotfix`](/zh/learning-path/first-safe-hotfix) — 紧急修复场景的快速响应流程

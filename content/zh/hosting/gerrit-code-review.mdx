@@ -158,13 +158,6 @@ ssh -p 29418 admin@gerrit-server gerrit create-project \
 | refs/heads/* | Code-Review, Verified 评分 |
 | refs/heads/main | 仅允许通过审查合入 |
 | refs/for/main | 允许所有人推送审查 |
-
-## 给你的练习
-
-1. 按正文把`git push`在测试仓库里走一遍，重点观察它对工作区、暂存区和历史分别做了什么
-2. 把 Gerrit 代码审查系统和它最容易混淆的相邻命令做一次对比实验，用 `git log --graph` 记录两者的差异
-3. 写一段 3 句话的总结，讲清 Gerrit 代码审查系统最关键的一条安全边界，存进你的片段库
-
 ## 继续学习建议
 
 1. `hosting/platform-comparison` — 托管平台对比

@@ -171,15 +171,6 @@ git rebase origin/main
 1. [`Feature branch collaboration`](/zh/workflows/feature-branch-collaboration)
 2. [`Sync before review`](/zh/workflows/sync-before-review)
 3. [`Merge queue workflow`](/zh/workflows/merge-queue-workflow)
-
-## 给你的练习
-
-1. 找你们最近做过的一个大特性，按本文方法拆成 3–6 个可独立合并的小批次，并给每批写出“最小可回滚单元”。
-2. 在测试仓库里模拟 TBD 节奏：从 main 切短分支、用 `git add -p` 做小提交、合并前 `git rebase origin/main`，体验“分叉时间越短冲突越少”。
-3. 挑一个你们团队当前禁止 rebase 的场景，设计“在 PR 中由平台做 update branch”的等价流程，并写出对应的 CI 门禁清单。
-
-{/* internal-links:auto */}
-
 ## 延伸阅读
 
 沿着同一主题继续深入：

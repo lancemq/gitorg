@@ -87,15 +87,6 @@ test:
 1. [`merge queue workflow`](/en/workflows/merge-queue-workflow)
 2. [`gitlab ci and runners`](/en/platforms/gitlab-ci-and-runners)
 3. [`sync before review`](/en/workflows/sync-before-review)
-
-## Try it yourself
-
-1. In a test project, turn on merged result pipelines + merge train, then create two conflicting MRs on purpose and watch how they enter the train queue instead of merging separately.
-2. Rewrite one existing pipeline in `.gitlab-ci.yml` using the `$CI_MERGE_REQUEST_ID` rule, and compare the output of "source branch only" vs "merge result".
-3. Force a train pipeline of one MR to fail, observe the trailing MRs being dropped from the queue, and practice re-running from the failure point.
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

@@ -229,13 +229,6 @@ If you suspect a key leak, **the first step is always to revoke the public key o
 <WarningBox title="Lock down private-key file permissions">
   Keep `~/.ssh` at `700` and the private key at `600` (`chmod 600 ~/.ssh/id_ed25519`). Overly open permissions make the SSH client refuse the key, and can also expose the plaintext to other local users.
 </WarningBox>
-
-## Try it yourself
-
-1. Generate an Ed25519 key pair and configure it on GitHub. Push once to confirm passwordless authentication works
-2. If your company also uses a Git platform, generate a second key and configure `~/.ssh/config` to distinguish them
-3. Check your GitHub SSH keys settings — do you recognize all authorized keys?
-
 ## Continue Learning
 
 1. `best-practices/security-with-git` — Git security best practices

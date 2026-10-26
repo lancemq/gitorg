@@ -90,15 +90,6 @@ Rehearse the flow on a small reproducible history before running it in a product
 - Cherry only compares commit patches — it does not show changes in the working tree or index. Make sure both branches are up to date before running.
 - For a more detailed comparison between two versions of a patch series, consider `git range-diff` instead, which shows how individual patches evolved between versions.
 - Cherry is a read-only reporting tool. It never moves refs or modifies history.
-
-## Try it yourself
-
-1. Walk through `git cherry` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
-2. Run a comparison experiment between git cherry and its most easily confused neighbor command, recording the difference with `git log --graph`
-3. Write a three-sentence summary of the single most important safety boundary of git cherry
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

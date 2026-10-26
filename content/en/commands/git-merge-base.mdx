@@ -96,15 +96,6 @@ Treat it as a read-only inspection tool first, then move to write-oriented usage
 - Merge-base returns only commit hashes — it does not produce diffs or explain what changed. Pair it with `git diff` or `git log` for full context.
 - For octopus merges (more than two branches), merge-base can compute a common base across all inputs, but the result may be less intuitive than pairwise analysis.
 - Merge-base is entirely read-only. It never writes to the repository, moves refs, or creates objects.
-
-## Try it yourself
-
-1. Run the core usage of `git merge-base` in a test repository, checking `git status` and `git log` before and after every step
-2. Deliberately trigger one of the mistakes described in the article (see the "What to watch most closely" section), then recover following the article's steps
-3. Write a five-bullet note on when git merge-base applies and when it doesn't, and add it to your team wiki
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

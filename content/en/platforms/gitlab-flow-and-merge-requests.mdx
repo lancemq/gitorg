@@ -124,24 +124,6 @@ That order keeps the team from building a ceremonial process around features it 
 <WarningBox title="Long-lived branches quietly inflate review cost">
   <p>Even if the branch model looks elegant on paper, merge requests become harder to review, test, and trust when branch lifetime grows too long.</p>
 </WarningBox>
-
-## Try it yourself
-
-<PracticeLab
-  title="Exercise: map one merge request to the real GitLab Flow gates"
-  intro="The goal is to see the merge request as a decision surface, not just a place to click Merge."
-  setupLabel="Setup"
-  setup={`Create a small branch from your default integration line.\nMake one focused change and open a merge request.`}
-  stepsLabel="Try it"
-  steps="Inspect which pipeline checks appear on the merge request.|Inspect which approvals or branch rules affect mergeability.|Ask whether this branch is only a collaboration branch or also tied to a delivery environment.|Write down what conditions truly make the MR ready."
-  outcomesLabel="What happens next"
-  outcomes="You see GitLab Flow as branch work plus policy and automation.|You learn which merge gates are technical and which are organizational.|You can evaluate whether the team's branch design matches real delivery needs."
-  mistakesLabel="Common mistake checks"
-  mistakes="If the branch model feels complicated, ask whether the delivery model actually needs that complexity.|If the MR is the only place context appears, planning may be underdeveloped upstream.|If merge readiness is unclear, define policy before adding more branches."
-/>
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

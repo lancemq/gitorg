@@ -114,15 +114,6 @@ Had it been `fix(auth): reject expired refresh token`, the trace would have hit 
 1. [`commit hygiene`](/en/best-practices/commit-hygiene)
 2. [`prepare commits before pull request`](/en/workflows/prepare-commits-before-pull-request)
 3. [`small batch review`](/en/best-practices/small-batch-review)
-
-## Try it yourself
-
-1. Rewrite the last five commits of a project into Conventional Commits format (`type(scope): summary` + body with reason), then compare the readability of `git log --oneline` before and after.
-2. Deliberately split a "login fix" and a "doc typo fix" into two commits, then run `git bisect` to feel why single-concern commits matter.
-3. During review, take a `fix: bug`-style message and rewrite it using the template, explaining why scope and reason are both required.
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

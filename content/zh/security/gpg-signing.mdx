@@ -216,13 +216,6 @@ git commit -S -m "signed with ssh key"
 ```
 
 一个容易踩的坑：平台要"认得"这把公钥才能把提交标成 Verified。所以需要在 GitHub / GitLab 的 SSH key 设置里，把同一把公钥同时标记为"可用于签名"（Signing key），而不只是"可用于认证"（Authentication key）。
-
-## 给你的练习
-
-1. **端到端签一次**：生成 GPG 密钥并 `git config --global user.signingkey <id>`，用 `git commit -S -m "..."` 签一条提交，再用 `git log --show-signature -1` 确认它显示 `Good signature`。
-2. **对比签名状态位**：故意用另一个身份（临时改 `user.name`/`user.email`，但不改 signingkey）提交，再用 `git log --format="%H %G? %GS"` 观察这条未签名的提交显示 `N`，理解"作者可伪造、签名不可伪造"的差别。
-3. **在测试仓库强制签名**：在分支保护里开启 Require signed commits（或在本地用 `pre-commit`/`pre-push` 钩子拦截未签名提交），尝试推一条没签名的提交，确认它被拦下。
-
 ## 继续学习建议
 
 1. [Git 安全最佳实践](/zh/best-practices/security-with-git) — 把签名放进整体安全策略

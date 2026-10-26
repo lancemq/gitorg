@@ -196,15 +196,6 @@ This shows which file each value comes from, making it easy to track down unexpe
 - If `git config` affects team behavior, prefer scripts or documented defaults over relying on memory and local drift.
 - When behavior disagrees with documentation, inspect config scope, aliases, and environment differences first.
 - Local, global, and system config layers can all affect behavior, so troubleshooting starts by identifying which scope is actually active.
-
-## Try it yourself
-
-1. Walk through `git branch` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
-2. Run a comparison experiment between git config and its most easily confused neighbor command, recording the difference with `git log --graph`
-3. Write a three-sentence summary of the single most important safety boundary of git config
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

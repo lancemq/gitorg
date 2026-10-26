@@ -307,15 +307,6 @@ git submodule foreach --recursive 'git status --porcelain'
 - 在子模块目录内做修改后，需要在子模块自己的仓库中提交并 push，然后在父仓库中更新子模块指针。
 - submodule 和 subtree 是不同的方案：submodule 保持独立仓库，subtree 则将代码合并到父仓库历史中。
 
-
-## 给你的练习
-
-1. 在测试仓库里把`git submodule`的核心用法完整跑一遍，每一步前后用 `git status` 和 `git log` 对照状态变化
-2. 故意制造一次文中提到的典型失误，再按正文思路把现场恢复回去
-3. 把 git submodule 的"适用 / 不适用"场景写成不超过 5 条的笔记，放进你的团队 Wiki
-
-{/* internal-links:auto */}
-
 ## 延伸阅读
 
 沿着同一主题继续深入：

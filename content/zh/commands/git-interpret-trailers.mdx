@@ -107,15 +107,6 @@ trailers 必须放在提交信息的**最后**，格式是 `Key: Value`，且前
 - `git commit --trailer` 是更高层的快捷方式，底层也依赖 interpret-trailers
 - 过于复杂的 trailer 操作可能需要配合 `git config trailer.*` 系列配置
 - 某些 Git 平台（如 GitHub）只识别特定的 trailer 名称（如 `Co-authored-by`），自定义 trailer 不会显示在 UI 上
-
-## 给你的练习
-
-1. 按正文把`git interpret-trailers`在测试仓库里走一遍，重点观察它对工作区、暂存区和历史分别做了什么
-2. 把 git interpret-trailers 和它最容易混淆的相邻命令做一次对比实验，用 `git log --graph` 记录两者的差异
-3. 写一段 3 句话的总结，讲清 git interpret-trailers 最关键的一条安全边界，存进你的片段库
-
-{/* internal-links:auto */}
-
 ## 延伸阅读
 
 沿着同一主题继续深入：

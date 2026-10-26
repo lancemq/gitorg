@@ -205,13 +205,6 @@ git lfs migrate import --include="*.dll,*.exe" --everything
 | 提交 | 全局递增编号 | SHA 哈希 |
 | 历史 | 线性 | 有向无环图 |
 | 离线 | 不可用 | 完整功能 |
-
-## 给你的练习
-
-1. 搭一个本地 SVN 仓库（含 trunk/branches/tags 和几个提交），用 `git svn clone --stdlayout --authors-file` 迁到 Git，验证分支和标签都正确转换。
-2. 在 SVN 历史里故意放一个 50MB 的"大文件"，迁移后用文中命令找出它，再用 BFG 把它从历史中剥离，对比仓库体积变化。
-3. 按文中四阶段计划，给你自己的团队起草一份迁移排期（评估 → 试运行 → 正式切换 → 过渡期），标出每个阶段谁负责、多久、回退条件是什么。
-
 ## 继续学习建议
 
 1. `learning-path/quick-start` — Git 快速上手

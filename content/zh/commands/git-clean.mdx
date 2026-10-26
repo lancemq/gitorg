@@ -183,15 +183,6 @@ git clean -fd -e 'node_modules/'
 - **`-x` 的危险性**：`-x` 会同时删除 `.gitignore` 中列出的文件，可能误删 IDE 配置、本地环境文件等重要内容，使用前务必用 `-n` 仔细检查。
 - **`-f` 是必需的**：除非配置了 `clean.requireForce=false`，否则必须加 `-f` 才能真正执行删除，这是 Git 的安全保护机制。
 - `git clean` 不影响已跟踪文件，已跟踪文件的修改需要用 `git checkout` 或 `git restore` 处理。
-
-## 给你的练习
-
-1. 按正文把`git clean`在测试仓库里走一遍，重点观察它对工作区、暂存区和历史分别做了什么
-2. 把 git clean 和它最容易混淆的相邻命令做一次对比实验，用 `git log --graph` 记录两者的差异
-3. 写一段 3 句话的总结，讲清 git clean 最关键的一条安全边界，存进你的片段库
-
-{/* internal-links:auto */}
-
 ## 延伸阅读
 
 沿着同一主题继续深入：

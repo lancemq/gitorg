@@ -158,13 +158,6 @@ The risk with AI is higher than with humans: an AI may read a secret to "fix" so
 - A `.gitignore` that excludes AI tooling state and secrets.
 - A habit of reading `git diff --staged` before every commit.
 - `push.default = simple` and a team rule of `--force-with-lease` only.
-
-## Try it yourself
-
-1. Create a throwaway branch, let an AI tool make three separate logical changes, and commit each one separately with a hand-written message — practice splitting AI output.
-2. Have the AI rewrite the history (`rebase -i` squash), then use `git reflog` and `git reset --hard HEAD@{1}` to undo it.
-3. Stage a change with `git add -p`, deliberately include one line you would not want, and practice un-staging just that line.
-
 ## Further reading
 
 Keep going on the same topic:

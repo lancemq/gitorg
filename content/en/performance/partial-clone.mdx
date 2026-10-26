@@ -161,13 +161,6 @@ git cat-file -p <blob-hash>
 git fetch --unshallow
 git config --unset extensions.partialClone
 ```
-
-## Try it yourself
-
-1. **Compare the three filters on first clone**: clone the same large repo with `--filter=blob:none`, `--filter=tree:0`, and `--filter=blob:limit=1m`, record the initial download size of each, then `git checkout main` and watch which operations trigger on-demand fetches.
-2. **Combine partial clone with sparse checkout**: `git clone --filter=blob:none --sparse <url>` then `git sparse-checkout set src/my-team`, and confirm the local repo neither downloaded all blobs nor expanded directories you do not care about — the most direct speed-up for a monorepo.
-3. **Drill the rollback to a full clone**: in a partial clone, run `git fetch --unshallow` to pull every object, then `git config --unset extensions.partialClone` to turn partial cloning off, and use `git fsck` to confirm all objects are now local.
-
 ## A detail easy to miss: partial clone does not slow down history commands
 
 `--filter=blob:none` only filters file contents (blobs); commit, tree, and tag history objects are still downloaded in full. So commands that only read history — `git log`, `git branch --contains`, `git rev-list` — run at almost the same speed as in a full clone. What actually gets slower are operations that must materialize content into the working tree: `git checkout`, `git diff` against the working tree, or a full `git grep`. Understand this and you can judge whether partial clone will actually help your scenario.

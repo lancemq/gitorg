@@ -193,13 +193,6 @@ deploy_production:
   rules:
     - if: $CI_COMMIT_TAG
 ```
-
-## Try it yourself
-
-1. In a test repo, add a minimal `.gitlab-ci.yml` with one `build` stage running `npm ci && npm test`, push, and watch the pipeline trigger automatically.
-2. Add `workflow: rules` so `main` gets production variables and `develop` gets staging variables; verify the injected variables really differ per branch.
-3. Set `GIT_DEPTH` very small (e.g. `5`), then run a script that depends on an older commit beyond that depth — see how "not enough history" breaks history-dependent steps.
-
 ## Continue Learning
 
 1. `github/github-actions-basics` — GitHub Actions basics

@@ -88,15 +88,6 @@ Rehearse the flow on a small reproducible history before running it in a product
 - The input is an `.idx` file path, not a `.pack` file; `git verify-pack` automatically finds the corresponding `.pack` file.
 - Entries with `chain depth` in the output are delta objects — depth 0 means a base object, and larger values indicate deeper delta chains.
 - This command is more diagnostic than operational and is not part of the everyday collaboration workflow; the most valuable parts of the output are object sizes, delta chains, and offset relationships.
-
-## Try it yourself
-
-1. Walk through `git verify-pack` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
-2. Run a comparison experiment between git verify-pack and its most easily confused neighbor command, recording the difference with `git log --graph`
-3. Write a three-sentence summary of the single most important safety boundary of git verify-pack
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

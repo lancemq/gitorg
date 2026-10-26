@@ -134,13 +134,6 @@ A common real pattern: Git for code, DVC for datasets and model weights, and a m
 - **Using Git LFS for data that changes every run.** LFS storage costs scale with revisions just like Git.
 - **Forgetting to commit the `.dvc` pointer.** Without it, `dvc pull` can't find the right version — the pointer is the whole point.
 - **Treating lakeFS branches as cheap copies.** They're metadata; the underlying objects are shared, so destructive operations still need care.
-
-## Try it yourself
-
-1. In a throwaway repo, `dvc init`, add a small CSV with `dvc add`, commit the `.dvc` pointer, then modify the CSV and re-add — observe how Git only sees the pointer change.
-2. Run `git count-objects -vH` on a repo before and after a large binary commit to feel the bloat firsthand.
-3. Set up a two-commit DVC history, `git checkout` the older commit, and `dvc pull` to reproduce the older dataset exactly.
-
 ## Further reading
 
 Keep going on the same topic:

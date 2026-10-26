@@ -187,15 +187,6 @@ When Git history looks wrong, start with this:
 1. [`git reflog`](/en/commands/git-reflog)
 2. create a rescue branch
 3. choose reset, cherry-pick, merge, or manual reconstruction only after the old position is safe
-
-## Try it yourself
-
-1. Follow the PracticeLab: build a throwaway repo, deliberately run `git reset --hard HEAD~1`, then find the pre-reset entry with `git reflog --date=local` and capture it with `git switch -c rescue/recover HEAD@{1}`.
-2. Simulate a deleted branch: `git branch -D` a local branch, then use `git reflog` or `git fsck --lost-found` to relocate its commit and recreate a branch from it.
-3. Run `git commit --amend` to change the latest message, then use reflog to find the pre-amend SHA and bring the old version back via a rescue branch or cherry-pick.
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

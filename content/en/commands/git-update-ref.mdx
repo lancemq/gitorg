@@ -89,15 +89,6 @@ Treat it as a read-only inspection tool first, then move to write-oriented usage
 - Writing references directly bypasses the validation and protection of high-level commands like `git branch` and `git tag` — a typo in the reference name could accidentally create an unwanted branch.
 - `update-ref` does not check whether the target hash points to a valid commit object — even if the hash does not exist, the reference will be created.
 - When using `-d` to delete a reference, an error is thrown if the reference does not exist; adding `-no-deref` deletes the symbolic reference itself rather than the target it points to.
-
-## Try it yourself
-
-1. Walk through `git update-ref` in a test repository, paying attention to what it changes in the working tree, the index, and history respectively
-2. Run a comparison experiment between git update-ref and its most easily confused neighbor command, recording the difference with `git log --graph`
-3. Write a three-sentence summary of the single most important safety boundary of git update-ref
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

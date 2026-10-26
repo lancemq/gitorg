@@ -197,15 +197,6 @@ If you remember one model, remember this:
 4. refs and HEAD are just names pointing at those objects
 
 That mental split makes later topics like refs, rebase, reset, and recovery much easier.
-
-## Try it yourself
-
-1. **See an object directly**: in a repo, edit a file and commit. Run `git cat-file -t HEAD` to confirm it is a commit, `git cat-file -p HEAD` to see the tree it points to, then `git cat-file -p <tree-sha>` to reach a blob. Walk the `commit → tree → blob` chain using the hashes.
-2. **Verify content addressing**: put the same content into two differently named files and commit both, then use `git rev-parse :<path>` to confirm they resolve to the same blob hash — same content, same hash.
-3. **See how light a branch is**: after `git branch tmp`, run `git cat-file -t tmp` to confirm it is just a ref to an existing commit, then `git log --oneline --all --graph` to watch branch pointers move without copying objects.
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

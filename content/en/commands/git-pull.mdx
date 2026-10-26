@@ -156,24 +156,6 @@ That is often useful for a local feature branch, but you should still ask:
 <WarningBox title="Pull is not automatically safe">
   <p>The convenience of one command can hide a branch-changing decision. If branch history matters right now, inspect before you integrate.</p>
 </WarningBox>
-
-## Try it yourself
-
-<PracticeLab
-  title="Exercise: compare plain pull, ff-only, and fetch-first"
-  intro="The goal is to see how different sync habits change branch behavior."
-  setupLabel="Setup"
-  setup={`git switch -c lab/pull-demo\n# simulate local commits and an upstream branch that also moved`}
-  stepsLabel="Try it"
-  steps="Run `git fetch` and inspect branch divergence with `git log --oneline --graph --decorate --all -12`.|Try `git pull --ff-only` and observe whether it succeeds or fails.|If the branches diverged, decide whether `git pull --rebase` or `git merge` is the better next step."
-  outcomesLabel="What happens next"
-  outcomes="You see pull as a policy choice, not only a sync shortcut.|You learn when ff-only protects you from surprise merges.|You build the habit of inspecting divergence before integration."
-  mistakesLabel="Common mistake checks"
-  mistakes="Do not pull with unrelated unstaged work if you can avoid it.|If the result surprises you, inspect `pull.rebase` and `pull.ff` config rather than guessing.|If the branch is shared, treat rebasing during pull as a coordination decision."
-/>
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

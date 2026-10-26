@@ -182,13 +182,6 @@ git lfs migrate import --include="*.dll,*.exe" --everything
 | Commits | Global sequential numbers | SHA hashes |
 | History | Linear | DAG |
 | Offline | Unavailable | Full functionality |
-
-## Try it yourself
-
-1. Set up a local SVN repo (trunk/branches/tags with a few commits), migrate with `git svn clone --stdlayout --authors-file`, and verify branches and tags converted correctly.
-2. Intentionally add a 50MB "large file" to SVN history, find it after migration with the article's command, then strip it with BFG and compare repo size before/after.
-3. Following the four phases, draft a migration schedule for your own team (assess → pilot → switchover → transition), noting who owns each phase, its duration, and the rollback condition.
-
 ## Continue Learning
 
 1. `learning-path/quick-start` — Git quick start

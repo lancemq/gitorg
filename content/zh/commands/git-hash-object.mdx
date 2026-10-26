@@ -108,15 +108,6 @@ hash-object 是 Git **plumbing 命令**的核心之一，它揭示了 Git 最底
 - 悬空对象最终会被 `git gc` 清理，除非你创建了引用指向它们
 - 计算 commit 对象 ID 需要遵循严格的 commit 对象格式（包含 tree、parent、author、committer 等字段）
 - 大文件的 hash-object 计算可能较慢，因为需要读取完整内容
-
-## 给你的练习
-
-1. 按正文把`git hash-object`在测试仓库里走一遍，重点观察它对工作区、暂存区和历史分别做了什么
-2. 把 git hash-object 和它最容易混淆的相邻命令做一次对比实验，用 `git log --graph` 记录两者的差异
-3. 写一段 3 句话的总结，讲清 git hash-object 最关键的一条安全边界，存进你的片段库
-
-{/* internal-links:auto */}
-
 ## 延伸阅读
 
 沿着同一主题继续深入：

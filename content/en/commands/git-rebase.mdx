@@ -216,15 +216,6 @@ Anchor the old position before deciding whether to reset or replay work again.
   mistakesLabel="Common mistake checks"
   mistakes="Do not rebase and force-push a branch that teammates already depend on without checking first.|If the rebase looks wrong midway through, stop and use `git rebase --abort` or `git reflog` instead of stacking more commands on top.|If your real goal is simple integration without history rewrite, merge may be the safer tool."
 />
-
-## Try it yourself
-
-1. On a throwaway branch, use `git rebase -i HEAD~4` to squash four noisy commits into two logical blocks, then confirm with `git log --oneline`.
-2. Deliberately create a conflict mid-rebase and walk through `git status → resolve → git add → git rebase --continue`; then try `git rebase --abort` to feel the difference.
-3. Push a rebased branch with both `git push --force` and `git push --force-with-lease` on a backup branch to see why the latter is safer.
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:

@@ -269,13 +269,6 @@ steps:
 ### 误解 3：CI 失败了就一定是代码有问题
 
 不一定。CI 可能因为网络问题、缓存过期、依赖变更等原因失败。排查 CI 问题时先看日志，再怀疑代码。
-
-## 给你的练习
-
-1. 在你的一个项目里创建 `.github/workflows/pr-check.yml`，实现 PR 时自动跑 lint 和 test
-2. 把 `fetch-depth` 从默认值改成 `0`，观察 CI 时间的变化
-3. 试着加一个 matrix 配置，在不同操作系统上同时运行测试
-
 ## 继续学习建议
 
 1. [GitHub Merge Queue 工作流](/zh/workflows/merge-queue-workflow) — 把"等 CI 通过再合并"变成队列自动合入

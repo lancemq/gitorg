@@ -89,15 +89,6 @@ Treat it as a read-only inspection tool first, then move to write-oriented usage
 - You can use the `TREE:PATH` syntax to see contents under a specific path, such as `git ls-tree HEAD:src/`.
 - Output includes file modes (e.g., 100644 for regular files, 100755 for executables, 040000 for directories).
 - It shows the tree structure from the object database, independent of the working tree state — even if the working tree has uncommitted changes, ls-tree still shows the tree object's contents.
-
-## Try it yourself
-
-1. Run the core usage of `git ls-tree` in a test repository, checking `git status` and `git log` before and after every step
-2. Deliberately trigger one of the mistakes described in the article (see the "What to watch most closely" section), then recover following the article's steps
-3. Write a five-bullet note on when git ls-tree applies and when it doesn't, and add it to your team wiki
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:
