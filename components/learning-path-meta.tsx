@@ -52,7 +52,6 @@ export function LearningPathMeta({
 }: LearningPathMetaProps) {
   if (typeof step !== "number") return null;
   const t = copy[locale];
-  const isFinal = step >= total;
 
   return (
     <div className="learning-path-meta">
@@ -61,22 +60,10 @@ export function LearningPathMeta({
         <span className="lp-step-count">{t.stepOf(step, total)}</span>
       </p>
 
-      {isFinal ? (
-        <div className="lp-next-card lp-next-card-finish">
-          <strong>{t.finishLabel}</strong>
-          <p>{t.finishBody}</p>
-          <Link href={`/${locale}/workflows`} className="lp-next-cta">
-            {t.finishCta} →
-          </Link>
-        </div>
-      ) : next ? (
+      {/* 下一步卡片已下线（2026-10）：仅保留步骤徽标 */}
+      {false ? (
         <div className="lp-next-card">
           <p className="lp-next-title">{t.nextTitle}</p>
-          <Link href={`/${locale}/learning-path/${next.slug}`} className="lp-next-link">
-            <span className="lp-next-step">Step {step + 1}</span>
-            <span className="lp-next-name">{next.title}</span>
-            <span className="lp-next-arrow">→</span>
-          </Link>
         </div>
       ) : null}
     </div>
