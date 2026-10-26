@@ -24,7 +24,7 @@ export const metadata = {
     {
       title: "Git range diff",
       url: "https://git-scm.com/docs/git-range-diff",
-      kind: "official",
+      kind: "discussion",
     },
   ],
 };
@@ -33,58 +33,84 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 通过高质量 review handoff（背景、范围、风险、验证）减少评审往返沟通成本并提升合并决策速度。
-- 理解 高质量 handoff 的四要素 相关的概念
-- 掌握 提交 PR 时建议附带 相关的操作
+- 用"背景 / 范围 / 风险 / 验证"四要素写 PR 描述，让 reviewer 不用猜就能开审
+- 知道哪些信息放 PR 描述、哪些放提交信息、哪些干脆自动化掉
+- 用 `git range-diff` 管理 stacked PR 的层间差异，避免 reviewer 重复阅读
 
 ## 先想一个问题
 
-你或者你的团队可能已经在用代码评审交接质量了——但用法对不对？有没有踩在边界上？这篇带你把代码评审交接质量的前提、边界和常见误用重新过一遍，很多隐患在变成事故之前就能排掉。
+reviewer 打开一个 PR，看到标题 "update logic"，描述栏空白。他现在需要：翻 issue 找背景、逐文件猜改动意图、私聊作者问"这个函数为什么这么写"。十五分钟过去了，评审还没真正开始。
 
-## 高质量 handoff 的四要素
+这个成本几乎完全由作者侧决定：**交接质量高的 PR，reviewer 十分钟能给出有效反馈；交接质量差的 PR，三轮往返都未必对齐**。评审慢，多数时候不是 reviewer 慢，是 handoff 缺信息。
 
-1. 背景：为什么要改
-2. 范围：改了哪些边界，不改哪些
-3. 风险：潜在影响面
-4. 验证：如何证明改动有效
+## 一句话理解
 
-<CommandFlowFigure
-  title="Code Review Handoff 要素"
-  caption="高质量的 handoff 减少审查者的认知负担，加快审批速度。"
-  inputsLabel="Handoff 输入"
-  inputs="清晰的 PR 描述|测试指南|设计决策说明"
-  commandLabel="review handoff"
-  outputsLabel="审查效率"
-  outputs="快速理解|精准反馈|少回退"
-  note="审查者的时间也是成本。减少他们的猜测就是提升整体效率。"
-/>
+评审交接 = 把 reviewer 需要的判断依据前置给齐，让对方的时间花在判断上，而不是补全上下文上。
 
+## 四要素 PR 描述模板
 
-## 提交 PR 时建议附带
+直接抄进团队 Wiki 用：
 
-- 关键变更点列表（3-7 条）
-- 风险检查项
-- 本地或预发验证结果
-- 需要 reviewer 特别关注的文件
+```markdown
+## 背景（Why）
+<一两句话：哪个需求/bug 导致这次改动，链接 issue>
 
-## 对 stacked PR 的补充
+## 改动范围（What）
+- <关键变更点 1>
+- <关键变更点 2>
+- 明确不改什么：<边界说明，防止 reviewer 提范围外建议>
 
-每层 PR 要说明依赖关系，并强调“本层新增差异”，避免 reviewer 重复阅读。
+## 风险与影响面（Risk）
+- <可能受影响的模块/接口>
+- <最坏情况与已做的防护>
 
-<WarningBox title="不要把 reviewer 当成需求背景探测器">
-  如果上下文全靠 reviewer 自己补全，评审必然变慢且判断质量波动更大。
+## 如何验证（How tested）
+- 单测：<新增/修改了哪些用例>
+- 手工：<在哪个环境做了什么操作，看到什么结果>
+```
+
+四要素的判断标准：reviewer 读完描述后，**不看代码也能复述出"这个 PR 在干嘛、为什么这么干、改坏了会怎样"**。做不到，就是还缺信息。
+
+## 信息该放在哪一层
+
+| 信息 | 放哪 | 原因 |
+| --- | --- | --- |
+| 为什么改、不改什么 | PR 描述 | 评审决策的依据 |
+| 这一个提交干了什么 | commit message | `git log` 单独可读 |
+| "检查项 A 通过" | CI | 机器可判定的别用人眼 |
+| 逐行实现说明 | 代码注释 | 跟着代码走，别写进描述 |
+
+常见反模式是把实现细节堆进 PR 描述（"我在第 42 行加了个 if"）——reviewer 会看到 diff，描述里只需要讲 diff 看不出来的东西：意图、取舍、风险。
+
+## Stacked PR 的交接要点
+
+分层 PR 的额外风险是 reviewer 重复阅读已审过的层。两个动作解决：
+
+**每层描述只讲"本层新增差异"**，开头一句话写明依赖："基于 #123（已合并/待合并），本层在其之上新增了缓存逻辑"。
+
+**层间变动用 `git range-diff` 贴出对比**。上层 PR 因下层 rebase 而变化时：
+
+```bash
+# 对比上层 PR 在下层 rebase 前后的提交差异
+git range-diff origin/main...pr-branch-old origin/main...pr-branch-new
+```
+
+输出会逐提交标注 unchanged / modified / added，reviewer 只需要看 modified 的部分。
+
+<WarningBox title="别把 reviewer 当成需求背景探测器">
+  如果上下文全靠 reviewer 自己翻 issue、问产品、猜意图，评审必然变慢且判断质量波动大。"我着急先合了再补描述"的 PR，大概率在评审里把着急的时间加倍赔回去。
 </WarningBox>
 
 ## 接下来建议继续看什么
 
-1. [`small batch review`](/zh/best-practices/small-batch-review)
-2. [`pull request prep`](/zh/best-practices/pull-request-prep)
-3. [`stacked pull requests workflow`](/zh/workflows/stacked-pull-requests-workflow)
+1. [Pull Request 评审准备与协作规范](/zh/best-practices/pull-request-review-readiness) —— 开 PR 前的自检清单
+2. [小批量评审](/zh/best-practices/small-batch-review) —— PR 越小，四要素越容易写清楚
+3. [提交前整理与交互式 rebase](/zh/best-practices/review-and-safe-push) —— 让提交序列本身可读
+
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [分支策略与分支生命周期](/zh/best-practices/branch-workflow-and-lifecycle)
-- [提交卫生与提交信息](/zh/best-practices/commit-hygiene)
-- [高级提交信息规范](/zh/best-practices/commit-message-advanced)
-
+- [Pull Request 评审准备与协作规范](/zh/best-practices/pull-request-review-readiness)
+- [小批量评审](/zh/best-practices/small-batch-review)
+- [评审前整理与安全推送](/zh/best-practices/review-and-safe-push)

@@ -27,50 +27,85 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 通过 CODEOWNERS 建立文件级评审归属，减少关键模块无人负责或评审漂移的问题。
-- 理解 设计原则 相关的概念
-- 掌握 与分支保护联动 相关的操作
+- 写一份能真正生效的 `CODEOWNERS` 文件：放在哪、语法是什么、怎么排优先级
+- 把 CODEOWNERS 和分支保护的 "Require review from Code Owners" 串成强制门禁
+- 用按目录分组的 owner 策略，让"改了谁的地盘就找谁审"自动化
 
 ## 先想一个问题
 
-关于 GitHub CODEOWNERS 与评审归属，你的理解可能停留在"知道怎么操作"，但说不清它为什么这样设计、边界在哪里。恰恰是这些说不清的地方，最容易在关键时刻出问题。这篇把 GitHub CODEOWNERS 与评审归属从"会用"推进到"理解"。
+一个 20 人的仓库，PR 创建后 reviewer 怎么选？最常见的两个结局：要么发起人凭印象 @ 几个人，关键模块的改动被不相干的人随手 approve；要么没人认领，PR 挂两天才被"路过"的人审掉。
 
-## 设计原则
+CODEOWNERS 解决的就是"**谁有资格审这块代码**"的问题：把文件路径映射到团队或个人，PR 一碰到这些路径，owner 自动变成必需评审人。
 
-1. 按模块边界定义 owner，不按个人临时分工
-2. 避免单点 owner，关键模块至少双 owner
-3. 定期同步组织结构变化
+## 一句话理解
 
-<PlatformHierarchyFigure
-  title="CODEOWNERS 与审查责任分配"
-  caption="CODEOWNERS 将文件路径与审查者绑定，确保关键代码变更必须经过合适的人审查。"
-  topLabel="文件路径"
-  topItems="src/|docs/|config/"
-  middleLabel="CODEOWNERS"
-  middleItems="@team-backend|@team-docs|@team-devops"
-  bottomLabel="审查要求"
-  bottomItems="必须审批|自动分配|责任明确"
-/>
+`CODEOWNERS` 是一张"路径 → 负责人"的映射表；配合分支保护的 code owner 评审要求，它就从"通讯录"升级成"门禁"。
 
+## 创建 CODEOWNERS 文件
 
-## 与分支保护联动
+文件可以放在仓库的三个位置（按优先级）：
 
-当开启 “require review from code owners”，关键文件变更会自动触发 owner 审批门禁。
+```text
+.github/CODEOWNERS      # 推荐：和其它 .github 配置放一起
+CODEOWNERS              # 仓库根目录
+docs/CODEOWNERS         # docs 目录
+```
 
-<WarningBox title="CODEOWNERS 过细会导致评审拥堵">
-  规则颗粒度过小会让 PR 频繁触发大量 owner，反而降低吞吐。
+语法是"**模式 + 空格 + 一个或多个 owner**"，后面的规则覆盖前面：
+
+```text
+# 默认：所有文件归 platform 组兜底
+*                       @acme/platform
+
+# 前端目录归前端组，双 owner 避免单点
+frontend/               @acme/frontend @acme/frontend-lead
+
+# 指定单个文件
+.github/workflows/ci.yml @acme/devops
+
+# 越具体的规则优先级越高：CI 配置最终归 devops，不是 platform
+```
+
+owner 可以是 GitHub 用户（`@username`）、组织内团队（`@org/team-name`）、或邮箱（仅当公开邮箱匹配）。**注意团队必须先在组织里存在**，写一个不存在的团队，GitHub 会在 Checks 里报错且规则不生效。
+
+## 和分支保护串成门禁
+
+光有文件只是通讯录。到 **Settings → Branches → Add branch protection rule**（或 Rulesets）里勾选 **Require a pull request before merging → Require review from Code Owners**，映射表才变成强制：
+
+- PR 触到 `frontend/` 的文件 → `@acme/frontend` 自动成为必需评审人
+- owner 没 approve 之前，合并按钮保持禁用
+- owner 主动提交的改动，仍需要规则里另一位 owner 审（自己不能审自己）
+
+验证方式：开一个改 `frontend/` 下文件的 PR，Reviewers 栏里会出现自动带出的 owner，且带有 "Requested" 状态。
+
+<WarningBox title="规则颗粒度要跟组织规模匹配">
+  每个 PR 路径命中越多 owner 规则，需要的审批就越多。几十个目录各自一组 owner 的大仓库，常见后果是 PR 卡在等凑审批。按"模块边界"分组（一个服务一个 owner 组），而不是按子目录细分。
 </WarningBox>
+
+## 常见误区
+
+- **单点 owner**：只写 `@alice` 一个人，她休假时所有相关 PR 全部阻塞。关键模块至少写两个 owner。
+- **把 CODEOWNERS 当权限工具**：它只决定"谁来审"，不限制谁能写这些文件——写权限仍由分支保护和仓库角色控制。
+- **兜底规则缺失**：没有 `*` 兜底规则时，新增目录没有 owner，code owner 评审要求对它不生效，门禁出现静默漏洞。
+
+## 运维节奏
+
+CODEOWNERS 不是配完就完：组织架构每变动一次（人员调组、团队更名），这张映射表就陈旧一分。建议把它纳入季度检查——就像依赖升级一样，跑一遍规则、抽查几个近期 PR 的 reviewer 是否合理。
+
+<TipBox title="让代码改 CODEOWNERS 也走 CODEOWNERS">
+  给 `CODEOWNERS` 文件本身配一条 owner 规则（通常指向平台组或 Tech Lead）。否则任何人都能改这张门禁表，把自己的模块从评审范围里划掉。
+</TipBox>
 
 ## 接下来建议继续看什么
 
-1. [`code review handoff quality`](/zh/best-practices/code-review-handoff-quality)
-2. [`small batch review`](/zh/best-practices/small-batch-review)
-3. `github pull requests and reviews`
+1. [GitHub 分支保护与 Rulesets](/zh/platforms/github-branch-protection-and-rulesets) —— code owner 评审的开关所在
+2. [代码评审交接质量](/zh/best-practices/code-review-handoff-quality) —— owner 审通过后，交接质量怎么保证
+3. [小批量评审](/zh/best-practices/small-batch-review) —— PR 越小，owner 审批越快
+
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
 - [GitHub 分支保护与 Rulesets](/zh/platforms/github-branch-protection-and-rulesets)
 - [GitHub Flow 基础教程](/zh/platforms/github-flow-basics)
-- [GitLab CI/CD 与 Runners 入门](/zh/platforms/gitlab-ci-and-runners)
-
+- [Pull Request 与 Code Review 教程](/zh/platforms/pull-requests-and-reviews)

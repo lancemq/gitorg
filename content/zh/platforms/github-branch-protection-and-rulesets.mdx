@@ -27,48 +27,76 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 用 Branch protection 与 Rulesets 把分支策略从约定升级为平台强制，降低误推送和低质量合并风险。
-- 理解 推荐最小策略 相关的概念
-- 掌握 Rulesets 的价值 相关的操作
+- 为 `main` 配一套最小但完整的分支保护：禁直推、必需 PR、必需 CI、必需评审
+- 分清 classic branch protection 和 Rulesets 各自适合的场景，知道新仓库该选哪个
+- 用 required status checks 把"CI 绿了才能合"变成平台强制
 
 ## 先想一个问题
 
-关于 GitHub 分支保护与 Rulesets，你的理解可能停留在"知道怎么操作"，但说不清它为什么这样设计、边界在哪里。恰恰是这些说不清的地方，最容易在关键时刻出问题。这篇把 GitHub 分支保护与 Rulesets 从"会用"推进到"理解"。
+团队约定"`main` 只能走 PR 合并"，写在了 Wiki 上。三个月后：有人赶时间直推了一个提交；有人 force push 抹掉了两个同事的提交；CI 还在跑、代码已经合进去了。Wiki 没有约束力——**没有平台强制的约定，只是建议**。
 
-## 推荐最小策略
+GitHub 提供两代工具把约定变成强制：经典的 branch protection rules，和新的 rulesets。这篇把两代都讲清楚，以及一个新仓库应该怎么选。
 
-1. 受保护分支禁止直接 push
-2. 必须通过 required checks
-3. 必须至少一次 code review
-4. 限制 force push 和删除分支
+## 一句话理解
 
-<PlatformHierarchyFigure
-  title="分支保护与 Rulesets 层级"
-  caption="Rulesets 是新一代分支保护机制，支持更细粒度的应用范围和标准化管理。"
-  topLabel="仓库级策略"
-  topItems="默认分支|标签规则"
-  middleLabel="Rulesets"
-  middleItems="目标分支|触发条件|约束规则"
-  bottomLabel="保护结果"
-  bottomItems="合规合并|审批强制|自动化检查"
-/>
+分支保护回答"这条分支上哪些事不允许发生"；required status checks 和 required reviews 决定"什么条件下才允许合并"；Rulesets 是这一切的新一代载体，支持通配符批量管分支、规则分层叠加。
 
+## 动手配置最小保护（classic branch protection）
 
-## Rulesets 的价值
+进入 **Settings → Branches → Add branch protection rule**，Branch name pattern 填 `main`，勾选：
 
-- 跨分支统一策略
-- 规则可分层与组合
-- 减少每个仓库手工重复配置
+1. **Require a pull request before merging** —— 禁止直推，一切改动走 PR
+   - Required approvals: `1`（小团队）或 `2`（核心服务）
+   - 勾选 **Dismiss stale pull request approvals when new commits are pushed**：新提交进来后旧 approve 作废，防止"审完再偷改"
+2. **Require status checks to pass before merging** —— CI 红了不能合
+   - 搜索并添加必需检查项（如 `ci / build`、`ci / test`）。注意：只能选**已经跑过至少一次**的检查名
+   - 勾选 **Require branches to be up to date before merging**：合并前必须基于最新 `main`，避免"各自都绿、合到一起才崩"
+3. **Do not allow force pushes** 和 **Do not allow deletions** —— 保持默认勾选，锁死历史
 
-<WarningBox title="保护规则应优先约束主线与发布线">
-  若保护范围只覆盖部分关键分支，流程仍会在最脆弱路径上失守。
+保存后验证：往 `main` 直推会被拒绝；开一个 PR 不等 CI 跑完，合并按钮是灰的并写明哪个检查未通过。
+
+## Rulesets：新一代的做法
+
+Rulesets 在 **Settings → Rules → Rulesets** 创建，和 classic 保护的差别在四个点：
+
+| 能力 | Classic protection | Rulesets |
+| --- | --- | --- |
+| 分支匹配 | 一个规则一个 pattern | 一个 ruleset 多个 target（`main`、`release/*` 一起管） |
+| 组织级复用 | 每仓库单独配 | 支持组织级 ruleset，批量应用到所有仓库 |
+| 规则叠加 | 单规则生效 | 多个 rulesets 叠加，全部必须满足 |
+| bypass 权限 | 无 | 可指定角色/团队在紧急时绕过（留审计记录） |
+| 可见性 | 仅管理员可见 | 所有用户可见哪些规则在管这条分支 |
+
+新仓库建议直接用 Rulesets；老仓库在迁移时可以先并行建 ruleset、验证无冲突后再下掉 classic 规则。
+
+<WarningBox title="bypass 是逃生门，不是日常通道">
+  配了 bypass 权限的团队，务必约定"绕过必须附原因"，并定期审计 Rulesets 的 bypass 日志（Settings → Rules 里能看到每次绕过）。逃生门用顺手了，门禁就名存实亡。
 </WarningBox>
+
+## 常见误区
+
+- **保护了 `main` 却放过 `release/*` 和 `develop`**：所有可能被多人共同使用的分支都该纳入，Rulesets 的多 target 正是为此设计的。
+- **required checks 配了名字但 CI 改名**：workflow 里的 job 改名后，旧检查永远 pending，合并按钮永久灰。改名 CI 时要同步更新保护规则。
+- **把 force push 完全锁死后没有应急方案**：历史真的被污染需要改写时，正确做法是管理员临时调整规则操作，事后恢复——而不是平时就留一个可 force push 的口子。
+
+## 和其它门禁怎么配合
+
+分支保护是最外层的框架，往里面装什么决定门禁强度：
+
+- 勾上 **Require review from Code Owners**，让"谁来审"由 CODEOWNERS 文件自动决定
+- 配合 required CI checks，让"代码能不能合"由流水线说了算
+- 合并方式（merge commit / squash / rebase）也在同一页面配置，和团队评审节奏直接相关
+
+<TipBox title="最小可用起步组合">
+  Require PR + 1 approval + 必需 CI + 禁 force push。这四项覆盖 90% 的事故面，且不会明显拖慢节奏；其余选项等团队跑顺后再加。
+</TipBox>
 
 ## 接下来建议继续看什么
 
-1. [`PR merge strategy and platform settings`](/zh/workflows/pr-merge-strategy-and-platform-settings)
-2. [`shared history boundaries`](/zh/best-practices/shared-history-boundaries)
-3. `github pull requests and reviews`
+1. [GitHub CODEOWNERS 与评审归属](/zh/platforms/github-codeowners-and-review-ownership) —— 让"谁来审"自动化
+2. [PR 合并策略与平台设置](/zh/workflows/pr-merge-strategy-and-platform-settings) —— 合并按钮旁边的三个选项怎么选
+3. [共享历史边界](/zh/best-practices/shared-history-boundaries) —— 禁 force push 背后的历史约定
+
 ## 延伸阅读
 
 沿着同一主题继续深入：
@@ -76,4 +104,3 @@ export const metadata = {
 - [GitHub Actions 与 GitHub Skills 入门](/zh/platforms/github-actions-and-skills)
 - [GitHub CODEOWNERS 与评审归属](/zh/platforms/github-codeowners-and-review-ownership)
 - [GitHub Flow 基础教程](/zh/platforms/github-flow-basics)
-

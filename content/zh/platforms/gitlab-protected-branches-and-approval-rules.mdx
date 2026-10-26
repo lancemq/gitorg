@@ -27,36 +27,92 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 通过 Protected branches 与 Merge request approval rules 固化团队协作边界，减少高风险改动直接进入主线。
-- 理解 最小落地策略 相关的概念
-- 掌握 常见治理收益 相关的操作
+- 在 GitLab 里为 `main` 配置一套可直接落地的保护规则：禁止直接 push、强制 MR、必需 CI 和审批
+- 分清 Maintainer / Developer 角色在 Allowed to merge / Allowed to push 里的分工逻辑
+- 用 Approval rules 把"至少 N 个人点头"变成平台强制，而不是群里喊一嗓子
 
 ## 先想一个问题
 
-你或者你的团队可能已经在用 GitLab 受保护分支与审批规则了——但用法对不对？有没有踩在边界上？这篇带你把 GitLab 受保护分支与审批规则的前提、边界和常见误用重新过一遍，很多隐患在变成事故之前就能排掉。
+想象一个场景：周五晚上，一位新同事为了"赶紧修个线上小问题"，直接往 `main` push 了一个没跑过 CI 的提交。十分钟后流水线红了，同组的发布被卡住，没人说得清这个提交改了什么。
 
-## 最小落地策略
+问题不在人，在于 `main` 对所有人敞开。受保护分支解决的就是这件事：**把"大家约定好别直接推"升级成"平台根本不允许推"**。这篇带你把 GitLab 的 Protected branches 和 Approval rules 配置成一套能实际运转的门禁。
 
-1. 主线只允许通过 MR 合并
-2. 关键分支禁止开发者直接推送
-3. 至少一位或多位审批人通过
-4. 必需 CI 通过后才能合并
+## 一句话理解
 
-## 常见治理收益
+受保护分支决定"谁能往这条分支送代码、走什么流程"；审批规则决定"MR 合并前必须满足哪些人的同意"。两者配合，`main` 才真正变成一条只能通过评审进入的分支。
 
-- 降低误操作推送风险
-- 强化关键模块评审责任
-- 让合并决策可追溯
+## 动手配置最小保护规则
 
-<WarningBox title="权限模型要和团队角色同步更新">
-  组织结构变化后若不更新保护策略，权限会出现“历史遗留漏洞”。
+进入项目 **Settings → Repository → Protected branches**，点 **Add protected branch**（或 **Expand** 展开已有列表），对 `main` 做如下配置：
+
+| 配置项 | 推荐值 | 说明 |
+| --- | --- | --- |
+| Branch | `main` | 通配符可用，如 `release/*` |
+| Allowed to merge | Maintainers | 谁有权限点合并按钮 |
+| Allowed to push and merge | No one | 任何人都不许直推，只能走 MR |
+| Allowed to force push | 关闭 | 防止改写公共历史 |
+
+配置完成后立刻验证：本地往 `main` 直推一次。
+
+```bash
+git checkout main
+git commit --allow-empty -m "test direct push"
+git push origin main
+```
+
+终端会收到拒绝：
+
+```text
+remote: You are not allowed to push code to this branch.
+To gitlab.example.com:team/app.git
+ ! [remote rejected] main -> main (protected branch hook declined)
+error: failed to push some refs to 'gitlab.example.com:team/app.git'
+```
+
+看到 `protected branch hook declined` 就说明门禁生效了。
+
+<WarningBox title="Allowed to push 不要留 Developers">
+  给 Developer 保留直推权限是常见的"配置了等于没配"：保护规则只拦 Maintainer 之外的人。想让所有人走 MR，就把 Allowed to push and merge 设为 No one。
 </WarningBox>
+
+## 用审批规则强制"至少两个人点头"
+
+分支保护解决了"怎么进"，审批规则解决"谁来把关"。入口在 **Settings → Merge requests → Merge request approval rules**。
+
+**默认审批规则（全仓库生效）**：把 Approvals required 设为 `1` 或 `2`，Approval rules 选 **Any eligible users**（任何有权限的人都可以审）或指定审批人。
+
+**按模块定向审批**：点 **Add approval rule**，可以按 Code owners 路径规则定向——比如 `frontend/**` 需要 `@frontend-team` 里的 2 个人同意，`infra/**` 需要 `@sre` 的 1 个人同意。谁改了哪块代码，GitLab 会按改动文件自动算出该找谁审。
+
+配置完成后，一个不满足审批数的 MR 会在合并按钮旁边明确显示：
+
+```text
+Merge blocked: 1 approval required but 0 given.
+```
+
+## 常见误区
+
+- **把审批数设成 3、4 个起步**：审批人凑不齐，MR 堆积，大家开始互相"无脑点同意"，评审质量反而下降。小团队 1 个、核心模块 2 个是更可持续的起点。
+- **保护了 `main` 却放过 `release/*`**：发布分支同样直接面向生产，用通配符 `release/*` 一起纳入保护。
+- **审批规则从不更新**：同事离职后还留在 Approvers 列表里，审批请求发给了不存在的人。每次组织调整后过一遍规则。
+
+## 和工作流怎么配合
+
+保护分支 + 审批规则只定义了"门禁"，日常怎么走还取决于团队流程：
+
+- 小团队直接用 GitHub Flow 式的"分支 → MR → 评审 → 合并"节奏即可
+- 需要区分发布节奏的团队，配合 GitLab Flow 的环境分支使用
+- 高流量的 monorepo 可以进一步开启 Merge Trains，让合并本身也排队验证
+
+<TipBox title="落地顺序建议">
+  先上"禁止直推 + 1 个审批"这两个最小项，跑两周稳定后再按模块加定向审批规则。一次把所有门禁拉满，最常见的结局是团队想办法绕过门禁。
+</TipBox>
 
 ## 接下来建议继续看什么
 
-1. [`gitlab flow and merge requests`](/zh/platforms/gitlab-flow-and-merge-requests)
-2. [`pr merge strategy and platform settings`](/zh/workflows/pr-merge-strategy-and-platform-settings)
-3. [`shared history boundaries`](/zh/best-practices/shared-history-boundaries)
+1. [GitLab Flow 与 Merge Requests](/zh/platforms/gitlab-flow-and-merge-requests) —— 保护分支之上的分支模型
+2. [PR 合并策略与平台设置](/zh/workflows/pr-merge-strategy-and-platform-settings) —— squash / merge commit / rebase 怎么选
+3. [共享历史边界](/zh/best-practices/shared-history-boundaries) —— 为什么"哪些分支可以被改写"要提前约定
+
 ## 延伸阅读
 
 沿着同一主题继续深入：
@@ -64,4 +120,3 @@ export const metadata = {
 - [GitLab Merge Trains 与合并结果流水线](/zh/platforms/gitlab-merge-trains-and-merge-result-pipelines)
 - [Issues、Projects 与 Discussions 教程](/zh/platforms/issues-projects-and-discussions)
 - [Pull Request 与 Code Review 教程](/zh/platforms/pull-requests-and-reviews)
-

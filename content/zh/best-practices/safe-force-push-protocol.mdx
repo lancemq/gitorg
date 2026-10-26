@@ -33,65 +33,93 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 需要重写历史时，用明确告警、冻结窗口和 `--force-with-lease` 协议降低误覆盖协作者提交的风险。
-- 理解 协议最小要素 相关的概念
-- 掌握 推荐执行顺序 相关的操作
+- 判断一次历史改写"允不允许做"：分支归属、共享状态、备份三个前置条件
+- 默认用 `--force-with-lease` 代替 `--force`，并理解 lease 检查的是什么
+- 强推后发出一份队友能照着执行的"对齐指引"，而不是让大家自己摸索
 
 ## 先想一个问题
 
-你或者你的团队可能已经在用安全 force push 协议了——但用法对不对？有没有踩在边界上？这篇带你把安全 force push 协议的前提、边界和常见误用重新过一遍，很多隐患在变成事故之前就能排掉。
+你在 feature 分支上 rebase 完想推上去，习惯性敲了 `git push --force`。三十秒后同事在群里问："我本地那几个提交没了？"——他一小时前刚往这条分支推过代码，被你的强推无声覆盖了。
 
-## 协议最小要素
+`--force` 本身不难用，难的是**你不知道自己覆盖掉了谁的工作**。安全 force push 协议解决的就是这个信息差：把"覆盖别人"从一个静默副作用，变成一个有检查、有告知、有恢复路径的显式动作。
 
-1. 仅允许在明确范围分支执行
-2. 执行前发出冻结提醒
-3. 默认使用 `--force-with-lease`
-4. 执行后发布恢复指引
+## 一句话理解
 
-<CommandFlowFigure
-  title="安全 Force-push 协议"
-  caption="安全的 force-push 不是不用，而是在严格的先验条件下使用。"
-  inputsLabel="强制先验"
-  inputs="确认没有人基于当前分支|创建备份|使用 --force-with-lease"
-  commandLabel="force-push protocol"
-  outputsLabel="安全结果"
-  outputs="不覆盖他人工作|可恢复|团队可同步"
-  note="--force-with-lease 是 force-push 的安全版本，它会检查远程是否与预期一致。"
-/>
+安全的 force push = 只在私有分支做 + `--force-with-lease` 兜底 + 执行后告诉所有人怎么对齐。
 
+## 前置判断：这次强推允不允许
 
-## 推荐执行顺序
+动手前过三个问题，任何一个是"否"就停下：
+
+1. **这条分支只有你一个人在用吗？** 个人 feature 分支通常是；共享分支（`main`、`develop`、`release/*`、公共集成分支）直接不允许。
+2. **有备份吗？** 改写前留一个指回旧历史的引用，成本是零，收益是无限：
+
+```bash
+# 改写前打一个备份分支，指向当前远端位置
+git branch backup/feature-x-pre-rebase origin/feature-x
+```
+
+3. **协作者知道吗？** 已经有人在基于这条分支工作时，强推要提前打招呼并约定对齐时机，不能"推完再说"。
+
+## 用 `--force-with-lease` 代替 `--force`
 
 ```bash
 git fetch origin
-git log --oneline --graph --decorate -20
-git push --force-with-lease origin <branch>
+git push --force-with-lease origin feature-x
 ```
 
-## 为什么必须用 lease
+`--force-with-lease` 的语义是："**只有当远端分支还停在我最后一次 fetch 看到的位置时，才允许覆盖**"。如果同事在你 rebase 期间又推了新提交，远端位置和你本地的"lease"对不上，push 会被拒绝：
 
-`--force-with-lease` 会检测远端是否出现你未知的新提交，能避免覆盖同事刚推送的改动。
+```text
+! [rejected]        feature-x -> feature-x (stale info)
+error: failed to push some refs to 'origin'
+hint: Updates were rejected because the tip of your current branch is behind
+```
 
-<WarningBox title="共享主线尽量不做 force push">
-  对多人协作主线做强推，恢复和沟通成本通常远高于一次历史整洁收益。
-</WarningBox>
+这个拒绝不是麻烦，是它在替你保住同事的提交。收到拒绝后先 `git fetch` + `git log` 看看远端多了什么，把新提交 rebase 进来再推，而不是换 `--force` 硬闯。
+
+<TipBox title="把 lease 设成 git 默认">
+  `git config --global alias.fpush 'push --force-with-lease'`——以后肌肉记忆里只有 fpush，`--force` 从命令表里消失。
+</TipBox>
+
+## 强推之后的对齐指引
+
+强推完成不是结束。受影响的协作者本地还停在旧历史上，直接 pull 会产生一团乱麻的合并。在群里发这段模板：
+
+```text
+feature-x 已 rebase 强推（旧位置备份在 backup/feature-x-pre-rebase）。
+基于旧历史有本地提交的同学这样对齐：
+  git fetch origin
+  git switch feature-x
+  git rebase origin/feature-x
+  # 冲突时以 origin 侧为准；你自己的提交会重放在上面
+有问题的提交先不要 push，找我确认。
+```
+
+**为什么不建议 `git pull`**：pull 会把旧远端历史和新远端历史做一次合并，产出一坨双向重复的提交。rebase 是把"你的本地工作"搬到"新历史"上，结果干净得多。
 
 ## 常见误区
 
-- 把 `--force` 当成“快速修正键”
-- 没有提前告知受影响协作者
-- 强推后不给恢复命令和对齐窗口
+- **把 `--force` 当快速修正键**：`push -f` 一次省 5 秒，覆盖同事提交后找回花一小时，还得赔一顿咖啡。
+- **在共享分支强推"就这一次"**：`main`、`develop` 上没有安全强推这回事。真需要改写（如敏感信息清理），走正式流程：冻结 → 备份 → 通知全员 → 协作式重写。
+- **强推后不做对齐指引**：最贵的成本不在覆盖本身，而在每个队友各自摸索恢复时浪费的时间和产生的二次混乱。
+- **依赖 `--force-with-lease` 就不打招呼**：lease 只保护"你在 fetch 之后远端没动"的情况，不解决"大家不知道历史变了"的协作问题。
+
+## 和平台门禁的配合
+
+- GitHub / GitLab 的分支保护都可以直接**禁止 force push**（GitHub 默认禁止，GitLab 里是 "Allowed to force push" 开关）——共享分支的协议应该由平台强制，而不是靠自觉
+- 私有 feature 分支通常不需要额外配置，个人分支自己管好 lease 即可
 
 ## 接下来建议继续看什么
 
-1. [`shared history boundaries`](/zh/best-practices/shared-history-boundaries)
-2. [`assess force-push impact`](/zh/recovery/assess-force-push-impact)
-3. [`review and safe push`](/zh/best-practices/review-and-safe-push)
+1. [共享历史边界](/zh/best-practices/shared-history-boundaries) —— 哪些分支永远不该改写，提前约定清楚
+2. [reflog 找回丢失提交](/zh/recovery/reflog-recovery) —— 强推事故后的第一恢复手段
+3. [误删分支后怎么找回](/zh/recovery/recover-deleted-branch) —— 备份分支也没了时的兜底
+
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [安全使用 cherry-pick专题](/zh/best-practices/safe-cherry-picks)
-- [Git 安全实践](/zh/best-practices/security-with-git)
-- [共享历史的改写边界](/zh/best-practices/shared-history-boundaries)
-
+- [共享历史边界](/zh/best-practices/shared-history-boundaries)
+- [改写历史前备份](/zh/best-practices/backup-before-rewrite)
+- [Reflog 恢复教程](/zh/recovery/reflog-recovery)

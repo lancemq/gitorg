@@ -24,7 +24,7 @@ export const metadata = {
     {
       title: "git-scm.com — Git tag",
       url: "https://git-scm.com/docs/git-tag",
-      kind: "official",
+      kind: "discussion",
     },
   ],
 };
@@ -33,52 +33,76 @@ export const metadata = {
 
 ## 学完这篇你会掌握什么
 
-- 通过固定发布清单把关键检查项前置并标准化，降低“靠经验记忆”导致的线上发布遗漏与事故。
-- 理解 最小清单结构 相关的概念
-- 掌握 执行原则 相关的操作
+- 写一份每项"可验证、有负责人、有失败出口"的发布清单，而不是一页打勾仪式
+- 把 Git 操作（tag、回滚点、cherry-pick 窗口）嵌进清单，让检查和命令一一对应
+- 区分"清单该管的事"和"该交给 CI 自动化的事"，避免清单无限膨胀
 
 ## 先想一个问题
 
-你或者你的团队可能已经在用发布清单纪律了——但用法对不对？有没有踩在边界上？这篇带你把发布清单纪律的前提、边界和常见误用重新过一遍，很多隐患在变成事故之前就能排掉。
+发布出过事的人都有同款记忆：复盘会上有人小声说"我以为你确认过迁移脚本了"。不是谁失职——发布当天要确认的事太多，靠记忆和默契，漏一项只是时间问题。
 
-## 最小清单结构
+清单的作用不是"让发布更隆重"，而是把**经验从人脑里搬到纸面上**：老手每次发布前脑子里过一遍的那十几件事，变成团队里每个人都能照着执行的固定动作。
 
-1. 版本与变更范围确认
-2. 数据迁移与回退策略确认
-3. 监控与告警阈值确认
-4. 发布后验证与值班确认
+## 一句话理解
 
-<GitflowReleaseFigure
-  title="发布检查单纪律"
-  caption="检查单确保每次发布都经过同样的验证步骤，减少人为疏漏。"
-  startLabel="启动发布"
-  releasePrepLabel="发布准备"
-  releaseBackmergeLabel="发布后回带"
-  hotfixBackmergeLabel="hotfix 回带"
-/>
+发布清单 = 把"老手的直觉"翻译成"新手的步骤"，每一项都要有可验证的完成证据。
 
+## 一份可执行的发布清单长什么样
 
-## 执行原则
+反例是"确认版本号正确"——怎么确认？正确的写法是**动作 + 证据**：
 
-- 每项要有负责人
-- 每项要可验证，不写空泛措辞
-- 失败项不能“先发布后补”
+```markdown
+## 发布前（T-1 天）
 
-## 示例检查项
+- [ ] 变更范围：`git log v2.3.0..release/2.4.0 --oneline` 输出与需求单核对，共 N 个提交（负责人：@release-manager）
+- [ ] 数据迁移：迁移脚本已在预发执行，回滚脚本预演通过，截图贴到发布单（负责人：@db-owner）
+- [ ] 灰度方案：第一批放量比例与观察指标已写入发布单（负责人：@on-call）
+- [ ] 冻结窗口：`release/2.4.0` 已进入 code freeze，`git branch` 确认无未合并的功能提交（负责人：@tech-lead）
 
-- `git tag` 对应版本号与变更单一致
-- 回滚命令在预发已演练
-- 关键看板已设置发布窗口标记
+## 发布中
 
-<WarningBox title="清单不是形式化打勾">
-  如果执行时不验证证据（日志、截图、命令结果），清单会退化为仪式，无法真正降低风险。
+- [ ] 打 tag：`git tag -a v2.4.0 -m "release 2.4.0" && git push origin v2.4.0`，tag 指向的 commit 与发布单一致
+- [ ] 流水线：发布 pipeline 全绿，产物版本号 `2.4.0` 与 tag 一致
+- [ ] 线上验证：健康检查接口返回 200，核心埋点有新版本数据上报
+
+## 发布后（T+1 天）
+
+- [ ] 观察期结束：错误率与延迟回到基线，无未处理告警
+- [ ] 回带：`release/2.4.0` 的修复已合回 `main`
+- [ ] 复盘：本次发布发现的清单缺口已提 issue
+```
+
+三个特征把它和"打勾仪式"区分开：**每项有负责人**（出问题找得到人）、**每项有证据**（命令输出/截图，不是"已确认"两个字）、**每项有失败出口**（不通过时做什么，写清楚）。
+
+## 哪些事该给 CI，别塞进清单
+
+清单越长越没人认真执行。凡是机器能判定的检查，都应该从清单里删掉、下沉到流水线：
+
+| 靠人检查（清单） | 靠机器检查（CI） |
+| --- | --- |
+| 变更范围是否符合需求单 | 单元测试、lint、构建 |
+| 回滚方案是否演练过 | tag 与版本号一致性 |
+| 灰度比例的业务判断 | 迁移脚本语法校验 |
+| 值班交接确认 | 依赖漏洞扫描 |
+
+判断标准：**需要业务判断或跨团队沟通的留给清单；有明确通过/失败标准的交给 CI**。
+
+<WarningBox title="失败项不能'先发布后补'">
+  清单里任何一项没有通过，发布就停——包括"就差这一个迁移脚本验证"的时候。允许一次"带病发布"，清单的权威性就归零，下次没人会认真对待"停止线"。
 </WarningBox>
+
+## 常见误区
+
+- **清单只有发布当天用**：迁移演练、灰度方案这些 T-1 项才是拦事故的主力，发布当天只剩执行。
+- **清单从不清版**：每次事故复盘发现的缺口应该回流进清单（见"复盘"项），一年不变的清单意味着复盘在空转。
+- **紧急修复跳过清单**：hotfix 更需要清单——恰恰是高压场景下最容易漏掉回滚准备。可以有一份 3 项的 hotfix 精简版，但不能没有。
 
 ## 接下来建议继续看什么
 
-1. [`release hygiene`](/zh/best-practices/release-hygiene)
-2. [`code freeze and release candidate workflow`](/zh/workflows/code-freeze-and-release-candidate-workflow)
-3. [`hotfix rollback after release`](/zh/workflows/hotfix-rollback-after-release)
+1. [发布前 Git 卫生专题](/zh/best-practices/release-hygiene) —— 冻结窗口里分支该收拾成什么样
+2. [Code Freeze 与发布候选工作流](/zh/workflows/code-freeze-and-release-candidate-workflow) —— 冻结到发布的完整节奏
+3. [发布后 Hotfix 与回滚](/zh/workflows/hotfix-rollback-after-release) —— 清单失败出口的具体走法
+
 ## 延伸阅读
 
 沿着同一主题继续深入：
@@ -86,4 +110,3 @@ export const metadata = {
 - [Pull Request 评审准备与协作规范](/zh/best-practices/pull-request-review-readiness)
 - [发布前 Git 卫生专题](/zh/best-practices/release-hygiene)
 - [评审前整理与安全推送](/zh/best-practices/review-and-safe-push)
-
