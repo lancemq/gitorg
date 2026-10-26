@@ -1013,6 +1013,16 @@ export function PracticeLab({
   mistakesLabel,
   mistakes,
 }: PracticeLabProps) {
+  // 练习区块暂时下线：不再在正文页展示（内容仍保留在 MDX 中）
+  void setup;
+  void setupLabel;
+  void title;
+  void intro;
+  void outcomesLabel;
+  void mistakesLabel;
+  void stepsLabel;
+  return null;
+
   const stepItems = splitItems(steps);
   const outcomeItems = splitItems(outcomes);
   const mistakeItems = splitItems(mistakes);
