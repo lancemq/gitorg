@@ -31,9 +31,12 @@ export function SiteShell({ locale, sidebar, children }: SiteShellProps) {
         </div>
 
         <nav className="side-nav">
-          {sidebar.groups.map((group) => (
-            <div className="nav-group" key={group.title}>
-              <p className="nav-title">{group.title}</p>
+          {sidebar.groups.map((group, groupIndex) => (
+            <div
+              className={`nav-group${group.divider ? " is-divided" : ""}`}
+              key={group.title ?? `group-${groupIndex}`}
+            >
+              {group.title ? <p className="nav-title">{group.title}</p> : null}
               {group.items.map((item) => (
                 <div className="nav-node" key={item.href}>
                   <Link
@@ -85,6 +88,15 @@ export function SiteShell({ locale, sidebar, children }: SiteShellProps) {
         <div className="sidebar-footer">
           <p>{sidebar.footerTitle}</p>
           <span>{sidebar.footerText}</span>
+          {sidebar.footerLinks?.length ? (
+            <div className="sidebar-footer-links">
+              {sidebar.footerLinks.map((link) => (
+                <Link key={link.href} href={link.href}>
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          ) : null}
         </div>
       </aside>
 

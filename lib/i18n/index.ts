@@ -82,7 +82,8 @@ export type NavItem = {
 };
 
 export type NavGroup = {
-  title: string;
+  title?: string;
+  divider?: boolean;
   items: NavItem[];
 };
 
@@ -91,6 +92,7 @@ export type SidebarContent = {
   searchLabel: string;
   footerTitle: string;
   footerText: string;
+  footerLinks?: { label: string; href: string }[];
   localeLabel: string;
   localeNames: Record<Locale, string>;
   groups: NavGroup[];
