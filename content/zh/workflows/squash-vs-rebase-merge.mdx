@@ -123,6 +123,27 @@ export const metadata = {
 如果答案是否定的，squash 往往更合适。  
 如果答案是肯定的，rebase merge 往往更有价值。
 
+## 对应的 Git 操作序列
+
+两种合并的命令形态与产物对比：
+
+```bash
+# squash：整个分支变成 main 上的一个提交
+git switch main
+git merge --squash feature/login-form
+git commit -m "feat: login form (#123)"
+git log --oneline -1   # 只有一个新提交，分支内部的 8 个提交消失
+
+# rebase merge：分支提交逐个重放到 main 上，保持粒度
+git switch feature/login-form
+git rebase origin/main          # 先把分支对齐最新 main
+git switch main
+git merge --ff-only feature/login-form
+git log --oneline -3   # 分支里的每个提交都在，且是线性的
+```
+
+选型速查：分支里有"半成品提交"（fixup、wip）选 squash；提交本身就是精心拆分的逻辑单元（每个可独立 revert）选 rebase merge。
+
 ## 常见误区
 
 ### 误区 1：squash 一定更高级

@@ -115,6 +115,30 @@ export const metadata = {
 4. 共享分支如果必须重写历史，必须显式通知相关人
 5. 主分支和 release 分支比普通共享分支更保守
 
+## 对应的 Git 操作序列
+
+共享分支的日常同步节奏：
+
+```bash
+# 每天开工第一件事：同步 main 到本地
+git switch main && git pull --ff-only origin main
+# --ff-only 保证本地 main 永远是远端的干净镜像，不会被意外弄出合并提交
+
+# 功能分支周期性吸收 main 的更新（推荐 rebase，保持线性）
+git switch feature/login-form
+git fetch origin
+git rebase origin/main
+
+# 分支已经共享给他人时，改用 merge 而不是 rebase
+git merge origin/main
+
+# 判断该用哪个：分支有没有被别人拉取过
+git branch -r --contains feature/login-form
+# 有任何远端引用包含它 → 已共享 → 用 merge
+```
+
+要点：`pull --ff-only` 是防止本地 main 被污染的最好习惯；rebase 还是 merge 的判断依据是"分支是否已共享"，不是个人喜好。
+
 ## 常见误区
 
 ### 把共享分支当成个人分支继续整理

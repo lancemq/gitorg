@@ -114,6 +114,29 @@ git branch -vv
 
 这个协议的价值不是限制大家，而是让每个人对“同步之后会发生什么”有共同预期。
 
+## 对应的 Git 操作序列
+
+多人同分支的日常同步动作：
+
+```bash
+# 开工：先同步，再干活
+git switch feature/shared-branch
+git pull --rebase origin feature/shared-branch
+# --rebase 把本地未推送的提交挪到远端最新之后，避免"merge 同步提交"刷屏
+
+# 收工：推送前再拉一次，减少推送被拒
+git fetch origin
+git rebase origin/feature/shared-branch   # 有新提交就 rebase 一下
+git push origin feature/shared-branch
+
+# 推送被拒（别人抢先推了）时的标准处理
+git fetch origin
+git rebase origin/feature/shared-branch
+git push origin feature/shared-branch
+```
+
+要点：同分支协作的三条纪律——开工先 pull --rebase、提交粒度小而频繁、push 被拒用 rebase 而不是 merge。半天推一次的大提交是同分支冲突的头号来源。
+
 ## 常见误区
 
 ### “我一直用 pull，也没出过事”

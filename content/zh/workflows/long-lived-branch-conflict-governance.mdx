@@ -77,6 +77,25 @@ export const metadata = {
 - 对重复冲突启用 rerere
 - 一旦某些目录长期高冲突，回头讨论是不是应该拆模块、缩小并行修改范围
 
+## 对应的 Git 操作序列
+
+长周期分支的定期同步：
+
+```bash
+# 每周固定一次：把 main 的进展合入长周期分支，让冲突小额分期偿还
+git switch feature/big-refactor
+git fetch origin
+git merge origin/main
+# 冲突逐个解掉，本次同步的解决决策记录在 merge commit message 里
+git commit  # 补充说明：为何这样解
+
+# 检查"分叉程度"，决定是否需要加大同步频率
+git rev-list --left-right --count feature/big-refactor...origin/main
+# 输出形如 "23  51"：本分支独有 23 个提交，main 独有 51 个——分叉越大越危险
+```
+
+要点：`--left-right --count` 是长周期分支的健康仪表盘，两个数字都超过 30 就该拉响警报。
+
 ## 常见误区
 
 - 以为冲突只是个人操作问题

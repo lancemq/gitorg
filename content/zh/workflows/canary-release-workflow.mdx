@@ -71,6 +71,28 @@ export const metadata = {
   如果团队没有明确“何时通过、何时回滚”的门槛，金丝雀发布无法发挥风险控制作用。
 </WarningBox>
 
+## 对应的 Git 操作序列
+
+金丝雀版本的分支与标签操作：
+
+```bash
+# 从 release 分支切出 canary 分支，部署小流量环境
+git switch -c release/2.5.0-canary release/2.5.0
+git push origin release/2.5.0-canary
+
+# 每一级放量通过后，若需带修复进入下一级，用 cherry-pick 同步
+git switch release/2.5.0-canary
+git cherry-pick <fix-commit>
+
+# 全量通过后，把 canary 分支快进合并回 release 分支并打正式 tag
+git switch release/2.5.0
+git merge --ff-only release/2.5.0-canary
+git tag -a v2.5.0 -m "canary validated release"
+git push origin release/2.5.0 v2.5.0
+```
+
+要点：canary 分支上的改动用 cherry-pick 进来而不是直接提交，保证与 release 分支的差异始终只有"待验证的修复"。
+
 ## 常见误区
 
 ### 误区 1：只看技术指标，不看业务指标

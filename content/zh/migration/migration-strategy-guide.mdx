@@ -15,6 +15,12 @@ export const metadata = {
   ],
 };
 
+# 代码仓库迁移策略指南
+
+## 学完这篇你会掌握什么
+
+- 完整的仓库迁移框架，涵盖评估、试迁移、切换和过渡四阶段，工具选型矩阵、作者映射、历史取舍和团队沟通策略。
+
 ## 先想一个问题
 
 你或者你的团队可能已经在用代码仓库迁移策略指南了——但用法对不对？有没有踩在边界上？这篇带你把代码仓库迁移策略指南的前提、边界和常见误用重新过一遍，很多隐患在变成事故之前就能排掉。
@@ -76,12 +82,10 @@ echo "源: $(svn log -q | grep -c '^r')" && echo "目标: $(git log --oneline | 
 将源系统用户名映射为 `姓名 <邮箱>` 格式：
 
 ```bash
-git svn clone --authors-file=authors.txt
+git svn clone --authors-file=authors.txt https://svn.example.com/svn/repo trunk
 # 查找未映射的作者
-
-## 学完这篇你会掌握什么
-
-- 完整的仓库迁移框架，涵盖评估、试迁移、切换和过渡四阶段，工具选型矩阵、作者映射、历史取舍和团队沟通策略。
+git shortlog -sn HEAD | head -20
+```
 
 ## 历史保留 vs 清理的权衡
 

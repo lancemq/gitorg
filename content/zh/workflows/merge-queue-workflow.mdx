@@ -110,6 +110,28 @@ merge queue 的重点，是让受保护分支只有一种受控进入方式。
 
 这样做的目的，是让 queue 承担“整合协调”，而不是变成“临时救火池”。
 
+## 对应的 Git 操作序列
+
+合并队列下的提交与入队：
+
+```bash
+# 正常开发推送分支，然后在平台上点 "Add to merge queue"
+# 队列会自动把你的分支与其它排队分支依次组合验证
+
+# 查看自己分支与 main 的分叉情况（入队前自检）
+git fetch origin
+git log --oneline main..feature/login-form     # 你将带入的提交
+git log --oneline feature/login-form..main     # main 上领先的部分（队列会处理）
+
+# 如果队列验证失败（组合后冲突或 CI 挂）：
+git switch feature/login-form
+git rebase origin/main      # 吸收 main 最新进度，解冲突
+git push --force-with-lease origin feature/login-form
+# 然后重新入队
+```
+
+要点：合并队列改变了"合完再发现问题"的模式——它的验证分支模拟的是"所有排队 PR 都合进去之后"的状态，所以偶发的组合冲突在入队阶段就会暴露。
+
 ## 常见误区
 
 ### 以为 queue 能代替 pre-review sync

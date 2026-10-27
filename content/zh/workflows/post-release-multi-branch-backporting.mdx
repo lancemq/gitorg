@@ -119,6 +119,27 @@ backport 的难点不是把提交搬过去，而是判断这个提交在那条�
 4. 记录已完成、已拒绝和待处理的维护线
 5. release note / changelog / support 说明同步更新
 
+## 对应的 Git 操作序列
+
+一次修复，多分支回带的操作序列：
+
+```bash
+# 1. 修复在 main 上完成并合并
+# ... main 上的 fix PR ...
+
+# 2. 依次回带到各维护分支
+git switch release/2.3 && git cherry-pick <fix-commit> && git push origin release/2.3
+git switch release/2.4 && git cherry-pick <fix-commit> && git push origin release/2.4
+
+# 3. cherry-pick 冲突时的原则：老分支允许裁剪，不允许改变语义
+#    解决后不加 -e 直接继续，或在提交信息里注明"backport, adapted"
+
+# 4. 全部回带完成后，用 range-diff 确认各分支版本语义一致
+git range-diff main release/2.3 release/2.4
+```
+
+要点：维护一张回带矩阵（修复 × 目标分支），每完成一格打勾——靠记忆管理 3 个以上分支的回带必漏。
+
 ## 常见误区
 
 ### 以为一个 cherry-pick 成功就代表所有线都能直接复用

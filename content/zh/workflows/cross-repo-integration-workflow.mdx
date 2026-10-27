@@ -76,6 +76,25 @@ export const metadata = {
   某个仓库的接口已变更，但另一个仓库仍使用旧契约，就会出现“单测都绿、联调全红”。跨仓任务里，版本矩阵比单仓通过更关键。
 </WarningBox>
 
+## 对应的 Git 操作序列
+
+跨仓库联动的同步与验证：
+
+```bash
+# 1. 在依赖仓库发布新版本并打 tag
+cd repo-lib && git tag -a v3.2.0 -m "release v3.2.0" && git push origin v3.2.0
+
+# 2. 在消费仓库里升级依赖版本，单独成提交（便于回滚整个集成）
+cd repo-app
+# 更新 package.json / go.mod / pom.xml 中的版本号
+git commit -am "build: bump repo-lib to v3.2.0"
+
+# 3. 联调通过后合并；联调失败则一个 revert 撤销整个集成
+git revert <integration-commit>
+```
+
+要点：跨仓库的版本升级提交必须独立、可单独 revert——把依赖升级混在功能提交里，回滚时就是事故。
+
 ## 常见误区
 
 ### 误区 1：只在聊天工具同步，不沉淀集成清单

@@ -65,6 +65,25 @@ export const metadata = {
   即使接口设计正确，如果客户端升级节奏不可控，强制切换仍会触发大面积失败。版本治理必须包含沟通和窗口管理。
 </WarningBox>
 
+## 对应的 Git 操作序列
+
+版本分支与下线收尾，落到 Git 上就是这几条命令：
+
+```bash
+# 从主干切出旧版本的维护分支，迁移窗口内两版并行
+git switch -c api/v1-maintenance origin/main
+git push origin api/v1-maintenance
+
+# 新版本开发继续在 main 上走常规 MR
+
+# 迁移截止、监控归零后，给旧版本打最后一个维护 tag 再归档分支
+git tag -a v1.9.9 api/v1-maintenance -m "final v1 maintenance release"
+git push origin v1.9.9
+git push origin --delete api/v1-maintenance
+```
+
+要点：维护分支只收修复类 cherry-pick，不收功能；下线分支前打 tag，保证历史随时可查。
+
 ## 常见误区
 
 ### 误区 1：版本号有了就算治理完成

@@ -120,6 +120,29 @@ git revert <hotfix-commit>
 
 这套协议的价值是让“事故处理”不只靠个人经验，而是能被团队复用。
 
+## 对应的 Git 操作序列
+
+发布后修复与回滚的完整动作：
+
+```bash
+# 场景 A：修 bug 前进（hotfix）
+git switch -c hotfix/2.4.1 v2.4.0        # 从出问题的 tag 切出
+# ... 修复 ...
+git commit -am "fix: null check in billing path"
+git tag -a v2.4.1 && git push origin v2.4.1 hotfix/2.4.1
+git switch main && git cherry-pick v2.4.1  # 修复回带 main
+
+# 场景 B：直接回滚（修复来不及）
+git revert --no-edit v2.4.0               # 生成抵消提交，不改写历史
+git tag -a v2.4.0-rc-revert && git push origin v2.4.0-rc-revert
+
+# 场景 C：需要把某个坏提交从分支上精确撤掉
+git revert <bad-commit>                    # 单提交撤销
+git revert --no-commit v2.4.0..v2.4.2 && git commit  # 区间批量撤销
+```
+
+要点：`revert` 优先于"删 tag 重发"——tag 是承诺，删了它所有引用这个版本号的部署记录都对不上了。
+
 ## 常见误区
 
 ### “线上坏了，就赶紧在当前分支继续修”

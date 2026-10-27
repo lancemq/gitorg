@@ -113,6 +113,26 @@ export const metadata = {
   只要平台入口还开着，团队里就一定会有人走那条路。真正想统一 PR 落地方式，必须让平台设置和规范站在同一边。
 </WarningBox>
 
+## 对应的 Git 操作序列
+
+三种合并方式对应的操作与产物：
+
+```bash
+# Merge commit：保留分支形态，适合有意义的提交序列
+git switch main && git merge --no-ff feature/login-form
+
+# Squash：压成一个提交，适合零散小提交的功能分支
+# （GitHub/GitLab 上点 "Squash and merge"，命令行等价于：）
+git switch main && git merge --squash feature/login-form
+git commit -m "feat: login form with validation (#123)"
+
+# Rebase merge：线性历史且保留原提交粒度
+git switch main && git merge --ff-only feature/login-form
+# （前提：feature 分支已 rebase 到 main 最新）
+```
+
+平台设置在 Settings → Merge requests / Branches 里控制按钮显隐——**关掉团队不用的合并方式**，比写文档约定更有效。
+
 ## 常见误区
 
 ### 以为平台默认值就是团队最佳实践

@@ -15,6 +15,12 @@ export const metadata = {
   ],
 };
 
+# git filter-repo 仓库重写深入
+
+## 学完这篇你会掌握什么
+
+- 深入解析 git filter-repo 工具，涵盖仓库拆分、文件清理、作者信息重写等高级用法，以及与 filter-branch 和 BFG 的对比。
+
 ## 先想一个问题
 
 关于 git filter-repo 仓库重写，你的理解可能停留在"知道怎么操作"，但说不清它为什么这样设计、边界在哪里。恰恰是这些说不清的地方，最容易在关键时刻出问题。这篇把 git filter-repo 仓库重写从"会用"推进到"理解"。
@@ -29,10 +35,8 @@ git filter-repo 是由 Elijah Newren 开发的 Python 工具，现已作为 Git 
 
 ```bash
 # 安装
-
-## 学完这篇你会掌握什么
-
-- 深入解析 git filter-repo 工具，涵盖仓库拆分、文件清理、作者信息重写等高级用法，以及与 filter-branch 和 BFG 的对比。
+pip3 install git-filter-repo
+```
 
 ## 核心使用场景
 

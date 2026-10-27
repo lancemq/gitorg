@@ -68,6 +68,27 @@ export const metadata = {
   在未确认全链路已切换完成前，直接删除旧结构会让回滚成本暴增。优先延迟清理，先确保稳定。
 </WarningBox>
 
+## 对应的 Git 操作序列
+
+迁移脚本的版本化与回滚点管理：
+
+```bash
+# 迁移改动单独成提交，与功能代码分开，方便单独回滚
+git switch -c feat/2.4-user-migration origin/main
+# ... 编写 migration/002_add_user_index.up.sql 与 .down.sql ...
+git add migration/
+git commit -m "migration: add user index with rollback script"
+
+# 发布前在预发验证回滚路径：先执行 up，再执行 down，确认数据无损
+# （命令行验证由 CI 或 DBA 在预发环境执行，仓库里保留脚本即可）
+
+# 合并后打发布 tag，tag 就是理论上的回滚锚点
+git tag -a v2.4.0 -m "includes migration 002"
+git push origin v2.4.0
+```
+
+要点：up/down 脚本必须同一个提交进库——只进 up 不进 down 的迁移，等于把回滚方案留给了现场发挥。
+
 ## 常见误区
 
 ### 误区 1：开发环境通过就直接上生产

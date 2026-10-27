@@ -69,6 +69,27 @@ export const metadata = {
   复盘不是写文档，而是改系统。每条结论都应转化为可执行、可验证、可追责的工程动作。
 </WarningBox>
 
+## 对应的 Git 操作序列
+
+从复盘到护栏落地，Git 侧的三个动作：
+
+```bash
+# 1. 用 git log 锁定事故相关提交区间，作为复盘的事实依据
+git log --oneline v1.3.0..v1.3.1
+
+# 2. 复盘产出的护栏改动（检查脚本、CI 步骤）单独成 PR
+git switch -c guardrail/prevent-missing-migration origin/main
+# ... 添加 CI 检查步骤 ...
+git commit -m "ci: block merges when migration files are missing"
+git push origin guardrail/prevent-missing-migration
+# 开 MR 并关联复盘文档链接
+
+# 3. 给事后修复打标注 tag，方便日后追溯同类问题
+git tag -a postmortem/2026-10-migration-miss <commit> -m "incident fix reference"
+```
+
+要点：护栏 PR 描述里必须回链复盘文档——半年后有人质疑这条 CI 检查时，能一眼找到它存在的原因。
+
 ## 常见误区
 
 ### 误区 1：把“加强注意”当改进项
