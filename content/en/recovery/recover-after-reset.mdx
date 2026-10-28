@@ -46,14 +46,6 @@ export const metadata = {
 
 # Recover after an over-aggressive reset
 
-## What you will learn
-
-- When reset moves the branch, index, or working tree farther than expected, first identify which layer changed, then recover with reflog, ORIG_HEAD, or a rescue branch.
-
-## Start with a problem
-
-The mistake already happened: the command ran, the output looks wrong. The real danger isn't the loss itself — it's panic-follow-ups that destroy the recoverable state. This article walks the recovery path for Recover after an over-aggressive reset ahead of time: what to do first, what next, and what never to do.
-
 ## First, identify what you actually lost
 
 <ResetFigure

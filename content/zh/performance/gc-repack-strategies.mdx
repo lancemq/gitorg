@@ -31,14 +31,6 @@ export const metadata = {
 
 # Git gc 与 repack 策略
 
-## 学完这篇你会掌握什么
-
-- 掌握 git gc、git repack 和 git maintenance 的工作原理与配置策略，保持仓库健康并提升性能。
-
-## 先想一个问题
-
-你或者你的团队可能已经在用 Git gc 与 repack 策略了——但用法对不对？有没有踩在边界上？这篇带你把 Git gc 与 repack 策略的前提、边界和常见误用重新过一遍，很多隐患在变成事故之前就能排掉。
-
 ## 概述
 
 随着提交增多，Git 仓库中的对象文件会逐渐碎片化。`git gc`（Garbage Collection）和 `git repack` 是整理仓库、回收空间、提升性能的关键工具。

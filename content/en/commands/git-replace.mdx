@@ -25,10 +25,6 @@ export const metadata = {
 - Build a complete mental model of git replace instead of memorizing commands
 - Reproduce the core scenario in a test repository and compare before/after state
 
-## Start with a problem
-
-Next time you're about to type `git replace`, pause for a second: does this command touch the working tree, the index, or rewrite history? If the output surprises you, what do you check first? This article clears up the boundaries and risks of git replace before you act.
-
 ## The short version
 
 git-replace lets you **replace** a commit in history with a new commit object **without rewriting history or force pushing**. The replacement relationship is stored in the `refs/replace/` namespace, and other operations transparently follow the replacement.

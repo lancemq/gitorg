@@ -25,10 +25,6 @@ export const metadata = {
 - Explain what problem git hash-object solves and where it applies
 - Walk through the key usages of `git hash-object` and understand what each step changes
 
-## Start with a problem
-
-Next time you're about to type `git hash-object`, pause for a second: does this command touch the working tree, the index, or rewrite history? If the output surprises you, what do you check first? This article clears up the boundaries and risks of git hash-object before you act.
-
 ## The short version
 
 git-hash-object computes the **Git object ID (SHA-1)** for given content, letting you directly observe Git's **content-addressing** model: identical content always produces the same hash, and different content (even a single byte difference) produces an entirely different hash.

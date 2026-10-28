@@ -40,14 +40,6 @@ export const metadata = {
 
 # Git Packfiles and Object Storage
 
-## What you will learn
-
-- Learn how Git uses packfiles, compression, and object reuse to store and transfer history efficiently instead of copying full project snapshots every time.
-
-## Start with a problem
-
-You use Git every day — but could you explain what Git actually does at the Git Packfiles and Object Storage layer? Most people stop at "it works". This article digs one level deeper; once you understand the mechanics, the "weird behaviors" stop being weird.
-
 ## The short version
 
 Git does not store every operation as a naïve full copy of the project. It reuses objects, compresses related data, and packs objects together. That is where packfiles matter.

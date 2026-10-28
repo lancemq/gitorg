@@ -25,10 +25,6 @@ export const metadata = {
 - Explain what problem git prune solves and where it applies
 - Walk through the key usages of `git prune` and understand what each step changes
 
-## Start with a problem
-
-Next time you're about to type `git prune`, pause for a second: does this command touch the working tree, the index, or rewrite history? If the output surprises you, what do you check first? This article clears up the boundaries and risks of git prune before you act.
-
 ## The short version
 
 git-prune deletes objects in the object database that are **no longer pointed to by any reference** (unreachable objects). It is a core component of Git garbage collection.

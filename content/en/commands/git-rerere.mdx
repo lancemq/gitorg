@@ -25,10 +25,6 @@ export const metadata = {
 - Explain what problem git rerere solves and where it applies
 - Walk through the key usages of `git rerere` and understand what each step changes
 
-## Start with a problem
-
-Many Git incident post-mortems trace back to "using git rerere with half an understanding". Can you clearly state what `git rerere` changes and what it leaves untouched? If not, spend a few minutes here first.
-
 ## The short version
 
 git-rerere (Reuse Recorded Resolution) records your conflict resolution after you solve it once, then automatically applies it the next time the **same conflict** appears, saving you from repeating manual work.
