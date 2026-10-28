@@ -68,11 +68,6 @@ git commit -m "chore: bump submodule foo to <sha>"
   If the superproject pointer is not committed, teammates will not get the intended submodule revision.
 </WarningBox>
 
-## Good follow-up reads
-
-1. [`submodule update flow`](/en/workflows/submodule-update-flow)
-2. `cross repository integration workflow`
-3. [`git-bundle`](/en/commands/git-bundle)
 ## What problem this command solves in a workflow
 
 `git submodule` manages nested repositories as dependencies within a parent (superproject) repository. It solves the problem of "how do I incorporate and track external repositories at specific versions within my project?"
@@ -200,11 +195,12 @@ Always verify with `git diff --submodule` to see exactly what changed.
 - After cloning a repository with submodules, run `git submodule update --init --recursive` to fetch and check out all nested repositories.
 - Submodules can be confusing for collaborators who are unfamiliar with them — consider documenting the workflow in your project README.
 - Changing a submodule's URL requires updating both `.gitmodules` and the internal `.git/config`, and all team members need to sync the change.
+
 ## Further reading
 
 Keep going on the same topic:
 
-- [git status Tutorial](/en/commands/git-status)
-- [git switch Tutorial](/en/commands/git-switch)
-- [git-symbolic-ref Tutorial](/en/commands/git-symbolic-ref)
+- [Submodule Update Flow](/en/workflows/submodule-update-flow)
+- [git-bundle Tutorial](/en/commands/git-bundle)
 
+{/* internal-links:auto */}

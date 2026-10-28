@@ -192,20 +192,14 @@ git restore <deleted-file>
 | 补充文件到上次提交 | `git add <file> && git commit --amend --no-edit` |
 | 恢复误删的文件 | `git restore <file>` |
 | 不确定是否要丢弃 | 先 `git stash` 再决定 |
-## 继续学习建议
-
-1. `recovery/reflog-recovery` — 用 reflog 恢复丢失的提交
-2. `recovery/recover-after-reset` — reset 后的恢复
-3. `commands/git-restore` — git restore 命令详解
-4. `commands/git-reset` — git reset 命令详解
-
-{/* internal-links:auto */}
 
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [暂存与 commit](/zh/learning-path/stage-and-commit)
-- [远端同步](/zh/learning-path/sync-with-remote)
-- [查看历史与变更](/zh/learning-path/view-history-and-changes)
+- [reflog 恢复手册](/zh/recovery/reflog-recovery) —— 用 reflog 恢复丢失的提交
+- [reset 过头后怎么恢复](/zh/recovery/recover-after-reset) —— reset 后的恢复
+- [git restore 教程](/zh/commands/git-restore) —— git restore 命令详解
+- [git reset 教程](/zh/commands/git-reset) —— git reset 命令详解
 
+{/* internal-links:auto */}

@@ -90,6 +90,7 @@ Rehearse the flow on a small reproducible history before running it in a product
 - A valid signature confirms authenticity (the tag was signed by this key) and integrity (the tag object was not modified), but not trustworthiness (you must decide whether to trust the key).
 - Verify-tag is entirely read-only. It never modifies tags, objects, refs, or any part of the repository.
 - If a tag's underlying object (commit, tree) was corrupted, the signature will still verify if the tag object itself is intact — verify-tag checks the tag's signature, not the health of the tagged content.
+
 ## Further reading
 
 Keep going on the same topic:
@@ -98,3 +99,4 @@ Keep going on the same topic:
 - [git-verify-pack Tutorial](/en/commands/git-verify-pack)
 - [git-worktree Tutorial](/en/commands/git-worktree)
 
+{/* internal-links:auto */}

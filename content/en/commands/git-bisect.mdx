@@ -180,6 +180,7 @@ This is useful for sharing debugging sessions with teammates or resuming after a
 - Always finish with `git bisect reset` to return to your original branch. Forgetting to reset leaves your repo in a detached HEAD state.
 - Bisect operates on your local checkout. If your working tree has uncommitted changes that conflict with bisect's checkouts, stash or commit them first.
 - If the regression is in build artifacts rather than source (e.g., compiler version changed), bisect may give misleading results — ensure your test validates the right thing.
+
 ## Further reading
 
 Keep going on the same topic:
@@ -188,3 +189,4 @@ Keep going on the same topic:
 - [git blame](/en/commands/git-blame)
 - [git branch Tutorial](/en/commands/git-branch)
 
+{/* internal-links:auto */}

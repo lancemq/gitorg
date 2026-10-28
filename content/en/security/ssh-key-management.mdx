@@ -229,18 +229,13 @@ If you suspect a key leak, **the first step is always to revoke the public key o
 <WarningBox title="Lock down private-key file permissions">
   Keep `~/.ssh` at `700` and the private key at `600` (`chmod 600 ~/.ssh/id_ed25519`). Overly open permissions make the SSH client refuse the key, and can also expose the plaintext to other local users.
 </WarningBox>
-## Continue Learning
-
-1. `best-practices/security-with-git` — Git security best practices
-2. `commands/git-config` — Git configuration management
-3. GPG signing & verification
-
-{/* internal-links:auto */}
 
 ## Further reading
 
 Keep going on the same topic:
 
+- [git-config Tutorial](/en/commands/git-config) —— Git configuration management
 - [Secure Git Collaboration Workflows](/en/security/secure-git-workflows)
 - [Advanced Commit Signing](/en/security/signing-advanced)
 
+{/* internal-links:auto */}

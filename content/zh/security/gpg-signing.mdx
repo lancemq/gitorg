@@ -212,19 +212,13 @@ git commit -S -m "signed with ssh key"
 ```
 
 一个容易踩的坑：平台要"认得"这把公钥才能把提交标成 Verified。所以需要在 GitHub / GitLab 的 SSH key 设置里，把同一把公钥同时标记为"可用于签名"（Signing key），而不只是"可用于认证"（Authentication key）。
-## 继续学习建议
-
-1. [Git 安全最佳实践](/zh/best-practices/security-with-git) — 把签名放进整体安全策略
-2. [SSH 密钥管理与 Git 认证](/zh/security/ssh-key-management) — 对比 SSH 签名与认证的区别
-3. [Git 安全协作工作流](/zh/security/secure-git-workflows) — 签名提交工作流
-
-{/* internal-links:auto */}
 
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [Git 仓库安全审计](/zh/security/git-security-audit)
-- [Git 密钥扫描与泄露防护](/zh/security/secret-scanning)
-- [Git 安全协作工作流](/zh/security/secure-git-workflows)
+- [Git 安全最佳实践](/zh/best-practices/security-with-git) —— 把签名放进整体安全策略
+- [SSH 密钥管理与 Git 认证](/zh/security/ssh-key-management) —— 对比 SSH 签名与认证的区别
+- [Git 安全协作工作流](/zh/security/secure-git-workflows) —— 签名提交工作流
 
+{/* internal-links:auto */}

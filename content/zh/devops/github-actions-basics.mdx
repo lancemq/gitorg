@@ -269,12 +269,6 @@ steps:
 ### 误解 3：CI 失败了就一定是代码有问题
 
 不一定。CI 可能因为网络问题、缓存过期、依赖变更等原因失败。排查 CI 问题时先看日志，再怀疑代码。
-## 继续学习建议
-
-1. [GitHub Merge Queue 工作流](/zh/workflows/merge-queue-workflow) — 把"等 CI 通过再合并"变成队列自动合入
-2. [CI 中的 Git 优化策略](/zh/workflows/ci-optimization-with-git) — fetch-depth、缓存与浅克隆的进一步权衡
-3. [GitHub Actions 官方文档](https://docs.github.com/en/actions) — 事件、上下文与可复用 Action 的完整参考
-
 ## 一个容易踩的坑：缓存与 Git 历史
 
 `actions/checkout` 之外的步骤经常用到依赖缓存（如 `actions/cache` 或包管理器的原生缓存）。一个常见误会：把 `node_modules` 这类目录缓存下来后，以为"CI 已经拿到了完整仓库"。其实缓存只加速依赖安装，**不会**补全 `fetch-depth: 1` 缺失的历史。
@@ -283,13 +277,11 @@ steps:
 
 > 一句话：缓存解决"装得快"，fetch-depth 解决"历史够不够"。两者各管各的，别互相替代。
 
-{/* internal-links:auto */}
-
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [CircleCI 与 Git 集成](/zh/devops/circleci-git)
-- [GitHub Desktop 使用指南](/zh/devops/github-desktop)
-- [GitLab CI/CD 与 Git 协同](/zh/devops/gitlab-ci-basics)
+- [GitHub Merge Queue 工作流](/zh/workflows/merge-queue-workflow) —— 把"等 CI 通过再合并"变成队列自动合入
+- [CI 中的 Git 优化策略](/zh/workflows/ci-optimization-with-git) —— fetch-depth、缓存与浅克隆的进一步权衡
 
+{/* internal-links:auto */}

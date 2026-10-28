@@ -87,6 +87,7 @@ Rehearse the flow on a small reproducible history before running it in a product
 - The input is an `.idx` file path, not a `.pack` file; `git verify-pack` automatically finds the corresponding `.pack` file.
 - Entries with `chain depth` in the output are delta objects — depth 0 means a base object, and larger values indicate deeper delta chains.
 - This command is more diagnostic than operational and is not part of the everyday collaboration workflow; the most valuable parts of the output are object sizes, delta chains, and offset relationships.
+
 ## Further reading
 
 Keep going on the same topic:
@@ -95,3 +96,4 @@ Keep going on the same topic:
 - [git-verify-tag Tutorial](/en/commands/git-verify-tag)
 - [git-worktree Tutorial](/en/commands/git-worktree)
 
+{/* internal-links:auto */}

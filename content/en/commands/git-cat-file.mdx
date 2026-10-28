@@ -86,6 +86,7 @@ Treat it as a read-only inspection tool first, then move to write-oriented usage
 - The real risk in plumbing commands is not just that they can fail, but that they can successfully perform the wrong low-level action.
 - Before running `git cat-file` in a real repo, test it in a tiny disposable repository and verify whether a safer porcelain command would do the job.
 - If arguments contain refs, trees, index paths, or raw object IDs, inspect those inputs independently before performing writes.
+
 ## Further reading
 
 Keep going on the same topic:
@@ -94,3 +95,4 @@ Keep going on the same topic:
 - [git checkout Tutorial](/en/commands/git-checkout)
 - [git cherry-pick Tutorial](/en/commands/git-cherry-pick)
 
+{/* internal-links:auto */}

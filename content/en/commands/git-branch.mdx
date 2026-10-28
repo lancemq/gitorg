@@ -118,6 +118,7 @@ People often confuse `main` with `origin/main`. The first is your local branch. 
 - Deleting a branch does not delete commits: as long as other refs or the reflog still point at them, the commit objects remain.
 - `git branch -d` refuses to delete unmerged branches as a safety measure; use `-D` to force when you are sure.
 - Remote-tracking refs (e.g., `origin/main`) and local branches (e.g., `main`) are independent: fetch updates the former, and you need merge or rebase to integrate into the latter.
+
 ## Further reading
 
 Keep going on the same topic:
@@ -126,3 +127,4 @@ Keep going on the same topic:
 - [git-bundle Tutorial](/en/commands/git-bundle)
 - [git-cat-file Tutorial](/en/commands/git-cat-file)
 
+{/* internal-links:auto */}

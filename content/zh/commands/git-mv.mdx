@@ -81,6 +81,7 @@ git mv docs/guide.md docs/intro.md
 - 目标路径已存在时操作会失败，除非使用 `-f` 强制覆盖。
 - Git 底层通过内容相似度来识别 rename，所以 `mv` + `git add -A` 和 `git mv` 在最终提交层面效果一致——`git mv` 主要胜在一步到位、状态更清晰。
 - 移动带有未暂存改动的文件时，改动会随文件一起迁移，不会丢失。
+
 ## 延伸阅读
 
 沿着同一主题继续深入：
@@ -89,3 +90,4 @@ git mv docs/guide.md docs/intro.md
 - [git-notes 教程](/zh/commands/git-notes)
 - [git-prune 教程](/zh/commands/git-prune)
 
+{/* internal-links:auto */}

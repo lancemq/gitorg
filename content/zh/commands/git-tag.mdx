@@ -299,6 +299,7 @@ git tag -l | grep -E 'alpha|beta|rc' | xargs -I {} git push origin --delete {}
 - 标签默认只在本地创建，不会随 `git push` 自动同步到远端。
 - 轻量标签只是一个引用指针，附注标签则是包含元数据的完整对象——发布时应优先使用附注标签。
 - 给已经打标签的提交改名需要 `-f` 强制覆盖，但谨慎操作以免误导协作者。
+
 ## 延伸阅读
 
 沿着同一主题继续深入：
@@ -307,3 +308,4 @@ git tag -l | grep -E 'alpha|beta|rc' | xargs -I {} git push origin --delete {}
 - [git-update-index 教程](/zh/commands/git-update-index)
 - [git-update-ref 教程](/zh/commands/git-update-ref)
 
+{/* internal-links:auto */}

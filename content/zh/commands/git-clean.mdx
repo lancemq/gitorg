@@ -173,6 +173,7 @@ git clean -fd -e 'node_modules/'
 - **`-x` 的危险性**：`-x` 会同时删除 `.gitignore` 中列出的文件，可能误删 IDE 配置、本地环境文件等重要内容，使用前务必用 `-n` 仔细检查。
 - **`-f` 是必需的**：除非配置了 `clean.requireForce=false`，否则必须加 `-f` 才能真正执行删除，这是 Git 的安全保护机制。
 - `git clean` 不影响已跟踪文件，已跟踪文件的修改需要用 `git checkout` 或 `git restore` 处理。
+
 ## 延伸阅读
 
 沿着同一主题继续深入：
@@ -181,3 +182,4 @@ git clean -fd -e 'node_modules/'
 - [git clone 教程](/zh/commands/git-clone)
 - [git commit 教程](/zh/commands/git-commit)
 
+{/* internal-links:auto */}

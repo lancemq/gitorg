@@ -143,6 +143,7 @@ git branch -d feature/login
 - 删除分支不等于删除提交：只要还有其他引用或 reflog 指向它们，提交对象依然存在。
 - `git branch -d` 拒绝删除未合并的分支，这是一种安全保护；确认不需要时用 `-D` 强制。
 - 远端跟踪分支（如 `origin/main`）和本地分支（如 `main`）是独立的，fetch 更新前者，需要 merge 或 rebase 才会整合进后者。
+
 ## 延伸阅读
 
 沿着同一主题继续深入：
@@ -151,3 +152,4 @@ git branch -d feature/login
 - [git-bundle 教程](/zh/commands/git-bundle)
 - [git-cat-file 教程](/zh/commands/git-cat-file)
 
+{/* internal-links:auto */}

@@ -122,6 +122,7 @@ git restore --source=HEAD~1 src/app.ts
 - 不加任何参数时默认恢复到索引版本（`--worktree`），加了 `--staged` 时恢复到 HEAD 版本。
 - 同时使用 `--staged` 和 `--worktree` 时，既取消暂存又丢弃工作区改动，效果最彻底但也最危险。
 - 它不会移动 HEAD 或改写提交历史——如果你需要的是"让分支指针回到某个提交"，应该用 `git reset` 而不是 `restore`。
+
 ## 延伸阅读
 
 沿着同一主题继续深入：
@@ -130,3 +131,4 @@ git restore --source=HEAD~1 src/app.ts
 - [git-rev-list 教程](/zh/commands/git-rev-list)
 - [git-rev-parse 教程](/zh/commands/git-rev-parse)
 
+{/* internal-links:auto */}

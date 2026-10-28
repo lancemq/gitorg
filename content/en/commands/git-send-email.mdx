@@ -75,13 +75,6 @@ git send-email --dry-run *.patch
   Once patches are mailed to public lists, correction cost rises quickly. Validate formatting and threading first.
 </WarningBox>
 
-## Good follow-up reads
-
-1. [`git-format-patch`](/en/commands/git-format-patch)
-2. [`git-request-pull`](/en/commands/git-request-pull)
-3. [`open source fork pr contribution`](/en/workflows/open-source-fork-pr-contribution)
-`git send-email` transmits patch files as emails to a mailing list or reviewer. It handles threading, encoding, and SMTP configuration — making it the delivery step after `git format-patch` has prepared the patches.
-
 ## Typical use cases
 
 - Send a series of generated patch files to a project's mailing list: `git send-email *.patch`.
@@ -107,11 +100,13 @@ git send-email --dry-run *.patch
 - SMTP credentials and server settings must be configured in `.gitconfig` or via command-line flags before sending.
 - `send-email` preserves the threading structure from `format-patch`, so patches arrive as a coherent email thread.
 - Some projects have specific patch submission guidelines (subject prefixes, sign-off requirements) — check the project's contribution guide before sending.
+
 ## Further reading
 
 Keep going on the same topic:
 
-- [git rm](/en/commands/git-rm)
-- [git-shortlog Tutorial](/en/commands/git-shortlog)
-- [git-show-ref Tutorial](/en/commands/git-show-ref)
+- [git-format-patch Tutorial](/en/commands/git-format-patch)
+- [git-request-pull Tutorial](/en/commands/git-request-pull)
+- [Open Source Contribution with Fork + PR](/en/workflows/open-source-fork-pr-contribution)
 
+{/* internal-links:auto */}

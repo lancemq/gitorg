@@ -134,6 +134,7 @@ A common real pattern: Git for code, DVC for datasets and model weights, and a m
 - **Using Git LFS for data that changes every run.** LFS storage costs scale with revisions just like Git.
 - **Forgetting to commit the `.dvc` pointer.** Without it, `dvc pull` can't find the right version — the pointer is the whole point.
 - **Treating lakeFS branches as cheap copies.** They're metadata; the underlying objects are shared, so destructive operations still need care.
+
 ## Further reading
 
 Keep going on the same topic:
@@ -142,3 +143,4 @@ Keep going on the same topic:
 - [Git History Explained](/en/concepts/git-history)
 - [Git Hooks Deep Dive](/en/concepts/git-hooks-deep)
 
+{/* internal-links:auto */}

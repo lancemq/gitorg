@@ -247,6 +247,7 @@ Bisecting: 12 revisions left to test after this (roughly 4 steps)
 - 如果中间的某个提交无法测试（比如构建失败），用 `git bisect skip` 跳过。
 - `git bisect run <script>` 可以自动执行测试脚本，脚本返回 0 = good，返回 1-127 = bad。
 - 结束后必须运行 `git bisect reset`，否则会留在中间提交状态。
+
 ## 延伸阅读
 
 沿着同一主题继续深入：
@@ -255,3 +256,4 @@ Bisecting: 12 revisions left to test after this (roughly 4 steps)
 - [git blame](/zh/commands/git-blame)
 - [git branch 教程](/zh/commands/git-branch)
 
+{/* internal-links:auto */}

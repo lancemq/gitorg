@@ -209,20 +209,14 @@ git lfs migrate import --include="*.psd" --everything
 | 历史很深的仓库 | partial clone + 定期 gc |
 | 包含大量二进制文件 | Git LFS |
 | 频繁切换分支 | sparse checkout |
-## 继续学习建议
-
-1. `concepts/worktree` — 多 worktree 优化并行开发
-2. `internals/packfiles-and-storage` — packfile 与存储原理
-3. `commands/git-gc` — GC 命令详解
-4. `commands/git-sparse-checkout` — 稀疏检出命令详解
-
-{/* internal-links:auto */}
 
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [Git Maintenance 深入](/zh/performance/git-maintenance)
-- [Partial Clone：按需获取 Git 对象](/zh/performance/partial-clone)
-- [Scalar Git 深入](/zh/performance/scalar-git)
+- [Git Worktree 概念：多工作目录并行开发](/zh/concepts/worktree) —— 多 worktree 优化并行开发
+- [Git Packfiles 与对象存储](/zh/internals/packfiles-and-storage) —— packfile 与存储原理
+- [git-gc 教程](/zh/commands/git-gc) —— GC 命令详解
+- [git-sparse-checkout 教程](/zh/commands/git-sparse-checkout) —— 稀疏检出命令详解
 
+{/* internal-links:auto */}

@@ -133,6 +133,7 @@ git revert -m 1 <merge-commit>
 - 如果这次操作可能影响团队协作，先跑 `git status`、`git log --oneline --graph` 和 `git reflog`，再决定是否继续。
 - 一旦不确定，就先建一个备份分支，让自己保留“能回去”的选项。
 - 撤销 merge commit 时通常需要配合 `-m` 指定主线父提交，否则 Git 无法判断回滚方向。
+
 ## 延伸阅读
 
 沿着同一主题继续深入：
@@ -141,3 +142,4 @@ git revert -m 1 <merge-commit>
 - [git rm](/zh/commands/git-rm)
 - [git-send-email 教程](/zh/commands/git-send-email)
 
+{/* internal-links:auto */}

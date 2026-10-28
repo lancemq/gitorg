@@ -281,12 +281,6 @@ Not at all. You can push changes to `.github/workflows/` and GitHub Actions will
 ### Misconception 3: CI failure always means a code bug
 
 Not necessarily. Failures can come from network issues, cache expiry, or dependency changes. Always check the logs first.
-## Continue Learning
-
-1. [SSH key management and deploy keys](/en/security/ssh-key-management) — how CI authenticates to Git hosts
-2. [Git security practices](/en/best-practices/security-with-git) — keeping CI and signing aligned
-3. [GitHub Actions documentation](https://docs.github.com/en/actions) — events, contexts, and reusable actions
-
 ## A common trap: caches vs Git history
 
 Steps outside `actions/checkout` often use dependency caches (such as `actions/cache` or a package manager's native cache). A frequent misunderstanding is assuming that because `node_modules` is cached, "CI already has the full repo." The cache only speeds up dependency installation — it does **not** fill in the history missing from a `fetch-depth: 1` checkout.
@@ -295,13 +289,11 @@ If your lint or tests need `git diff` to see "which files this PR changed," but 
 
 > In one line: the cache solves "install fast," fetch-depth solves "is the history enough." They cover different problems and should not substitute for each other.
 
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:
 
-- [CircleCI with Git Integration](/en/devops/circleci-git)
-- [GitHub Desktop Guide](/en/devops/github-desktop)
-- [GitLab CI & Git Integration](/en/devops/gitlab-ci-basics)
+- [SSH Key Management & Git Authentication](/en/security/ssh-key-management) —— how CI authenticates to Git hosts
+- [Git security practices](/en/best-practices/security-with-git) —— keeping CI and signing aligned
 
+{/* internal-links:auto */}

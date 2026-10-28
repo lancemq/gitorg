@@ -189,19 +189,12 @@ git config --unset extensions.partialClone
 
 `--filter=blob:none` 只过滤"文件内容（blob）"，commit、tree、tag 这些历史对象依然完整下载。所以 `git log`、`git branch --contains`、`git rev-list` 这类**只看历史、不看文件内容**的命令，在 partial clone 里速度和完整仓库几乎一样。真正会变慢的是"需要把内容落到工作区"的动作：`git checkout`、`git diff`（对比工作区）、`git grep` 全仓搜索等。理解这一点，你就能判断"我的场景到底省不省得下来"。
 
-## 继续学习建议
-
-1. `performance/large-repo-optimization` — 大仓库综合优化策略
-2. `commands/git-sparse-checkout` — 稀疏检出命令详解
-3. `internals/packfiles-and-storage` — 对象存储与 packfile 原理
-
-{/* internal-links:auto */}
-
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [大仓库性能优化策略](/zh/performance/large-repo-optimization)
-- [Scalar Git 深入](/zh/performance/scalar-git)
-- [浅克隆深入](/zh/performance/shallow-clone-deep)
+- [大仓库性能优化策略](/zh/performance/large-repo-optimization) —— 大仓库综合优化策略
+- [git-sparse-checkout 教程](/zh/commands/git-sparse-checkout) —— 稀疏检出命令详解
+- [Git Packfiles 与对象存储](/zh/internals/packfiles-and-storage) —— 对象存储与 packfile 原理
 
+{/* internal-links:auto */}

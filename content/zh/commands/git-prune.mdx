@@ -100,6 +100,7 @@ Git 的对象数据库只增不减（在正常操作下）。rebase、reset、am
 - `git gc --prune=now` 是更常用的方式，它会先做 pack、再清理，比单独 `git prune` 更安全高效
 - 在团队协作中，prune 只影响本地仓库，不会删除远端的对象
 - 如果磁盘空间极度紧张，可以考虑 `git gc --aggressive`，它会做更深度的压缩
+
 ## 延伸阅读
 
 沿着同一主题继续深入：
@@ -108,3 +109,4 @@ Git 的对象数据库只增不减（在正常操作下）。rebase、reset、am
 - [git pull 教程](/zh/commands/git-pull)
 - [git push 教程](/zh/commands/git-push)
 
+{/* internal-links:auto */}

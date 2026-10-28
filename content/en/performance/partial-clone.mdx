@@ -161,19 +161,12 @@ git config --unset extensions.partialClone
 
 `--filter=blob:none` only filters file contents (blobs); commit, tree, and tag history objects are still downloaded in full. So commands that only read history — `git log`, `git branch --contains`, `git rev-list` — run at almost the same speed as in a full clone. What actually gets slower are operations that must materialize content into the working tree: `git checkout`, `git diff` against the working tree, or a full `git grep`. Understand this and you can judge whether partial clone will actually help your scenario.
 
-## Continue Learning
-
-1. [Large repository performance optimization](/en/performance/large-repo-optimization) — comprehensive optimization
-2. [Sparse checkout](/en/commands/git-sparse-checkout) — sparse checkout
-3. [Object storage & packfiles](/en/internals/packfiles-and-storage) — how objects are stored
-
-{/* internal-links:auto */}
-
 ## Further reading
 
 Keep going on the same topic:
 
-- [Large Repository Performance Optimization](/en/performance/large-repo-optimization)
-- [Scalar Git Deep Dive](/en/performance/scalar-git)
-- [Deep Dive into Shallow Clone](/en/performance/shallow-clone-deep)
+- [Large repository performance optimization](/en/performance/large-repo-optimization) —— comprehensive optimization
+- [git-sparse-checkout Tutorial](/en/commands/git-sparse-checkout) —— sparse checkout
+- [Object storage & packfiles](/en/internals/packfiles-and-storage) —— how objects are stored
 
+{/* internal-links:auto */}

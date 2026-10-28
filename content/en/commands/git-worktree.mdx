@@ -72,15 +72,6 @@ Metadata can become stale and list output confusing.
 
 This can hide branch-specific state differences.
 
-## Good follow-up reads
-
-1. [`parallel work with worktree`](/en/workflows/parallel-work-with-worktree)
-2. [`ai agent worktree mode`](/en/workflows/ai-agent-worktree-mode)
-3. [`git-switch`](/en/commands/git-switch)
-- Create a separate working directory for a hotfix branch while keeping your main work intact: `git worktree add ../repo-hotfix hotfix`.
-- Run long builds or tests on one branch in a worktree while continuing to develop on another branch in the main directory.
-- Review a pull request branch in an isolated worktree without disrupting your current working state.
-
 ## Diagram view
 
 <CommandFlowFigure
@@ -192,10 +183,13 @@ You can create multiple experiment worktrees simultaneously to compare different
 - Worktrees share the same `.git` directory and object database, so disk usage is efficient compared to multiple clones.
 - Use `git worktree list` to see all active worktrees and `git worktree remove <path>` to clean up when done.
 - Worktree metadata is stored in `.git/worktrees/`, so moving or renaming the main repository directory may require updating worktree paths.
+
 ## Further reading
 
 Keep going on the same topic:
 
-- [git-verify-pack Tutorial](/en/commands/git-verify-pack)
-- [git-verify-tag Tutorial](/en/commands/git-verify-tag)
+- [Parallel Task Handling with Worktree](/en/workflows/parallel-work-with-worktree)
+- [Using git worktree as the default mode for AI coding agents](/en/workflows/ai-agent-worktree-mode)
+- [git switch Tutorial](/en/commands/git-switch)
 
+{/* internal-links:auto */}

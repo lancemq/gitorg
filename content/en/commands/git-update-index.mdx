@@ -84,6 +84,7 @@ Treat it as a read-only inspection tool first, then move to write-oriented usage
 - `--skip-worktree` differs from `--assume-unchanged`: the former means "I don't want Git to touch this file", suitable for local config files; the latter means "this file is large, I don't want to check if it changed".
 - When manually adding entries with `--cacheinfo`, you must correctly specify the mode, blob hash, and path — incorrect data can corrupt the index.
 - Before manipulating the index, it is recommended to first run `git ls-files --stage` to see the current index state and confirm the existing attributes of the target entry.
+
 ## Further reading
 
 Keep going on the same topic:
@@ -92,3 +93,4 @@ Keep going on the same topic:
 - [git-update-ref Tutorial](/en/commands/git-update-ref)
 - [git-verify-pack Tutorial](/en/commands/git-verify-pack)
 
+{/* internal-links:auto */}

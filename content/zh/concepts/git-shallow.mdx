@@ -444,19 +444,13 @@ git bisect start
 3. **大型仓库考虑部分克隆**：`--filter=blob:none` 比浅克隆更灵活
 4. **Submodule 也使用浅克隆**：`--shallow-submodules` 减少嵌套仓库的下载量
 5. **监控仓库大小**：定期使用 `git count-objects -vH` 检查仓库状态
-## 继续学习建议
-
-1. [`git sparse-checkout`](/zh/commands/git-sparse-checkout) —— 只检出部分目录
-2. [`git filter-repo`](/zh/migration/git-filter-repo) —— 改写仓库历史
-3. [`git bundle`](/zh/commands/git-bundle) —— 离线传输仓库
-
-{/* internal-links:auto */}
 
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [Git Rerere 冲突复用策略](/zh/concepts/rerere-strategy)
-- [Git Subtree 使用指南](/zh/concepts/git-subtree)
-- [Git Merge 策略详解](/zh/concepts/merge-strategies)
+- [git-sparse-checkout 教程](/zh/commands/git-sparse-checkout) —— 只检出部分目录
+- [git filter-repo 仓库重写深入](/zh/migration/git-filter-repo) —— 改写仓库历史
+- [git-bundle 教程](/zh/commands/git-bundle) —— 离线传输仓库
 
+{/* internal-links:auto */}

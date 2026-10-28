@@ -104,6 +104,7 @@ hash-object 是 Git **plumbing 命令**的核心之一，它揭示了 Git 最底
 - 悬空对象最终会被 `git gc` 清理，除非你创建了引用指向它们
 - 计算 commit 对象 ID 需要遵循严格的 commit 对象格式（包含 tree、parent、author、committer 等字段）
 - 大文件的 hash-object 计算可能较慢，因为需要读取完整内容
+
 ## 延伸阅读
 
 沿着同一主题继续深入：
@@ -112,3 +113,4 @@ hash-object 是 Git **plumbing 命令**的核心之一，它揭示了 Git 最底
 - [git-help 教程](/zh/commands/git-help)
 - [git init 教程](/zh/commands/git-init)
 
+{/* internal-links:auto */}

@@ -239,18 +239,12 @@ curl -H "Authorization: token YOUR_TOKEN" https://api.github.com/user/keys
 <WarningBox title="私钥文件权限也要锁死">
   确保 `~/.ssh` 目录权限为 `700`、私钥为 `600`（`chmod 600 ~/.ssh/id_ed25519`）。权限过宽时 SSH 客户端会直接拒绝使用密钥，甚至把明文暴露给同机其他用户。
 </WarningBox>
-## 继续学习建议
-
-1. `best-practices/security-with-git` — Git 安全最佳实践
-2. `commands/git-config` — Git 配置管理
-3. GPG 签名与验证
-
-{/* internal-links:auto */}
 
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [Git 安全协作工作流](/zh/security/secure-git-workflows)
-- [提交签名进阶](/zh/security/signing-advanced)
+- [Git 安全实践](/zh/best-practices/security-with-git) —— Git 安全最佳实践
+- [git-config 教程](/zh/commands/git-config) —— Git 配置管理
 
+{/* internal-links:auto */}

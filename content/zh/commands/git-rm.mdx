@@ -96,6 +96,7 @@ git rm -r tmp/
 - 如果文件在工作区中有未暂存的改动，`git rm` 会拒绝删除以防止意外丢失数据——使用 `-f` 可以强制删除。
 - `--cached` 模式只从索引中移除跟踪，文件本身保留在工作区，这常用于将文件加入 `.gitignore` 后停止跟踪。
 - 一旦删除被提交并推送到远端，文件就从共享历史中被移除——虽然 reflog 中可能仍有痕迹，但普通用户已难以恢复。
+
 ## 延伸阅读
 
 沿着同一主题继续深入：
@@ -104,3 +105,4 @@ git rm -r tmp/
 - [git-send-email 教程](/zh/commands/git-send-email)
 - [git-shortlog 教程](/zh/commands/git-shortlog)
 
+{/* internal-links:auto */}
