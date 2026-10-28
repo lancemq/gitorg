@@ -4,7 +4,7 @@ export const metadata = {
   locale: "zh",
   section: "commands",
   author: "lance-mq",
-  summary: "解释 git init 如何初始化仓库、默认分支如何产生，以及它在新项目和已有目录中的常见用法。",
+  summary: "从零建立仓库，并说清 --bare、--shared、-b、--template 各自的真实后果，以及重复 init 为什么是安全的。",
   sourceUrls: [
     "https://git-scm.com/docs/git-init",
     "https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository",
@@ -16,7 +16,7 @@ export const metadata = {
       kind: "official",
     },
     {
-      title: "Git Basics Getting a Git Repository",
+      title: "Getting a Git Repository",
       url: "https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository",
       kind: "book",
     },
@@ -25,86 +25,153 @@ export const metadata = {
 
 # git init 教程
 
-## 一句话理解
+`git init` 做的事比它看起来多：它不只创建 `.git` 目录，还决定了这个仓库的对象格式、初始分支名、共享权限，以及后续所有命令的默认行为。
 
-`git init` 会在当前目录下创建一个新的 Git 仓库元数据结构，让这个目录开始具备版本管理能力。
-
-## 最常见场景
-
-- 新项目从零开始接入 Git
-- 已有代码目录想纳入版本管理
-- 临时实验目录需要快速建立本地仓库
-
-## 基本用法
+## 最小用法
 
 ```bash
+mkdir my-project && cd my-project
 git init
 ```
 
-执行后会生成 `.git` 目录，其中保存对象数据库、引用和配置。
+输出会告诉你建了什么：
 
-## 指定默认分支
+```
+Initialized empty Git repository in /path/my-project/.git/
+```
+
+此时 `git status` 会显示 `No commits yet`，所有文件都是未跟踪状态——**init 不产生任何提交**，历史的第一条要你手动 `git add` + `git commit` 才会出现。
+
+## 重复执行是安全的
+
+这是最常被误解的一点：在已有仓库里再跑一次 `git init`，不会清空任何东西。
+
+```bash
+git init
+# Reinitialized existing Git repository in /path/my-project/.git/
+```
+
+它的真实语义是「确保这个目录是一个仓库，并补齐缺失的元数据结构」。已有对象、引用、配置全部保留。所以「误在项目里又 init 了一次」不需要抢救。
+
+## 指定初始分支名
+
+Git 2.28 起可以直接指定，不再依赖版本默认值：
 
 ```bash
 git init -b main
 ```
 
-如果你想明确初始化后的主分支名称，这种写法更直接。
-
-## 一个常见工作流
+想让它成为所有新仓库的默认：
 
 ```bash
-git init
-git add .
-git commit -m "chore: initial commit"
+git config --global init.defaultBranch main
 ```
 
-## 常见误区
+不设的话，Git 会按编译时的默认值走（常见是 `master`），并在每次 init 时打印一条 hint 提示你配置——这条提示不是错误。
 
-### 误区 1：init 会自动产生首个提交
+## --bare：没有工作区的仓库
 
-不会。`git init` 只是初始化仓库，真正的历史起点来自你的第一次 `commit`。
+```bash
+git init --bare repo.git
+```
 
-### 误区 2：已有目录不能再 init
+区别不在名字，在结构：
 
-可以。对已有项目执行 `git init` 很常见，只要你清楚它会把当前目录作为一个新仓库开始管理。
+| | 普通仓库 | `--bare` 仓库 |
+|---|---|---|
+| 结构 | 工作区 + `.git/` 子目录 | 目录本身就是仓库内容 |
+| `HEAD`、`objects/`、`refs/` | 在 `.git/` 里 | 直接在根目录 |
+| 能否直接编辑文件 | 能 | 不能，没有工作区 |
+| 典型用途 | 日常开发 | 服务端、CI 的中央仓库 |
 
+在 bare 仓库里执行 `git status` 会说这不是工作区。这也是为什么服务端 hook 里不能用 `git diff`——没有工作区可比，必须用 `git diff <old> <new>` 或 `git cat-file`。
 
-## 这条命令在流程里解决什么问题
+```bash
+# 本地建一个「远端」，常用于测试推送行为
+git init --bare /tmp/remote.git
+git remote add origin /tmp/remote.git
+git push -u origin main
+```
 
-`git init` 更偏向仓库初始化、配置和使用方式本身。它不一定天天出现，但会决定你之后的大部分 Git 行为是否稳定、可预期。
+## --shared：多人共用一台机器上的仓库
 
-## 典型用例
+团队在共享服务器上共用一个仓库目录时，默认权限会让别人无法写入。`--shared` 调整的是 `core.sharedRepository`：
 
-- 在干净目录中快速创建新仓库，开始项目开发。
-- 把 `git init` 放进 onboarding 和环境检查流程，减少“每个人本地行为不一致”的问题。
-- 在排查 Git 行为差异时，用 `git init` 在一个干净目录中快速创建对照仓库，排除旧配置干扰。
+```bash
+git init --shared=group repo.git    # 同组可读写
+git init --shared=all repo.git      # 所有人可读写
+git init --shared=0660 repo.git     # 直接指定权限位
+```
 
-## 图例理解
+它同时会把新建对象和目录的权限设为组可写，避免「A 推上去的对象 B 无法读取」这类问题。事后补救也能改，但要连带修 `objects/` 下已有文件的权限：
 
-<CommandFlowFigure
-  title="仓库初始化与默认行为"
-  caption="管理类命令决定仓库怎样开始、怎样解释配置，以及后续命令默认会怎么工作。"
-  inputsLabel="基础条件"
-  inputs="仓库目录|配置层级|帮助主题"
-  commandLabel="git init"
-  outputsLabel="结果"
-  outputs="初始化状态|生效配置|可参考文档"
-  note="这类命令的价值往往不在“立即生成提交”，而在于让后面的所有命令更稳定可预测。"
-/>
+```bash
+git config core.sharedRepository group
+chmod -R g+rwX .
+```
 
-## 特殊情况与边界
+## --template：控制新仓库里预置什么
 
-- 配置和初始化类命令往往不会立刻造成事故，但一旦默认值错了，后面很多命令都会持续偏离预期。
-- 如果你在团队环境里使用 `git init`，最好把关键默认配置写成文档或脚本，而不是只靠个人记忆。
-- 初始化后检查仓库配置是否正确。
+`git init` 会把模板目录（默认 `/usr/share/git-core/templates`）里的内容复制进新仓库的 `.git`。最实用的用法是带上团队的标准 hook：
+
+```bash
+mkdir -p /opt/git-templates/hooks
+cp team-commit-msg-check /opt/git-templates/hooks/commit-msg
+chmod +x /opt/git-templates/hooks/commit-msg
+
+git init --template=/opt/git-templates
+```
+
+这样每个新仓库自带 `commit-msg` 校验，不需要再跑 `core.hooksPath` 配置。模板目录里还可以放 `info/exclude`（默认忽略规则）和 `description`。
+
+注意：模板只在 **init 那一刻**复制，之后修改模板不会影响已有仓库。
+
+## --separate-git-dir：把 .git 放到别处
+
+```bash
+git init --separate-git-dir=/data/repos/myproject.git /work/my-project
+```
+
+工作目录里只会有一个 `.git` 文件（内容是一行 `gitdir: /data/repos/...`），真正的仓库数据在别处。适合「代码目录在 SSD、对象库在大盘」或「工作目录会被整体同步覆盖」的场景。
+
+## 已有项目接入 Git 的完整顺序
+
+```bash
+cd existing-project
+git init -b main
+
+# 先建忽略规则，再 add，否则会把 node_modules 之类一起塞进暂存区
+printf 'node_modules/\n.env\ndist/\n' > .gitignore
+
+git add .
+git status --short | head    # 确认没混进不该提交的东西
+git commit -m "chore: initial import"
+```
+
+顺序很关键：**先写 `.gitignore` 再 `git add .`**。反过来做，已经暂存的文件不会因为补了忽略规则而自动移出，需要 `git rm -r --cached .` 重来。
+
+首次提交前的自查：
+
+```bash
+# 是否混入了大文件或密钥
+git ls-files | xargs -I{} du -h {} 2>/dev/null | sort -rh | head
+git ls-files | grep -Ei '\.(env|pem|key)$'
+```
+
+## 常见错误
+
+**以为 init 等于 clone**。`git init` 建的是空仓库，没有远端、没有历史、没有分支（`HEAD` 指向一个尚不存在的分支）。要接入已有项目，用 `git clone`。
+
+**在错误的目录层级 init**。在 `~/projects` 这个装着几十个项目的父目录里 init，会把所有子项目都纳进一个仓库。发现后删掉 `.git` 即可，但删之前确认里面没有你以为已经提交的东西。
+
+**忘记 -b 导致分支名和团队不一致**。这不会报错，但推送时会出现「本地 master、远端 main」两套分支并存的情况，后续要手动改名。
 
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [git-help 教程](/zh/commands/git-help)
-- [git-interpret-trailers 教程](/zh/commands/git-interpret-trailers)
-- [git log 教程](/zh/commands/git-log)
+- [git clone 教程](/zh/commands/git-clone) —— 从已有仓库开始，与 init 的分工
+- [git config 教程](/zh/commands/git-config) —— init.defaultBranch 等默认值的配置层级
+- [hooks 与策略执行](/zh/internals/hooks-and-policy-enforcement) —— 用 --template 预置团队 hook
 
 {/* internal-links:auto */}

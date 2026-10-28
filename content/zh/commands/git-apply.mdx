@@ -1,12 +1,13 @@
 export const metadata = {
-  title: "git-apply 教程",
+  title: "git apply 教程",
   slug: "git-apply",
   locale: "zh",
   section: "commands",
   author: "lance-mq",
-  summary: "解释如何用 git-apply 把补丁内容应用到工作区或暂存区。",
+  summary: "把补丁应用到工作区或暂存区但不生成提交：--check、--3way、--reject、-p 各自解决什么问题，以及应用失败后怎么回退。",
   sourceUrls: [
     "https://git-scm.com/docs/git-apply",
+    "https://git-scm.com/docs/git-am",
   ],
   citations: [
     {
@@ -14,84 +15,196 @@ export const metadata = {
       url: "https://git-scm.com/docs/git-apply",
       kind: "official",
     },
+    {
+      title: "Git am",
+      url: "https://git-scm.com/docs/git-am",
+      kind: "official",
+    },
   ],
 };
 
-# git-apply 教程
+# git apply 教程
 
-## 学完这篇你会掌握什么
+`git apply` 只做一件事：把 diff 内容写进文件。**它不创建提交，也不写入 reflog**。这个特点决定了它的全部用法——它是个「打补丁」工具，不是「导入提交」工具。
 
-- 解释如何用 git-apply 把补丁内容应用到工作区或暂存区。
-- 建立 git apply 的完整心智模型，而不是只记住零散命令
-- 在测试仓库里亲手复现正文里的核心场景，观察前后状态差异
+## 与 git am 的分工
 
-## 一句话理解
+| | `git apply` | `git am` |
+|---|---|---|
+| 输入 | 纯 diff | 邮件格式补丁（mbox） |
+| 是否生成提交 | 否 | 是，每个补丁一个提交 |
+| 保留作者信息 | 否 | 是 |
+| 失败后能否 abort | 不能 | 能（`git am --abort`） |
+| 典型用途 | 试验、局部应用、脚本 | 邮件协作、批量导入提交 |
 
-git-apply 用于把补丁内容应用到工作区或暂存区。
+一句话：需要提交和作者信息就用 `git am`，只想要文件改动就用 `git apply`。
 
-## 什么时候适合用
+## 先看再打：--check 与 --stat
 
-- 当你需要把补丁内容应用到工作区或暂存区
-- 当你想把这类操作做成稳定流程而不是手工重复
-- 当你需要更准确地理解 Git 在这一步到底记录了什么
+`git apply` 最危险的地方是没有 `--abort`。一旦打上去，回退只能靠 `git restore` 或 `git checkout --`，而未提交的改动可能一起被清掉。
 
-## 基本示例
+所以标准流程永远先干跑：
 
 ```bash
-git apply fix-login.patch
+git apply --check fix-login.patch
 ```
 
-## 读这条命令时最该注意什么
+`--check` 不写任何文件，只在能干净应用时返回 0。想看影响范围：
 
-补丁工作流最怕上下文不一致，所以应用前最好先确认基线、工作区状态和回退动作。
+```bash
+git apply --stat fix-login.patch
+# src/login.ts | 12 ++++++------
+# src/config.ts |  4 ++--
+# 2 files changed, 10 insertions(+), 10 deletions(-)
 
-## 一个更稳的实践建议
+git apply --numstat fix-login.patch
+# 6  6  src/login.ts      ← 适合脚本解析
+```
 
-先用 `--check` 测试补丁是否能干净应用，再用 `--stat` 了解影响范围，确认无误后再真正应用。
+三步走完再真正应用：
 
-## 补充理解角度
+```bash
+git apply --check fix-login.patch && git apply fix-login.patch
+```
 
-- 处理补丁邮件或补丁文件
-- 在仓库外部交换变更
-- 保留提交边界而不是手工复制改动
+## 路径层级不对：-p
 
+补丁里的路径通常带前缀（`a/src/login.ts`），Git 默认 `-p1`，剥掉一层。如果补丁是在子目录里生成的，前缀层数会不同：
 
-## 这条命令在流程里解决什么问题
+```bash
+# 补丁里是 src/main/java/com/...，但你要应用到 java/ 目录下
+git apply -p4 patch.diff
 
-`git apply` 把补丁文件的内容应用到工作区或暂存区，但不生成提交。理解它时，要把它和 `git am` 对照来看：apply 负责修改文件内容，am 负责生成提交。
+# 不确定层数时，先看补丁头
+head -5 patch.diff
+# --- a/src/login.ts
+# +++ b/src/login.ts
+```
 
-## 典型用例
+`--directory` 是另一种解法：不剥前缀，而是整体换个根：
 
-- 预览和微调第三方补丁，确认改动合适后再决定如何提交。
-- 在不改变提交历史的前提下，把某段 diff 应用到当前工作区进行试验。
-- 配合 `--cached` 直接把补丁应用到暂存区，跳过工作区修改。
+```bash
+git apply --directory=packages/web patch.diff
+```
 
-## 图例理解
+## 上下文不匹配：--3way 与 --reject
 
-<CommandFlowFigure
-  title="补丁应用命令的作用面"
-  caption="补丁应用类命令负责把外部补丁纳入本地，关键区别在于是否生成提交以及处理的是邮件格式还是纯 diff。"
-  inputsLabel="输入"
-  inputs="补丁文件（diff 格式）|当前工作区/暂存区"
-  commandLabel="git apply"
-  outputsLabel="结果"
-  outputs="被修改的工作区文件|或暂存区变更"
-  note="apply 和 am 的分工很明确：apply 只改文件内容，am 才会生成提交。"
-/>
+补丁是基于旧版本生成的，直接应用时报 `patch does not apply`，两种情况：
 
-## 特殊情况与边界
+**基线漂移但内容还在**。用 `--3way` 退回三方合并，前提是补丁里记录的 blob 在本仓库中存在：
 
-- `git apply` 不支持 `--abort` 或 `--continue`，如果应用后想撤销，需要用 `git checkout` 或 `git restore` 手动回退。
-- 执行前先用 `git apply --check` 预览而不真正修改文件，确认没有冲突再执行。
-- `git apply` 处理的是普通 diff 格式，不是完整的邮件格式补丁，邮件格式中的 From/Subject 等头会被忽略。
-- 路径前缀不匹配时可以用 `-p` 参数调整，上下文不匹配时可以用 `--3way` 尝试三方合并。
+```bash
+git apply --3way fix-login.patch
+# 能合并就自动合并；有冲突则留下冲突标记，返回非 0
+```
+
+**只想应用能打上的部分**。用 `--reject`，失败的 hunk 写到 `.rej` 文件，其余照常应用：
+
+```bash
+git apply --reject fix-login.patch
+# 输出：Applying patch fix-login.patch with 1 reject...
+# 生成 fix-login.patch.rej
+```
+
+`.rej` 里的内容就是没打上的 hunk，手工处理后删掉即可。注意 `--reject` 与 `--3way` 互斥：前者要「部分成功」，后者要「整体合并」。
+
+两种都不要用时，`git apply --check` 会告诉你具体哪个 hunk 失败：
+
+```
+error: patch failed: src/login.ts:42
+error: src/login.ts: patch does not apply
+```
+
+## 只改索引：--cached 与 --index
+
+默认只改工作区。要让改动直接进暂存区：
+
+```bash
+git apply --cached patch.diff    # 只写索引，工作区不变
+git apply --index patch.diff     # 索引和工作区都写
+```
+
+`--cached` 适合「先把补丁内容放进下一次提交，稍后再对齐工作区」的场景，但它要求索引当前状态与补丁的基线一致，否则报错：
+
+```
+error: src/login.ts: does not match index
+```
+
+## 反向应用与撤销
+
+```bash
+git apply -R patch.diff     # 反向应用（撤销这个补丁）
+```
+
+前提是当前内容与补丁的「已应用」状态一致。这也是个实用的验证手段：应用后立刻 `-R` 试一次，能反向成功说明补丁完整落地了。
+
+但 `-R` 不是通用的撤销手段——它只撤销补丁涉及的那些行。如果应用之后你又改了同一区域，`-R` 会失败。
+
+## 常见的应用失败原因
+
+```bash
+# 行尾差异（CRLF/LF）—— 跨平台协作最常见的失败原因
+git apply --ignore-whitespace patch.diff
+
+# 补丁包含 Git 不认识的元信息，只警告不中断
+git apply --whitespace=nowarn patch.diff
+
+# 想顺便修掉补丁引入的行尾空白问题
+git apply --whitespace=fix patch.diff
+```
+
+按出现频率排：
+
+1. **行尾不一致**：Windows 上生成的补丁到 Linux 上打不上，用 `--ignore-whitespace` 或统一 `.gitattributes`
+2. **路径层级不对**：`-p` 没调对
+3. **上下文漂移**：基线太旧，用 `--3way` 或换新补丁
+4. **文件已被删除或重命名**：补丁里的路径在当前树里不存在
+
+## 从 stdin 读补丁
+
+`git apply` 可以走管道，这让它在脚本里非常灵活：
+
+```bash
+# 把某个提交的改动应用到另一个分支，但不带提交信息
+git show 3f2a91c8 | git apply -R     # 反向撤销这次提交的改动
+
+# 只应用两个分支之间的差异
+git diff main...feature | git apply
+```
+
+`-` 表示从标准输入读。这在 CI 里做「把某个修复搬到构建产物上」很常用。
+
+## 一组限制选项
+
+批量场景下需要排除或只包含特定路径：
+
+```bash
+git apply --exclude='*.lock' patch.diff
+git apply --include='src/*' patch.diff
+```
+
+这类参数在 monorepo 的端口补丁里有用——同一个 patch 只应用其中一部分。
+
+## 安全习惯
+
+1. **先 `--check`**，永远
+2. **确认工作区干净**，否则失败后很难分辨哪些改动是你的、哪些是补丁留下的
+3. **不确定时先建备份分支**：`git switch -c rescue/pre-apply`，出问题直接切回去
+4. **需要提交信息就用 `git am`**，不要在 `git apply` 之后手工拼提交
+
+```bash
+git status --short        # 必须为空或已知
+git apply --check p.diff  # 必须返回 0
+git switch -c rescue/pre-apply
+git apply p.diff
+```
 
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [git-am 教程](/zh/commands/git-am)
-- [git-archive 教程](/zh/commands/git-archive)
-- [git bisect](/zh/commands/git-bisect)
+- [git-am 教程](/zh/commands/git-am) —— 邮件补丁导入提交，以及它的 abort/continue 机制
+- [git-archive 教程](/zh/commands/git-archive) —— 另一个「不带历史地搬代码」的工具
+- [三方合并机制](/zh/internals/three-way-merge-mechanics) —— `--3way` 背后用的是什么
 
 {/* internal-links:auto */}

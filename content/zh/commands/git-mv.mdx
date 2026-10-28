@@ -1,93 +1,174 @@
 export const metadata = {
-  title: "git mv",
+  title: "git mv 教程",
   slug: "git-mv",
   locale: "zh",
   section: "commands",
   author: "lance-mq",
-  summary: "用于重命名或移动已跟踪文件，帮助你把文件系统变化和暂存区状态一次保持一致。",
+  summary: "文件移动与重命名的正确做法：它与 mv + add -A 的真实差别、大小写重命名在 macOS 上的陷阱，以及重命名检测失效的条件。",
   sourceUrls: [
     "https://git-scm.com/docs/git-mv",
-    "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+    "https://git-scm.com/docs/git-add",
   ],
   citations: [
     {
-      title: "git-scm.com — Git mv",
+      title: "Git mv",
       url: "https://git-scm.com/docs/git-mv",
       kind: "official",
     },
     {
-      title: "Git Basics Recording Changes to the Repository",
-      url: "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
-      kind: "book",
+      title: "Git add",
+      url: "https://git-scm.com/docs/git-add",
+      kind: "official",
     },
   ],
 };
 
-# git mv
-
-## 常见写法
+# git mv 教程
 
 ```bash
 git mv old-name.ts new-name.ts
 git mv docs/guide.md docs/intro.md
+git mv src/legacy src/archive        # 整个目录
 ```
 
-## 什么时候值得用
+`git mv` 做的其实是三件事：删掉索引里旧路径的条目、把文件移到新路径、把新路径加入索引。所以 `git status` 直接显示 `renamed:`，而不是 `deleted:` 加 `untracked:`。
 
-- 你希望文件移动和 Git 暂存保持一步完成
-- 你在大规模重命名目录，希望操作更一致
+## 它和 mv + add -A 有区别吗
 
-## 它和手动 `mv` 的关系
+提交层面没有区别。Git 不存储「重命名」这个事实，rename 是 diff 时按内容相似度推断出来的。
 
-手动移动文件后再 `git add -A` 也可以。Git 最终会通过内容相似度推断 rename。`git mv` 的价值主要是让命令更直接、暂存状态更清晰。
+```bash
+# 这两种做法产生的提交内容完全一致
+git mv a.ts b.ts
 
-## 常见误区
+mv a.ts b.ts && git add -A
+```
 
-### Git 底层真的保存“重命名对象”吗
+差别在中间状态：`git mv` 一步完成，索引里立刻是「rename」；手动 `mv` 之后如果不 `git add -A`，索引里是「a.ts 被删除」加「b.ts 未跟踪」，`git commit -a` 甚至会把删除提交上去而丢掉新文件。
 
-不完全是。Git 更关注内容和路径变化，rename 更多是比较和展示层面的结果。
+选哪种：
 
-### `git mv` 比普通 `mv` 更“高级”
+- 一次移动几个文件 → `git mv` 更省事，状态清楚
+- 大批量移动（脚本生成的一堆文件）→ `mv` + `git add -A` 更快
+- 移动后还要改内容 → 两者都行，但建议先单独提交移动（见最后一节）
 
-它主要是更方便，不是完全不同的底层机制。
+## 目标已存在时会失败
 
+```bash
+git mv a.ts b.ts
+# fatal: destination exists, source=a.ts, destination=b.ts
+```
 
-## 这条命令在流程里解决什么问题
+`-f` 强制覆盖，但覆盖意味着 `b.ts` 原内容直接丢失：
 
-`git mv` 在文件系统和暂存区两个层面同时操作：它把文件从源路径移到目标路径（工作区层面），并把这次移动记录到索引中（暂存区层面）。它解决的是"让文件移动和 Git 暂存一步到位"的问题，避免手动 `mv` 后再 `git add` 和 `git rm`。
+```bash
+git mv -f a.ts b.ts
+```
 
-## 典型用例
+`-k` 是另一个方向：跳过会出错的移动，继续处理剩下的。批量脚本里有用，手动操作时容易掩盖问题。
 
-- 重命名文件并自动暂存（`git mv old.ts new.ts`），一步完成文件系统移动和 Git 暂存。
-- 移动文件到新目录（`git mv docs/guide.md docs/intro.md`），适合整理项目结构。
-- 大规模重命名目录时保持暂存状态清晰，`git status` 会直接显示为 renamed 而非 deleted + added。
+```bash
+git mv -k *.md docs/    # 已经在 docs/ 里的文件跳过，不中断
+```
 
-## 图例理解
+## macOS/Windows 上的大小写重命名
 
-<CommandFlowFigure
-  title="文件移动的双重影响"
-  caption="git mv 同时修改工作区（实际移动文件）和索引（标记为已暂存的 rename），是一次性操作。"
-  inputsLabel="输入"
-  inputs="源文件路径|目标文件路径|索引中的跟踪状态"
-  commandLabel="git mv"
-  outputsLabel="产出"
-  outputs="工作区中新路径的文件|索引中已暂存的 rename 记录"
-  note="Git 底层并不存储重命名对象，而是通过内容相似度推断 rename，所以手动 mv + add -A 也能达到相同效果。"
-/>
+这是最常踩的坑。macOS 默认文件系统不区分大小写，`README.md` 和 `readme.md` 被视为同一个文件：
 
-## 特殊情况与边界
+```bash
+git mv README.md readme.md
+# 可能静默失败，或状态不符合预期
+```
 
-- `git mv` 只对已跟踪的文件生效，对新文件使用会报错。
-- 目标路径已存在时操作会失败，除非使用 `-f` 强制覆盖。
-- Git 底层通过内容相似度来识别 rename，所以 `mv` + `git add -A` 和 `git mv` 在最终提交层面效果一致——`git mv` 主要胜在一步到位、状态更清晰。
-- 移动带有未暂存改动的文件时，改动会随文件一起迁移，不会丢失。
+原因是文件系统认为「源和目标相同」，移动成了空操作，索引没有变化。稳妥做法是两阶段：
+
+```bash
+git mv README.md temp-name.md
+git mv temp-name.md readme.md
+git status --short
+# R  README.md -> readme.md
+```
+
+先移到一个完全不同的名字，再移到目标名，两次操作都能被索引正常记录。
+
+如果仓库里已经存在大小写冲突（比如从 Linux 上误提交了 `Foo.ts` 和 `foo.ts` 两个文件），可以临时打开严格模式检查：
+
+```bash
+git -c core.ignorecase=false status
+```
+
+## 重命名检测会失效的情况
+
+`git mv` 只是把动作做对了，**提交之后是否显示为 rename，取决于内容相似度**（默认 50% 阈值）。以下情况会退化成「删除 + 新增」：
+
+```bash
+# 移动的同时重写了大部分内容 → 相似度不足，diff 显示为删+增
+git mv old.ts new.ts
+# 然后大改 new.ts 的内容直到低于 50%
+```
+
+这时历史追溯会断掉：`git log --follow new.ts` 找不到移动前的历史。
+
+查看实际判定的相似度：
+
+```bash
+git diff -M --summary HEAD
+# rename old.ts => new.ts (34%)   ← 低于阈值就不会显示成 rename
+```
+
+解决方式不是调低阈值（那只是让展示好看），而是**把移动和内容改动拆成两个提交**：
+
+```bash
+# 提交 1：纯移动，相似度 100%
+git mv old.ts new.ts
+git commit -m "refactor: move old.ts to new.ts"
+
+# 提交 2：只有内容改动
+# 编辑 new.ts ...
+git commit -am "refactor: rewrite new.ts logic"
+```
+
+这样 `--follow` 能跨过第一个提交继续追溯，reviewer 也能一眼看出「只是搬了位置」。
+
+## 带未暂存改动移动
+
+文件有未提交的修改时，`git mv` 会把改动一起带走，不会丢：
+
+```bash
+echo "// draft" >> a.ts
+git mv a.ts b.ts
+git status --short
+# R  a.ts -> b.ts
+# 修改内容保留在 b.ts 里
+```
+
+要确认改动确实跟过去了：
+
+```bash
+git diff HEAD -- b.ts
+```
+
+## 移动目录的边界
+
+`git mv src/legacy src/archive` 会递归移动目录里的所有**已跟踪**文件。目录里如果有未跟踪文件（`node_modules`、临时文件），它们也会被物理移动，但不会进入索引——这通常是期望行为，但值得确认一次：
+
+```bash
+git mv src/legacy src/archive
+git status --short | grep '^??'   # 看看有没有意料之外的未跟踪文件跟过来
+```
+
+## 一个判断标准
+
+需要 Git 知道「这是同一次移动」的场合，用 `git mv` 并单独提交；只是整理文件、不在乎历史连续性的场合，`mv` + `git add -A` 完全够用。
+
+真正影响质量的不是用哪条命令，而是**有没有把移动和改动分开提交**——这一条决定了几个月后别人（和你自己）能不能靠 `--follow` 找回这段历史。
 
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [git-mergetool 教程](/zh/commands/git-mergetool)
-- [git-notes 教程](/zh/commands/git-notes)
-- [git-prune 教程](/zh/commands/git-prune)
+- [重命名检测与差异算法](/zh/internals/rename-detection-and-diff-algorithms) —— 相似度怎么算、阈值怎么影响 diff
+- [git add 教程](/zh/commands/git-add) —— 移动后如何精确控制暂存内容
+- [提交卫生与提交信息](/zh/best-practices/commit-hygiene) —— 为什么移动与改动要拆开提交
 
 {/* internal-links:auto */}

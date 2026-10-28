@@ -1,10 +1,10 @@
 export const metadata = {
-  title: "git blame",
+  title: "git blame 教程",
   slug: "git-blame",
   locale: "zh",
   section: "commands",
   author: "lance-mq",
-  summary: "定位某一行代码最后由哪个提交引入或修改，适合排查行为来源和上下文。",
+  summary: "逐行标注每一行最后一次修改它的提交、作者与时间，并说明为什么「最后一次」常常不是根因、怎么继续往前追。",
   sourceUrls: [
     "https://git-scm.com/docs/git-blame",
     "https://git-scm.com/book/en/v2/Git-Tools-Debugging-with-Git",
@@ -25,75 +25,160 @@ export const metadata = {
 
 # git blame
 
-## 先想一个问题
+线上某一行出了问题，你想知道它是什么时候、为什么变成现在这样。`git blame` 逐行标注最后一次修改该行的提交、作者和时间。
 
-线上某一行出了问题，你想知道它是什么时候、为什么变成现在这样。`git blame` 逐行标注最后一次修改该行的提交、作者和时间。但"最后一次"常常不是根因——真正的因果链在更早的提交里，所以它需要和 `git log -L`、`git show` 配合才完整。
+关键在于：**「最后一次」往往不是根因**。一次格式化提交、一次重命名、一次 lint 自动修复，都会让 blame 指向一个毫无信息量的提交。所以真正会用 blame 的人，重点不在看默认输出，而在用参数把它「穿透」到有意义的提交上。
 
-## 常见写法
+## 基本输出怎么读
 
 ```bash
 git blame src/app.ts
-git blame -L 20,60 src/app.ts
 ```
 
-## 什么时候最有用
+每行四段：提交短哈希、作者、时间、行号与内容。
 
-- 想知道某行逻辑是谁在什么背景下改的
-- 想快速跳到对应提交继续看 diff
-- 排查一个行为为什么会变成现在这样
+```
+3f2a91c8 (Li Wei  2026-08-14 11:02:33 +0800  42) const timeout = readConfig("TIMEOUT");
+```
 
-## 应该怎么用它
+看到不认识的提交，直接看它的 diff —— 这是 blame 最常见的下一步：
 
-`git blame` 最好和这些命令配合：
+```bash
+git show 3f2a91c8 -- src/app.ts
+```
 
-- `git show <commit>`
-- `git log -- <file>`
-- `git diff`
+## 只看关心的行范围
 
-单独看 blame 只能告诉你“最后是谁改了这一行”，不一定能直接说明真实原因。
+整文件 blame 在几百行的文件上基本没法读，先缩小范围：
 
-## 常见误区
+```bash
+# 第 20 到 60 行
+git blame -L 20,60 src/app.ts
 
-### blame 是“追责工具”
+# 从第 20 行起往后 10 行
+git blame -L 20,+10 src/app.ts
 
-更好的理解是“追上下文工具”。它最有价值的地方不是找人，而是快速回到变更发生时的提交背景。
+# 按函数名定位（依赖语言的 funcname 规则，多数语言可用）
+git blame -L :handleRequest src/app.ts
+```
 
+`-L :funcname` 比记行号稳，函数上下移动时不用重新数。
 
-## 这条命令在流程里解决什么问题
+## 穿透格式化提交：.git-blame-ignore-revs
 
-从流程位置看，`git blame` 更像“先观察、再决定”的命令。它通常不直接改写历史，而是帮助你确认工作区、暂存区、引用或提交对象当前到底处于什么状态。
+这是 blame 最实用、最少人用的功能。仓库跑过一次 `prettier` 或 `gofmt` 全量格式化之后，blame 会把几百行全指向那次提交，历史信息被冲掉。
 
-## 典型用例
+解决办法是列出一个「忽略清单」，让 blame 跳过这些提交：
 
-- 在 review 代码时，用 `git blame` 快速了解每行代码的来源和修改历史。
-- 把 `git blame` 放进代码评审、排障和复盘流程，帮助团队对齐上下文。
-- 当你需要解释“现在仓库为什么会这样”时，让 `git blame` 先输出可验证的信息。
+```bash
+# 1. 建清单文件（一行一个完整哈希，可加注释）
+cat > .git-blame-ignore-revs <<'EOF'
+# 全量 prettier 格式化
+9a1c4f2e8b7d6a5c3f2e1d0b9a8c7f6e5d4c3b2a
+# 迁移到 ESLint 自动修复
+1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c
+EOF
 
-## 图例理解
+# 2. 让 blame 默认读取它
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+```
 
-<CommandFlowFigure
-  title="观察类命令的作用位置"
-  caption="这类命令主要读取仓库状态并输出信息，重点在于知道自己观察的是哪一层。"
-  inputsLabel="观察对象"
-  inputs="工作区|暂存区|提交历史|引用"
-  commandLabel="git blame"
-  outputsLabel="产出"
-  outputs="控制台信息|差异上下文|决策依据"
-  note="如果输出看起来“不对”，优先排查的是观察范围，而不是命令本身有没有生效。"
-/>
+之后 `git blame` 会显示格式化**之前**真正改过这一行的提交。这个文件应当提交进仓库，GitHub 的 blame 页面也会识别它。
 
-## 特殊情况与边界
+清单里的哈希必须是完整 40 位——短哈希在这里不生效。
 
-- 大多数观察命令本身不改历史，但它看到的结果会受 HEAD、路径、提交范围或引用选择影响。
-- 如果 `git blame` 的输出和预期不一致，先确认你看的到底是工作区、索引、当前分支，还是某个历史提交。
-- 把 `git blame` 和 `git status`、`git log`、`git show` 组合使用，通常比单独看一个输出更稳。
+## 追踪跨文件移动与拷贝
+
+默认情况下，blame 只看文件内部。行从别的文件搬过来、或整段代码被移动过之后，它会把责任算在「移动的那次提交」上。
+
+```bash
+# 检测文件内被移动的行
+git blame -M src/app.ts
+
+# 检测从其他文件复制过来的行（在同一文件集合内）
+git blame -M -C src/app.ts
+
+# 更激进的 -C：连未修改的文件也当候选源
+git blame -C -C src/app.ts
+
+# 最激进：在同一提交内查找来源
+git blame -C -C -C src/app.ts
+```
+
+每多一个 `-C`，搜索范围就大一圈，大仓库上的耗时也随之上升。定位「这段代码原本在哪个文件」时，`-C -C` 通常够用。
+
+## 去掉噪声，只看需要的信息
+
+```bash
+git blame -s src/app.ts     # 省略作者名，只留哈希
+git blame -e src/app.ts     # 显示邮箱而不是名字
+git blame -w src/app.ts     # 忽略空白改动
+git blame -c src/app.ts     # 紧凑格式，列对齐更省空间
+```
+
+`-w` 值得单独说：调整缩进、把空格换成 tab 这类改动会占满 blame 输出，加 `-w` 之后这些行会指向真正改内容的提交。
+
+## 脚本里用：--line-porcelain
+
+给人看的格式不适合解析，`: <sha> <orig-line> <final-line> <count>` 这种机器格式才是：
+
+```bash
+git blame --line-porcelain src/app.ts | grep -A2 '^author ' | head -20
+```
+
+`--line-porcelain` 每个行块都完整输出 author、author-mail、author-time、summary 等字段（默认的 `--porcelain` 会把连续相同提交的字段省略）。要统计「这个文件里谁改得最多」：
+
+```bash
+git blame --line-porcelain src/app.ts \
+  | grep '^author ' \
+  | sort | uniq -c | sort -rn
+```
+
+## 反向查找：这段代码是哪次删掉的
+
+`--reverse` 把方向倒过来，用来定位删除：
+
+```bash
+git blame --reverse v1.0..HEAD -- src/app.ts
+```
+
+它显示的是「在 `v1.0` 时刻这些行的归属，以及它们在哪个提交里最后一次存在」。用途是找出「某个函数是什么时候被删的」——正向 blame 对已经消失的行无能为力。
+
+## 与 git log -L 的分工
+
+两者常被混用，其实解决的问题不同：
+
+| | `git blame` | `git log -L` |
+|---|---|---|
+| 回答 | 这一行现在是哪个提交留下的 | 这段代码的完整演变过程 |
+| 输出 | 每行一次归属 | 每次改动的 diff |
+| 适合 | 定位起点 | 看清整条变化链 |
+
+```bash
+# 这个函数从头到尾被改过几次，每次改了什么
+git log -L :handleRequest:src/app.ts --oneline
+```
+
+blame 告诉你「第 42 行来自 3f2a91c8」，`log -L` 告诉你「这个函数一共被改了 7 次，第 3 次把超时从 30s 改成 60s」。追根因时，通常是 blame 定位 → `log -L` 看演变 → `show` 看单次改动。
+
+## 性能与常见问题
+
+- **大文件很慢**。blame 本质是逐行回溯历史，几千行的文件在深历史上可能要几十秒。先用 `-L` 缩小范围。
+- **重命名会断链**。文件改过名之后，blame 默认不会跨过重命名。需要 `-M -C` 配合，或者先用 `git log --follow` 找到旧名。
+- **合并提交的归属**。默认 blame 会沿合并的两侧继续追溯（`-m` / `first-parent` 可以改变这个行为），所以「这一行是谁改的」在合并历史里可能指向分支上的原始提交，而不是合并者。
+
+## 这条命令不该用来做什么
+
+「谁写坏了这行」是最常见也最没用的用法。作者名对排查没有帮助，真正有用的是那次提交的**动机**：`git show` 里的提交信息、关联的 issue、同一提交里还改了什么。
+
+把 blame 当成「追上下文工具」而不是「追责工具」，它才值回票价。
 
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [git bisect](/zh/commands/git-bisect)
-- [git branch 教程](/zh/commands/git-branch)
-- [git-bundle 教程](/zh/commands/git-bundle)
+- [git log 教程](/zh/commands/git-log) —— `-L`、`-S`、`--follow` 的完整用法
+- [git show 教程](/zh/commands/git-show) —— 从 blame 跳到具体提交看 diff
+- [reflog 找回丢失提交](/zh/recovery/reflog-recovery) —— 历史被改写后 blame 指向失效时怎么办
 
 {/* internal-links:auto */}

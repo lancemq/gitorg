@@ -4,10 +4,10 @@ export const metadata = {
   locale: "zh",
   section: "commands",
   author: "lance-mq",
-  summary: "讲清 git remote 如何查看、添加、修改和删除远端仓库定义，以及 origin 在协作中的典型角色。",
+  summary: "管理远端定义：fetch 与 push URL 的区别、改名后引用怎么变、prune 与 set-head 何时用，以及 fork 场景的双远端配置。",
   sourceUrls: [
     "https://git-scm.com/docs/git-remote",
-    "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
+    "https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes",
   ],
   citations: [
     {
@@ -16,8 +16,8 @@ export const metadata = {
       kind: "official",
     },
     {
-      title: "Git Branching Remote Branches",
-      url: "https://git-scm.com/book/en/v2/Git-Branching-Remote-Branches",
+      title: "Working with Remotes",
+      url: "https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes",
       kind: "book",
     },
   ],
@@ -25,66 +25,185 @@ export const metadata = {
 
 # git remote 教程
 
-## 一句话理解
+`git remote` 只操作**本地记录的远端定义**，它从不与服务器通信。这条界线决定了它的所有行为：改 URL 不会验证 URL 是否可用，删远端不会影响服务器，加远端也不会自动下载任何数据。
 
-`git remote` 用来管理远端仓库定义，比如查看已有远端、添加新远端或修改 URL。
-
-## 常见用法
+## 查看：-v 的两行不是重复
 
 ```bash
 git remote -v
-git remote add origin https://example.com/repo.git
+# origin  git@github.com:me/repo.git (fetch)
+# origin  git@github.com:me/repo.git (push)
+```
+
+两行分别对应 fetch 和 push 的地址。默认相同，但它们可以不同——这正是「只读上游 + 推自己的 fork」能成立的原因。
+
+脚本里取值用 `get-url`，避免解析 `-v` 的列对齐：
+
+```bash
+git remote get-url origin
+git remote get-url --push origin
+```
+
+## 添加与修改
+
+```bash
+git remote add origin https://github.com/me/repo.git
+git remote set-url origin git@github.com:me/repo.git
+```
+
+`set-url` 是 https 换 ssh 的标准动作，改完不需要重新 clone。`add` 之后**不会自动 fetch**，远端跟踪分支（`origin/main`）要等你下次 `git fetch` 才会出现。
+
+`rename` 比想象中做得更多：
+
+```bash
 git remote rename origin upstream
+```
+
+它同时更新三处：远端定义本身、所有 `refs/remotes/origin/*` 引用改名为 `refs/remotes/upstream/*`、以及 `branch.<name>.remote` 配置里指向它的分支。所以改名后不需要手动修上游跟踪关系。
+
+`remove` 只删定义和对应的远端跟踪引用：
+
+```bash
 git remote remove upstream
 ```
 
-## origin 一定存在吗
+本地分支不受影响，但原本以 `upstream/main` 为上游的分支会失去上游（`git branch -vv` 里显示 `gone`）。
 
-不是。`origin` 只是最常见的默认名字，不是 Git 的强制规则。
+## 一个远端，两个地址
 
-## 一个常见场景
+镜像或 fork 场景下，同一个远端可以有独立的 push 地址：
 
-在 fork 工作流里，本地往往同时配置：
+```bash
+# 从上游读，往自己的 fork 写
+git remote set-url --add --push origin git@github.com:me/fork.git
+```
 
-- `origin`：你自己的 fork
-- `upstream`：原始上游仓库
+也可以用纯配置写，效果相同：
 
+```bash
+git config remote.origin.pushurl git@github.com:me/fork.git
+```
 
-## 这条命令在流程里解决什么问题
+`--add` 允许多个 push URL，一次 `git push` 会推给全部地址——适合同步镜像，但要清楚「推失败一个就算失败」。
 
-`git remote` 围绕“本地仓库怎样与远端、补丁或可传输工件交换信息”展开。理解它时，要先分清下载、发布、整合、分发这几种动作分别由谁负责。
+## show：一次看清跟踪关系
 
-## 典型用例
+```bash
+git remote show origin
+```
 
-- 在同步上游、发布本地提交或传递补丁时，用 `git remote` 控制信息流动的方向。
-- 把 `git remote` 放进协作流程中，让“先观察远端，再决定整合方式”这件事更可控。
-- 在自动化、镜像、离线传输或邮件流中，用 `git remote` 管理可交换的历史单元。
+输出比 `-v` 有用得多，包含四块信息：
 
-## 图例理解
+```
+* remote origin
+  Fetch URL: git@github.com:me/repo.git
+  Push  URL: git@github.com:me/repo.git
+  HEAD branch: main
+  Remote branches:
+    main    tracked
+    feature tracked
+    old-ui  stale (use 'git remote prune' to remove)
+  Local branches configured for 'git pull':
+    main    merges with remote main
+```
 
-<CommandFlowFigure
-  title="本地与外部信息流"
-  caption="远端与补丁类命令最关键的是分清信息从哪里来、到哪里去，以及是否会顺手改当前分支。"
-  inputsLabel="来源"
-  inputs="本地引用|远端引用|补丁 / 工件"
-  commandLabel="git remote"
-  outputsLabel="结果"
-  outputs="远端列表|添加/修改/删除结果"
-  note="remote 管理的是本地仓库中记录的远端定义，不会直接与远端服务器通信。"
-/>
+- `tracked`：远端存在且本地有对应引用
+- `stale`：远端已删除，本地 `refs/remotes/` 下还留着
+- 底部列出哪些本地分支配置了 pull 上游
 
-## 特殊情况与边界
+这条输出能同时回答「我的分支跟的是谁」和「哪些远端分支其实已经没了」。
 
-- 远端类命令最常见的误区，是把“下载”“整合”“发布”混成同一件事。先拆清动作，再决定参数。
-- 如果操作结果会影响共享分支或对外发布，执行 `git remote` 前最好再确认一次目标远端、目标引用和权限边界。
-- 和 `git fetch`、`git push`、`git branch -vv` 一起看，通常更容易判断问题出在同步、认证还是引用选择。
+## prune：清理已删除的远端分支
+
+团队成员删了远端分支后，你本地 `git branch -r` 仍然看得到，因为远端跟踪引用不会自动消失。
+
+```bash
+git remote prune origin       # 只清理，不下载
+git fetch --prune             # 清理 + 拉取，日常更常用
+git fetch --prune --prune-tags  # 连远端已删除的 tag 一起清
+```
+
+先干跑看会删什么：
+
+```bash
+git remote prune origin --dry-run
+```
+
+`prune` 只删 `refs/remotes/` 下的引用，本地分支和已合并的历史不受影响。
+
+## set-head：修正 origin/HEAD
+
+`origin/HEAD` 是一个符号引用，指向「远端的默认分支」。`git clone` 时会自动设置，用它来决定检出的初始分支。
+
+```bash
+git remote set-head origin main   # 手动指定
+git remote set-head origin -a     # 让 Git 去问远端，自动设置
+git remote set-head origin -d     # 删除这个符号引用
+```
+
+`origin/HEAD` 失效时的典型症状：`git log origin` 报 `unknown revision`，或者某些脚本里 `origin/HEAD` 解析不到。
+
+## fork 工作流的完整配置
+
+```bash
+# 1. clone 自己的 fork
+git clone git@github.com:me/repo.git && cd repo
+
+# 2. 加上游
+git remote add upstream https://github.com/original/repo.git
+
+# 3. 只拉上游，不推
+git remote set-url --push upstream no_push
+
+# 4. 同步上游
+git fetch upstream
+git switch main
+git merge --ff-only upstream/main
+git push origin main
+```
+
+第 3 步是个防呆技巧：把 upstream 的 push URL 设成一个无效值，任何「不小心推到上游」的操作会立刻失败，而不是等到权限报错甚至真的推上去。
+
+验证当前配置：
+
+```bash
+git remote -v
+# origin    git@github.com:me/repo.git (fetch)
+# origin    git@github.com:me/repo.git (push)
+# upstream  https://github.com/original/repo.git (fetch)
+# upstream  no_push (push)
+```
+
+## 什么时候 origin 不存在
+
+`origin` 不是 Git 的规则，只是 `git clone` 默认起的名字。以下情况根本没有 origin：
+
+```bash
+git init                     # 本地新建仓库，没有任何远端
+git remote add upstream ...  # 取别的名字
+```
+
+```bash
+git remote            # 空输出
+git push              # fatal: No configured push destination
+```
+
+`git push` 不带参数时要靠 `branch.<name>.remote` 找目标。从未设过远端时，必须显式写 `git push origin main`。
+
+## 常见错误
+
+**改了 URL 但推不上去**。`set-url` 只改 fetch 地址，如果之前单独设置过 `pushurl`，它会保持不变。用 `git remote get-url --push origin` 确认。
+
+**prune 掉了别人的分支，以为代码丢了**。prune 删的只是「远端引用的本地副本」，代码本身在远端和你的本地分支里都还在。
+
+**rename 之后脚本失效**。脚本里硬编码了 `origin` 的，改名后全部要改。CI 里尤其常见，改名前先搜一遍。
 
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [git reflog](/zh/commands/git-reflog)
-- [git-replace 教程](/zh/commands/git-replace)
-- [git-request-pull 教程](/zh/commands/git-request-pull)
+- [git fetch 教程](/zh/commands/git-fetch) —— 远端定义如何变成远端跟踪引用
+- [git push 教程](/zh/commands/git-push) —— push 目标是怎么被解析出来的
+- [git clone 教程](/zh/commands/git-clone) —— origin 这个默认名字的由来
 
 {/* internal-links:auto */}

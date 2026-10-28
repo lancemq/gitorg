@@ -4,14 +4,20 @@ export const metadata = {
   locale: "zh",
   section: "commands",
   author: "lance-mq",
-  summary: "把邮件格式补丁序列应用为真实提交，适合 patch-by-email 协作；重点在冲突处理中保持提交序列完整性。",
+  summary: "把邮件格式补丁序列导入为提交：如何处理中途冲突、--3way 与 -i 各自解决什么、abort 与 skip 的边界在哪。",
   sourceUrls: [
     "https://git-scm.com/docs/git-am",
+    "https://git-scm.com/docs/git-format-patch",
   ],
   citations: [
     {
-      title: "git-scm.com — Git am",
+      title: "Git am",
       url: "https://git-scm.com/docs/git-am",
+      kind: "official",
+    },
+    {
+      title: "Git format patch",
+      url: "https://git-scm.com/docs/git-format-patch",
       kind: "official",
     },
   ],
@@ -19,86 +25,185 @@ export const metadata = {
 
 # git-am 教程
 
-## 学完这篇你会掌握什么
+`git am` 不是「应用一个补丁文件」，而是「**执行一批补丁**」。它按顺序把邮件格式的补丁逐个变成提交，中途任何一封失败都会暂停整个队列，等你的决定。
 
-- 把邮件格式补丁序列应用为真实提交，适合 patch-by-email 协作；重点在冲突处理中保持提交序列完整性。
-- 理解 git am 在日常 Git 工作流里的位置和作用
+这条设计决定了它的所有行为：为什么有 `--continue`、为什么有队列状态、为什么 `--abort` 会一次性回退全部。
 
-## 一句话理解
+## 和 git apply 的根本区别
 
-`git am` 会把邮件补丁（mbox/patch 文件）按顺序应用成提交，而不是只改工作区文件。
+```bash
+git am 0001-fix-login.patch    # 生成提交，保留原作者与提交信息
+git apply 0001-fix-login.patch # 只改文件，不生成提交
+```
 
-## 什么时候适合用
+`git am` 解析的是邮件格式：`From <sha>` 分隔线、`From:` 作者、`Date:` 时间、`Subject:` 作为提交标题、分隔线之后的正文作为提交说明。所以它能还原「这个改动是谁、什么时候、为什么做的」。
 
-- 接收邮件补丁序列
-- 需要保留原作者提交信息
-- 在非平台化协作流程中导入变更
+如果补丁里没有这些头信息（纯 diff），`git am` 会失败：
+
+```
+Patch is empty.  Was it split wrong?
+```
+
+这时该用 `git apply`。
 
 ## 基本流程
 
 ```bash
+# 单个补丁
 git am 0001-fix.patch
-# 或
+
+# 一批补丁（按文件名排序，编号顺序即应用顺序）
 git am *.patch
+
+# 从邮件导出的 mbox（一封文件里多封邮件）
+git am mailbox.mbox
+
+# 从标准输入
+curl -s https://lore.kernel.org/patch/12345/raw | git am -
 ```
 
-如果中途冲突：
+应用成功后，每个补丁产生一个提交，作者保持原样，committer 是你。
+
+## 中途冲突时
+
+补丁队列跑到一半失败，Git 会停下来并保留整个队列状态：
+
+```
+Applying: fix: correct timeout handling
+error: patch failed: src/client.ts:88
+error: src/client.ts: patch does not apply
+Patch failed at 0003-fix-timeout
+hint: Use 'git am --show-current-patch=diff' to see the failed patch
+```
+
+三个选择，语义差别很大：
 
 ```bash
+# 1. 手工解决冲突后继续（必须先 git add）
+git add src/client.ts
 git am --continue
+
+# 2. 放弃当前这一封，继续下一封
 git am --skip
+
+# 3. 放弃整个队列，回到 am 开始前的状态
 git am --abort
 ```
 
-## 为什么它不同于 `git apply`
+`--skip` 的代价要说清：被跳过的这个补丁**不会出现在历史里**。后续补丁如果依赖它，会继续失败。连续 skip 通常意味着基线选错了，应该 `--abort` 后换基线重来，而不是硬着头皮跳。
 
-- `git apply`：只应用文件差异
-- `git am`：应用差异并创建提交（含作者/主题等邮件元信息）
+先看失败的补丁长什么样：
 
-## 稳定使用建议
+```bash
+git am --show-current-patch=diff    # 只看 diff
+git am --show-current-patch=raw     # 完整邮件原文（含提交信息）
+```
 
-1. 应用前先在临时分支执行
-2. 先检查基线是否匹配补丁预期
-3. 冲突时优先保留可回退点，不要连续盲目 `--skip`
+## --3way：让基线漂移的补丁也能打上
+
+补丁往往基于旧版本生成，直接应用会因上下文不匹配失败。`--3way` 让 Git 用补丁里记录的 blob 做三方合并：
+
+```bash
+git am --3way *.patch
+```
+
+想让它成为默认行为（强烈建议在补丁工作流里开启）：
+
+```bash
+git config --global am.threeWay true
+```
+
+`--3way` 失败时不是直接中止，而是留下冲突标记让你解决，解决后同样 `git add` + `--continue`。相比「完全打不上」，这通常省下大量手工对齐的时间。
+
+## -i：逐个确认
+
+批量导入来自邮件列表的补丁时，你可能只想选择性应用：
+
+```bash
+git am -i mailbox.mbox
+```
+
+每封补丁都会暂停并询问，可以选择应用、跳过或编辑提交信息。适合「这批补丁里有些与当前分支无关」的场景。
+
+## 提交信息处理
+
+```bash
+git am --signoff *.patch      # 追加 Signed-off-by: 你
+git am --keep-cr *.patch      # 保留 CRLF 行尾（Windows 来源的补丁）
+git am --committer-date-is-author-date *.patch  # 用作者时间当提交时间
+```
+
+`--keep-cr` 在处理从 Windows 邮件客户端转发的补丁时几乎必需，否则行尾会被规范化，导致后续每个补丁都冲突。
+
+## 队列状态放在哪
+
+`git am` 复用 rebase 的 apply 后端，状态在 `.git/rebase-apply/`：
+
+```bash
+ls .git/rebase-apply/
+# 0001  0002  0003  next  last  patch  …
+```
+
+| 文件 | 含义 |
+|------|------|
+| `next` / `last` | 当前处理到第几个补丁、总共几个 |
+| `patch` | 正在应用的那一封原文 |
+| `0001`、`0002`… | 已应用的补丁副本 |
+
+知道这个目录存在有两个用处：一是理解 `--abort` 为什么能一次性回退（它删掉这个目录并把 HEAD 恢复），二是队列卡死时能确认还有几封没处理。
+
+## 常见失败与对策
+
+**补丁序列顺序错了**。`git am *.patch` 依赖文件名排序，`0001-`、`0002-` 这种前缀是有意义的。如果文件名不带序号，先排序再传给 `git am`：
+
+```bash
+ls -1 *.patch | sort -V | xargs git am
+```
+
+**空补丁导致中断**。某些补丁在目标分支上已经应用过，内容为空：
+
+```bash
+git am --empty=skip *.patch    # 跳过空补丁
+git am --empty=keep *.patch    # 仍生成一个空提交（保留提交信息）
+```
+
+**应用后想撤销**。`--abort` 只在队列未结束时可用。已经全部应用完才发现不对，只能从 reflog 回退：
+
+```bash
+git reflog
+git reset --hard HEAD@{n}    # n = am 开始前的位置
+```
+
+## 稳定使用的顺序
+
+```bash
+# 1. 干净起点
+git switch -c apply/patches main
+git status --short          # 必须为空
+
+# 2. 单个补丁可以先干跑（git am 本身没有 --check，用 apply 代替）
+git apply --check 0001-fix.patch
+
+# 3. 真正应用
+git am --3way *.patch
+
+# 4. 检查结果：提交数、作者是否保留
+git log --oneline -5
+git log -1 --format='%an <%ae>'
+```
+
+`git am` 没有全局 dry-run 选项，所以整批「能不能过」只能在临时分支上真跑一遍。这也是为什么第 1 步建分支、第 3 步失败时用 `--abort` 回退值得坚持——代价只是重跑一次，而不是在主干上收拾残局。
 
 <WarningBox title="先确认补丁基线再 am">
-  基线漂移会让补丁序列在中途大量冲突，处理成本远高于先同步一次历史。
+  基线漂移会让补丁序列在中途大量冲突，处理成本远高于先同步一次历史。在临时分支上先跑一遍，确认整批能过再正式应用。
 </WarningBox>
-
-## 常见误区
-
-### 误区 1：把 am 当作“任何补丁都能自动吃下”
-`git am` 把邮件格式的补丁应用到当前分支并生成新提交，同时保留原始作者信息和提交元数据。理解它时，要把它放在"补丁如何从外部正式进入本地历史"这个环节中来看。
-
-上下文不匹配时仍会失败，需要人工判断。
-
-### 误区 2：冲突后直接 abort 丢弃全部进度
-- 把外部贡献者或邮件列表发来的补丁序列正式应用到本地分支。
-- 在补丁工作流中，用 `git am` 把收到的 .patch 文件转化为真正的提交记录。
-- 当需要保留提交者身份和完整提交说明时，用 `git am` 而不是手工复制改动。
-
-如果前几封已成功应用，先评估是否值得继续。
-
-### 误区 3：跳过补丁不留记录
-<CommandFlowFigure
-  title="补丁应用命令的作用面"
-  caption="补丁应用类命令负责把外部补丁正式纳入本地分支，关键区别在于是否生成提交以及是否保留邮件头信息。"
-  inputsLabel="输入"
-  inputs="邮件格式补丁文件|当前分支"
-  commandLabel="git am"
-  outputsLabel="结果"
-  outputs="新提交（保留作者信息）|前进的分支指针"
-  note="am 和 apply 的分工很明确：am 生成提交，apply 只改工作区。"
-/>
-
-后续很难解释为什么提交序列缺了一段。
 
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [git-format-patch 教程](/zh/commands/git-format-patch)
-- [git-send-email 教程](/zh/commands/git-send-email)
-- [cherry-pick 挑错提交后的恢复](/zh/recovery/recover-after-wrong-cherry-pick)
+- [git-format-patch 教程](/zh/commands/git-format-patch) —— 生成补丁的另一半，`-o`、`--cover-letter` 的用法
+- [git-send-email 教程](/zh/commands/git-send-email) —— 把补丁发到邮件列表
+- [rebase 内部机制与 sequencer](/zh/internals/rebase-internals-and-sequencer) —— `rebase-apply` 目录的来龙去脉
 
 {/* internal-links:auto */}
