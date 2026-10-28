@@ -33,7 +33,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Next time you're about to type `git show`, pause for a second: does this command touch the working tree, the index, or rewrite history? If the output surprises you, what do you check first? This article clears up the boundaries and risks of git status before you act.
+`git status` has more than one output. The human-readable default shifts with `status.short` and `status.branch`; scripts must use `--porcelain` for a stable format. Before reading ahead/behind counts, make sure you know which of the XY columns is the index and which is the working tree.
 
 ## The short version
 

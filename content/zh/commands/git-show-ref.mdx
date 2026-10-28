@@ -27,7 +27,7 @@ export const metadata = {
 
 ## 先想一个问题
 
-下次在终端里准备敲 `git show-ref` 之前，先停一秒：这条命令会碰到工作区、暂存区，还是直接改写历史？如果它的输出和你预期的不一样，第一步该检查什么？——这篇就是帮你把 git show-ref 的边界和风险想清楚，再动手。
+`git branch` 只列分支，`git show-ref` 列出 `refs/` 下所有引用——包括远端跟踪分支、tag、notes、stash。排查"这个引用到底指向哪"时，它比 `branch -a` 更接近底层；加 `--heads`、`--tags`、`--dereference` 过滤后，输出可以直接当脚本输入。
 
 ## 一句话理解
 

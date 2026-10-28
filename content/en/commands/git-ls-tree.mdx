@@ -26,7 +26,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Next time you're about to type `git ls-tree`, pause for a second: does this command touch the working tree, the index, or rewrite history? If the output surprises you, what do you check first? This article clears up the boundaries and risks of git ls-tree before you act.
+`git ls-tree` lists the contents of a tree object, not the working directory. That distinction is the whole point: it reads what a commit actually recorded, including files that no longer exist on disk. `-r` recurses, `-l` adds blob sizes, and `--name-only` makes the output scriptable.
 
 ## The short version
 

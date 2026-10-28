@@ -32,7 +32,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Next time you're about to type `git merge-base`, pause for a second: does this command touch the working tree, the index, or rewrite history? If the output surprises you, what do you check first? This article clears up the boundaries and risks of git merge-base before you act.
+`git merge-base` answers "where did these two lines of history diverge", and that one answer drives three-way merge, `git diff A...B`, and every "what actually changed on my branch" question. Note that the answer is not always a single commit: criss-cross merges produce several best candidates unless you pass `--all`.
 
 ## The short version
 

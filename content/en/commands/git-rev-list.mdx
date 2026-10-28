@@ -26,7 +26,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Next time you're about to type `git rev-list`, pause for a second: does this command touch the working tree, the index, or rewrite history? If the output surprises you, what do you check first? This article clears up the boundaries and risks of git rev-list before you act.
+`git log` is `git rev-list` with presentation bolted on. The part that actually filters commits is rev-list: it emits hashes only, which is why it composes cleanly with `xargs`, `git diff`, and counting scripts. `--since`, `--author`, `--grep`, and `--no-merges` are the starting point for any commit audit.
 
 ## The short version
 

@@ -26,7 +26,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Many Git incident post-mortems trace back to "using git show-ref with half an understanding". Can you clearly state what `git show-ref` changes and what it leaves untouched? If not, spend a few minutes here first.
+`git branch` lists branches; `git show-ref` lists everything under `refs/` — remote-tracking branches, tags, notes, stash. When debugging what a ref actually points to, it sits closer to the plumbing than `branch -a`. With `--heads`, `--tags`, or `--dereference` the output becomes scriptable.
 
 ## The short version
 

@@ -27,7 +27,7 @@ export const metadata = {
 
 ## 先想一个问题
 
-下次在终端里准备敲 `git cherry` 之前，先停一秒：这条命令会碰到工作区、暂存区，还是直接改写历史？如果它的输出和你预期的不一样，第一步该检查什么？——这篇就是帮你把 git cherry 的边界和风险想清楚，再动手。
+`git cherry <upstream> <head>` 回答一个很具体的问题：这个分支上哪些提交，上游已经有了等价改动？它靠 patch-id 判断，所以能识别"cherry-pick 过但 hash 已经变了"的情况——这正是 `git log --left-right` 看不出来的部分。
 
 ## 一句话理解
 

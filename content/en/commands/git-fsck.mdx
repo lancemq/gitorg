@@ -26,7 +26,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Many Git incident post-mortems trace back to "using git fsck with half an understanding". Can you clearly state what `git fsck` changes and what it leaves untouched? If not, spend a few minutes here first.
+When a repository reports `fatal: object ... is corrupt`, or `git log` dies partway through a clone, `git fsck` answers whether the object store is still complete. It is read-only and safe to run anytime, but `dangling` (usually harmless) and `missing` (needs action) are entirely different findings.
 
 ## The short version
 

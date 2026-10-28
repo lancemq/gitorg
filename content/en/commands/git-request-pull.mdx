@@ -33,7 +33,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Many Git incident post-mortems trace back to "using git request-pull with half an understanding". Can you clearly state what `git request-pull` changes and what it leaves untouched? If not, spend a few minutes here first.
+In an email-based workflow, `git request-pull` produces the standard message: which URL and branch to pull from, and which commits are included. It pushes nothing — it just assembles the diffstat and commit list so you can paste it into mail. Most mistakes come from the start and end revision arguments.
 
 ## The short version
 

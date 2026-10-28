@@ -27,7 +27,7 @@ export const metadata = {
 
 ## 先想一个问题
 
-下次在终端里准备敲 `git verify-pack` 之前，先停一秒：这条命令会碰到工作区、暂存区，还是直接改写历史？如果它的输出和你预期的不一样，第一步该检查什么？——这篇就是帮你把 git verify-pack 的边界和风险想清楚，再动手。
+pack 文件是 Git 压缩对象后的产物，`.idx` 是它的索引。`git verify-pack -v .git/objects/pack/*.idx` 会列出 pack 里每个对象的类型、原始大小、以及在 pack 内占用的字节数。查"仓库为什么这么大"时，这是唯一能看到压缩后真实体积的地方。
 
 ## 一句话理解
 

@@ -26,7 +26,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Many Git incident post-mortems trace back to "using git help with half an understanding". Can you clearly state what `git help` changes and what it leaves untouched? If not, spend a few minutes here first.
+`git help <cmd>` and `git <cmd> --help` open the same documentation; the difference is only rendering — man page versus terminal output. The real friction is environmental: minimal images without `git-doc`, systems where `man` is missing, and `git help --web` needing a browser.
 
 ## The short version
 

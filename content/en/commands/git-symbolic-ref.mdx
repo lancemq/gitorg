@@ -26,7 +26,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Next time you're about to type `git symbolic-ref`, pause for a second: does this command touch the working tree, the index, or rewrite history? If the output surprises you, what do you check first? This article clears up the boundaries and risks of git symbolic-ref before you act.
+HEAD is not a commit; it is a symbolic reference to a branch. `git symbolic-ref` reads and writes exactly that layer, which explains two things people misread: why `git branch` marks no current branch in detached HEAD, and what actually changes when you switch branches.
 
 ## The short version
 

@@ -33,7 +33,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Many Git incident post-mortems trace back to "using git diff with half an understanding". Can you clearly state what `git diff` changes and what it leaves untouched? If not, spend a few minutes here first.
+Four different comparisons sit behind `git diff`: working tree vs index, index vs HEAD, HEAD vs a commit, and two commits against each other. "The diff shows something unexpected" is almost always a mixing-up of those layers. Decide which layer first; only then do `--cached`, `--stat`, or `--name-only` mean anything.
 
 ## The short version
 

@@ -26,7 +26,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Many Git incident post-mortems trace back to "using git ls-files with half an understanding". Can you clearly state what `git ls-files` changes and what it leaves untouched? If not, spend a few minutes here first.
+`git status` tells you what changed; `git ls-files` tells you what the index actually tracks — including files with no changes that status never shows. When asking why a file was not committed, or what `.gitignore` really excluded, its output is closer to the truth than status.
 
 ## The short version
 

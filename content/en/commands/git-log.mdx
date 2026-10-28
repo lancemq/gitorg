@@ -33,7 +33,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Next time you're about to type `git reflog`, pause for a second: does this command touch the working tree, the index, or rewrite history? If the output surprises you, what do you check first? This article clears up the boundaries and risks of git log before you act.
+The default `git log` output satisfies almost nobody: full history is too long, `--oneline` drops context, and branch relationships need extra flags. The productive approach is to decide what you are filtering on and how you want it rendered, then compose `--oneline --graph`, `--since`, `-S<string>`, and `--follow` into the view you actually need.
 
 ## The short version
 

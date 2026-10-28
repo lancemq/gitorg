@@ -26,7 +26,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Next time you're about to type `git count-objects`, pause for a second: does this command touch the working tree, the index, or rewrite history? If the output surprises you, what do you check first? This article clears up the boundaries and risks of git count-objects before you act.
+`du -sh .git` climbed into the gigabytes and you want to know where those bytes went. `git count-objects -v` splits the object store into loose objects, packs, garbage, and reclaimable space. Reading those lines is what tells you whether the next move is `git gc` or an investigation into one growing file.
 
 ## The short version
 

@@ -32,7 +32,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Next time you're about to type `git format-patch`, pause for a second: does this command touch the working tree, the index, or rewrite history? If the output surprises you, what do you check first? This article clears up the boundaries and risks of git format-patch before you act.
+`git format-patch` does not touch the repository; it writes `.patch` files to disk, one per commit, each carrying the full message plus diff. The boundaries that matter are `-o` (where files land), `--cover-letter` (whether a 0000 mail is produced), and the fact that merge commits are skipped by default.
 
 ## The short version
 

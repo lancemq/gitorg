@@ -33,7 +33,7 @@ export const metadata = {
 
 ## 先想一个问题
 
-很多 Git 事故复盘到最后，发现根源都是"对 git config 一知半解就上了手"。你真的说得清 `git show` 会改变什么、不会改变什么吗？如果不确定，先花几分钟把这篇看完。
+同一个 key 可能在四个地方都有值：`--system`、`--global`、`--local`、`--worktree`，后读的覆盖先读的。"我明明改过配置却没生效"，绝大多数是因为改在了低优先级的层。`git config --show-origin --get <key>` 会直接告诉你最终生效的那个值来自哪个文件。
 
 ## 一句话理解
 

@@ -32,7 +32,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Next time you're about to type `git grep`, pause for a second: does this command touch the working tree, the index, or rewrite history? If the output surprises you, what do you check first? This article clears up the boundaries and risks of git grep before you act.
+`git grep` searches tracked content at a specific revision, which is why it beats shelling out to `grep -r`: no ignored files, no build output, and `git grep <pattern> <commit>` searches history instead of your working tree. `-n`, `-w`, `-l`, and `--and` cover most real queries.
 
 ## The short version
 

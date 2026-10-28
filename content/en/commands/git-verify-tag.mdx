@@ -26,7 +26,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Next time you're about to type `git verify-tag`, pause for a second: does this command touch the working tree, the index, or rewrite history? If the output surprises you, what do you check first? This article clears up the boundaries and risks of git verify-tag before you act.
+`git verify-tag` checks the signature embedded in an annotated tag. It says nothing about the commit the tag points to — that is `git verify-commit`. Mixing the two up is why people conclude "the release is signed" when only the tag object was.
 
 ## The short version
 

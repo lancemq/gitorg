@@ -32,7 +32,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Next time you're about to type `git branch`, pause for a second: does this command touch the working tree, the index, or rewrite history? If the output surprises you, what do you check first? This article clears up the boundaries and risks of git config before you act.
+The same key can hold a value in four places: `--system`, `--global`, `--local`, `--worktree`. Later scopes win. "I changed the config but nothing happened" almost always means the value was set at the wrong scope. `git config --show-origin --get <key>` tells you which file the effective value actually came from.
 
 ## The short version
 

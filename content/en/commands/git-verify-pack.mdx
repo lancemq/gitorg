@@ -26,7 +26,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Many Git incident post-mortems trace back to "using git verify-pack with half an understanding". Can you clearly state what `git verify-pack` changes and what it leaves untouched? If not, spend a few minutes here first.
+`git verify-pack -v` reads the `.idx` index of a pack and prints every object inside: type, uncompressed size, and bytes occupied within the pack. It writes nothing. This is the only routine way to see compressed size per object, which is what you need when asking why a repository is large.
 
 ## The short version
 

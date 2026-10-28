@@ -26,7 +26,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Many Git incident post-mortems trace back to "using git describe with half an understanding". Can you clearly state what `git describe` changes and what it leaves untouched? If not, spend a few minutes here first.
+`git describe` derives a version string from history rather than inventing one. It combines the nearest tag, the number of commits since, and the abbreviated hash — but `--tags`, `--match`, and `--dirty` each change what that string actually guarantees.
 
 ## The short version
 

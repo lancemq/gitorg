@@ -26,7 +26,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Many Git incident post-mortems trace back to "using git cherry with half an understanding". Can you clearly state what `git cherry` changes and what it leaves untouched? If not, spend a few minutes here first.
+`git cherry <upstream> <head>` answers one narrow question: which commits on this branch already have an equivalent upstream? It compares patch-ids, so it still recognizes commits that were cherry-picked and therefore have different hashes — exactly the case `git log --left-right` cannot detect.
 
 ## The short version
 

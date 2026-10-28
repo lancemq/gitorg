@@ -32,7 +32,7 @@ export const metadata = {
 
 ## Start with a problem
 
-Many Git incident post-mortems trace back to "using git rev-parse with half an understanding". Can you clearly state what `git rev-parse` changes and what it leaves untouched? If not, spend a few minutes here first.
+In scripts, `git rev-parse` is the standard way to turn human input — `HEAD~2`, `main@{yesterday}`, `:/fix bug` — into a definite object name, and to get the repo root or current branch. Its output is plain text, so it composes safely with `xargs` and shell variables.
 
 ## The short version
 
