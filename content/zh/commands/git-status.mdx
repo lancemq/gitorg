@@ -4,7 +4,7 @@ export const metadata = {
   locale: "zh",
   section: "commands",
   author: "lance-mq",
-  summary: "讲清 git status 如何查看工作区、暂存区和分支状态，以及它为什么是日常最应该频繁使用的命令之一。",
+  summary: "读清 XY 两列的含义、为什么脚本里必须用 --porcelain，以及 ahead/behind、重命名、忽略文件的显示规则。",
   sourceUrls: [
     "https://git-scm.com/docs/git-status",
     "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
@@ -25,91 +25,192 @@ export const metadata = {
 
 # git status 教程
 
-## 先想一个问题
+`git status` 是唯一一条「随时可以跑、永远不改变任何东西」的命令。它的价值不在于告诉你改了什么，而在于**在你执行有风险的动作之前，确认你以为的状态就是真实状态**。
 
-`git status` 不只一种输出。给人看的默认格式会随 `status.short`、`status.branch` 配置变化，脚本里必须用 `--porcelain` 才能拿到稳定格式。读它的前提是先分清 XY 两列各代表暂存区还是工作区，否则 ahead/behind 的数字很容易被误读。
+但它有两种形态：给人看的和给脚本看的。混用是常见错误来源。
 
-## 一句话理解
-
-`git status` 是你了解当前仓库状态的第一入口，用来查看哪些文件被修改、哪些已经暂存、当前分支是否领先或落后。
-
-## 为什么它很重要
-
-很多 Git 误操作不是因为命令不会，而是因为操作前没有先看一眼当前状态。
-
-## 最常见输出内容
-
-- 当前分支名
-- 是否有未暂存改动
-- 是否有已暂存改动
-- 是否存在未跟踪文件
-- 是否和上游分支有差异
-
-## 基本用法
+## XY 两列：先分清索引和工作区
 
 ```bash
 git status
 ```
 
-## 紧凑模式
+```
+On branch main
+Your branch is ahead of 'origin/main' by 2 commits.
+  (use "git push" to publish your local commits)
+
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        modified:   src/app.ts
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   src/config.ts
+
+Untracked files:
+        notes.md
+```
+
+`--short` 把它压成两列字母，信息密度高得多：
+
+```bash
+git status --short
+# M  src/app.ts        ← 第一列 M：已暂存（索引里有改动）
+#  M src/config.ts     ← 第二列 M：工作区改了，还没 add
+# ?? notes.md          ← 未跟踪
+```
+
+**左列（X）= 索引相对 HEAD 的差异，右列（Y）= 工作区相对索引的差异。**
+
+| 组合 | 含义 | 下一步 |
+|------|------|--------|
+| `M ` | 已暂存，工作区干净 | 可以 commit |
+| ` M` | 未暂存 | 需要 `git add` |
+| `MM` | 暂存后又改了 | 两处都有改动，`add` 会覆盖暂存版本 |
+| `A ` | 新文件已暂存 | 可以 commit |
+| `??` | 未跟踪 | `git add` 才会纳入 |
+| `!!` | 被忽略（需 `--ignored`） | — |
+| `R ` | 重命名 | 显示为 `old -> new` |
+| `UU` | 冲突未解决 | 必须先解决 |
+
+`MM` 是最容易看错的一种：文件被 `add` 过，之后又改了。此时 `git diff` 显示工作区的那部分改动，`git diff --staged` 显示已暂存的部分，`git diff HEAD` 才是全部。
+
+## ahead / behind 从哪来
+
+```
+Your branch is ahead of 'origin/main' by 2 commits.
+```
+
+这是在比较本地 `main` 与 `refs/remotes/origin/main`。**它反映的是上次 fetch 之后的远端状态**，不代表服务器现在的样子。看到 `behind 3` 时，先 `git fetch` 再看一次，数字可能变。
+
+紧凑版：
+
+```bash
+git status -sb
+# ## main...origin/main [ahead 2, behind 3]
+#  M src/config.ts
+```
+
+`-b` 加分支行，`-s` 用 short 格式，`-sb` 是最适合日常盯着的组合。三个点 `...` 表示两边都有各自的提交；如果显示成 `## main` 没有上游，说明这个分支还没设置 upstream。
+
+## 脚本里必须用 --porcelain
+
+默认输出会跟着配置变（`status.short`、`status.branch`、`color.status`），而且提示语会随语言环境翻译。任何解析它的脚本都会在别人的机器上坏掉。
+
+```bash
+git status --porcelain        # v1，稳定但字段少
+git status --porcelain=v2     # v2，带分支信息，推荐
+```
+
+`--porcelain` 自动关闭颜色、关闭相对路径、固定为 short 格式，并且不随 `status.short` 变化。v2 还能直接读到 ahead/behind：
+
+```bash
+git status --porcelain=v2 --branch
+# # branch.oid 3f2a91c8...
+# # branch.head main
+# # branch.upstream origin/main
+# # branch.ab +2 -3
+# 1 .M N... 100644 100644 100644 8b1d44e 8b1d44e src/config.ts
+```
+
+`branch.ab +2 -3` 就是 ahead 2 / behind 3，不需要再解析自然语言。
+
+路径可能含空格或中文时，加 `-z` 用 NUL 分隔：
+
+```bash
+git status --porcelain=v2 -z | tr '\0' '\n'
+```
+
+`-z` 还会关掉路径的引号转义，中文名会原样输出，而不是 `"\346\226\207..."` 这种八进制形式。
+
+## 看被忽略的文件
+
+默认不显示，但排查「为什么这个文件没被跟踪」时需要它：
+
+```bash
+git status --ignored
+#  M src/app.ts
+# !! node_modules/
+# !! dist/
+# !! .env
+```
+
+`--ignored=matching` 只显示匹配的条目本身，`--ignored=traditional` 会显示整个被忽略的目录。规则没生效时，用这条命令配合 `git check-ignore -v <path>` 能直接看到是哪个 `.gitignore` 的哪一行在起作用。
+
+## 重命名的显示条件
+
+```bash
+git mv old.ts new.ts
+git status --short
+# R  old.ts -> new.ts
+```
+
+这里的 `R` 是**索引层面**的记录，`git mv` 会把它标记为重命名。但如果用 `mv` + `git add -A`，`status` 也能推断出来——前提是内容相似度足够，否则会显示成一删一增：
+
+```
+D  old.ts
+?? new.ts
+```
+
+## 缩减输出的配置
+
+```bash
+# 默认就用 short 格式
+git config --global status.short true
+
+# 默认带分支行
+git config --global status.branch true
+
+# 不显示未跟踪文件（大仓库里 untracked 可能几千个）
+git config --global status.showUntrackedFiles no
+
+# 但保留某个目录的显示
+git status --untracked-files=normal
+```
+
+`showUntrackedFiles=no` 在大仓库里能把 `status` 从几秒降到瞬时，代价是「新建了文件却忘了 add」这类问题要靠别的办法发现。用 `normal`（默认）比 `all` 更克制：`all` 会展开未跟踪目录里的每个文件。
+
+## 排序与分列
+
+```bash
+git status --column            # 按列排版，宽屏下更好读
+git status --no-column
+```
+
+`status.showUntrackedFiles` 是全局的，`--column` 只影响显示布局。终端宽度变化时列数会重排，所以它不适合管道输出。
+
+## 一条实践规则
+
+在任何「可能丢东西」的命令之前跑一次：
 
 ```bash
 git status --short
 ```
 
-这更适合频繁查看。
+需要它的场合：
 
-## 一个好习惯
+- `git reset --hard`（未提交改动直接消失）
+- `git checkout -- .` / `git restore .`（同上）
+- `git clean -fd`（未跟踪文件永久删除）
+- `git rebase` / `git merge`（冲突时的工作区状态会被覆盖）
+- `git pull`（会尝试合并，先知道自己在什么状态）
 
-在这些操作前先跑一次 `git status`：
+一个具体例子：`git clean -fd` 删的是未跟踪文件，而这些文件**不在 Git 里，没有任何恢复手段**。执行前 `git status --short | grep '^??'` 看一眼，比事后找磁盘恢复工具便宜得多。
 
-- `commit`
-- `pull`
-- `rebase`
-- `reset`
+## 常见误解
 
-## 常见误区
+**「status 干净就等于可以安全操作」**。它只反映工作区和索引，不反映你已经 rebase 过、或者本地有未推送的提交。ahead 的数字也是本地认知。
 
-### 误区 1：status 只是给新手用的
-
-不是。它对经验丰富的开发者同样重要，因为它是最低风险但最高价值的检查命令之一。
-
-
-## 这条命令在流程里解决什么问题
-
-从流程位置看，`git status` 更像“先观察、再决定”的命令。它通常不直接改写历史，而是帮助你确认工作区、暂存区、引用或提交对象当前到底处于什么状态。
-
-## 典型用例
-
-- 在执行任何操作之前，先用 `git status` 确认工作区和暂存区的当前状态。
-- 把 `git status` 放进代码评审、排障和复盘流程，帮助团队对齐上下文。
-- 当你需要解释“现在仓库为什么会这样”时，让 `git status` 先输出可验证的信息。
-
-## 图例理解
-
-<CommandFlowFigure
-  title="观察类命令的作用位置"
-  caption="这类命令主要读取仓库状态并输出信息，重点在于知道自己观察的是哪一层。"
-  inputsLabel="观察对象"
-  inputs="工作区|暂存区|提交历史|引用"
-  commandLabel="git status"
-  outputsLabel="产出"
-  outputs="控制台信息|差异上下文|决策依据"
-  note="如果输出看起来“不对”，优先排查的是观察范围，而不是命令本身有没有生效。"
-/>
-
-## 特殊情况与边界
-
-- 大多数观察命令本身不改历史，但它看到的结果会受 HEAD、路径、提交范围或引用选择影响。
-- 如果 `git status` 的输出和预期不一致，先确认你看的到底是工作区、索引、当前分支，还是某个历史提交。
-- 把 `git status` 和 `git diff`、`git log`、`git show` 组合使用，通常比单独看一个输出更稳。
+**「status 慢是 Git 的问题」**。多数情况是未跟踪文件太多，或者文件系统监控（如 `core.fsmonitor`）没配好。`git status --porcelain` 加计时能看到差异。
 
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [git stash 教程](/zh/commands/git-stash)
-- [git-submodule 教程](/zh/commands/git-submodule)
-- [git switch 教程](/zh/commands/git-switch)
+- [git diff 教程](/zh/commands/git-diff) —— status 说「哪些文件」，diff 说「改了什么」
+- [git add 教程](/zh/commands/git-add) —— 从 XY 的左列到右列，add 做了什么
+- [reflog 找回丢失提交](/zh/recovery/reflog-recovery) —— status 看不到的历史，从哪找回来
 
 {/* internal-links:auto */}

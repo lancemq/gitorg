@@ -4,7 +4,7 @@ export const metadata = {
   locale: "zh",
   section: "commands",
   author: "lance-mq",
-  summary: "说明 git clone 如何复制仓库、默认远端 origin 的作用，以及克隆后本地分支与远端分支的基本关系。",
+  summary: "从远端获得完整仓库：浅克隆与部分克隆的代价、只克隆单个分支的后果、--reference 加速，以及 clone 后本地分支为什么只有一个。",
   sourceUrls: [
     "https://git-scm.com/docs/git-clone",
     "https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository",
@@ -16,7 +16,7 @@ export const metadata = {
       kind: "official",
     },
     {
-      title: "Git Basics Getting a Git Repository",
+      title: "Getting a Git Repository",
       url: "https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository",
       kind: "book",
     },
@@ -25,79 +25,182 @@ export const metadata = {
 
 # git clone 教程
 
-## 一句话理解
-
-`git clone` 会把一个已有仓库完整复制到本地，包括历史、对象、引用和默认远端配置。
-
-## 基本用法
-
 ```bash
-git clone https://example.com/repo.git
+git clone https://github.com/user/repo.git
+git clone https://github.com/user/repo.git my-project    # 指定目录名
+git clone git@github.com:user/repo.git                   # SSH
 ```
 
-## clone 之后会发生什么
+clone 拿到的是**完整仓库**：全部历史、全部对象、全部分支的远端引用，外加一个名为 `origin` 的远端配置和已检出的默认分支。它不是「下载一份快照」。
 
-- 本地得到完整历史
-- 默认远端通常命名为 `origin`
-- Git 会尝试检出默认分支
+## clone 之后，本地只有一个分支
 
-## 指定目录名
+这是最常见的困惑来源：
 
 ```bash
-git clone https://example.com/repo.git my-project
+git clone https://github.com/user/repo.git && cd repo
+git branch
+# * main          ← 只有一个
+
+git branch -r
+#   origin/main
+#   origin/develop
+#   origin/feature-x
 ```
 
-## 为什么 clone 比下载 ZIP 更适合开发
+远端有 5 个分支，本地只有 1 个。原因是 clone 会为每个远端分支创建 remote-tracking 引用（`origin/xxx`），但只为默认分支建立本地分支。
 
-因为 clone 不只是拿到文件快照，而是拿到完整仓库历史和协作能力。
+要基于某个远端分支开始工作：
 
-## 常见误区
+```bash
+git switch develop          # 自动创建本地 develop 并跟踪 origin/develop
+```
 
-### 误区 1：clone 只适合第一次使用仓库
+`git switch` 在只有 `origin/develop` 时会自动做这件事，不需要 `-b` + `--track`。
 
-虽然它最常用于第一次拉取，但在多副本实验、临时调试和独立备份场景里也很常见。
+## 只克隆一个分支
 
-### 误区 2：clone 下来后还不算 Git 仓库
+```bash
+git clone --single-branch --branch develop https://github.com/user/repo.git
+```
 
-其实 clone 之后本地已经是完整仓库，不只是远端的“工作副本”。
+`--branch` 也能接受 tag：
 
+```bash
+git clone --branch v1.4.0 --single-branch https://github.com/user/repo.git
+# Note: switching to 'v1.4.0'.
+# You are in 'detached HEAD' state.
+```
 
-## 这条命令在流程里解决什么问题
+用 tag 克隆会进入 detached HEAD——tag 不是一个可以提交的分支。要在此之上开发，需要自己建分支：
 
-`git clone` 把远程仓库完整复制到本地，包括所有历史、对象、引用和远端配置，然后自动检出默认分支。理解它时，要把它放在"如何从零开始获得一个可开发的完整仓库"这个场景中来看。
+```bash
+git switch -c hotfix/v1.4.1
+```
 
-## 典型用例
+`--single-branch` 的代价：其他分支的远端引用不会创建。后续想拿到它们：
 
-- 新项目或新成员加入时，用 `git clone` 获得完整的仓库历史和协作能力。
-- 把 clone 下来的仓库作为日常开发的起点，后续通过 fetch 和 push 与远端同步。
-- 在需要完整仓库上下文（如 git bisect、git log）的场景中，clone 比下载 ZIP 更合适。
+```bash
+git remote set-branches origin '*'   # 恢复所有分支的跟踪
+git fetch origin
+```
 
-## 图例理解
+## 浅克隆：快，但有边界
 
-<CommandFlowFigure
-  title="克隆操作的作用面"
-  caption="clone 命令从远端复制完整仓库到本地，包含历史、远端配置和初始检出，是协作开发的起点。"
-  inputsLabel="输入"
-  inputs="远端仓库 URL|可选的本地目录名"
-  commandLabel="git clone"
-  outputsLabel="结果"
-  outputs="完整本地仓库|远端 origin 配置|已检出的默认分支"
-  note="clone 不只是下载文件，而是获得完整的 Git 仓库和协作能力。"
-/>
+```bash
+git clone --depth 1 https://github.com/user/repo.git
+```
 
-## 特殊情况与边界
+只取最近 1 个提交，大仓库的克隆时间能从几分钟降到几秒。代价是一串连锁反应：
 
-- clone 下来后，本地分支只跟踪当前检出的远端分支，其他远端分支需要通过 `git checkout -b` 或 `git switch` 显式检出。
-- 如果只需要当前快照而不需要完整历史，可以用下载 ZIP 或 `git clone --depth 1` 来节省时间。
-- clone 包含完整的远端配置（origin），后续可以直接使用 `git fetch`、`git pull` 和 `git push` 与远端交互。
-- 大仓库克隆较慢时，可以考虑 `--single-branch`、`--depth` 或 `--filter` 等选项来减少传输量。
+| 受限的操作 | 原因 |
+|---|---|
+| `git log` 只能看到 1 个提交 | 历史没下载 |
+| `git blame` 大部分行显示为同一次提交 | 同上 |
+| `git describe` 可能找不到可用的 tag | tag 对象缺失 |
+| `git bisect` 基本不可用 | 没有可回溯的中间提交 |
+| 从浅克隆 push 有额外限制 | 服务端可能拒绝不完整历史 |
+
+需要完整历史时补回来：
+
+```bash
+git fetch --unshallow
+```
+
+`--depth` 也能配合时间用：
+
+```bash
+git clone --shallow-since="3 months ago" https://github.com/user/repo.git
+git clone --depth 50 --no-single-branch ...   # 每个分支都取最近 50 个
+```
+
+CI 里用 `--depth 1` 很合适（只构建、不查历史）；开发机不建议，因为一旦需要 blame 或 bisect 就废了。
+
+## 部分克隆：要历史，但不要所有文件内容
+
+`--filter=blob:none` 是比 `--depth` 更聪明的选择。它下载全部提交和目录结构，但**文件内容按需拉取**：
+
+```bash
+git clone --filter=blob:none https://github.com/user/repo.git
+```
+
+结果：`git log`、`git bisect`、`git branch -r` 全部正常，只有真正 checkout 某个文件时才会去取它的内容。代价是第一次切到老提交时会有一次网络等待。
+
+```bash
+git clone --filter=tree:0 ...      # 更激进：连 tree 对象也延迟
+git clone --filter=blob:limit=1m ...  # 只跳过大于 1MB 的文件
+```
+
+对「仓库很大但只需要看代码」的场景，这通常比浅克隆更实用。
+
+## 加速：--reference 复用本地对象
+
+同一台机器上已经有这个仓库的副本时，可以让新 clone 直接引用旧的对象库，而不是重新下载：
+
+```bash
+git clone --reference /path/to/existing-repo https://github.com/user/repo.git
+```
+
+注意这会让新仓库**依赖**旧仓库的 `.git/objects`：旧仓库被删掉，新仓库就坏了。要独立：
+
+```bash
+git clone --reference /path/to/existing-repo --dissociate https://github.com/user/repo.git
+```
+
+`--dissociate` 会在 clone 后把需要的对象复制过来，解除依赖。CI 里用本地缓存加速常常这么配。
+
+## 目录结构与特殊模式
+
+```bash
+git clone --bare https://github.com/user/repo.git repo.git   # 没有工作区
+git clone --mirror https://github.com/user/repo.git repo.git # bare + 全部 refs
+git clone --recursive https://github.com/user/repo.git       # 连 submodule 一起
+git clone --sparse https://github.com/user/repo.git          # 只检出顶层文件
+```
+
+`--mirror` 与 `--bare` 的区别：`--bare` 只取分支和 tag，`--mirror` 连 `refs/remotes/*`、notes 等所有引用一起取，并且配置成可 `push --mirror` 完整同步。做仓库镜像时用 `--mirror`，只做服务端仓库用 `--bare`。
+
+`--recursive` 在 submodule 很多的仓库上是必需的，否则克隆完会发现子目录是空的：
+
+```bash
+git clone --recursive https://github.com/user/repo.git
+# 已经克隆了但忘了加参数
+git submodule update --init --recursive
+```
+
+## 重命名远端
+
+```bash
+git clone -o upstream https://github.com/original/repo.git
+```
+
+`-o` 把默认的 `origin` 换成别的名字。fork 场景里有点用，但更常见的做法是 clone 后 `git remote rename`，因为 clone 时你通常还不知道后续要加几个远端。
+
+## clone 与下载 ZIP 的区别
+
+ZIP 只有当前快照：没有 `.git`、没有历史、不能 commit、不能 push、不能 bisect。但 ZIP 在两种情况下是对的：
+
+- 只想读代码、不参与开发
+- 目标环境不允许 `.git` 目录（某些部署场景）
+
+需要「能改、能提交、能看历史」中的任何一项，就得 clone。
+
+## 常见问题
+
+**clone 卡在 `Receiving objects`**。网络或仓库大小问题。换协议（https ↔ ssh）、加大 `http.postBuffer`、或用 `--depth`/`--filter` 减少传输量。
+
+**`fatal: destination path 'repo' already exists`**。同名目录已存在且非空。换个目录名，或先确认那个目录里有什么。
+
+**clone 下来权限不对**（可执行位丢失）。检查 `core.fileMode`，以及源仓库是否本来就没记录可执行位。
+
+**用完 `--depth 1` 发现要查历史**。`git fetch --unshallow` 补全，不需要重新 clone。
 
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [git clean 教程](/zh/commands/git-clean)
-- [git commit 教程](/zh/commands/git-commit)
-- [git-config 教程](/zh/commands/git-config)
+- [git init 教程](/zh/commands/git-init) —— 从零建仓库，与 clone 的分工
+- [git remote 教程](/zh/commands/git-remote) —— clone 之后怎么管理远端
+- [git fetch 教程](/zh/commands/git-fetch) —— 远端引用如何更新到本地
 
 {/* internal-links:auto */}

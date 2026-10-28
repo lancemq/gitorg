@@ -1,108 +1,166 @@
 export const metadata = {
-  title: "git rm",
+  title: "git rm 教程",
   slug: "git-rm",
   locale: "zh",
   section: "commands",
   author: "lance-mq",
-  summary: "删除已跟踪文件并同步到暂存区，理解它有助于区分文件系统删除和 Git 记录删除。",
+  summary: "删除已跟踪文件的三种方式、--cached 为什么不能清除历史、-f 的真实代价，以及误删后的恢复路径。",
   sourceUrls: [
     "https://git-scm.com/docs/git-rm",
-    "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+    "https://git-scm.com/docs/git-restore",
   ],
   citations: [
     {
-      title: "git-scm.com — Git rm",
+      title: "Git rm",
       url: "https://git-scm.com/docs/git-rm",
       kind: "official",
     },
     {
-      title: "Git Basics Recording Changes to the Repository",
-      url: "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
-      kind: "book",
+      title: "Git restore",
+      url: "https://git-scm.com/docs/git-restore",
+      kind: "official",
     },
   ],
 };
 
-# git rm
-
-## 常见写法
+# git rm 教程
 
 ```bash
-git rm app/old-file.ts
-git rm -r legacy-folder
-git rm --cached .env.local
+git rm notes.txt              # 删文件 + 暂存删除
+git rm -r legacy-folder/      # 删目录
+git rm --cached .env.local    # 只停止跟踪，文件留在磁盘
 ```
 
-## 三种最常见场景
+`git rm` 做的事和 `rm` + `git add -u` 完全一样，区别只是「一步完成」和「意图明确」。所以它真正的价值不在命令本身，而在于它**会拒绝让你误删**。
 
-### 删除文件并提交删除
+## 与系统 rm 的关系
 
 ```bash
+rm notes.txt && git add -u      # 等价
+git rm notes.txt                # 一步完成，且会先检查
+```
+
+差别在检查：`git rm` 会拒绝删除有未暂存改动的文件，`rm` 不会。这个保护是它有价值的唯一理由。
+
+```bash
+echo "draft" >> notes.txt
 git rm notes.txt
-git commit -m "remove old notes"
+# error: the following file has local modifications:
+#     notes.txt
+# (use --cached to keep the file, or -f to force removal)
 ```
 
-### 只从 Git 跟踪中移除，但保留本地文件
+`-f` 强制删除，代价是**那部分未提交的改动永久消失**。如果那段改动还没进过任何提交，Git 帮不了你。
+
+## --cached：停止跟踪，保留文件
+
+最常见的用法是「文件已经被提交过，现在想让它回到被忽略的状态」：
 
 ```bash
 git rm --cached .env.local
+echo ".env.local" >> .gitignore
+git commit -m "chore: stop tracking local env file"
 ```
 
-这在把文件加入 `.gitignore` 时很常见。
+顺序很重要：**先 `--cached` 再写 `.gitignore`**。反过来的话，文件已经在索引里，加进 `.gitignore` 不会自动生效——忽略规则只作用于未被跟踪的文件。
 
-### 递归删除目录
+要一次清空整个索引重新开始（常见于 `.gitignore` 写太晚、误提交了 `node_modules`）：
 
 ```bash
-git rm -r tmp/
+git rm -r --cached .
+git add .
+git commit -m "chore: re-apply gitignore"
 ```
 
-## 为什么它和直接 `rm` 不一样
+这会生成一个巨大的 diff（所有文件都变成删除 + 新增），但 `git diff --cached -M` 能看出大部分是重命名检测。谨慎使用——在已有历史的仓库上，它会把整个索引重写一遍。
 
-你可以先用系统 `rm` 删除文件，再用 `git add -u` 或 `git commit -a` 让 Git 感知删除；但 `git rm` 会把“删除文件”和“暂存删除记录”一起完成。
+### --cached 不会清除历史
 
-## 风险点
+这是最需要说清的一点。`git rm --cached` 只是让文件在**下一次提交**里消失，之前的历史仍然完整保留着那个文件：
 
-- `git rm` 删除的是已跟踪文件
-- 如果还没提交，通常还能从历史或工作区恢复
-- 一旦提交并推送，删除就会进入共享历史
+```bash
+git rm --cached secrets.env
+git commit -m "remove secrets"
+git log --all --oneline -- secrets.env
+# 3f2a91c remove secrets
+# 8b1d44e add secrets     ← 内容还在这里
+```
 
+任何人 clone 这个仓库，都能 `git show 8b1d44e:secrets.env` 拿到原文。
 
-## 这条命令在流程里解决什么问题
+真正清除需要改写历史（`git filter-repo`），并且必须假设「已经泄露」——轮换密钥比清理历史更优先。
 
-`git rm` 同时在工作区和暂存区两个层面删除文件：它会从文件系统中移除文件（工作区），并把"删除"这一操作记录到索引中（暂存区）。它解决的是"让 Git 知道文件被删除了，并准备进入下一次提交"的问题。
+## 恢复误删
 
-## 典型用例
+删除还没提交时：
 
-- 删除文件并自动暂存删除记录（`git rm <file>`），一步完成文件系统删除和 Git 暂存。
-- 只从 Git 跟踪中移除但保留本地文件（`git rm --cached <file>`），常用于把误提交的文件加入 `.gitignore` 后的处理。
-- 递归删除整个目录（`git rm -r <dir>`），适合清理不再需要的文件夹。
+```bash
+git restore --staged notes.txt    # 先取消暂存的删除
+git restore notes.txt             # 再从 HEAD 恢复到工作区
+```
 
-## 图例理解
+删除已经提交、还没推送：
 
-<CommandFlowFigure
-  title="文件删除的双重影响"
-  caption="git rm 同时从工作区移除文件和从索引中移除跟踪记录，让删除操作进入下一次提交。"
-  inputsLabel="输入"
-  inputs="已跟踪的文件路径|（可选）--cached 只删索引"
-  commandLabel="git rm"
-  outputsLabel="产出"
-  outputs="工作区中文件被删除|索引中已暂存的删除记录"
-  note="可以用系统 rm 删除文件后再用 git add -u 达到类似效果，但 git rm 一步到位、意图更清晰。"
-/>
+```bash
+git restore --source=HEAD~1 notes.txt
+git commit -m "restore notes"
+```
 
-## 特殊情况与边界
+或者直接回退那个提交（如果它是最后一个）：
 
-- `git rm` 只对已跟踪的文件有效，对未跟踪的文件使用会报错。
-- 如果文件在工作区中有未暂存的改动，`git rm` 会拒绝删除以防止意外丢失数据——使用 `-f` 可以强制删除。
-- `--cached` 模式只从索引中移除跟踪，文件本身保留在工作区，这常用于将文件加入 `.gitignore` 后停止跟踪。
-- 一旦删除被提交并推送到远端，文件就从共享历史中被移除——虽然 reflog 中可能仍有痕迹，但普通用户已难以恢复。
+```bash
+git reset --soft HEAD~1    # 撤销提交，保留索引
+git restore --staged notes.txt
+git restore notes.txt
+```
+
+已经推送的删除，用 `git revert` 生成反向提交，不要改写公共历史。
+
+## -n 试跑
+
+批量删除前先看会删什么：
+
+```bash
+git rm -r --dry-run legacy/
+# rm 'legacy/a.ts'
+# rm 'legacy/b.ts'
+```
+
+`--dry-run`（`-n`）只打印，不动文件。目录里有几十个文件时值得先跑一次。
+
+## 常见错误
+
+**对未跟踪文件用 git rm**：
+
+```bash
+git rm untracked.txt
+# fatal: pathspec 'untracked.txt' did not match any files
+```
+
+未跟踪的文件不归 Git 管，直接用 `rm`。要清理一批未跟踪文件，用 `git clean -n` 先看，再 `git clean -fd`。
+
+**以为 --cached 能清掉敏感信息**。见上文，它只影响下一次提交。
+
+**在子目录里 `git rm -r .`**。`.` 指当前目录，只删这个目录下的文件。要清整个索引必须在仓库根目录执行。
+
+**删除后忘了提交**。`git rm` 只是暂存删除，`git status` 会显示 `D`，但文件在磁盘上已经没了。此时 `git restore --staged` + `git restore` 可以救回来——前提是删除还没提交。
+
+## 与 git mv 的对称性
+
+`git mv` 在底层就是「`git rm` 旧路径 + `git add` 新路径」的组合。理解这一点之后，两个命令的行为都可预测：
+
+```bash
+git mv a.ts b.ts
+# 等价于
+git rm --cached a.ts && mv a.ts b.ts && git add b.ts
+```
 
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [git revert 教程](/zh/commands/git-revert)
-- [git-send-email 教程](/zh/commands/git-send-email)
-- [git-shortlog 教程](/zh/commands/git-shortlog)
+- [git add 教程](/zh/commands/git-add) —— 索引的添加侧，与删除侧对称
+- [git-mv 教程](/zh/commands/git-mv) —— 移动文件时的索引入口
+- [git clean 教程](/zh/commands/git-clean) —— 处理未跟踪文件，rm 管不到的那部分
 
 {/* internal-links:auto */}
