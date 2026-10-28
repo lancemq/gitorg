@@ -8,6 +8,7 @@ export const metadata = {
   sourceUrls: [
     "https://git-scm.com/docs/git-rebase",
     "https://git-scm.com/docs/git-cherry-pick",
+    "https://git-scm.com/docs/git-range-diff",
     "https://git-scm.com/docs/git-reflog",
   ],
   quotes: [
@@ -37,6 +38,11 @@ export const metadata = {
       kind: "official",
     },
     {
+      title: "Git range diff",
+      url: "https://git-scm.com/docs/git-range-diff",
+      kind: "official",
+    },
+    {
       title: "Git reflog",
       url: "https://git-scm.com/docs/git-reflog",
       kind: "official",
@@ -46,12 +52,7 @@ export const metadata = {
 
 # rebase 内部机制与 sequencer
 
-## 它在做什么
-
-1. 计算待重放提交集合
-2. 按顺序把提交应用到新 base
-3. 遇冲突暂停，等待用户处理
-4. 继续直到队列结束
+rebase 不是「把分支挪过去」，而是一个**队列执行器**：先把要重放的提交排成一列，然后逐个 cherry-pick 到新基点上。理解这一点，`.git` 目录里的那些文件和 `--continue / --skip / --abort` 的行为就都能解释了。
 
 <RebaseFigure
   title="Rebase 内部机制"
@@ -61,40 +62,139 @@ export const metadata = {
   modeLabel="sequencer replay"
 />
 
+## 队列长什么样：打开 .git 里的状态文件
 
-## 为什么提交 ID 会变化
-
-因为 rebase 生成的是新提交对象，父指针和对象内容都可能变化。
-
-## `--continue / --skip / --abort` 的本质
-
-- `continue`：继续执行队列
-- `skip`：跳过当前提交
-- `abort`：丢弃队列执行结果，回到起点
-
-## 出错恢复思路
-
-先保住位置，再决定是否重来：
+rebase 进行到一半时，Git 的全部进度都写在 `.git` 下，不是一个抽象的「运行中」状态：
 
 ```bash
-git reflog
-git switch -c rescue/pre-rebase HEAD@{n}
+ls .git/rebase-merge/
+# git-rebase-todo  done  head-name  onto  orig-head  interactive  ...
 ```
 
+几个关键文件：
+
+| 文件 | 内容 | 用途 |
+|------|------|------|
+| `git-rebase-todo` | 尚未执行的命令列表 | 可以用 `--edit-todo` 改 |
+| `done` | 已完成的命令 | 出错后看「执行到哪一步」 |
+| `onto` | 新基点的 SHA | 判断这次 rebase 到底接到哪里 |
+| `orig-head` | rebase 开始前的 HEAD | `--abort` 回到的那个位置 |
+| `head-name` | 原分支名（如 `refs/heads/feature`） | rebase 完成后恢复分支指向 |
+
+`git-rebase-todo` 就是交互式 rebase 里你编辑过的那份清单，格式简单到可以手改：
+
+```
+pick 3f2a91c 修复登录超时
+pick 8b1d44e 补充重试日志
+```
+
+```bash
+# 不改 todo 的内容，只是重新打开编辑器改剩下的命令
+git rebase --edit-todo
+```
+
+这条命令在长队列跑到一半发现顺序不对时很有用：不用 abort 重来，直接调整剩下待执行的部分。
+
+## 两套后端，两个目录
+
+Git 有两个 rebase 实现，进度目录不同，混起来看会迷惑：
+
+- **merge 后端**（`.git/rebase-merge/`）：用 cherry-pick 机制逐个重放，支持交互式编辑、`--edit-todo`、`--rebase-merges`。
+- **apply 后端**（`.git/rebase-apply/`）：把 patch 打到工作区再提交，历史更早，`--apply` 可以强制使用，`git am` 也复用它。
+
+```bash
+git rebase --apply main     # 强制 apply 后端
+git rebase --merge main     # 强制 merge 后端
+```
+
+两者对 `--continue` 的处理有差别：merge 后端在 `--continue` 时会重新执行提交（因此会再跑一遍 commit hook），apply 后端则更像 `git am --continue`。如果 rebase 卡在「hook 又失败了一次」，先确认当前是哪个后端——`.git/rebase-merge` 还是 `.git/rebase-apply` 存在，就是答案。
+
+## 三个控制命令到底做了什么
+
+`--continue` / `--skip` / `--abort` 不是「继续/跳过/取消」这么简单，它们各自的副作用值得说清：
+
+| 命令 | 实际动作 | 注意 |
+|------|----------|------|
+| `--continue` | 把当前工作区内容提交为这个提交，然后取出 todo 里的下一条继续 | 必须先把冲突文件 `git add`；未解决的冲突会拒绝继续 |
+| `--skip` | 丢弃当前提交的改动（相当于 `reset --hard` 到这一步之前），取下一条 | **被跳过提交的改动不会出现在任何地方**，除非它在之前已经应用过 |
+| `--abort` | 删掉整个队列状态，HEAD 回到 `orig-head` | 已完成的那些重放一并丢弃，工作区恢复到 rebase 前 |
+
+`--skip` 是最容易被误用的一条。它的语义不是「这个提交稍后再处理」，而是「这个提交不要了」。连续 skip 几次，很容易把关键补丁连根删掉，而且 `--abort` 会把重放出来的一切都还原，等于白做。
+
 <WarningBox title="别在不确定状态下连续 skip">
-  连续跳过容易无意丢失关键补丁。每次 skip 前都应明确“这个提交为什么可跳过”。
+  连续跳过容易无意丢失关键补丁。每次 skip 前都应能明确回答「这个提交的改动为什么可以不要」；答不上来就先 `--abort`，回到起点重新规划，而不是在队列中途赌。
 </WarningBox>
 
-## 接下来建议继续看什么
+## 为什么提交 ID 一定会变
 
-1. [`recover after rebase`](/zh/recovery/recover-after-rebase)
-2. [`commit graph`](/zh/internals/commit-graph)
-3. [`git-rebase`](/zh/commands/git-rebase)
+新提交的哈希由「tree + parent + author + committer + message」共同决定。rebase 里：
+
+- tree（内容）大多不变
+- **parent 变了**（接在新的基点上）
+- committer 与 committer date 变成当前
+- author 与 author date **保留原值**
+
+前两项就足以让哈希完全不同。所以「rebase 后提交 ID 变了但内容没变」是正常结果，不是出了问题。反过来，如果某个提交的改动在重放时被冲突解决改掉了，`tree` 也会不同——这正是需要用 `range-diff` 检查的地方。
+
+## 用 range-diff 验证「改了什么」
+
+rebase 之后想知道「除了哈希，内容到底变没变」，用 `git range-diff` 做前后对照，它按提交的补丁内容配对，而不是按哈希：
+
+```bash
+# 记录 rebase 前的提交范围
+git range-diff main@{1}..feature@{1} main..feature
+```
+
+输出会把前后两个版本的同名提交并排显示，用 `=`、`!`、`+`、`-` 标出「完全一致 / 内容有差异 / 仅新版有 / 仅旧版有」。交互式 rebase 里做过 squash、edit、drop 之后，这是确认「我没有在解冲突时手滑改坏东西」最直接的手段。
+
+## `--onto` 的三参数语义
+
+`git rebase --onto` 常被记成一条神秘命令，其实它的完整形式是三个位置参数：
+
+```
+git rebase --onto <新基点> <旧基点> <分支>
+```
+
+含义是：把 `<旧基点>..<分支>` 这个范围内的提交，重放到 `<新基点>` 上。两个基点相同的时候，第二个参数可以省略，就退化成熟悉的 `git rebase main`。
+
+```bash
+# 把 feature 上「main 之后的提交」整体接到 release 分支上
+git rebase --onto release main feature
+
+# 只把 topic 分支里不属于 base 的那几个提交，搬到另一条线上
+git rebase --onto newbase oldbase topic
+```
+
+判断范围的方法：`git log --oneline oldbase..topic` 列出来的，就是会被重放的那批提交。先跑一遍这条，`--onto` 就不会再用错。
+
+## 出错后的恢复顺序
+
+rebase 期间 HEAD 处于游离状态，但原始位置一直被记着。恢复有两层：
+
+```bash
+# 第一层：队列还在，直接退回起点
+git rebase --abort
+
+# 第二层：队列已经没了（比如已经 --continue 完才发现不对），从 reflog 找回
+git reflog
+# 找到 rebase 开始前的那条记录，例如 HEAD@{12}
+git switch -c rescue/pre-rebase HEAD@{12}
+```
+
+关键习惯是**先建分支再动手**：在 `git switch -c rescue/pre-rebase` 之后再折腾，出问题时永远有一条已知可用的线可以回去。
+
+```bash
+git switch -c rescue/pre-rebase    # 先钉住当前状态
+git switch feature
+git rebase -i main                 # 再重写历史
+```
+
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [对象可达性与垃圾回收](/zh/internals/reachability-and-garbage-collection)
-- [Git 中的引用与 HEAD](/zh/internals/refs-and-head)
-- [Refspec 与引用更新教程](/zh/internals/refspec-and-ref-updates)
+- [rebase 出错后怎么恢复](/zh/recovery/recover-after-rebase) —— 队列中断与已完成的两种现场处理
+- [Git 提交图与历史表达](/zh/internals/commit-graph) —— 为什么父指针一变哈希就全变
+- [git rebase 教程](/zh/commands/git-rebase) —— 完整参数与交互式命令表
 
+{/* internal-links:auto */}

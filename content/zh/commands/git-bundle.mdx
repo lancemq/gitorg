@@ -22,11 +22,22 @@ export const metadata = {
 ## 学完这篇你会掌握什么
 
 - 把 Git 历史打包成单文件用于离线传输或受限网络同步，适合“不能直接 fetch/push”的场景。
-- 建立 git bundle 的完整心智模型，而不是只记住零散命令
+- 只打包需要的 ref 范围（`--all` 往往不是最优），并在分发前用 `git bundle verify` 确认前置对象齐全。
 
 ## 一句话理解
 
 `git bundle` 能把仓库引用与对象打成一个可传输文件，接收方可以像远端一样读取它。
+
+<CommandFlowFigure
+  title="bundle 打包与传输"
+  caption="bundle 命令把仓库历史打包为单个文件，接收端可以像使用远端一样对其进行 clone 或 fetch 操作。"
+  inputsLabel="输入"
+  inputs="仓库历史|引用范围"
+  commandLabel="git bundle"
+  outputsLabel="结果"
+  outputs="单个 bundle 文件|可离线传输的完整历史"
+  note="bundle 文件可以被另一个仓库当作远端使用，支持 clone 和 fetch。"
+/>
 
 ## 什么时候适合用
 
@@ -64,43 +75,67 @@ git clone repo.bundle repo-from-bundle
 很多场景只需要最小引用集，盲目全量会造成大文件和泄露风险。
 
 ### 误区 2：不校验就给接收方
-`git bundle` 把仓库历史打包成单个文件，支持离线克隆和 fetch 操作。理解它时，要把它放在"如何在没有网络连接的环境中传输完整 Git 历史"这个场景中来看。
 
 接收方失败后再排查，沟通与传输成本会放大。
 
 ### 误区 3：把 bundle 当长期实时同步方案
-- 在没有网络连接的环境中，用 bundle 文件把完整仓库历史从一台机器传输到另一台。
-- 用 `git clone repo.bundle` 从 bundle 文件创建一个完整仓库，替代网络克隆。
-- 创建增量 bundle，只打包上次传输后新增的提交，减少传输量。
 
 bundle 更适合“批量快照式”交换，不适合高频双向协作。
 
-## 接下来建议继续看什么
-<CommandFlowFigure
-  title="bundle 打包与传输"
-  caption="bundle 命令把仓库历史打包为单个文件，接收端可以像使用远端一样对其进行 clone 或 fetch 操作。"
-  inputsLabel="输入"
-  inputs="仓库历史|引用范围"
-  commandLabel="git bundle"
-  outputsLabel="结果"
-  outputs="单个 bundle 文件|可离线传输的完整历史"
-  note="bundle 文件可以被另一个仓库当作远端使用，支持 clone 和 fetch。"
-/>
+## 增量传输：只带上次之后新增的提交
 
-1. [`git-fetch`](/zh/commands/git-fetch)
-2. [`git-request-pull`](/zh/commands/git-request-pull)
-3. `cross repository integration workflow`
+全量 bundle 的体积和仓库历史成正比，日常传递更常用的是「以某个已有提交为基线」的增量包：`git bundle` 直接把参数交给 `rev-list`，所以范围表达式照常可用。
 
-- bundle 适合离线传输历史，但创建时需要确保包含所有必要的祖先提交，否则接收端可能缺少必需的提交。
-- 接收端可以用 `git clone repo.bundle` 从零创建仓库，也可以用 `git fetch repo.bundle` 增量更新已有仓库。
-- 创建 bundle 前可以用 `git bundle verify` 检查文件是否完整、是否包含所需的引用。
-- 如果 bundle 只包含部分引用范围，接收端 clone 后可能只有指定的分支，需要额外 fetch 其他分支。
+```bash
+# 只打包 v1.2 之后 main 上新增的提交
+git bundle create updates.bundle v1.2..main
+
+# 同时带上两个分支，排除对方一定已有的基线
+git bundle create updates.bundle ^v1.2 main release
+
+# 打包前先看清单：包含哪些 ref、每个 ref 指向哪个提交
+git bundle list-heads updates.bundle
+
+# 接收端验证：会逐条打印 refs，并检查前置提交是否齐全
+git bundle verify updates.bundle
+```
+
+`verify` 失败时最典型的报错是：
+
+```
+error: Repository lacks these prerequisite commits:
+error: 3f2a91c... (v1.2)
+```
+
+这表示接收端没有 `v1.2` 及更早的历史，增量包无法单独使用。解决方式只有两种：让对方先补齐这段历史，或者改用对端已有提交作为新的基线重新打包。**这个错误在打包端完全看不出来**，所以 `verify` 必须在分发前跑，而不是等接收方报错。
+
+## 接收端怎么用
+
+```bash
+# 从 bundle 增量更新已有仓库（推荐：落到远端跟踪分支，不直接改动当前分支）
+git fetch ../updates.bundle main:refs/remotes/bundle/main
+
+# 从零创建仓库：要求 bundle 里包含 HEAD
+git clone repo.bundle repo-from-bundle
+
+# 只解包对象、不建引用，适合先检查内容再决定怎么接
+git bundle unbundle updates.bundle
+```
+
+`git clone` 一个 bundle 时，要求包里含有 `HEAD` 引用——用 `git bundle create repo.bundle --all` 生成的包满足这一点；如果只打了某个分支的范围（如 `v1.2..main`），clone 会失败，只能走 `fetch`。这是「bundle 能不能直接 clone」的实际分界线。
+
+## 什么时候不该用 bundle
+
+- **高频双向协作**：每次都要重新打包、传递、验证，成本远高于直接 `push`/`fetch`。bundle 是快照交换，不是同步通道。
+- **需要匿名只读分发**：这种情况 `git daemon`、静态 HTTP 或平台归档更省事。
+- **包含敏感路径的全量历史**：`--all` 会把所有 ref 的历史一起带出去，打包前先确认没有不该外传的分支和标签。
 
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [git branch 教程](/zh/commands/git-branch)
-- [git-cat-file 教程](/zh/commands/git-cat-file)
-- [git checkout 教程](/zh/commands/git-checkout)
+- [git fetch 教程](/zh/commands/git-fetch) —— 接收端拿到 bundle 后的引用更新方式
+- [git-request-pull 教程](/zh/commands/git-request-pull) —— 另一种「让对方自己来取」的协作方式
+- [跨仓库集成工作流](/zh/workflows/cross-repo-integration-workflow) —— bundle 在多仓库交付里的位置
 
+{/* internal-links:auto */}

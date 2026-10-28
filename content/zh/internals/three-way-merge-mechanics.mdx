@@ -8,6 +8,7 @@ export const metadata = {
   sourceUrls: [
     "https://git-scm.com/docs/git-merge",
     "https://git-scm.com/docs/git-merge-base",
+    "https://git-scm.com/docs/git-merge-file",
     "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
   ],
   quotes: [
@@ -37,6 +38,11 @@ export const metadata = {
       kind: "official",
     },
     {
+      title: "Git merge file",
+      url: "https://git-scm.com/docs/git-merge-file",
+      kind: "official",
+    },
+    {
       title: "Git Branching Basic Branching and Merging",
       url: "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
       kind: "book",
@@ -48,11 +54,11 @@ export const metadata = {
 
 ## 三方输入分别是什么
 
-- `base`：两边分支共同祖先（merge-base）
-- `ours`：当前分支 tip
-- `theirs`：被合并分支 tip
+三方合并不是「把两个文件的差异拼起来」，而是以共同祖先为基线，分别计算两侧相对基线的改动，再把这些改动叠加到同一份结果上。三个输入各有名字：
 
-Git 对比的是 “base→ours” 与 “base→theirs” 的改动差异。
+- `base`：两边分支的共同祖先（merge-base），也就是「改动之前长什么样」
+- `ours`：当前分支的 tip，即执行 `git merge` 时你所在的那个提交
+- `theirs`：被合进来的分支 tip
 
 <MergeFigure
   title="三方合并机制"
@@ -62,29 +68,143 @@ Git 对比的是 “base→ours” 与 “base→theirs” 的改动差异。
   modeLabel="three-way merge"
 />
 
+```bash
+git merge-base main feature
+# 3f2a91c8...  ← base
+git rev-parse main feature
+# main 的 tip、feature 的 tip
+```
 
-## 为什么会冲突
+`base` 决定了「什么算改动」。同一份文件，如果 base 里是 `A`，ours 是 `B`，theirs 也是 `A`，那 theirs 侧没有改动，结果直接取 `B`——不会冲突，也不需要你判断。
 
-当两边都修改了同一位置且结果不可自动判定时，就会触发冲突。
+## 决策表：只有三种情况会走到你面前
 
-## 一个常见误解
+理解了 base 的作用，冲突就不再神秘。对任意一段内容，两侧相对 base 的比较只有四种结果，其中三种 Git 能自动决定：
 
-冲突不代表 Git 不知道文件结构，而是语义选择需要人工决策。
+| base | ours | theirs | 结果 |
+|------|------|--------|------|
+| A | A | A | 保持 A |
+| A | B | A | 取 B（只有 ours 改） |
+| A | A | C | 取 C（只有 theirs 改） |
+| A | B | C | **冲突**，需要人工选择 |
 
-<WarningBox title="先看 base 再解冲突">
-  只看 ours/theirs 容易失去上下文。理解 base 的原始状态，通常能更快判断哪侧更合理。
-</WarningBox>
+注意第三行：两侧改成**一样**的内容（`A→B` 与 `A→B`）也算「无分歧」，Git 直接采用，不产生冲突。很多「明明两边都改了却没冲突」的疑惑，答案就在这里——改动的**结果**相同，而不是改动本身相同。
 
-## 接下来建议继续看什么
+## 冲突标记到底说明了什么
 
-1. [`merge-base and ancestry`](/zh/internals/merge-base-and-ancestry)
-2. [`git-merge`](/zh/commands/git-merge)
-3. [`rerere for recurring conflicts`](/zh/workflows/rerere-for-recurring-conflicts)
+冲突时 Git 把三方内容都留在文件里，供你选择。默认格式只有两方：
+
+```
+<<<<<<< HEAD
+B                     ← ours
+=======
+C                     ← theirs
+>>>>>>> feature
+```
+
+看不出 base 是 `A`，于是你只能猜「谁改了什么」。打开 `diff3` 风格后，base 会被完整保留：
+
+```bash
+git config --global merge.conflictStyle diff3
+```
+
+```
+<<<<<<< HEAD
+B
+||||||| merged common ancestors
+A                     ← base，判断的依据
+=======
+C
+>>>>>>> feature
+```
+
+Git 2.35 起还有 `zdiff3`，它会在冲突块两端裁掉与 base 相同的行，只留下真正分歧的部分，长文件里比 `diff3` 更好读。
+
+```bash
+git config --global merge.conflictStyle zdiff3
+```
+
+## 亲手验证一次：不用仓库也能看到三方合并
+
+`git merge-file` 就是 `git merge` 内部对单个文件做的事，可以脱离仓库直接做实验：
+
+```bash
+printf 'a\nb\nc\n' > base.txt
+printf 'a\nB\nc\n' > ours.txt
+printf 'a\nb\nC\n' > theirs.txt
+
+# 参数顺序必须是 ours base theirs
+git merge-file -p ours.txt base.txt theirs.txt
+# 输出 a / <<<<<<< ours.txt ... 说明两处改动相邻、判定为冲突
+```
+
+把三份文件的行距拉开再试一次，就会得到自动合并的结果——同样的三方输入，冲突与否取决于改动是否落在同一区域（Git 默认上下文为 3 行）。
+
+## 多个 merge base 时怎么办
+
+大多数情况 base 只有一个。但两条分支互相 merge 过（criss-cross），共同祖先可能不止一个：
+
+```bash
+git merge-base --all main feature
+# 输出两个或更多提交
+```
+
+这时 Git 不能任选一个当基线，否则合并结果会丢掉某一侧的改动。`recursive` 策略（以及 Git 2.34 起的默认 `ort` 策略）的做法是：先把这些 merge base **两两虚拟合并**成一个临时树，再用这个合成结果当 base。这也是为什么这类合并更慢、更容易产生意外冲突。
+
+```bash
+# 看两个分支的全部 merge base，判断是否处在 criss-cross 局面
+git merge-base --all main feature
+# 判断 A 是否为 B 的祖先（退出码 0/1，适合写进脚本）
+git merge-base --is-ancestor v1.2 main && echo "v1.2 已经包含在 main 里"
+```
+
+## ours 与 theirs 会反转
+
+解冲突时最常踩的坑：`--ours` / `--theirs` 指的是「合并的哪一侧」，不是「时间上谁更新」。
+
+```bash
+git checkout --ours path/to/file   # merge 时 = 当前分支
+git checkout --theirs path/to/file # merge 时 = 被合入的分支
+```
+
+但在 `git rebase` 过程中，Git 是把你的提交逐个重放到上游之上，**当前分支其实是上游**。于是：
+
+- `--ours` 在 rebase 中 = 上游（被重放到的目标）
+- `--theirs` 在 rebase 中 = 你正在重放的那个提交
+
+「rebase 时选 ours 结果把自己的改动弄丢了」这类事故，全部来自这个反转。判断依据不是记口诀，而是看 `git status` 给出的当前操作类型（`You are currently rebasing` / `merging`）。
+
+## 二进制与重命名没有三方语义
+
+三方合并只对文本按行成立。二进制文件（图片、编译产物、锁文件）无法做行级比较，只要两侧都改过，Git 就直接判定冲突，让你整份二选一。
+
+重命名则依赖重命名检测：如果一侧重命名、另一侧修改了原路径的内容，Git 通常能合并成「新路径 + 修改」，但阈值（默认 50% 相似度）判定失败时，就会变成「一个删除 + 一个修改」的冲突。调整阈值可以改变判定，但那是权衡，不是修复：
+
+```bash
+git merge -X rename-threshold=30% feature
+```
+
+## 一个实用判断顺序
+
+遇到冲突时，按这个顺序看，比直接读冲突标记快得多：
+
+1. `git log --oneline --left-right main...feature` —— 两边各自多了哪些提交，先知道对方为什么改
+2. `git diff main...feature -- <file>` —— 只看 theirs 相对 base 的改动
+3. `git show :1:<file>` / `:2:` / `:3:` —— 暂存区里的 base / ours / theirs 三个版本，可以直接导出对比
+
+```bash
+# 冲突文件的三份原始版本都在暂存区，编号 1=base 2=ours 3=theirs
+git show :1:src/config.ts > /tmp/base.ts
+git show :2:src/config.ts > /tmp/ours.ts
+git show :3:src/config.ts > /tmp/theirs.ts
+```
+
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [修订选择、范围表达式与提交集合](/zh/internals/revision-selection-and-ranges)
-- [传输协议、协商与 pack 交换](/zh/internals/transfer-protocols-and-negotiation)
-- [Tree 对象与目录快照教程](/zh/internals/tree-objects-and-snapshots)
+- [共同祖先与历史祖先关系教程](/zh/internals/merge-base-and-ancestry) —— merge-base 的计算与 `--is-ancestor` 的用法
+- [git merge 教程](/zh/commands/git-merge) —— 合并策略参数与 `-X` 选项
+- [用 rerere 处理重复冲突](/zh/workflows/rerere-for-recurring-conflicts) —— 同一冲突反复出现时的复用机制
 
+{/* internal-links:auto */}

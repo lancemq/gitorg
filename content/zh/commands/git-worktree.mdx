@@ -23,6 +23,17 @@ export const metadata = {
 
 `git worktree` 让一个仓库同时拥有多个检出目录，每个目录可以绑定不同分支并独立工作。
 
+<CommandFlowFigure
+  title="多工作树并行开发"
+  caption="worktree 共享同一个 .git 目录，但每个工作目录有独立的 HEAD 和工作区，实现真正的并行开发。"
+  inputsLabel="共享仓库"
+  inputs="同一个 .git 目录|不同分支|独立工作目录路径"
+  commandLabel="git worktree"
+  outputsLabel="结果"
+  outputs="多个工作目录|各自的 HEAD|并行开发环境"
+  note="同一个分支通常不能同时在多个 worktree 里作为可写检出目标，规划前先确认分支占用情况。"
+/>
+
 ## 为什么常比 stash 更稳
 
 - 任务上下文隔离在不同目录
@@ -68,23 +79,6 @@ git worktree remove ../repo-hotfix
 - review 同事的 PR 时，在不离开当前分支的情况下，用 worktree 检出 PR 分支进行本地验证。
 
 容易造成“看似同分支、实则状态不同”的错觉。
-
-## 接下来建议继续看什么
-
-1. [`parallel work with worktree`](/zh/workflows/parallel-work-with-worktree)
-2. [`ai agent worktree mode`](/zh/workflows/ai-agent-worktree-mode)
-3. [`git-switch`](/zh/commands/git-switch)
-
-<CommandFlowFigure
-  title="多工作树并行开发"
-  caption="worktree 共享同一个 .git 目录，但每个工作目录有独立的 HEAD 和工作区，实现真正的并行开发。"
-  inputsLabel="共享仓库"
-  inputs="同一个 .git 目录|不同分支|独立工作目录路径"
-  commandLabel="git worktree"
-  outputsLabel="结果"
-  outputs="多个工作目录|各自的 HEAD|并行开发环境"
-  note="同一个分支通常不能同时在多个 worktree 里作为可写检出目标，规划前先确认分支占用情况。"
-/>
 
 ## 多 worktree 的分支限制
 
@@ -304,6 +298,8 @@ git branch -D experiment-xyz
 
 沿着同一主题继续深入：
 
-- [git-verify-pack 教程](/zh/commands/git-verify-pack)
-- [git-verify-tag 教程](/zh/commands/git-verify-tag)
+- [用 worktree 并行处理多个任务](/zh/workflows/parallel-work-with-worktree) —— 多个任务同时推进时的目录与分支安排
+- [AI Coding Agent 下的 git worktree 模式](/zh/workflows/ai-agent-worktree-mode) —— 让 agent 在独立工作树里改代码
+- [git switch 教程](/zh/commands/git-switch) —— 切换分支时的安全检查
 
+{/* internal-links:auto */}

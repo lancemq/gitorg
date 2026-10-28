@@ -9,6 +9,7 @@ export const metadata = {
     "https://git-scm.com/docs/githooks",
     "https://git-scm.com/docs/git-commit",
     "https://git-scm.com/docs/git-push",
+    "https://git-scm.com/docs/git-config",
   ],
   citations: [
     {
@@ -26,15 +27,15 @@ export const metadata = {
       url: "https://git-scm.com/docs/git-push",
       kind: "official",
     },
+    {
+      title: "Git config",
+      url: "https://git-scm.com/docs/git-config",
+      kind: "official",
+    },
   ],
 };
 
 # hooks 与策略执行
-
-## 两类 hooks
-
-- 本地 hooks：在开发者机器上执行（如 pre-commit）
-- 服务端 hooks：在远端仓库接收推送时执行（如 pre-receive）
 
 <CommandFlowFigure
   title="Hook 执行流"
@@ -47,36 +48,136 @@ export const metadata = {
   note="客户端 hooks 可以被绕过，不要它们作为唯一的安全防线。"
 />
 
+## 两类 hooks：能力不同，可信度也不同
 
-## 职责边界
+| | 客户端 hooks | 服务端 hooks |
+|---|---|---|
+| 存放位置 | `.git/hooks/`（非 bare 仓库） | `$GIT_DIR/hooks/`（bare 仓库） |
+| 典型代表 | `pre-commit`、`commit-msg`、`pre-push` | `pre-receive`、`update`、`post-receive` |
+| 执行者 | 开发者本机 | 托管平台/自建服务器 |
+| 能否被跳过 | **能**（`--no-verify`、直接不装） | 不能（除非改服务器） |
+| 适合放什么 | 快速反馈：格式、lint、单测 | 强制门禁：分支保护、提交规范、权限 |
 
-- 本地 hooks 适合快速反馈（格式、基础 lint）
-- 服务端 hooks 适合强制门禁（分支保护、提交策略）
+这张表的结论很直接：**客户端 hook 是体验优化，服务端 hook 才是策略**。把「必须」级别的规则只放在 `pre-commit` 里，等于默认它会被绕过。
 
-## 常见策略落地点
+## 客户端 hook 的执行机制
 
-1. 提交信息格式检查
-2. 禁止直接推送受保护分支
-3. 必须关联工单或变更单
+Git 只在固定路径找一个同名可执行文件，规则就三条：
 
-## 一个实践原则
+1. 路径是 `$GIT_DIR/hooks/<hook-name>`，没有扩展名
+2. 文件必须有可执行权限，且第一行是 shebang（`#!/bin/sh`、`#!/usr/bin/env python3`）
+3. **退出码非 0 就中止操作**（`pre-*` 系列），`post-*` 系列只看不改
 
-“建议性规则”放本地，“必须性规则”放服务端，避免因本地绕过导致策略失效。
+最麻烦的一点：`.git/hooks/` 不在版本控制里，`git clone` 不会带走任何 hook。团队共享只能靠额外机制。
+
+### 共享方案：core.hooksPath
+
+把脚本放进仓库里的目录，再用配置指过去：
+
+```bash
+mkdir -p .githooks
+cat > .githooks/commit-msg <<'EOF'
+#!/bin/sh
+# 校验首行格式：type(scope): summary
+pattern='^(feat|fix|docs|refactor|test|chore|perf)(\([a-z0-9-]+\))?: .{1,72}$'
+head -n1 "$1" | grep -Eq "$pattern" || {
+  echo "commit message 不符合约定，应为: type(scope): summary" >&2
+  echo "实际首行: $(head -n1 "$1")" >&2
+  exit 1
+}
+EOF
+chmod +x .githooks/commit-msg
+
+git config core.hooksPath .githooks
+```
+
+`$1` 是 commit message 的临时文件路径，脚本可以读、也可以改（`prepare-commit-msg` 常用来插入模板）。
+
+注意两点：`core.hooksPath` 写的是**相对工作区根目录**的路径；它是 local 配置，新人 clone 后需要自己执行一次 `git config`。想省掉这一步，就在 `npm install` / `make setup` 之类的初始化脚本里带上——这是 husky、lefthook 这类工具实际做的事，不是魔法。
+
+## 服务端 hook 的真实上下文
+
+服务端 hook 最容易踩的坑：**bare 仓库没有工作区**。所以 `git diff`（默认比工作区和暂存区）在 `pre-receive` 里没有意义，必须显式比较两个提交：
+
+```bash
+#!/bin/sh
+# hooks/pre-receive —— 拒绝非快进推送
+zero=0000000000000000000000000000000000000000
+status=0
+while read old new ref; do
+  # 新建分支时 old 是全 0，跳过检查
+  [ "$old" = "$zero" ] && continue
+  if ! git merge-base --is-ancestor "$old" "$new"; then
+    echo "拒绝非快进推送: $ref ($old -> $new)" >&2
+    status=1
+  fi
+done
+exit $status
+```
+
+`pre-receive` 从标准输入读入所有待更新的引用，每行三个字段：旧值、新值、引用名。它一次性拿到全部引用，适合做「整批拒绝」的规则；如果只想拒绝某一条，用 `update` hook——它按引用逐个调用，参数是 `<ref> <old> <new>`，语义更清楚。
+
+两类 hook 的差异在这里体现得很明显：
+
+- `pre-receive` 拒绝时，这次推送里的**所有**引用都不生效
+- `update` 拒绝时，只拒绝当前这一个引用，其余可以继续
+
+要做「受保护分支不允许非 fast-forward」，`update` 更合适；要做「一次推送里不允许出现任何未签名提交」，`pre-receive` 更合适，因为它能看到全貌。
+
+### 服务端 hook 能做但客户端做不到的检查
+
+```bash
+# 检查提交是否带签名（服务端能看到全部提交对象）
+git rev-list --no-walk=unsorted "$new" --not --all | while read c; do
+  git verify-commit "$c" 2>/dev/null || { echo "未签名提交: $c" >&2; exit 1; }
+done
+
+# 检查被推送的文件里是否含大文件（需要先算出变更集）
+git diff --name-only "$old" "$new" | while read f; do
+  size=$(git cat-file -s "$new:$f" 2>/dev/null || echo 0)
+  [ "$size" -gt 5242880 ] && echo "文件超过 5MB: $f ($size bytes)" >&2
+done
+```
+
+`git cat-file -s "$new:$f"` 直接读对象大小，不需要检出到磁盘——这正是 bare 仓库里唯一可行的做法。
+
+## 绕过路径与实际防护强度
+
+客户端 hook 至少有三条绕过路径，做策略设计时必须知道：
+
+1. `git commit --no-verify` / `git push --no-verify` 跳过 `pre-commit`、`commit-msg`、`pre-push`
+2. 直接不配置 `core.hooksPath`，或删掉 `.git/hooks/*`
+3. 换一个不触发 hook 的客户端/接口（平台网页直接改文件）
+
+所以判定标准应该是：**如果这条规则被绕过会造成什么后果？**
+
+- 造成的只是 review 成本上升 → 放客户端，足够
+- 会造成不可回滚的后果（密钥泄露、受保护分支被改、构建产物污染）→ 必须放服务端或平台门禁
+
+平台侧的 branch protection / rulesets 本质上就是托管版的服务端 hook，而且比自建 hook 更难绕过，能用平台能力时优先用平台。
+
+## 一个分层的落法
+
+```
+pre-commit     → 格式、lint、冲突标记检查（秒级，可绕过）
+commit-msg     → 提交信息格式（可绕过）
+pre-push       → 单测、类型检查（分钟级，可跳过）
+pre-receive    → 签名、大文件、分支保护（强制）
+平台 rulesets  → 审批数、状态检查、合并方式（强制，有审计）
+```
+
+分层的意义不是「多写几层更安全」，而是让每一层的失败成本匹配它的位置：本地失败只需重跑，服务端失败意味着推送被拒，平台失败意味着流程卡住——越往后越贵，所以**越便宜的检查越往前放**。
 
 <WarningBox title="只依赖本地 hooks 不能形成团队强制">
   本地 hooks 可能被跳过或配置不一致。关键治理策略应在远端统一执行。
 </WarningBox>
 
-## 接下来建议继续看什么
-
-1. [`review and safe push`](/zh/best-practices/review-and-safe-push)
-2. [`commit message conventions`](/zh/best-practices/commit-message-conventions)
-3. [`pr merge strategy and platform settings`](/zh/workflows/pr-merge-strategy-and-platform-settings)
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [环境变量、仓库变量与 Git 运行上下文](/zh/internals/environment-and-repository-variables)
-- [工作区、暂存区与对象库](/zh/internals/index-and-working-tree)
-- [共同祖先与历史祖先关系教程](/zh/internals/merge-base-and-ancestry)
+- [评审前整理与安全推送](/zh/best-practices/review-and-safe-push) —— 推送前的自检顺序
+- [提交信息规范约定](/zh/best-practices/commit-message-conventions) —— commit-msg 校验的规则来源
+- [PR 合并策略与平台配置](/zh/workflows/pr-merge-strategy-and-platform-settings) —— 托管平台侧的门禁配置
 
+{/* internal-links:auto */}

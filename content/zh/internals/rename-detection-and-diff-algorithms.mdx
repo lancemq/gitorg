@@ -8,6 +8,7 @@ export const metadata = {
   sourceUrls: [
     "https://git-scm.com/docs/git-diff",
     "https://git-scm.com/docs/git-log",
+    "https://git-scm.com/docs/diffcore-rename",
     "https://git-scm.com/docs/git-config",
   ],
   citations: [
@@ -17,7 +18,12 @@ export const metadata = {
       kind: "official",
     },
     {
-      title: "git-scm.com — Git log",
+      title: "Diffcore rename",
+      url: "https://git-scm.com/docs/diffcore-rename",
+      kind: "official",
+    },
+    {
+      title: "Git log",
       url: "https://git-scm.com/docs/git-log",
       kind: "official",
     },
@@ -31,9 +37,7 @@ export const metadata = {
 
 # 重命名检测与差异算法
 
-## 重命名是如何推断的
-
-Git 会基于内容相似度把“删除 + 新增”匹配为 rename。
+Git 的对象库里没有「重命名」这种记录。一次 `git mv` 产生的提交，和「删掉一个文件、再新增一个内容几乎相同的文件」在存储层完全等价。你看到的 `rename` 是 `git diff` 当场算出来的推断结果。
 
 <CommandFlowFigure
   title="重命名检测与 Diff 算法"
@@ -46,35 +50,118 @@ Git 会基于内容相似度把“删除 + 新增”匹配为 rename。
   note="重命名检测不是存储层的真实记录，而是 diff 时的推断。"
 />
 
+## 检测分两步：先看路径，再看内容
 
-## 为什么有时看起来像删了再新建
+`diffcore-rename` 的处理顺序决定了大多数「为什么这里显示成删除+新增」的疑问：
 
-- 相似度阈值没达到
-- 改动量太大
-- 参数配置不同（例如是否启用重命名检测）
+1. **路径完全相同**的文件直接配对，不参与相似度计算。
+2. 剩下的「删除集合」与「新增集合」做两两比较，算出相似度，超过阈值的配对为 rename。
+3. 默认阈值 `50%`，由 `-M` 控制。
 
-## diff 算法影响什么
+```bash
+git diff -M --summary HEAD~1
+# rename src/utils/{format.js => formatter.js} (92%)
 
-不同算法会影响 hunk 切分和可读性，进而影响 review 成本。
+git diff -M --stat HEAD~1
+# src/utils/{format.js => formatter.js} | 0
+```
 
-## 实战建议
+`--summary` 后面括号里的百分比就是 similarity index。同一份改动换个阈值，结果可能完全不同：
 
-在大规模重构中，先做“纯重命名提交”再做逻辑改动，通常能显著提升差异可读性。
+```bash
+git diff -M20% --summary HEAD~1   # 放宽到 20%，勉强算重命名
+git diff -M90% --summary HEAD~1   # 收紧到 90%，可能只剩删除 + 新增
+```
+
+## 相似度是怎么算的
+
+它不是按字符数算，而是按**内容块**加权：Git 把两侧内容切块，统计「相同块」占总体积的比例。这带来两个实际后果：
+
+- **行数少的小文件更容易跌破阈值**。改了两行，在 20 行的文件里是 10%，在 2000 行的文件里是 0.1%。所以「同样改了两行，小文件显示删除+新增，大文件显示重命名」是正常现象。
+- **改动越均匀越容易被认成重命名，改动越集中越不像**。文件里换掉一整段（哪怕总占比不高）比到处微调更容易保住阈值，因为切块后的匹配更差。
+
+`-B`（break rewrite）处理的是另一个方向：一个文件整体被重写时，Git 会把它拆成「删除 + 新增」，而不是硬套一个低相似度的重命名。
+
+```bash
+git diff -B50% -M --stat HEAD~1
+```
+
+## 拷贝检测要多一步
+
+`-C` 找的是「新文件来自某个已有文件」，比 rename 贵得多，因为它要把每个新增文件与**所有**现存文件比较。默认还会偷懒：只把被修改过的文件当作候选源。
+
+```bash
+git diff -C -M --summary HEAD~1                 # 只在发生改动的文件里找源
+git diff -C -M --find-copies-harder --summary   # 连未修改的文件也纳入候选（很慢）
+```
+
+`--find-copies-harder` 在大型仓库上是明显的时间开销，日常 review 里一般用不到；只有在「从这个模块复制了一份来实现新模块」这类重构里才值得开。
+
+## 阈值之外还有一道闸：renameLimit
+
+当删除与新增的文件数量很大时，两两比较会退化成 O(n²)。Git 有一道保护：
+
+```bash
+git config diff.renameLimit 1000   # 参与检测的文件数上限
+git config merge.renameLimit 7000  # merge 时的上限
+```
+
+超过上限，Git 会**直接跳过相似度检测**，于是你在 diff 里看到的全是删除 + 新增，没有任何提示。这正是「机器上本地能看出重命名、CI 里却看不出来」的常见原因——两边配置不同。遇到大批量文件移动（比如整目录搬迁）时，调高这个值再看，比怀疑 Git 出 bug 有效。
+
+## diff 算法影响的是「怎么切 hunk」
+
+配对完成之后，具体怎么把行级差异切成 hunk，由 diff 算法决定。默认是 Myers，另外三种在实际场景里各有优势：
+
+```bash
+git diff --diff-algorithm=myers      # 默认，最少的增删行数
+git diff --diff-algorithm=minimal    # 同 Myers，但花更多时间求最优
+git diff --diff-algorithm=patience   # 先对齐唯一行，再处理中间
+git diff --diff-algorithm=histogram  # 近似 patience，但对重复行更稳
+```
+
+差别在**重复行多的文件**上最明显。一个全是 `});` 的 JSX 文件、一份格式相近的配置表，Myers 容易把改动挂到一个「语法上能对上、语义上对不上」的位置，导致 diff 看起来把整块代码搬了家。`patience` 和 `histogram` 优先匹配只出现一次的行，切出来的 hunk 更贴近人的理解。
+
+```bash
+# 只在某次比较里用，不改全局
+git diff --diff-algorithm=histogram -- src/components/Form.tsx
+
+# 或者干脆设为默认
+git config --global diff.algorithm histogram
+```
+
+一个可验证的对比方法：对同一个提交分别用两种算法看 `--stat`，如果增删行数相差很大，说明这个文件的 diff 位置很依赖算法，评审时值得换一种看。
+
+## `git log --follow` 只跟一个文件
+
+重命名检测在历史浏览里是**逐次比较**的：`--follow` 从当前提交往回走，每一步都重新做一次 rename 检测，所以它能跨过重命名，但一次只跟一个路径，而且遇到合并提交时行为会变得不可靠。
+
+```bash
+git log --follow --oneline -- src/utils/formatter.js
+# 能一直追溯到它叫 format.js 的时候
+```
+
+需要看「这批文件整体是怎么搬的」时，用 `--find-renames` 配 `--stat` 看单个提交更准确：
+
+```bash
+git log --oneline --find-renames=40% --stat --since="2 weeks ago"
+```
+
+## 一条对评审真正有用的习惯
+
+重命名和逻辑改动混在同一个提交里，diff 会同时呈现两种信息，reviewer 很难分辨「哪些行是搬过去的、哪些行是改过的」。把纯移动单独提一个提交，第二个提交只放逻辑改动，Git 的 rename 检测就能让第一个提交几乎不显示内容（`| 0`），第二个提交的 diff 也只剩真正的改动。
+
+这也是「大规模重构先重命名、后改逻辑」这条建议的实际机制来源：不是风格偏好，而是让 diff 的推断结果对人有用。
 
 <WarningBox title="不要把 diff 结果当对象事实">
-  diff 是展示与比较策略，不是对象数据库里的原生“事件日志”。
+  diff 是展示与比较策略，不是对象数据库里的原生“事件日志”。同一组提交，换阈值、换算法、换 renameLimit，看到的「重命名」和「改动行数」都会变。
 </WarningBox>
 
-## 接下来建议继续看什么
-
-1. [`tree objects and snapshots`](/zh/internals/tree-objects-and-snapshots)
-2. [`git-diff`](/zh/commands/git-diff)
-3. [`small batch review`](/zh/best-practices/small-batch-review)
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [远端跟踪引用](/zh/internals/remote-tracking-refs)
-- [仓库布局、.git 目录与 GIT_DIR](/zh/internals/repository-layout-and-gitdir)
-- [修订选择、范围表达式与提交集合](/zh/internals/revision-selection-and-ranges)
+- [Tree 对象与目录快照教程](/zh/internals/tree-objects-and-snapshots) —— 路径只存在于 tree 里，为 rename 推断提供输入
+- [git diff 教程](/zh/commands/git-diff) —— `-M` / `-C` / `-B` 的完整参数表
+- [小批量评审专题](/zh/best-practices/small-batch-review) —— 把移动与改动拆开提交的评审收益
 
+{/* internal-links:auto */}

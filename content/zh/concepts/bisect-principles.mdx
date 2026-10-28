@@ -251,22 +251,15 @@ git bisect run ./build.sh
 2. **使用 `skip` 处理不可测试提交**——避免污染结果
 3. **限制搜索路径**——大型单体仓库加速 10x+
 4. **保存 `bisect log`**——复盘、审计、团队共享
-5. **自动化集成 CI**——夜ly 运行 bisect 监控回归
-
-## 继续学习
-
-1. `commands/git-bisect` — git bisect 命令参考
-2. `workflows/bisect-regression-triage-workflow` — 回归排查工作流
-3. `internals/commit-graph` — 提交图加速 bisect
-4. `concepts/rebase-mechanics` — Git Rebase 内部机制
-
-{/* internal-links:auto */}
+5. **自动化集成 CI**——每晚运行 bisect 监控回归
 
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [Git Attributes 详解](/zh/concepts/git-attributes)
-- [Git 历史说明](/zh/concepts/git-history)
-- [Git Hooks 工程化](/zh/concepts/hooks-automation)
+- [git bisect](/zh/commands/git-bisect) —— git bisect 命令参考
+- [回归问题 bisect 排查工作流](/zh/workflows/bisect-regression-triage-workflow) —— 回归排查工作流
+- [Git 提交图与历史表达](/zh/internals/commit-graph) —— 提交图加速 bisect
+- [Git Rebase 内部机制](/zh/concepts/rebase-mechanics) —— Git Rebase 内部机制
 
+{/* internal-links:auto */}
