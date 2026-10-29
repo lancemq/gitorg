@@ -221,7 +221,7 @@
 
 .external-resource-arrow {
   color: var(--text-muted);
-  font-size: 0.74rem;
+  font-size: 0.78rem;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -281,7 +281,7 @@
 
 .learning-path-signal span {
   color: var(--text-muted);
-  font-size: 0.7rem;
+  font-size: 0.76rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -306,7 +306,7 @@
 
 .learning-path-aside-kicker {
   color: #9a3412;
-  font-size: 0.66rem;
+  font-size: 0.78rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
@@ -337,7 +337,7 @@
   top: 0;
   left: 0;
   color: rgba(154, 52, 18, 0.82);
-  font-size: 0.7rem;
+  font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.1em;
 }
@@ -418,7 +418,7 @@
   border-radius: 999px;
   background: rgba(24, 24, 27, 0.04);
   color: #9a3412;
-  font-size: 0.72rem;
+  font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.08em;
 }
@@ -510,7 +510,7 @@
   border-radius: 999px;
   background: rgba(24, 24, 27, 0.06);
   color: var(--text-muted);
-  font-size: 0.66rem;
+  font-size: 0.78rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -565,7 +565,7 @@
   border: 1px solid rgba(24, 24, 27, 0.08);
   background: rgba(250, 250, 250, 0.96);
   color: var(--text-muted);
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
