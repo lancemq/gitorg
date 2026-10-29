@@ -116,7 +116,7 @@
     "tier": "core",
     "slug": "git-init",
     "title": "git init 教程",
-    "summary": "解释 git init 如何初始化仓库、默认分支如何产生，以及它在新项目和已有目录中的常见用法。",
+    "summary": "从零建立仓库，并说清 --bare、--shared、-b、--template 各自的真实后果，以及重复 init 为什么是安全的。",
     "suggestions": []
   },
   {
@@ -126,7 +126,7 @@
     "tier": "core",
     "slug": "git-clone",
     "title": "git clone 教程",
-    "summary": "说明 git clone 如何复制仓库、默认远端 origin 的作用，以及克隆后本地分支与远端分支的基本关系。",
+    "summary": "从远端获得完整仓库：浅克隆与部分克隆的代价、只克隆单个分支的后果、--reference 加速，以及 clone 后本地分支为什么只有一个。",
     "suggestions": []
   },
   {
@@ -136,7 +136,7 @@
     "tier": "core",
     "slug": "git-status",
     "title": "git status 教程",
-    "summary": "讲清 git status 如何查看工作区、暂存区和分支状态，以及它为什么是日常最应该频繁使用的命令之一。",
+    "summary": "读清 XY 两列的含义、为什么脚本里必须用 --porcelain，以及 ahead/behind、重命名、忽略文件的显示规则。",
     "suggestions": []
   },
   {
@@ -195,8 +195,8 @@
     "section": "commands",
     "tier": "extended",
     "slug": "git-rm",
-    "title": "git rm",
-    "summary": "删除已跟踪文件并同步到暂存区，理解它有助于区分文件系统删除和 Git 记录删除。",
+    "title": "git rm 教程",
+    "summary": "删除已跟踪文件的三种方式、--cached 为什么不能清除历史、-f 的真实代价，以及误删后的恢复路径。",
     "suggestions": []
   },
   {
@@ -205,8 +205,8 @@
     "section": "commands",
     "tier": "extended",
     "slug": "git-mv",
-    "title": "git mv",
-    "summary": "用于重命名或移动已跟踪文件，帮助你把文件系统变化和暂存区状态一次保持一致。",
+    "title": "git mv 教程",
+    "summary": "文件移动与重命名的正确做法：它与 mv + add -A 的真实差别、大小写重命名在 macOS 上的陷阱，以及重命名检测失效的条件。",
     "suggestions": []
   },
   {
@@ -276,7 +276,7 @@
     "tier": "recommended",
     "slug": "git-remote",
     "title": "git remote 教程",
-    "summary": "讲清 git remote 如何查看、添加、修改和删除远端仓库定义，以及 origin 在协作中的典型角色。",
+    "summary": "管理远端定义：fetch 与 push URL 的区别、改名后引用怎么变、prune 与 set-head 何时用，以及 fork 场景的双远端配置。",
     "suggestions": []
   },
   {
@@ -375,8 +375,8 @@
     "section": "commands",
     "tier": "recommended",
     "slug": "git-blame",
-    "title": "git blame",
-    "summary": "定位某一行代码最后由哪个提交引入或修改，适合排查行为来源和上下文。",
+    "title": "git blame 教程",
+    "summary": "逐行标注每一行最后一次修改它的提交、作者与时间，并说明为什么「最后一次」常常不是根因、怎么继续往前追。",
     "suggestions": []
   },
   {
@@ -476,7 +476,7 @@
     "tier": "extended",
     "slug": "git-am",
     "title": "git-am 教程",
-    "summary": "把邮件格式补丁序列应用为真实提交，适合 patch-by-email 协作；重点在冲突处理中保持提交序列完整性。",
+    "summary": "把邮件格式补丁序列导入为提交：如何处理中途冲突、--3way 与 -i 各自解决什么、abort 与 skip 的边界在哪。",
     "suggestions": []
   },
   {
@@ -485,8 +485,8 @@
     "section": "commands",
     "tier": "extended",
     "slug": "git-apply",
-    "title": "git-apply 教程",
-    "summary": "解释如何用 git-apply 把补丁内容应用到工作区或暂存区。",
+    "title": "git apply 教程",
+    "summary": "把补丁应用到工作区或暂存区但不生成提交：--check、--3way、--reject、-p 各自解决什么问题，以及应用失败后怎么回退。",
     "suggestions": []
   },
   {
