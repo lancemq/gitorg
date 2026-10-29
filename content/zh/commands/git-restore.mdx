@@ -25,10 +25,6 @@ export const metadata = {
 
 # git restore 教程
 
-## 一句话理解
-
-`git restore` 用来把文件恢复成某个已知状态，重点是“恢复路径内容”，而不是移动分支指针。
-
 ## 它解决了什么问题
 
 Git 早期很多“恢复文件”的动作都由 `git checkout -- <path>` 承担。官方后来引入 `git restore`，就是为了把“切分支”和“恢复文件”这两类动作拆开，让命令语义更清晰。
@@ -91,7 +87,6 @@ git restore --source=HEAD~1 src/app.ts
 ## 一个实践建议
 
 当你只想解决“这个文件改坏了”或“我只是想取消暂存”时，用 `restore` 往往比 `reset` 和 `checkout` 都更清晰。
-
 
 ## 这条命令在流程里解决什么问题
 

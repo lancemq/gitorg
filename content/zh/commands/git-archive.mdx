@@ -19,22 +19,6 @@ export const metadata = {
 
 # git-archive 教程
 
-## 学完这篇你会掌握什么
-
-- 解释如何用 git-archive 从某个提交或树对象导出归档包。
-- 说清 git archive 解决的实际问题和适用边界
-- 跟着正文把 `git archive` 的关键用法完整跑一遍，理解每一步改动了什么
-
-## 一句话理解
-
-git-archive 用于从某个提交或树对象导出归档包。
-
-## 什么时候适合用
-
-- 当你需要从某个提交或树对象导出归档包
-- 当你想把这类操作做成稳定流程而不是手工重复
-- 当你需要更准确地理解 Git 在这一步到底记录了什么
-
 ## 基本示例
 
 ```bash
@@ -65,10 +49,6 @@ git archive --format=zip HEAD > source.zip
 如果不指定 `--format`，Git 会根据输出文件后缀自动推断格式。
 
 这类命令通常会改变仓库布局或协作方式，团队内最好先统一约定。
-
-## 一个更稳的实践建议
-
-先用小范围实验仓库验证流程，再推广到主仓库或自动化。
 
 ## 进阶用法
 
@@ -168,7 +148,6 @@ git archive --remote=git@example.com:repo.git HEAD > remote-source.tar
     name: release-${{ github.ref_name }}
     path: myproject-*.tar.gz
 ```
-
 
 ## 这条命令在流程里解决什么问题
 

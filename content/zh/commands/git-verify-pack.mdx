@@ -19,83 +19,72 @@ export const metadata = {
 
 # git-verify-pack 教程
 
-## 学完这篇你会掌握什么
-
-- 解释如何用 git-verify-pack 检查 pack 文件中的对象和偏移信息。
-- 建立 git verify-pack 的完整心智模型，而不是只记住零散命令
-- 在测试仓库里亲手复现正文里的核心场景，观察前后状态差异
-
 ## 先想一个问题
 
 pack 文件是 Git 压缩对象后的产物，`.idx` 是它的索引。`git verify-pack -v .git/objects/pack/*.idx` 会列出 pack 里每个对象的类型、原始大小、以及在 pack 内占用的字节数。查"仓库为什么这么大"时，这是唯一能看到压缩后真实体积的地方。
 
-## 一句话理解
-
-git-verify-pack 用于检查 pack 文件中的对象和偏移信息。
-
-## 什么时候适合用
-
-- 当你需要检查 pack 文件中的对象和偏移信息
-- 当你想把这类操作做成稳定流程而不是手工重复
-- 当你需要更准确地理解 Git 在这一步到底记录了什么
-
-## 基本示例
+## 读懂 -v 的输出
 
 ```bash
-git verify-pack -v .git/objects/pack/pack-*.idx
+$ git verify-pack -v .git/objects/pack/pack-*.idx | head -6
+1a2b3c4 commit 231 142 12
+5d6e7f8 blob   1204896 8931 154      # SHA 类型 原始大小 pack内大小 偏移
+9a8b7c6 blob   511    318 9085 1 5d6e7f8   ← 末尾两个数：delta 基准的深度和 hash
+...
+non delta: 23112 objects
+chain length = 1: 4521 objects
+chain length = 2: 893 objects
+...
 ```
 
-## 读这条命令时最该注意什么
+每行五列是普通对象：SHA、类型、**原始大小**、**压缩后在 pack 里的大小**、偏移。七列是 delta 对象，多出的两列是 delta 链深度和基准对象。对比第 3、4 列就能看出压缩收益：上面那个 1.2MB 的 blob 压到 8.9KB，说明它和链上某个基准对象高度相似。
 
-这是一条纯只读的命令，用于验证 pack 文件的完整性并列出其中的对象信息。不会对仓库做任何修改。
+结尾的 `chain length` 分布是存储健康度信号：深度 1-2 占多数是正常的；大量深度 40+ 的对象说明 delta 链过长，读取时 要沿链解压多次，`git gc`（`pack.depth` 默认 50，`pack.window` 默认 10）重建后通常会显著缩短。
 
-## 一个更稳的实践建议
+## 三个实战组合
 
-使用 `-v` 参数可以详细列出 pack 中每个对象的 SHA-1、类型、大小、delta 信息和偏移量。直接传入 `.idx` 文件即可，不需要传 `.pack` 文件。
+**找 pack 里最大的对象**（比 count-objects 精确到单个 blob）：
 
-## 补充理解角度
+```bash
+git verify-pack -v .git/objects/pack/pack-*.idx \
+| sort -k3 -n -r | head -10 \
+| awk '{print $3, $1}' \
+| while read size hash; do
+    echo -n "$size bytes: "
+    git rev-list --objects --all | grep "$hash" | cut -d' ' -f2
+  done
+```
 
-- 验证接收到的 pack 文件是否完整无损
-- 分析 pack 文件中哪些对象占用了最多空间
-- 查看 delta 链的深度和依赖关系，辅助理解存储效率
+**校验收到的 pack 是否完整**（收到 bundle 或手工拷贝的 pack 后）：
 
+```bash
+git verify-pack -v pack-xxx.idx   # 只列对象不报错 = 结构完整
+```
 
-## 这条命令在流程里解决什么问题
+注意：它校验的是 pack 内部结构和 `.idx` 的一致性，**不校验对象是否可达**——一个损坏引用指向的孤儿 pack 它照样说没问题，可达性要用 `git fsck`。
 
-`git verify-pack` 关注的是对象存储、pack 文件、可达性和仓库维护质量。它通常不是日常提交流程的一部分，而更像是诊断或维护工具。
+**统计 delta 压缩效率**：
 
-## 典型用例
+```bash
+git verify-pack -v pack-*.idx | grep -c "chain length" -A0
+git verify-pack -v pack-*.idx | grep "non delta"   # 未压缩对象数
+```
 
-- 接收来自远端的 pack 文件后，用 `git verify-pack` 验证其完整性。
-- 分析仓库中最大的对象，定位体积膨胀的根因（结合 `-v` 和排序命令）。
-- 检查 pack 文件中 delta 链的深度，评估存储效率是否需要优化。
+non delta 占比高（比如超过一半）说明仓库里独立二进制多，delta 帮不上忙——这类仓库该上 LFS 而不是调 pack 参数。
 
-## 图例理解
+## 边界与坑
 
-<CommandFlowFigure
-  title="对象存储与维护视角"
-  caption="存储类命令主要作用在对象数据库、pack 文件和可达性层面，目标是验证、分析或清理。"
-  inputsLabel="存储对象"
-  inputs="对象数据库|pack 文件|可达性信息"
-  commandLabel="git verify-pack"
-  outputsLabel="结果"
-  outputs="完整性验证结果|对象列表（SHA/类型/大小/偏移）|delta 链信息"
-  note="这条命令只读不写，可以安全查看 pack 文件内容和完整性状态。"
-/>
-
-## 特殊情况与边界
-
-- 只读命令，不会影响仓库状态。
-- 输入的是 `.idx` 文件路径，不是 `.pack` 文件；`git verify-pack` 会自动找到对应的 `.pack` 文件。
-- 输出中带有 `chain depth` 的是 delta 对象，depth 为 0 表示基础对象，值越大说明 delta 链越深。
-- 它更适合验证 pack 文件完整性和分析，不是日常协作主流程；输出里关注对象大小、delta 链和偏移关系会更有价值。
+- 传入的是 `.idx` 不是 `.pack`；通配 `pack-*.idx` 一次跑全部。
+- **慢**：要解压整条 delta 链，几百 MB 的 pack 要跑几十秒到几分钟。它是诊断工具，别放进 CI 常规流程。
+- 只读，不会修改 pack 或仓库状态。
+- 找「谁在占空间」之后想清理，是 `git filter-repo` 的事；本命令只负责定位，不动历史。
 
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [git-update-ref 教程](/zh/commands/git-update-ref)
-- [git-verify-tag 教程](/zh/commands/git-verify-tag)
-- [git-worktree 教程](/zh/commands/git-worktree)
+- [git-count-objects 教程](/zh/commands/git-count-objects)
+- [git-gc 教程](/zh/commands/git-gc)
+- [Git Packfiles 与对象存储](/zh/internals/packfiles-and-storage)
 
 {/* internal-links:auto */}

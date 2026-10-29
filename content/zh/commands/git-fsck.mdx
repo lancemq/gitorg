@@ -19,82 +19,56 @@ export const metadata = {
 
 # git-fsck 教程
 
-## 学完这篇你会掌握什么
-
-- 解释如何用 git-fsck 检查对象库和引用的完整性。
-- 说清 git fsck 解决的实际问题和适用边界
-- 跟着正文把 `git fsck` 的关键用法完整跑一遍，理解每一步改动了什么
-
 ## 先想一个问题
 
 仓库突然报 `fatal: object ... is corrupt`，或者 clone 之后 `git log` 走到某处就断。`git fsck` 回答的是"对象库到底还完整吗"。它只读、随时可跑，但输出里的 `dangling`（悬空，通常无害）和 `missing`（缺失，需要处理）是完全不同的两件事。
 
-## 一句话理解
-
-git-fsck 用于检查对象库和引用的完整性。
-
-## 什么时候适合用
-
-- 当你需要检查对象库和引用的完整性
-- 当你想把这类操作做成稳定流程而不是手工重复
-- 当你需要更准确地理解 Git 在这一步到底记录了什么
-
-## 基本示例
+## 读懂四类输出
 
 ```bash
-git fsck --full
+$ git fsck --full
+Checking object directories: 100% (256/256), done.
+dangling commit 3a91f2c8...     ← 没有引用指向它，但对象完好
+missing blob 5d6e7f8a...        ← 引用存在，对象内容丢了（严重）
+broken link from  tree 9a8b7c6  ← 树里记录的子对象不存在（严重）
+error: HEAD: invalid sha1 pointer 1a2b3c4   ← 引用本身坏了（严重）
 ```
 
-## 读这条命令时最该注意什么
+判断规则：**dangling 结尾的行不用慌**——那只是「没人引用但还在」的对象，往往是一次 reset/amend 留下的旧提交，甚至是救援的机会；`missing`、`broken link`、`error` 才是损坏，需要处理。
 
-这是一条纯只读的检查命令，不会对仓库做任何修改。它会扫描对象数据库并报告损坏、悬空对象等问题。
+## 找回悬空提交：fsck 的另一面
 
-## 一个更稳的实践建议
+`git reset --hard` 丢了的提交，reflog 也查不到时（比如 reflog 过期被清），fsck 是最后的绳索：
 
-加上 `--full` 可以检查所有对象（包括已 pack 的），适合做全面完整性检查。`--no-dangling` 可以忽略悬空对象输出，让结果更简洁。
+```bash
+git fsck --full --unreachable --no-reflogs
+# unreachable commit 3a91f2c8...
+git show 3a91f2c8                 # 先看内容对不对
+git switch -c rescue/lost-work 3a91f2c8   # 确认后建分支接住它
+```
 
-## 补充理解角度
+悬空对象会在 gc 后被真正删除（默认 2 周宽限，`gc.pruneExpire` 可调），所以发现丢数据要尽快救。
 
-- 排查"对象损坏"或"corrupt"报错时的第一步工具
-- 查找悬空 blob/tree/commit，辅助恢复误删内容
-- 验证迁移、克隆或打包后的仓库完整性
+## 损坏的处理路径
 
+- **单个 blob 缺失**：能从远端补——`git fetch` 拉全量后 `git reset --hard origin/main`；没有远端就只剩备份一条路。
+- **pack 损坏**：报 pack 相关错误时，先 `git verify-pack` 定位坏 pack，删掉它再从远端重新 fetch。
+- **整个 .git 报大量错误**：别反复跑 fsck 或 gc，立即停手，把整个目录拷一份再操作；然后在工作区文件还在的前提下 `git init` 重建对象库，靠 `git add` 把现状重新收编。
+- `--lost-found` 会把悬空对象写成 `.git/lost-found/` 下的文件，比记 hash 直观，适合损坏现场保存证据。
 
-## 这条命令在流程里解决什么问题
+## 边界
 
-`git fsck` 关注的是对象存储、pack 文件、可达性和仓库维护质量。它通常不是日常提交流程的一部分，而更像是诊断或维护工具。
-
-## 典型用例
-
-- 在怀疑仓库数据完整性有问题时，用 `git fsck` 执行全面检查。
-- 把 `git fsck` 放进维护流程，帮助你观察 pack、对象数量和可达性状态。
-- 在排查性能、体积或完整性问题时，用 `git fsck` 补足高层命令看不到的存储细节。
-
-## 图例理解
-
-<CommandFlowFigure
-  title="对象存储与维护视角"
-  caption="存储类命令主要作用在对象数据库、pack 文件和可达性层面，目标是验证、分析或清理。"
-  inputsLabel="存储对象"
-  inputs="对象数据库|pack 文件|可达性信息"
-  commandLabel="git fsck"
-  outputsLabel="结果"
-  outputs="损坏报告|悬空对象列表|完整性状态"
-  note="这条命令只读不写，可以放心运行，不会改变仓库任何状态。"
-/>
-
-## 特殊情况与边界
-
-- 只读检查命令，任何时候运行都不会影响仓库状态。
-- `--lost-found` 可以把悬空对象的内容写入 `.git/lost-found/`，方便后续查看。
-- 悬空对象（dangling）本身不是错误，它们可能是未引用的提交、旧的 blob 等，需要结合场景判断是否需要处理。
+- 纯只读，`--lost-found` 也只是写新文件、不动已有对象。
+- 大仓库 `--full` 要解压校验所有对象，几十万提交的仓库可能跑几分钟，放后台跑。
+- 它不检查工作区文件、不检查远端仓库，只看本仓库 `.git` 里的对象库。
+- `--no-dangling` 可屏蔽悬空对象输出，日常完整性检查用它能少一半噪声。
 
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [git-format-patch 教程](/zh/commands/git-format-patch)
-- [git-gc 教程](/zh/commands/git-gc)
-- [git-grep 教程](/zh/commands/git-grep)
+- [git-count-objects 教程](/zh/commands/git-count-objects)
+- [git-verify-pack 教程](/zh/commands/git-verify-pack)
+- [reset 后恢复](/zh/recovery/recover-after-reset)
 
 {/* internal-links:auto */}

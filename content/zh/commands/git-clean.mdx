@@ -25,10 +25,6 @@ export const metadata = {
 
 # git clean 教程
 
-## 一句话理解
-
-`git clean` 用来删除未跟踪文件和目录，它不会作用于已经被 Git 跟踪的文件内容。
-
 ## 为什么它是高风险命令
 
 因为被删除的未跟踪文件通常不在 Git 历史里，删掉后不容易恢复。
@@ -141,7 +137,6 @@ git clean -fd -e 'node_modules/'
 <WarningBox title="双重操作不可逆">
   <p>`git reset --hard && git clean -fdx` 会让工作区彻底回到 HEAD 状态，所有未提交的修改和未跟踪的文件都会被删除。执行前请确保你不需要保留任何本地改动。</p>
 </WarningBox>
-
 
 ## 这条命令在流程里解决什么问题
 

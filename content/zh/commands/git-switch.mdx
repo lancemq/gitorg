@@ -25,10 +25,6 @@ export const metadata = {
 
 # git switch 教程
 
-## 一句话理解
-
-`git switch` 是专门负责“切分支”的命令，它把这项职责从旧式的 `git checkout` 中拆了出来。
-
 ## 为什么需要 switch
 
 `checkout` 既能切分支，也能恢复文件，语义过于宽。官方后来提供 `switch` 和 `restore`，就是为了让“切换分支”和“恢复路径”这两类操作更不容易混淆。
@@ -82,7 +78,6 @@ git switch --detach <commit>
 - `checkout`：旧式多用途命令
 
 对于新内容体系或团队培训材料，优先教 `switch` 往往更清晰。
-
 
 ## 这条命令在流程里解决什么问题
 

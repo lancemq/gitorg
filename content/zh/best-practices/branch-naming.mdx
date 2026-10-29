@@ -103,16 +103,32 @@ export const metadata = {
 
 也就是说，命名不是用来掩盖混乱，而是用来表达清晰边界。
 
-## 5. 一个可直接落地的团队建议
+## 5. 让规则可执行：分支保护与自动化
 
-如果团队想快速建立共识，可以先从下面这几条开始：
+命名约定只写在 Wiki 里没有约束力，真正让它生效的是让工具认识这些名字：
 
-1. 所有工作分支都带前缀
-2. 前缀只保留少量常用类别
-3. 后半段直接描述任务主题
-4. 禁止模糊分支名进入评审流程
+```bash
+# GitHub Rulesets：只允许 feature/* fix/* release/* 进 main
+# Branch protection → Restrict creations → 添加 pattern
+feature/*
+fix/*
+release/*
 
-这类规则足够轻，但已经能明显提升 PR、CI 和事故沟通时的清晰度。
+# CI 按 prefix 跑不同流水线（GitHub Actions 示例）
+on:
+  push:
+    branches:
+      - "feature/**"   # 跑完整测试
+      - "release/**"   # 跑测试 + 构建 + 预发部署
+      - "hotfix/**"    # 跳过部分检查，快速通道
+```
+
+两个高频坑：
+
+- **斜杠不是普通字符**。`feature/login-validation` 在 Git 里意味着 `refs/heads/feature/` 目录下有 `login-validation`，所以不能再有名叫 `feature` 的分支——`git branch feature login-validation` 会报 `fatal: cannot lock ref 'refs/heads/feature'`。
+- **分支名里的特殊字符会影响 refspec**。`#`、空格、`~`、`^`、`:`、`?`、`*[` 都不能出现在分支名里；想带工单号就放描述段，比如 `fix/PROJ-1234-navbar-overlap`。
+
+如果团队规模到了需要强约束的地步，用 `push` 钩子或平台 ruleset 把「无前缀分支拒之门外」，比事后在 review 里纠正便宜得多。
 
 ## 延伸阅读
 

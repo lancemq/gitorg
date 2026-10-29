@@ -56,6 +56,34 @@ export const metadata = {
 
 这个“先判断再传”的过程，就是它高效的根源之一。
 
+## 四种传输协议的差异
+
+协商逻辑是统一的，但「引用协商 + 对象交换」跑在什么通道上，决定了各协议的特性：
+
+| 协议 | 通道 | 典型形式 | 特点 |
+| --- | --- | --- | --- |
+| local | 本地文件系统 | `git clone /path/to/repo` | 无网络开销，直接硬链接对象 |
+| smart HTTP | HTTP + git-upload-pack/receive-pack 服务 | `https://...`（日常最常见） | 过防火墙友好；服务端参与协商，可做权限控制 |
+| dumb HTTP | 纯静态文件 | 老式托管、`git update-server-info` | 无协商，靠文件列表猜，fetch 效率低，现已少用 |
+| SSH | `git-upload-pack` over ssh | `git@github.com:repo` | 可复用 ssh 密钥与跳板，读写权限跟随系统账户 |
+| git:// | 自带 9418 端口守护进程 | `git://...` | 最快、无认证——**只适合公开只读**，GitHub 已弃用 |
+
+## 协商怎么减少传输量：haves/wants 与 filter
+
+fetch 时客户端发 wants（我要哪些对象）和 haves（我已有哪些），服务端据此算出「差集」打成 pack。这个协商有两条重要优化线：
+
+```bash
+# bitmaps：服务端把常用对象集合预存成位图，协商从「逐个问」变成「位图运算」
+# GitHub 等大托管默认开启；本地仓库可以主动生成：
+git repack -a -d --write-bitmap-index
+
+# partial clone：协商时直接声明「只要 commit+tree，blob 用到再取」
+git clone --filter=blob:none https://github.com/large/repo
+# 之后 checkout 到某个 blob 时按需单次拉取（promisor remote 机制）
+```
+
+`--filter=blob:none` 对大型 monorepo 是数量级的差别：clone 只下载提交图（几百 KB 级），blob 按需补。代价是后续操作依赖网络可达，离线工作会受限。
+
 ## pack 在这里扮演什么角色
 
 对象理论上可以一个个传，但这样效率太差。  

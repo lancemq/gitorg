@@ -24,10 +24,6 @@ export const metadata = {
 - 比较两组“补丁序列”而不是单点 diff，适合在 rebase 或重排提交后向 reviewer 解释“这次版本改动到底变了什么”。
 - 建立 git range-diff 的完整心智模型，而不是只记住零散命令
 
-## 一句话理解
-
-`git range-diff` 比较的是“两段提交序列之间的补丁变化”，不是单个提交或两个目录快照。
-
 ## 什么时候最有价值
 
 - 你对分支做了 rebase / squash / 重排后，想说明版本差异
@@ -72,25 +68,6 @@ git range-diff origin/main...feature-v1 origin/main...feature-v2
 - 用三点语法 `git range-diff origin/main...v1 origin/main...v2` 比较两个特性分支版本的差异。
 
 ## 图例理解
-
-<CommandFlowFigure
-  title="比较两组补丁序列"
-  caption="range-diff 关注的是“序列与序列的对应关系”，所以它特别适合评估 rebase 后的版本变化。"
-  inputsLabel="输入序列"
-  inputs="base...v1|base...v2"
-  commandLabel="git range-diff"
-  outputsLabel="输出"
-  outputs="补丁对应关系|新增/删除补丁|补丁内容变化"
-  note="它通常是“解释改动演进”的工具，而不是“修改历史”的工具。"
-  title="只读比较命令的作用面"
-  caption="range-diff 对比两组提交序列，输出每个提交在两个版本之间的差异（新增、删除、修改）。"
-  inputsLabel="输入"
-  inputs="提交范围 A（如 v1）|提交范围 B（如 v2）"
-  commandLabel="git range-diff"
-  outputsLabel="结果"
-  outputs="匹配对应关系|变更差异|新增或删除的提交"
-  note="range-diff 是只读操作，通过 patch-id 和作者信息匹配对应提交，不修改仓库任何状态。"
-/>
 
 ## 常见误区
 

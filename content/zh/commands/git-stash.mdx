@@ -40,22 +40,6 @@ export const metadata = {
 
 # git stash 教程
 
-## 一句话理解
-
-`git stash` 用于把当前未提交的工作状态临时搁置起来，让你先切换任务，再回来继续。
-
-<StashFigure
-  title="stash 的典型工作流"
-  caption="最常见的节奏不是长期堆积 stash，而是把当前改动先放进临时栈，切任务，处理完之后再有意识地 apply 或 pop 回来。"
-  workingLabel="当前工作区"
-  stashLabel="stash 栈"
-  restoreLabel="恢复后继续"
-  saveLabel="stash push"
-  applyLabel="apply / pop"
-/>
-
-把 stash 想成“临时寄存处”会更准确。它的价值在于帮你处理中断，而不是替代分支或长期保存重要状态。
-
 ## 适合什么场景
 
 - 正在写一半，需要紧急切到别的分支
@@ -177,7 +161,6 @@ git stash push -m "wip: checkout flow"
 - 临时切任务、稍后马上回来：stash 很合适
 - 需要保留几小时到几天并继续演进：更建议建分支
 - 涉及团队协作或 review：优先提交到分支，而不是藏在 stash 里
-
 
 ## 这条命令在流程里解决什么问题
 

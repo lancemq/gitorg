@@ -25,25 +25,9 @@ export const metadata = {
 
 # git-grep 教程
 
-## 学完这篇你会掌握什么
-
-- 解释如何用 git-grep 在仓库内容中搜索文本。
-- 理解 git grep 在日常 Git 工作流里的位置和作用
-- 对照正文把「什么时候适合用」和「基本示例」两个部分各操作一遍
-
 ## 先想一个问题
 
 `git grep` 搜的是某个版本里的已跟踪内容。这正是它比 `grep -r` 好用的原因：不碰被忽略的文件、不碰构建产物，而且 `git grep <pattern> <commit>` 直接搜历史而不是工作区。`-n`、`-w`、`-l`、`--and` 能覆盖大多数真实查询。
-
-## 一句话理解
-
-git-grep 用于在仓库内容中搜索文本。
-
-## 什么时候适合用
-
-- 当你需要在仓库内容中搜索文本
-- 当你想把这类操作做成稳定流程而不是手工重复
-- 当你需要更准确地理解 Git 在这一步到底记录了什么
 
 ## 基本示例
 
@@ -51,43 +35,34 @@ git-grep 用于在仓库内容中搜索文本。
 git grep "TODO"
 ```
 
-## 读这条命令时最该注意什么
+## 高频用法组合
 
-先把默认行为弄清楚，再去组合更多参数，通常能少踩很多隐藏规则。
+```bash
+# 只搜某个目录
+git grep "TODO" -- src/
 
-## 一个更稳的实践建议
+# 搜历史：v1.0 标签里有没有这个函数
+git grep "parseConfig" v1.0
 
-把它和 status、log、diff 一起看，更容易确认到底改了什么。
+# 正则 + 行号 + 上下文（语义与 GNU grep 对齐）
+git grep -nE "user_(id|name)" -- '*.ts'
+git grep -B2 -A2 "deprecated"
 
-## 补充理解角度
+# 布尔组合：同时含 A 和 B 的行
+git grep -e "fetch" --and -e "timeout"
 
-- 理解这条命令的默认行为
-- 把它放进日常提交或排查流程
-- 在脚本或团队习惯里稳定复用
+# 统计每个文件的命中数
+git grep -c "useState"
 
+# 搜暂存区（add 之后还没 commit 的内容）
+git grep --cached "secret"
+```
 
-## 这条命令在流程里解决什么问题
+## 和 grep -r / ripgrep 怎么选
 
-`git grep` 在仓库的已跟踪文件中搜索匹配的文本模式，默认忽略未跟踪文件和 .gitignore 的内容。理解它时，要把它放在"如何在代码库中快速定位特定内容"这个场景中来看。
+`git grep` 的优势在两点：**只搜已跟踪文件**（不会翻到 `node_modules` 和构建产物），以及**能直接搜任意提交**——`git grep "x" HEAD~30` 不需要 checkout。但它没有 ripgrep 的多线程和智能大小写，纯工作区搜索场景 ripgrep 通常更快。
 
-## 典型用例
-
-- 在代码库中快速查找某个函数、变量或常量的所有引用位置。
-- 配合 `--cached` 搜索暂存区内容，或指定特定提交/分支来搜索历史版本。
-- 用 `-n`（行号）、`-i`（忽略大小写）、`-c`（计数）等选项定制搜索结果。
-
-## 图例理解
-
-<CommandFlowFigure
-  title="仓库内文本搜索"
-  caption="grep 命令在已跟踪文件中执行文本模式匹配，比通用 grep 更快且结果更干净。"
-  inputsLabel="输入"
-  inputs="搜索模式|目标范围（工作区/暂存区/特定提交）"
-  commandLabel="git grep"
-  outputsLabel="结果"
-  outputs="匹配行及文件位置"
-  note="git grep 只搜索已跟踪文件，结果不会混入构建产物或临时文件。"
-/>
+经验法则：搜当前工作区用 ripgrep；搜「某个历史版本」用 `git grep <pattern> <commit>`，这一点 ripgrep 做不到。
 
 ## 特殊情况与边界
 

@@ -46,10 +46,6 @@ export const metadata = {
 
 # git checkout 教程
 
-## 一句话理解
-
-`git checkout` 是 Git 里的经典多用途命令，既能切分支，也能把路径恢复到指定状态。
-
 ## 为什么它现在看起来有点“重”
 
 正因为它承担了两类不同职责，所以新版本 Git 才引入了 `git switch` 和 `git restore` 来拆分语义。
@@ -95,7 +91,6 @@ git checkout <commit>
 ## 常见风险
 
 如果你用 checkout 恢复路径，本地改动可能被直接覆盖；如果你 checkout 到某个提交而忘记自己处在 detached HEAD，也容易在后面弄丢实验性提交。
-
 
 ## 这条命令在流程里解决什么问题
 

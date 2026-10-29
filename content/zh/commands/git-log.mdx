@@ -29,14 +29,6 @@ export const metadata = {
 
 默认的 `git log` 输出几乎没人满意：全量历史太长、单行模式丢信息、要看分支关系还得额外加参数。真正的用法是先想清楚"我要按什么条件筛提交、按什么格式看"，再用 `--oneline --graph`、`--since`、`-S<string>`、`--follow` 组合出你要的那一屏。
 
-## 一句话理解
-
-`git log` 是阅读历史的核心命令，它不只是看提交列表，更重要的是帮助你理解分支关系、共同祖先和当前历史到底长成了什么样。
-
-<MentalModelBox title="log 不只是看过去，而是为下一步决策提供依据">
-  <p>`git log` 的价值常常不在“读到了什么”，而在它帮助你避免了哪一个错误的 merge、rebase、reset 或恢复动作。</p>
-</MentalModelBox>
-
 ## 日常最有价值的写法
 
 ```bash

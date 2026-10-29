@@ -19,82 +19,68 @@ export const metadata = {
 
 # git-count-objects 教程
 
-## 学完这篇你会掌握什么
-
-- 解释如何用 git-count-objects 统计松散对象和包文件的数量。
-- 说清 git count-objects 解决的实际问题和适用边界
-- 跟着正文把 `git count-objects` 的关键用法完整跑一遍，理解每一步改动了什么
-
 ## 先想一个问题
 
 `du -sh .git` 涨到几个 G，你想知道这些字节花在哪。`git count-objects -v` 把对象库拆成松散对象、pack 文件、garbage、以及可回收空间几项。读懂这几行，才能判断下一步是该 `git gc`，还是该去查那个一直变大的文件。
 
-## 一句话理解
-
-git-count-objects 用于统计松散对象和包文件的数量。
-
-## 什么时候适合用
-
-- 当你需要统计松散对象和包文件的数量
-- 当你想把这类操作做成稳定流程而不是手工重复
-- 当你需要更准确地理解 Git 在这一步到底记录了什么
-
-## 基本示例
+## 读懂 -v 的每一行
 
 ```bash
-git count-objects -v
+$ git count-objects -v
+count: 17                  # 松散对象个数
+size: 2136                 # 松散对象占用（KB，磁盘计）
+in-pack: 48219             # 已打进 pack 的对象总数
+packs: 3                   # pack 文件个数
+size-pack: 15234           # pack 总占用（KB）—— 仓库体积的主力
+prune-packable: 0          # 已被打包但仍留着松散副本的对象
+garbage: 4                 # .git 里既非对象也非 pack 的文件数
+size-garbage: 12           # garbage 占用（KB）
 ```
 
-## 读这条命令时最该注意什么
+判断顺序：`count` 大（比如几千上万）说明该 gc 了——Git 自动 gc 的触发线是约 6700 个松散对象（`gc.auto` 默认值），日常 rebase/am 频繁的仓库很容易攒到。`size-pack` 才是仓库真实体积；它大而提交不多时，问题多半在二进制大文件，下一步用 `git rev-list --objects --all` 配合 `git cat-file --batch-check` 定位具体 blob。
 
-这是一条纯只读的诊断命令，不会对仓库做任何修改。输出结果可以安全查看，无需担心副作用。
+## 和 gc.auto 联动
 
-## 一个更稳的实践建议
+```bash
+git config gc.auto                 # 6700（默认），松散对象超过这个数触发自动打包
+git config gc.autoPackLimit        # 50，pack 文件超过这个数触发自动合并 pack
+```
 
-`-v` 会输出松散对象数量、包文件数量、总占用空间和磁盘占用等详细信息，是日常了解仓库存储状态的好工具。
+`git count-objects -v` 里的 `count` 就是和 `gc.auto` 比对的那个数。CI 机器上经常出现「从不自动 gc」——因为 `git gc --auto` 只在部分命令里被触发，且前台交互式的 `git commit` 在后台执行它时若耗时过长会被跳过。定期任务里显式跑 `git gc --auto`（或全量 `git gc`）更可靠。
 
-## 补充理解角度
+## 实际排障示例
 
-- 快速了解仓库中松散对象是否过多，判断是否需要 `git gc`
-- 对比 pack 前后对象数量变化，验证垃圾回收效果
-- 轻量级监控仓库体积增长趋势
+**例一：rebase 一天后变卡**
 
+```
+count: 8421    ← 超过 6700
+size-pack: 15234
+```
 
-## 这条命令在流程里解决什么问题
+诊断：大量 rebase/am 留下松散对象。处理：`git gc` 后 `count` 归个位数，`size-pack` 基本不变（这些对象本来就该进 pack）。
 
-`git count-objects` 关注的是对象存储、pack 文件、可达性和仓库维护质量。它通常不是日常提交流程的一部分，而更像是诊断或维护工具。
+**例二：clone 后体积远超同事**
 
-## 典型用例
+```
+garbage: 2107
+size-garbage: 358123   ← 350MB 垃圾
+```
 
-- 在仓库变大后，用 `git count-objects` 了解对象库的基本统计信息。
-- 把 `git count-objects` 放进维护流程，帮助你观察 pack、对象数量和可达性状态。
-- 在排查性能、体积或完整性问题时，用 `git count-objects` 补足高层命令看不到的存储细节。
+诊断：`.git` 里有中断操作留下的临时文件（常见于 gc 被强杀、`git clone --depth` 失败重试）。处理：先 `git prune` 无效时，检查 `.git/objects/pack/tmp_*` 和 `.git/gc.log`；`garbage` 计数高时 Git 会拒绝自动 gc 并把原因写进 `gc.log`，看那个文件比猜快得多。
 
-## 图例理解
+## 边界
 
-<CommandFlowFigure
-  title="对象存储与维护视角"
-  caption="存储类命令主要作用在对象数据库、pack 文件和可达性层面，目标是验证、分析或清理。"
-  inputsLabel="存储对象"
-  inputs="对象数据库|pack 文件|可达性信息"
-  commandLabel="git count-objects"
-  outputsLabel="结果"
-  outputs="松散对象数量|包文件数量|空间占用统计"
-  note="这条命令只读不写，可以放心运行，不会改变仓库任何状态。"
-/>
-
-## 特殊情况与边界
-
-- 只读命令，任何时候运行都不会影响仓库状态。
-- 输出中的 `size` 和 `size-pack` 可能不同，前者是松散对象大小，后者是 pack 文件中的对象大小。
-- 如果松散对象数量异常增多，通常是 `git gc` 还没有自动运行，可以手动执行 `git gc` 来整理。
+- 纯只读，不改仓库任何状态。
+- `size`/`size-pack` 单位是**磁盘占用（KB）**，不是对象内容字节数——压缩和文件系统块大小都会影响，别拿它和 `du` 之外的数字硬对。
+- 它只回答「多少、多大」，不回答「谁大」；定位大对象要用 `git rev-list --objects --all` 加 `git cat-file --batch-check`（见 git-cat-file 教程）。
+- `prune-packable` 长期不为 0 无需处理，下次 gc 会清掉。
 
 ## 延伸阅读
 
 沿着同一主题继续深入：
 
-- [git-config 教程](/zh/commands/git-config)
-- [git-describe 教程](/zh/commands/git-describe)
-- [git diff 教程](/zh/commands/git-diff)
+- [git-gc 教程](/zh/commands/git-gc)
+- [git-verify-pack 教程](/zh/commands/git-verify-pack)
+- [git-cat-file 教程](/zh/commands/git-cat-file)
 
 {/* internal-links:auto */}

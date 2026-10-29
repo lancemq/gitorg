@@ -68,6 +68,17 @@ export const metadata = {
 
 它们背后最终都落到某个提交对象上。
 
+引用在物理上就是 `.git/refs/` 下的文本文件，内容是一个 40 字符的 hash：
+
+```bash
+$ cat .git/refs/heads/main
+3a91f2c8d4e5...
+$ ls .git/refs/
+heads/   remotes/   tags/
+```
+
+两类引用要分开：普通引用直接存 hash；**符号引用**存的是「另一个引用的名字」，`cat .git/HEAD` 通常输出 `ref: refs/heads/main`——这就是 HEAD 的真身。packed-refs（`.git/packed-refs`）是打包优化：冷引用被合并成一个文件，`git pack-refs --all` 触发，读取时对用户透明。
+
 ## 3. 分支为什么只是“可移动引用”
 
 分支不是独立仓库副本，也不是一条被复制出来的历史线。它只是一个可以随着新提交向前移动的名字。
@@ -108,6 +119,15 @@ export const metadata = {
 - 新提交仍然会被创建
 - 但不会自动挂到某个分支名下面
 - 如果想保留，就应该尽快新建分支把这段历史接住
+
+`git status` 会在 detached 状态直接提示这一点，而用 plumbing 看最明确：
+
+```bash
+$ git symbolic-ref HEAD
+fatal: ref HEAD is not a symbolic ref     ← detached
+$ cat .git/HEAD
+1a2b3c4...                                ← 直接存 hash，不再是 ref: 指针
+```
 
 ## 7. 远端跟踪引用为什么重要
 

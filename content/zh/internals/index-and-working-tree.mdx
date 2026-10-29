@@ -138,6 +138,31 @@ export const metadata = {
 
 把暂存区看成“下一次提交的候选快照”，而不是“临时文件堆”。这样 add、commit、reset 的行为就会直观很多。
 
+## 7. 亲手验证三层差异
+
+三层模型不需要背，两条命令就能看到它：
+
+```bash
+# 看「工作区 vs 暂存区」的差异
+git diff
+
+# 看「暂存区 vs 当前提交」的差异
+git diff --cached
+```
+
+两个输出都为空，说明三层完全同步；只有第一个有输出，说明改了但没 add；只有第二个有输出，说明 add 了还没 commit。这就是 `git status` 里两段输出的本质。
+
+再往深一步，暂存区不是一个概念，是一个真实文件：
+
+```bash
+ls -la .git/index        # 二进制文件， Git 主动管理的状态
+git ls-files --stage     # 以可读方式列出暂存区当前内容
+# 100644 3b18e51d... 0   app.ts
+# 100644 9d2f3ba0... 0   index.ts
+```
+
+`ls-files --stage` 输出的三列分别是 mode、blob hash、stage 编号。正常情况 stage 全是 0；一旦出现 1/2/3 三行同一个路径，就是合并冲突还没解决——index 里同时存着 base/ours/theirs 三个版本。这也解释了为什么冲突解决的本质是「把 stage 归零」：`git add` 一个解决后的文件，就是把它的三行记录覆盖成一行 stage 0。
+
 ## 常见误区
 
 ### add 就是提交
@@ -151,6 +176,10 @@ export const metadata = {
 ### 暂存区只是多余中间层
 
 恰恰相反，正是这层让 Git 的提交边界控制变得非常强。
+
+### 误删 .git/index 就丢了代码
+
+不会。`.git/index` 只是缓存视图，里面没有任何独有数据——所有 blob 都已经在对象库里。删掉它之后 `git reset` 一下就能从 HEAD 重建，工作区文件更是分毫未动。
 
 ## 一个最值得记住的结论
 

@@ -24,21 +24,6 @@ export const metadata = {
 - 把 Git 历史打包成单文件用于离线传输或受限网络同步，适合“不能直接 fetch/push”的场景。
 - 只打包需要的 ref 范围（`--all` 往往不是最优），并在分发前用 `git bundle verify` 确认前置对象齐全。
 
-## 一句话理解
-
-`git bundle` 能把仓库引用与对象打成一个可传输文件，接收方可以像远端一样读取它。
-
-<CommandFlowFigure
-  title="bundle 打包与传输"
-  caption="bundle 命令把仓库历史打包为单个文件，接收端可以像使用远端一样对其进行 clone 或 fetch 操作。"
-  inputsLabel="输入"
-  inputs="仓库历史|引用范围"
-  commandLabel="git bundle"
-  outputsLabel="结果"
-  outputs="单个 bundle 文件|可离线传输的完整历史"
-  note="bundle 文件可以被另一个仓库当作远端使用，支持 clone 和 fetch。"
-/>
-
 ## 什么时候适合用
 
 - 内网隔离、无公网访问

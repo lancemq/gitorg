@@ -92,6 +92,21 @@ plumbing 命令更像底层构件，例如：
 高层命令把这四步封装成了一个稳定动作。  
 而底层命令让你看见这个动作究竟是由哪些原语拼起来的。
 
+这四步不是比喻，全部可以用 plumbing 单独复现：
+
+```bash
+# 2. 从索引写 tree（输出 tree hash，暂存区当前内容被固化）
+TREE=$(git write-tree)
+
+# 3. 写 commit 对象（指定树、父提交、作者、信息）
+COMMIT=$(git commit-tree "$TREE" -p HEAD -m "manual commit")
+
+# 4. 移动分支引用（工作区、暂存区都不动）
+git update-ref refs/heads/main "$COMMIT"
+```
+
+三条命令跑完，`git log` 里就多了一个提交——和 `git commit` 的产物在对象层面完全同构。注意 `commit -p` 省略时默认以 HEAD 为父；root commit 要不带 `-p` 手动造。
+
 ## 为什么日常用户通常不该直接依赖 plumbing
 
 因为 plumbing 更强，也更容易绕过高层语义保护。  
