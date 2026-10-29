@@ -22,7 +22,26 @@ export const metadata = {
 ## 基本示例
 
 ```bash
-git mergetool
+git mergetool            # 冲突时逐个调起配置的图形工具
+git mergetool --tool=vimdiff   # 临时指定，不用改配置
+```
+
+## 配置一次就够
+
+```bash
+git config --global merge.tool vscode
+git config --global mergetool.vscode.cmd 'code --wait $MERGED'
+# $MERGED/$LOCAL/$REMOTE/$BASE 由 git 填充
+git config --global mergetool.keepBackup false   # 别留 .orig 噪声文件
+```
+
+## 它解决的和没解决的
+
+`git mergetool` 只处理**冲突标记已经存在**的文件——它的输入是 `git merge`/`rebase` 留下的 stage 1/2/3 三份内容。没有冲突的文件根本不会进它的列表。全部处理完会自动 `git add`；中途想放弃某个文件，`git checkout --merge -- <file>` 可重来。
+
+无冲突、只是想「并排看两个版本」的场景不归它管，那是 `git difftool`：
+```bash
+git difftool main feature/login -- src/api.ts
 ```
 
 ## 读这条命令时最该注意什么

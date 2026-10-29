@@ -155,6 +155,18 @@ git log --oneline --graph --decorate --all
 - 新增节点的操作更容易审计和恢复
 - 改写历史表达的操作更需要确认共享边界
 
+## 过滤历史的实用组合
+
+```bash
+git log --oneline --graph --all --decorate        # 全局拓扑一眼
+git log -p --follow src/config.ts                 # 单文件演化（--follow 追跨目录改名）
+git log --grep="fix" --since="2 weeks ago" --author=maqi   # 多条件交
+git log -S "parseConfig" --oneline                # pickaxe：这个函数何时引入/删除
+git log -L 10,30:src/api.ts                       # 某几行代码的完整演化史
+git shortlog -sn -- v1.0..v1.1                    # 谁贡献了这个版本
+```
+
+`-S` 和 `-L` 是最被低估的两个：`-S` 回答「这段代码从哪来的」，`-L` 直接把指定行的每次变更（含提交原因）串成时间线——追查「这行为什么这么写」比 blame 高效得多。
 ## 延伸阅读
 
 沿着同一主题继续深入：

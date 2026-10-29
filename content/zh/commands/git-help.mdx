@@ -26,8 +26,30 @@ export const metadata = {
 ## 基本示例
 
 ```bash
-git help rebase
+git help rebase          # man 页（最完整）
+git rebase --help        # 等价
+git help -g              # 列概念指南：gitworkflows、gitrevisions、gitsubmodules…
+git help -a              # 列全部命令，含 plumbing
 ```
+
+## 环境问题的解法
+
+最小化 Docker 镜像里 man 页通常是缺的，报错形如 `No manual entry for rebase`。三条路：
+
+```bash
+# Debian/Ubuntu：装 git-doc（man 页）+ git 概念文档
+apt-get install -y git-doc
+
+# 不装文档，直接看网页版（读取 web.browser 或默认浏览器）
+git help --web rebase
+
+# 只想快速看参数，不想离开终端
+git rebase -h        # 短帮助（注意是 -h，不是 --help）
+```
+
+`-h` 和 `--help` 的差别值得记：`-h` 由 git 本体输出、永远可用；`--help` 要起 man 或浏览器，依赖文档包。CI 脚本里查参数一律用 `-h`。
+
+文档版本与本机 git 版本严格对应——`git help pull` 看到 `--rebase=interactive` 与否，先确认 `git --version`，再对照网页文档。
 
 
 ## 特殊情况与边界

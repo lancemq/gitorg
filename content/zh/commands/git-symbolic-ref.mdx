@@ -29,28 +29,17 @@ HEAD 不是一个提交，是一个指向分支的符号引用。`git symbolic-r
 git symbolic-ref HEAD
 ```
 
-## 这条命令在流程里解决什么问题
+## 脚本里判断 detached HEAD
 
-`git symbolic-ref` 解决的是"需要读取或修改符号引用（如 HEAD 指向哪个分支）"的问题。符号引用是一种间接引用，它不直接指向 commit hash，而是指向另一个引用（如 `refs/heads/main`）。
+```bash
+if git symbolic-ref -q HEAD >/dev/null; then
+  echo "在分支上：$(git symbolic-ref --short HEAD)"
+else
+  echo "detached HEAD，正站在 $(git rev-parse --short HEAD)"
+fi
+```
 
-## 典型用例
-
-- 查看当前 HEAD 指向哪个分支，用 `git symbolic-ref HEAD` 输出如 `refs/heads/main`，判断是否处于 detached HEAD 状态。
-- 在脚本中切换当前分支而不改变工作区，用 `git symbolic-ref HEAD refs/heads/feature` 改变 HEAD 指向（需谨慎）。
-- 创建自定义符号引用，用 `git symbolic-ref refs/heads/current refs/heads/main` 建立一个指向 main 的符号引用。
-
-## 图例理解
-
-<CommandFlowFigure
-  title="符号引用的读取与修改"
-  caption="symbolic-ref 操作的是符号引用——它不直接存储 commit hash，而是指向另一个引用。HEAD 就是最常见的符号引用。"
-  inputsLabel="符号引用"
-  inputs="HEAD|自定义符号引用|目标引用路径"
-  commandLabel="git symbolic-ref"
-  outputsLabel="结果"
-  outputs="当前指向的引用名称|更新后的符号引用|detached HEAD 检测"
-  note="symbolic-ref 是读写操作：不带新值时读取，带新值时写入。直接操作 HEAD 时需格外小心。"
-/>
+`-q` 让「不是符号引用」走静默失败（退出码 1）而不是报错文本；`--short` 把 `refs/heads/main` 缩成 `main`。`git branch --show-current` 是这两步的合体版，但老版本 git 没有，脚本里 symbolic-ref 兼容性最好。
 
 ## 特殊情况与边界
 

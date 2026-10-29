@@ -37,7 +37,6 @@ export const metadata = {
   detachedLabel="Push 映射"
 />
 
-
 无论是 `fetch` 还是 `push`，都不只是传对象。
 
 Git 还要决定：
@@ -204,6 +203,20 @@ refspec 解决的是“对象最后对应到哪里”。
 - `git branch -r`
 - `git ls-remote`
 
+## refspec 语法速查
+
+```
++src:dst        + 表示允许非快进更新（强制）
+src             只有 src，等于 src:src（fetch 时写到远端跟踪区）
+:dst            只有 dst（push 语义 = 删除 dst 引用）
+
+git push origin :topic-old                      # 删除远端分支（空源）
+git push origin HEAD:refs/for/main              # 推到 Gerrit 评审队列
+git fetch origin "refs/heads/*:refs/remotes/origin/*"   # 完整默认 fetch refspec
+git fetch origin main:refs/remotes/cache/main   # 把远端 main 缓存到自定义位置
+```
+
+「删除远端分支」和「推到特殊引用」都靠 refspec 的不对称语法表达——`:` 前为空即删除，目标不是 `refs/heads/` 时就是绕过常规分支语义（Gerrit 的 `refs/for/*`、CI 的标记引用都是这么实现的）。`push.default` 各种取值（simple/upstream/current）本质是在自动生成第一个参数。
 ## 延伸阅读
 
 沿着同一主题继续深入：

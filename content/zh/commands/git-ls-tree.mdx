@@ -26,8 +26,19 @@ export const metadata = {
 ## 基本示例
 
 ```bash
-git ls-tree -r HEAD
+git ls-tree HEAD                    # 只看根目录一层
+git ls-tree -r HEAD                 # 递归：tree 条目展开成文件
+git ls-tree -d HEAD                 # 只列目录不深入
+git ls-tree -t -r HEAD              # 递归但保留 tree 条目本身
+git ls-tree -r -l HEAD              # -l 附带 blob 大小（字节）
+git ls-tree HEAD src/               # 只看某个子路径
 ```
+
+`-r` 和 `-t` 的组合最常被误解：`-r` 单独用会把 tree 条目「折叠」掉，输出纯文件清单；加 `-t` 才把中间目录也列出来。想人工核对目录结构时用 `-t -r`，写脚本统计文件用裸 `-r`。
+
+## 典型用途：找大 blob 的另一半
+
+`git rev-list --objects --all` 输出「hash + 文件名」，配上 `git cat-file --batch-check` 得到大小——但如果你只想看某个提交的静态结构，`git ls-tree -r -l HEAD | sort -k4 -n | tail` 一行就够。
 
 ## 这条命令在流程里解决什么问题
 

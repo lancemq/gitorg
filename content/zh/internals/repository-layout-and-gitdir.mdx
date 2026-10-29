@@ -158,6 +158,29 @@ Git 允许你通过环境变量显式告诉它：
 
 **工作区告诉你“现在在哪改”，gitdir 才告诉 Git“仓库状态真正放在哪”。**
 
+## .git 目录速览
+
+```
+.git/
+├── HEAD                 # 符号引用：ref: refs/heads/main
+├── index                # 暂存区（二进制）
+├── config               # 仓库级配置
+├── refs/                # 分支与标签（heads/ remotes/ tags/）
+├── packed-refs          # 打包的冷引用
+├── objects/             # 对象库：aa/ 前两字符分桶 + pack/
+├── refs-original/       # (部分工具使用)
+├── logs/                # reflog（logs/HEAD、logs/refs/...）
+├── hooks/               # 钩子（.sample 后缀默认不启用）
+├── info/exclude         # 仓库级私有 ignore（不进版本库）
+└── FETCH_HEAD / ORIG_HEAD / MERGE_HEAD   # 操作现场记录
+```
+
+几个常被问到的点：
+
+- **ORIG_HEAD**：merge/rebase/reset 前的 HEAD 快照，`git reset --hard ORIG_HEAD` 撤销上一步大操作就是用它。
+- **MERGE_HEAD**：merge 进行中存在；它存在本身就是「合并未完成」的标志。
+- **objects/aa/…**：按 hash 前两位分桶（256 个目录），对象多了以后配合 pack/ 打包。
+- **删掉 .git 里的任何单个文件都可能破坏完整性**——不确定时先整目录备份，再操作。
 ## 延伸阅读
 
 沿着同一主题继续深入：

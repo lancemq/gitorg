@@ -132,6 +132,25 @@ git switch -c feature/login-validation
 
 最后这条很关键，因为它会把主题分支从“只是分开”推进到“可以顺利合并”。
 
+## 一个工作单元的完整生命周期
+
+```bash
+git switch -c feature/login-validation origin/main   # 从最新主线起，不从本地旧 main
+# …开发、分批提交…
+git fetch origin
+git rebase origin/main          # 合并前同步主线
+git push -u origin feature/login-validation
+# → PR 合并（squash or merge）
+git switch main && git pull
+git branch -d feature/login-validation              # 本地清理
+git push origin --delete feature/login-validation   # 远端清理
+```
+
+生命周期纪律的三条硬边界：
+
+1. **起点永远是最新主线**（`origin/main` 而非本地 main）——起点旧，合并时就会夹带别人的半成品改动。
+2. **合并即删除**。分支是「进行中的工作」的表达，合完不删，「还有没有没合并的工作」就只能靠猜。
+3. **取消也删除**。`git branch -D feature/x`（大写 D 强删未合并分支）就是「这个工作不要了」的正式动作——主题分支的丢弃成本应该低到不需要犹豫。
 ## 延伸阅读
 
 沿着同一主题继续深入：

@@ -103,6 +103,21 @@ export const metadata = {
 
 拆分的成本真实存在——多一次 CI、多一次合并等待。所以经验线是：**diff 超过 400 行或有超过 3 个不相关目录被改动时才拆**；在这个线以下，合并的成本通常大于大 review 的成本。
 
+## 量化分支大小
+
+```bash
+# 和主线的 diff 规模（送审前自检）
+git diff origin/main...HEAD --stat | tail -1
+# 12 files changed, 347 insertions(+), 89 deletions(-)
+
+# 提交数
+git rev-list --count origin/main..HEAD
+
+# 单个提交的大小分布（哪个提交是"巨无霸"）
+git log origin/main..HEAD --oneline --shortstat
+```
+
+经验线：`insertions+deletions < 400` 且提交数 ≤ 5 时评审质量最稳；超了优先 squash 噪声提交（`git rebase -i`）而不是直接送审。
 ## 延伸阅读
 
 沿着同一主题继续深入：

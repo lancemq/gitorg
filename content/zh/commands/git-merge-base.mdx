@@ -32,8 +32,31 @@ export const metadata = {
 ## 基本示例
 
 ```bash
-git merge-base main feature/login
+git merge-base main feature/login     # 输出一个 hash
+git merge-base --all main feature/login   # criss-cross 时可能有多个
 ```
+
+三个子命令形态各有用途：
+
+```bash
+# 1. 祖先判断：只看退出码，0=是、1=否，脚本首选
+if git merge-base --is-ancestor v1.0.0 main; then
+  echo "v1.0.0 已包含在 main"
+fi
+
+# 2. fork-point：rebase 过的分支找回原始分叉点
+#    比 merge-base 更准——它还参考 reflog 里的历史
+git merge-base --fork-point origin/main feature/login
+
+# 3. criss-cross 场景：--all 列出全部候选
+git merge-base --all A B
+```
+
+## 为什么答案是「可能多个」
+
+两个分支互相合并过对方（criss-cross）之后，不存在唯一的「最优共同祖先」，`--all` 会列出多个候选。这正是三方合并偶尔产生奇怪冲突的根源之一：Git 选了其中一个 base，和你心里想的那个不是同一个。诊断这类冲突先跑 `--all` 看候选集，再用 `git merge-file` 手工验证（见三方合并机制篇）。
+
+`A...B` 三点 diff 的语义也由它定义：`git diff A...B` = `git diff $(git merge-base A B) B`，即「B 相对共同祖先改了什么」——review 视角想要的正是这个，而不是 `git diff A B`（同时包含 A 侧的反向改动）。
 
 
 ## 特殊情况与边界

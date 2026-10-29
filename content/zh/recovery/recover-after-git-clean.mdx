@@ -55,6 +55,16 @@ git clean -nd
 
 ## 可尝试的恢复来源
 
+按成功率排序：
+
+1. **IDE 本地历史**（JetBrains 的 Local History、VS Code 的 Timeline）——不依赖 Git，最可能救回编辑过的文件
+2. **编辑器未关闭的标签页/草稿**——clean 后别关 IDE，先翻一圈
+3. **Time Machine / 文件系统快照**（macOS 本地快照 `tmutil listlocalsnapshots /`）
+4. **构建产物或复制目标**——`dist/`、部署目录里可能还有同内容副本
+5. **extundelete / PhotoRec 等 U 盘级工具**——SSD 上成功率低（TRIM），机械盘可一试
+
+reflog 帮不上忙的原因：`git clean` 只作用于工作区文件，这些文件从未进入对象库，Git 层面根本没有它们的记录。这是「untracked 无恢复路径」的根本原因。
+
 1. IDE Local History / Time Machine / 文件系统快照
 2. 构建产物或生成脚本可重建内容
 3. 同事分支或远端附件里可能有副本

@@ -132,6 +132,23 @@ GitLab 的 issue、board 和 milestone，就是为了把这些语义从 diff 页
   mistakes="如果 issue 很模糊，MR 通常也会跟着模糊。|如果所有任务都加 milestone，milestone 就会失去筛选价值。|如果 board 长期不更新，团队很快就不会再信它。"
 />
 
+## 标签驱动的看板自动化
+
+GitLab 看板的列可以直接绑定标签——「把 issue 拖到 In Progress 列」本质是给 issue 加 `in-progress` 标签。由此推出正确用法：**列名 = 标签名，移动靠打标签（API/CI 都能做），别手动拖**。
+
+```bash
+# 批量给一批 issue 打标签（= 批量移列）
+for i in 101 102 103; do
+  glab issue update $i --label in-progress
+done
+
+# 迭代（Iteration）vs 里程碑（Milestone）的区别：
+# Milestone 是「某个发布版本」的容器，按截止日期；
+# Iteration 是固定节奏的时间箱（如两周一个），属于 Iteration Cadence。
+glab issue update 101 --milestone "v2026.15"
+```
+
+常见反模式：同一语义建两套（标签 `doing` + 列「进行中」互不联动），结果是看板说做完、标签说没做。一个状态一个载体。
 ## 延伸阅读
 
 沿着同一主题继续深入：

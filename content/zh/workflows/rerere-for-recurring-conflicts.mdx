@@ -54,6 +54,24 @@ export const metadata = {
 ## 最小可用流程
 
 ```bash
+# 1. 全局启用（对所有仓库生效）
+git config --global rerere.enabled true
+
+# 2. 正常工作；冲突解决后 rerere 自动记录「冲突现场 → 解决方案」
+#    注意：必须 commit 之后才入库，解决到一半放弃的不算
+
+# 3. 下次同样冲突出现，Git 自动套用上次的解法
+git status   # 会看到 "resolved by rerere" 的文件已被自动暂存
+
+# 4. 复核自动解法是否正确（不是盲目信任）
+git diff            # 确认自动合并结果
+git rerere status   # 哪些文件走了 rerere
+git rerere diff     # rerere 记住的解法内容
+```
+
+缓存位置在 `.git/rr-cache/`，换机器想带走就一并拷贝。
+
+```bash
 git config --global rerere.enabled true
 git config --global rerere.autoupdate true
 ```

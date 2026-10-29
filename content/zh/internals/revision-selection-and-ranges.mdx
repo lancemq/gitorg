@@ -122,6 +122,21 @@ export const metadata = {
 
 也就是说，revision 语法是很多高级命令共享的底层语言。
 
+## 常用表达式速查
+
+```bash
+git show HEAD~3          # 第 3 个祖先（~ 只走第一父链）
+git show HEAD^2          # ^2 = 第 2 父（merge commit 的另一条线）；HEAD^ 等于 HEAD~1
+git show main..feature   # feature 有而 main 没有的提交
+git show main...feature  # 两边各自独有的（对称差，log 里默认左进右出 < >
+git show v1.0..HEAD -- src/   # 范围加路径过滤
+git show :/fix           # 从任意提交里找信息含 "fix" 的最近一个
+git show HEAD@{2}        # HEAD 的 reflog 第 2 步之前的位置
+```
+
+`~` 和 `^` 混用的规则值得一次记牢：`~N` 沿第一父链回退 N 步；`^N` 是「第 N 个父」，只在 merge commit 上有区别——`HEAD~2` 与 `HEAD^^` 相同，但 `HEAD^2` 是完全不同的提交（merge 的第二父链）。
+
+两点语法里，`A..B` 常用于「我要 review 什么」，`A...B` 常用于 `git diff A...B`（相对共同祖先，正是 PR 视角）。
 ## 常见误区
 
 ### `A..B` 就是“从 A 到 B”

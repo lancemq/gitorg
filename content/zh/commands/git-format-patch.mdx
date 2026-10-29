@@ -33,7 +33,26 @@ export const metadata = {
 
 ```bash
 git format-patch origin/main..HEAD
+# 0001-fix-navbar-overlap.patch
+# 0002-add-remember-me.patch
 ```
+
+每个提交一个文件，文件名自动带序号和提交标题；`git format-patch -2` 直接取最近两个提交，不用写范围。
+
+## 与 git am 的闭环
+
+```bash
+# 发送方：导出（-o 集中放一个目录）
+git format-patch origin/main..HEAD -o /tmp/patches/
+
+# 接收方：按顺序应用（保留作者、提交信息，逐个生成新提交）
+git am /tmp/patches/0001-*.patch
+git am /tmp/patches/0002-*.patch
+```
+
+这组命令是邮件式工作流（Linux 内核模式）的核心：补丁是纯文本，能直接进邮件列表讨论、能在评审里逐行引用。`-3`（或 `--3way`）让 am 在基线对不上时先尝试三方合并。
+
+不经过邮件、只想生成单个可 diff 的文件时用 `git format-patch --stdout origin/main..HEAD > all.patch`，接收端 `git am all.patch` 一次性应用。
 
 ## 读这条命令时最该注意什么
 

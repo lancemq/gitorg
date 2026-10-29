@@ -58,11 +58,40 @@ git switch -c release/2026w15
 git tag -a v2026.15.0-rc1 -m "train 2026w15 rc1"
 ```
 
-### 4. 班次期间只处理阻断项
+### 4. 班次期间的操作序列
+
+```bash
+# 切 release 分支（从 main 当前位置）
+git switch -c release/2026w15 main
+git push -u origin release/2026w15
+
+# 上保护：平台侧禁止直接 push，只允许 PR 回填（GitHub Rulesets 示例）
+#   restrict pushes → 仅 release-manager 角色可推
+#   required checks → 冒烟测试必须绿
+
+# rc 验证循环：问题从 main 修好后 cherry-pick 进来
+git switch release/2026w15
+git cherry-pick -x 3a91f2c        # -x 记录来源，回并时不重放
+git tag -a v2026.15.0-rc2 -m "rc2"
+git push --tags
+
+# 发版：打正式 tag
+git tag -a v2026.15.0 -m "train 2026w15"
+git push origin v2026.15.0
+
+# 回并：release 分支上的 hotfix 必须回 main（--no-ff 保留班次边界）
+git switch main
+git merge --no-ff release/2026w15
+git branch -d release/2026w15 && git push origin --delete release/2026w15
+```
+
+漏掉最后一步的回并，是 train 模式最常见的翻车点：release 上的修复只在下个班次里存在，main 永远拿不到。
+
+### 5. 班次期间只处理阻断项
 
 避免“顺带合入小优化”破坏班次稳定性。
 
-### 5. 准点发版并复盘
+### 6. 准点发版并复盘
 
 复盘关注两个指标：准点率、跨班率（被延后到下一班的比例）。
 

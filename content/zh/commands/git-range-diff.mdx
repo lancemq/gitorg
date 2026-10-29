@@ -87,6 +87,25 @@ git range-diff origin/main...feature-v1 origin/main...feature-v2
 
 容易把“看似等价”的历史重写带入不可见偏差。
 
+## rebase 前后的标准复核
+
+```bash
+git range-diff origin/main@{1}...feature@{1} origin/main...feature
+```
+
+输出三列标记：
+
+```
+1:  3a91f2c = 8d2e4b1 add login validation        ← = 完全相同（只换了 hash）
+2:  c7f1a03 ! 5d6e7f8 fix navbar overlap           ← ! 内容有变（要看改了什么）
+    @@ -10,7 +10,7 @@ ...
+3:  ---------                                      ← - 这一侧独有（被丢弃的提交）
+4:  ++++++++++                                     ← + 另一侧独有（新增的提交）
+```
+
+`=` 可以跳过，`!` 逐个看 diff——rebase 解决冲突时改掉的代码全在这里现形。review 别人的 rebase 分支、或验证「我 rebase 完没把代码改坏」，这个命令是唯一的机械答案。
+
+三个范围参数省写形式：`git range-diff base..old base..new`（base 相同时可写 `git range-diff base old...new`）。
 ## 延伸阅读
 
 沿着同一主题继续深入：

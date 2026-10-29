@@ -27,7 +27,26 @@ export const metadata = {
 
 ```bash
 git verify-tag v1.2.0
+# gpg: Signature made ... 
+# gpg: Good signature from "Release Manager <rm@example.com>"    ← 退出码 0
 ```
+
+失败形态两种，含义完全不同：
+
+```
+error: v1.2.0: cannot verify a non-tag object    ← 指向的是 commit，不是 annotated tag
+gpg: BAD signature from ...                      ← 内容被改过（严重）
+gpg: Can't check signature: No public key        ← 你缺签名者的公钥（正常，导入即可）
+```
+
+## -v 看签名详情 + 公钥准备
+
+```bash
+git verify-tag -v v1.2.0     # 完整 GPG 输出：签名时间、密钥指纹、算法
+gpg --keyserver keys.openpgp.org --recv-keys <指纹>   # 补公钥后重验
+```
+
+前置条件：标签必须是 annotated tag 且打标签时带了 `-s`（`git tag -s v1.2.0 -m "..."`），lightweight tag 无处存签名，verify 必然失败。CI 里验证发布包来源时，`git verify-tag $VERSION --raw` 的退出码比解析文本可靠。
 
 ## 这条命令在流程里解决什么问题
 

@@ -35,7 +35,6 @@ export const metadata = {
   modeLabel="找到 merge base"
 />
 
-
 当 Git 要比较两个分支、执行一次 merge、判断能不能 fast-forward，或者决定 rebase 应该从哪里开始搬提交时，它通常都要先找一个 **共同祖先**。
 
 这个共同祖先就是常说的 `merge base`。
@@ -222,6 +221,27 @@ Git 关心的是提交图和 parent 关系，不是分支名本身。
 - `git log --graph`
 - `git merge-base`
 
+## 用一条历史验证祖先语义
+
+```bash
+# 造一个四提交线性历史
+git init /tmp/anc && cd /tmp/anc
+echo a > f; git add f; git commit -m a
+echo b > f; git commit -am b
+git tag B
+echo c > f; git commit -am c
+
+# 祖先判断只看退出码
+git merge-base --is-ancestor B HEAD && echo "B 是 HEAD 祖先"   # 0，是
+
+# 分叉后
+git switch -c side HEAD~1
+echo d > f; git commit -am d
+git merge-base HEAD main    # 输出 B 的 hash —— 共同祖先
+git rev-list --count HEAD..main   # main 上领先几个提交
+```
+
+祖先关系是 Git 大量安全检查的底层：fast-forward 判定（远端必须是本地的祖先才允许非强推 push）、`git cherry` 的吸收判断、`git log A..B` 的范围语义，全部归结为「图上是否可达」。理解了可达性，这些规则不用背。
 ## 延伸阅读
 
 沿着同一主题继续深入：

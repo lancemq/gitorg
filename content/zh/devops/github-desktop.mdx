@@ -79,6 +79,12 @@ Push          → 推送本地提交到远端
 
 ## 注意事项
 
+- **不是完整 git**：rebase 交互模式、`cherry-pick`（仅通过菜单单个）、`bisect`、`worktree` 都没有；复杂操作要开命令行（菜单里有快捷入口，等效于在本仓库目录开终端）。
+- **stash 是隐藏功能**：界面不显眼，在 Branch 菜单里（Stash changes），忘了它在的人会以为必须 commit 才能切分支。
+- **合作者模型单一**：一个 GitHub 账号。要在公司号和个人号之间切换用 `File → Options → Accounts`，且 co-author 署名通过提交描述里的 `Co-authored-by:` trailer 支持。
+- **文件级暂存是亮点**：每行/每块选择性暂存（点行号旁的蓝色标）比 `git add -p` 直观，这是它对命令行用户最实用的功能。
+- 对应命令行概念：Commit to main = `git add . && git commit`；Fetch origin = `git fetch`；Pull origin = `git pull`（默认 merge 不是 rebase，行为可在设置里改）。
+
 1. GitHub Desktop 不支持的复杂操作：
    - Interactive rebase（需用命令行）
    - Cherry-pick（需用命令行）
@@ -86,6 +92,11 @@ Push          → 推送本地提交到远端
 
 2. 建议配合基本命令行知识使用，在 GUI 操作遇到冲突时仍需要用命令行解决
 
+## 与命令行协作的边界
+
+GitHub Desktop 的定位是「日常操作的图形层」，两边混用时有一条铁律：**命令行做过 rebase/重置类操作后，先 Fetch origin 再看界面**——界面缓存的状态可能滞后，直接在上面操作容易基于错误认知。反向（图形操作后回命令行）没有这个问题，因为它最终都是调用同样的 git。
+
+按 ESC 取消未完成的提交信息、Cmd+Shift+A 打开 amend 开关、拖提交可 reorder——这几个快捷操作覆盖了 90% 的图形交互需求。
 ## 延伸阅读
 
 沿着同一主题继续深入：

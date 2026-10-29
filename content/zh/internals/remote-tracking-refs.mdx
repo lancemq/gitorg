@@ -31,12 +31,6 @@ export const metadata = {
 
 # 远端跟踪引用
 
-## 学完这篇你会掌握什么
-
-- 理解 `main` 与 `origin/main` 的区别，能够帮助你更稳定地掌握 fetch、pull、push 和分支同步。
-- `main`：你的本地分支
-- `origin/main`：你本地记录的远端状态
-
 ## 先理解为什么 Git 要把它们分开
 
 <RefsHeadFigure
@@ -83,7 +77,23 @@ export const metadata = {
 - `origin/main` 在你电脑上
 - 它反映的是你上次和远端同步后，对远端 `main` 的认知
 
-## 为什么 fetch 很重要
+## 引用的物理位置与更新规则
+
+```bash
+$ ls .git/refs/remotes/origin/
+main   dev   feature/login
+$ cat .git/refs/remotes/origin/main
+3a91f2c8d4...
+```
+
+谁能改它，规则严格：
+
+- **`git fetch`**：唯一常规入口。把远端报告的分支位置写进 `refs/remotes/origin/*`，同时写 reflog（所以远端跟踪引用也有 reflog，`git reflog show origin/main` 能看远端历史）。
+- **本地提交**：永远不会动它。这就是「我落后远端多少」能稳定计算的原因——`git status` 里的 ahead/behind 就是 `main` 与 `origin/main` 两个 hash 之间的图距离。
+- **`git push` 成功后**：把你自己的远端跟踪引用快进到刚推的提交。这是唯一一次本地直接写它的例外。
+- **`git remote prune origin`**（或 `fetch --prune`）：远端已删的分支，对应的 `origin/*` 引用会被清掉。没 prune 时它们会一直留着——这就是「明明远端删了分支，我还看得到」的原因。
+
+ahead/behind 有个常见误读：它反映的是**上次 fetch 时的远端状态**，不是远端此刻的状态。`0 behind` 只说明「据我所知不落后」，先 fetch 再看才作数。
 
 `git fetch` 更新的是远端跟踪引用，而不是直接改写你的本地分支。这让 Git 能把“先知道远端现在在哪里”和“要不要改自己的分支”分成两步。
 

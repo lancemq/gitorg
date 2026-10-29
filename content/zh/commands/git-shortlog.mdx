@@ -32,8 +32,39 @@ export const metadata = {
 ## 基本示例
 
 ```bash
-git shortlog -sn
+git shortlog -sn          # 按提交数排序的作者统计
+git shortlog -sne         # 加邮箱——同名不同人立刻现形
+git shortlog -sn --no-merges v1.0..v2.0   # 一个版本区间的真实贡献
 ```
+
+输出长这样：
+
+```
+    42  Maqi
+    17  Zhang San
+     8  Li Si
+```
+
+## 整理 release notes
+
+不带 `-s` 时，shortlog 按作者分组列出每个提交的标题行——这就是 changelog 的原始素材：
+
+```bash
+git shortlog --no-merges -n v1.0..v1.1 > changelog-draft.txt
+```
+
+`-n` 按数量排序、`--no-merges` 去掉合并提交噪声。配合 `--group` 还能换分组维度：
+
+```bash
+# 按提交者而非作者分组（评审谁在替谁提交）
+git shortlog -sn --group=trailer:reviewed-by v2.0..main
+```
+
+`--group=trailer:...` 会从提交信息的 trailer（如 `Reviewed-by:`、`Co-authored-by:`）取人——统计 review 贡献比按 author 统计真实得多。
+
+## stdin 行为的坑
+
+交互终端里直接敲 `git shortlog`，它假定你从管道喂内容，会像挂起一样「没反应」——其实是在等 stdin。解决：显式给范围 `git shortlog HEAD`，或 `git log --oneline | git shortlog`。脚本里推荐后者，行为最可预期。
 
 
 ## 特殊情况与边界

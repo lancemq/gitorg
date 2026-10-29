@@ -54,11 +54,26 @@ git commit -m "add new checkout flow behind flag"
 
 逐步从 1% → 5% → 20% → 50% → 100%，每一步观察核心指标。
 
-### 4. 异常时优先关闭旗标
+### 4. flag 的三种技术形态
+
+```bash
+# 1. 配置中心/远端开关（LaunchDarkly、自建 admin API）——改配置不发版，灰度首选
+curl -X POST https://flags.internal/api/toggle   -d '{"flag":"new-checkout-flow","percent":5}'
+
+# 2. 环境变量/配置文件——改了要重启，适合粗粒度（整站级）
+FEATURE_NEW_CHECKOUT=off
+
+# 3. 代码内常量——改了要走发版，只适合「合并但暂不启用」的短周期场景
+const NEW_CHECKOUT_ENABLED = false;
+```
+
+形态决定回滚速度：线上事故时，形态 1 秒级恢复、形态 2 分钟级、形态 3 只能走完整回滚流程。核心路径的灰度至少要做到形态 1 或 2。
+
+### 5. 异常时优先关闭旗标
 
 如果出现指标恶化，先关旗并恢复旧路径，再决定是否回滚代码。
 
-### 5. 稳定后删除旗标与死代码
+### 6. 稳定后删除旗标与死代码
 
 长期遗留 flag 会增加代码复杂度，应设定清理时限。
 

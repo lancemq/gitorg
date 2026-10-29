@@ -131,6 +131,24 @@ Projects 的作用是把多个工作项组织成更可管理的节奏，比如�
 3. 迭代工作放进 Project 跟踪
 4. 讨论性问题优先进 Discussions
 
+## 让 issue 和提交产生联系的机制
+
+- **关键词关闭**：提交信息或 PR 标题里写 `Fixes #42` / `Closes #42`，合并进默认分支时自动关闭对应 issue（进非默认分支不触发）。`Fixes #42 (comment)` 只引用不关闭。
+- **跨仓库引用**：`Fixes owner/repo#42`，跨仓也能关联。
+- **手动关联**：PR 侧栏 Development 面板，或时间线里粘贴 issue 链接（出现引用即建立关系）。
+- **issue 里引提交**：粘贴完整 hash（`3a91f2c8…`），会自动生成一条时间线记录，指到那个提交所在平台页面。
+
+## Projects 自动化的关键语法
+
+Projects（V2）的工作流靠 saved answers/automation 规则：
+
+```yaml
+# GitHub Actions 里用 gh 操作 project item（移动卡片）
+gh project item-edit --project-id $PID --id $ITEM_ID \
+  --field-id $STATUS_FIELD --single-select-option-id $DONE_ID
+```
+
+常见闭环：issue 打上 `triaged` 标签 → 自动进 Projects 的某一列；PR 合并 → 卡片自动移到 Done。手动拖卡片最容易失联，规则驱动才是项目管理面板的正确用法。
 ## 延伸阅读
 
 沿着同一主题继续深入：

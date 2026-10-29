@@ -57,6 +57,27 @@ export const metadata = {
 ## 一条可执行流程
 
 ```bash
+# 1. clone 时就声明只要部分目录（cone 模式，最推荐）
+git clone --sparse --filter=blob:none git@github.com:org/monorepo.git
+cd monorepo
+
+# 2. 已有仓库切 cone 模式
+git sparse-checkout set --cone
+
+# 3. 声明你要的目录
+git sparse-checkout set services/payment packages/ui
+
+# 4. 加目录 / 看当前清单
+git sparse-checkout add services/inventory
+git sparse-checkout list
+
+# 5. 不想用了，恢复全量
+git sparse-checkout disable
+```
+
+`--filter=blob:none` 与 sparse-checkout 是配套的：前者让 clone 不下载无关 blob（省网络与存储），后者让工作区只检出声明的目录（省磁盘与 IDE 索引时间）。只加后者不加前者，对象还是会全量下载。
+
+```bash
 git sparse-checkout init --cone
 git sparse-checkout set apps/web packages/ui
 git worktree add ../repo-hotfix hotfix/login-fix

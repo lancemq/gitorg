@@ -139,6 +139,29 @@ packfiles 不是玄学，几个配置直接决定它什么时候发生、压得�
 
 Git 的强大不只是因为“有历史”，还因为它把历史存成对象，再把对象通过 packfiles 做成高效、可传输、可维护的形态。这是它能长期承载大规模协作的重要原因。
 
+## 亲手观察一次打包
+
+```bash
+# 1. 看打包前的松散对象
+git count-objects -v
+# count: 8421   ← 松散
+
+# 2. 手动打包（不动引用、不清不可达对象）
+git repack -a -d
+
+# 3. 再看
+git count-objects -v
+# count: 0          ← 全部进 pack
+# in-pack: 48219
+# size-pack: 15234  ← 磁盘占用主力
+
+# 4. 看压缩效果：哪些对象被 delta 了、链多深
+git verify-pack -v .git/objects/pack/pack-*.idx | tail -5
+# non delta: 23112 objects
+# chain length = 1: 4521 objects
+```
+
+`git repack -a -d` 与 `git gc` 的差别：repack 只做「打包合并」，不清理不可达对象、不过期 reflog——诊断存储问题时用它更可控，不会顺带删东西。
 ## 延伸阅读
 
 沿着同一主题继续深入：

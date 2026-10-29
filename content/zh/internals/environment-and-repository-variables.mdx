@@ -38,7 +38,6 @@ export const metadata = {
   note="默认情况下 Git 自动发现这些路径。手动设置时可以覆盖默认行为，但需谨慎使用。"
 />
 
-
 Git 官方书里特别值得关注的几个包括：
 
 - `GIT_DIR`
@@ -126,6 +125,29 @@ Git 官方书里特别值得关注的几个包括：
 
 **环境变量不是 Git 的边缘知识，它们在告诉你 Git 的仓库上下文其实是可配置、可重定向的。**
 
+## 常用变量速查
+
+```bash
+GIT_DIR=/srv/repo/.git        # 指定仓库位置（脚本里操作非当前目录的仓库）
+GIT_WORK_TREE=/srv/repo       # 配合 GIT_DIR 指定工作区（裸仓库操作文件时用）
+GIT_INDEX_FILE=/tmp/idx       # 临时索引——不污染真实暂存区的批处理
+GIT_AUTHOR_NAME / GIT_AUTHOR_EMAIL / GIT_AUTHOR_DATE   # 覆盖作者字段（导入历史时用）
+GIT_COMMITTER_NAME / ... / GIT_COMMITTER_DATE          # 覆盖提交者字段
+GIT_EDITOR=vim GIT_PAGER=cat  # 改交互工具；CI 里 GIT_PAGER=cat 免卡
+GIT_TRACE=1                   # 调试：打印 git 内部调用的命令链
+```
+
+两个高频场景：
+
+```bash
+# CI 里一次性覆盖提交者（否则用机器身份提交）
+git -c user.name=bot -c user.email=bot@ci commit -m "chore: bump"
+
+# 让 git 命令在别的仓库上运行（不 cd）
+GIT_DIR=/srv/app/.git GIT_WORK_TREE=/srv/app git status --short
+```
+
+环境变量优先级高于所有配置文件，所以「明明改了 config 还是不生效」时，先 `env | grep GIT` 检查是不是有旧导出。
 ## 延伸阅读
 
 沿着同一主题继续深入：

@@ -29,6 +29,38 @@ export const metadata = {
 git describe --tags --always
 ```
 
+## 读懂输出
+
+```
+v2.1.0                      ← HEAD 正好打在标签上
+v2.1.0-5-g3a91f2c           ← 之后有 5 个提交，当前是 3a91f2c
+v2.1.0-5-g3a91f2c-dirty     ← 工作区还有未提交修改（--dirty）
+v2.1.0-beta2-3-g...         ← 标签名本身带连字符也能解析
+```
+
+中段 `-<数字>-g<hash>` 是关键：数字非 0 就说明 HEAD 不是发布点。CI 里常把它直接当版本号，`5` 越大说明离上次发版越远——这是判断「该不该发版」的机械信号。
+
+## 语义开关
+
+```bash
+git describe --tags                       # 含 lightweight tag（默认只认 annotated）
+git describe --match "v[0-9]*"            # 只匹配特定模式，跳过 hotfix-* 等杂牌 tag
+git describe --abbrev=12                  # hash 部分定长 12（默认 7，可被 core.abbrev 影响）
+git describe --dirty="--modified"         # 自定义脏标记后缀
+git describe --contains 3a91f2c           # 反向：这个提交被哪个 tag 包含（找它的第一个发布版本）
+```
+
+`--match` 在多仓库、多产品共用一个仓库时几乎是必配：不加它，隔壁产品线的 `client-v3` 标签会污染你的版本号。
+
+## 报错
+
+```
+fatal: No annotated tags can describe '3a91f2c'.
+However, there were unannotated tags: try --tags.
+```
+
+这条报错本身就给了答案：仓库里有 lightweight tag 但没有 annotated。CI 流程里最省事的做法是统一用 annotated tag（`git tag -a v1.0 -m "..."`），describe 行为最可预期。
+
 
 ## 特殊情况与边界
 

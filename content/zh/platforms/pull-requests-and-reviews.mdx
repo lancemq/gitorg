@@ -141,6 +141,35 @@ GitHub 的 protected branches 不是为了“增加流程感”，而是为了�
 
 Squash 可以让主线更整洁，但如果每次都拿它掩盖混乱的提交过程，团队会失去很多调试和追踪价值。
 
+## review 状态机的平台差异
+
+| | GitHub PR | GitLab MR |
+| --- | --- | --- |
+| 评审对象 | 提交序列整体（rebase 后自动跟随） | 固定 source→target，rebase 不变 |
+| 批准失效 | 新提交推送后可配置失效（stale approvals） | 默认保留，可配 reset approvals on push |
+| 建议修改 | Suggestions，一键 commit suggestion | 可在 diff 行直接提交评论式修改建议 |
+| 草稿 | Draft PR（CI 可选触发） | Draft MR（自动带 [Draft] 前缀，不可合并） |
+
+两个实操要点：
+
+- **rebase 已有 review 的 PR 不会丢评审**：GitHub 的 review 挂在 PR 上而非提交上，强制推送后旧 comment 仍锚定在行上（行没了会折叠到 Outdated）。GitLab 要注意 approvals 重置策略，否则改一行就要重新找人批。
+- **requested changes 的阻塞是可配置的**：分支保护/MR 设置里决定「必须 N 个 approve 且无未解决 change request」。团队约定「changes 必须在合并前 resolve」，别依赖平台默认值。
+
+## gh CLI 常用操作
+
+```bash
+gh pr create --title "add login validation" --fill \
+  --reviewer @team/backend --assignee @me
+
+gh pr checkout 42          # 本地切到 PR 分支（审别人的改动）
+gh pr diff 42 --name-only  # 只看文件清单
+gh pr checks 42            # CI 状态
+gh pr merge 42 --squash --delete-branch
+
+gh pr list --state open --review-requested @me   # 我要审的
+```
+
+`gh pr checkout` 配合「本地跑测试再批」是比网页 review 更扎实的方式；`--fill` 用第一个提交的信息填充标题（约定式提交信息团队几乎零成本建 PR）。
 ## 延伸阅读
 
 沿着同一主题继续深入：

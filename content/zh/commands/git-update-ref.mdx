@@ -22,8 +22,39 @@ export const metadata = {
 ## 基本示例
 
 ```bash
-git update-ref refs/heads/feature HEAD
+git update-ref refs/heads/feature HEAD       # 指向 HEAD 的提交
+git update-ref refs/heads/feature 3a91f2c    # 指向指定提交
+git update-ref -d refs/heads/feature         # 删除引用
+git update-ref --no-deref HEAD 3a91f2c       # 不解析符号引用，直接改 HEAD 本身
 ```
+
+## 带旧值校验：引用的 CAS
+
+最后一个参数可以写「期望的旧值」，值对不上就拒绝——引用级别的 compare-and-swap：
+
+```bash
+# 只有当 feature 现在指向 aaaa111 时才改成 bbbb222
+git update-ref refs/heads/feature bbbb222 aaaa111
+# error: cannot lock ref ...: expected aaaa111 but got cccc333 时拒绝执行
+```
+
+并发脚本（比如多个 job 同时操作同一引用）必须用它，否则就是丢失更新。
+
+## 事务：stdin 模式
+
+多条更新要么全成功要么全不做：
+
+```bash
+git update-ref --stdin <<'EOF'
+start
+update refs/heads/a bbbb222
+update refs/heads/b cccc333
+prepare
+commit
+EOF
+```
+
+`prepare` 后任何一条失败，`abort` 可整体回滚。这是 `git fetch` 自己更新几十个远端跟踪引用时用的同一套机制。
 
 ## 这条命令在流程里解决什么问题
 

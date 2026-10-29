@@ -158,6 +158,28 @@ git range-diff main release/2.3 release/2.4
   4. 修完后，版本说明要怎么同步记录？
 </PracticeBox>
 
+## 三线并行时的回移判定表
+
+| 修复内容 | v2.1（维护） | v2.2（rc） | main |
+| --- | :-: | :-: | :-: |
+| 安全漏洞 | 必须 | 必须 | 必须 |
+| 数据损坏/资损 bug | 必须 | 必须 | 必须 |
+| 一般 bug | 影响面大才回 | 尽量回 | 天然包含 |
+| 行为变更/重构 | 禁止（只修不进新特性） | 慎重 | 天然包含 |
+| 依赖升级 | 仅安全升级 | 视情况 | 随意 |
+
+先落 main、再 cherry-pick 到维护线（方向别反：main 上先修 + review，确认后向下复制，比在老分支上修再「升级」安全）：
+
+```bash
+git switch main
+git commit -m "fix: null check in billing"   # 正常走 PR 合入 main
+git switch release/2.1
+git cherry-pick -x 3a91f2c    # -x 在信息里记录 "cherry picked from commit ..."
+git switch release/2.2
+git cherry-pick -x 3a91f2c
+```
+
+`-x` 留下的溯源行是审计依据：`git log release/2.1 --grep "cherry picked from"` 能列出全部回移记录，反向核对「该回的都回了没有」。
 ## 延伸阅读
 
 沿着同一主题继续深入：

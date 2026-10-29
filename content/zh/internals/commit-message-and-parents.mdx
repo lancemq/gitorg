@@ -40,7 +40,6 @@ commit 对象不是“写一句提交说明”那么简单，它真正做的是�
   pointerLabel="HEAD 指向"
 />
 
-
 一个 commit 对象通常会包含：
 
 - 指向当前快照根 tree 的信息
@@ -135,6 +134,40 @@ rebase 之所以被称为“改写历史”，不是因为它偷偷改了旧提�
 
 **commit 不是日志条目，而是一个把快照、父链和说明一起固定下来的历史节点。**
 
+## 父指针与 hash 的传导
+
+commit 对象存的是「树 hash + 父 hash 列表 + 作者/时间 + 信息」，所以链条上任何一个提交被改写，它之后的所有提交都会换 hash——父指针变了，每个后代对象的内容都变了。这就是「rebase 改写历史」的机械原理，也是「SHA 可以当完整性校验用」的原因。
+
+验证父指针的最直接方式：
+
+```bash
+git cat-file -p HEAD
+# tree 5d6e7f8...
+# parent 3a91f2c...     ← merge commit 会两行
+# author Maqi <mq@x.com> 1769635200 +0800
+# committer ...
+```
+
+`author` 与 `committer` 是两个独立字段：author 是代码原作者（am/cherry-pick 会保留），committer 是实际创建这个提交对象的人。补丁被转发应用后，author 不变、committer 变——追责时看 author，排同步问题时看 committer。
+
+时间戳也是 hash 的一部分：同一个树、同一个信息、不同的提交时间，hash 就不同。所以「两个提交内容一样」永远不等于「hash 一样」。
+
+## 提交信息的规范落点
+
+commit 信息的第一行（subject）会被大量工具消费：`git log --oneline`、GitHub PR 的 commit 标题、release notes 工具（如 conventional-changelog）。两条经得住推敲的规则：
+
+```bash
+# subject ≤ 50 字符、祈使句（"add" 而非 "added"）——与 "git merge" 生成的自动信息一致
+# body 每行 ≤ 72 字符（man 页和终端 80 列排版的历史约定）
+
+# 坏：修复了一个 bug
+# 好：fix: billing NaN when invoice has no line items
+
+git commit --fixup=3a91f2c     # 标记为某提交的修补（自动生成 "fixup! <原标题>"）
+git rebase -i --autosquash origin/main   # rebase 时自动把 fixup 归位并 squash
+```
+
+`--fixup` + `--autosquash` 是「先提交、最后整理」工作流的核心：开发时随便提交，收尾时一次性归位，不用中途停下补改历史。
 ## 延伸阅读
 
 沿着同一主题继续深入：

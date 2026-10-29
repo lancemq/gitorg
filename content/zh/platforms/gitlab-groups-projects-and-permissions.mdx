@@ -146,6 +146,37 @@ Maintainer 或更高权限给太多人，短期会觉得方便，长期会让责
   3. 如果未来有外部协作者或自动化账户加入，这个结构会不会太宽？
 </PracticeBox>
 
+## 权限矩阵要点
+
+GitLab 的权限是「角色 × 实体层级」（instance → group → project，下层可覆盖上层），高频角色边界：
+
+| 能力 | Guest | Reporter | Developer | Maintainer |
+| --- | :-: | :-: | :-: | :-: |
+| 看代码/issue | 看自己相关的 | ✓ | ✓ | ✓ |
+| 拉/clone 仓库 | ✗ | ✓ | ✓ | ✓ |
+| 推分支 | ✗ | ✗ | ✓ | ✓ |
+| 推到受保护分支 | ✗ | ✗ | 需单独授权 | ✓ |
+| 合并 MR | ✗ | ✗ | ✓（可配） | ✓ |
+| 改项目设置/CI 变量 | ✗ | ✗ | ✗ | ✓ |
+
+两个高频坑：
+
+- **受保护分支的角色是独立开关**。项目设置 → Repository → Protected branches 里要单独指定「谁可以 merge / 谁可以 push」，Developer 默认两边都不含。群组级保护（Premium）能批量管。
+- **CI/CD 变量有 protection 标志**。勾了 protected 的变量只在受保护分支的流水线里可见——「本地明明配了变量流水线就是取不到」，九成是这个。
+
+## API 操作
+
+```bash
+# 列出项目成员及其角色
+curl --header "PRIVATE-TOKEN: $PAT" \
+  "https://gitlab.com/api/v4/projects/<id>/members/all"
+
+# 调整某人到 Developer（access_level: 30）
+curl -X PUT --header "PRIVATE-TOKEN: $PAT" \
+  "https://gitlab.com/api/v4/projects/<id>/members/<user_id>?access_level=30"
+```
+
+角色数字：10 Guest / 20 Reporter / 30 Developer / 40 Maintainer / 50 Owner。脚本批量授权时直接用数字。
 ## 延伸阅读
 
 沿着同一主题继续深入：

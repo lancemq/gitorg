@@ -91,6 +91,33 @@ Rulesets 在 **Settings → Rules → Rulesets** 创建，和 classic 保护的�
   Require PR + 1 approval + 必需 CI + 禁 force push。这四项覆盖 90% 的事故面，且不会明显拖慢节奏；其余选项等团队跑顺后再加。
 </TipBox>
 
+## Rulesets 相对 classic protection 的关键增量
+
+- **ruleset 可以按 include/exclude 模式批量作用于分支名**（`release/*`、`hotfix/*`），不用给每条分支单独建保护；优先级规则：更具体的 pattern 胜出，active ruleset 全部生效（不是互斥单选）。
+- **bypass 名单是显式的一等配置**：指定角色/团队/Deploy key 可以绕过某条规则，且每次 bypass 会记录在 ruleset 审计里——classic protection 里「管理员可绕过」是隐式的。
+- **required status checks 支持「预期提交后仍有效」**：`strict` 状态下分支落后时必须 update 才能合并，防止拿旧 review 合新代码。
+- **push ruleset（Enterprise）能在 push 时拦截**：文件路径限制（禁 `dist/` 入库）、提交信息正则、文件大小上限，这些 classic 版做不到。
+
+API 管理（批量场景）：
+
+```bash
+# 列出仓库的 rulesets
+gh api repos/{owner}/{repo}/rulesets
+
+# 建一条：release/* 必须带签名提交
+gh api -X POST repos/{owner}/{repo}/rulesets \
+  --input - <<'EOF'
+{
+  "name": "release-signed",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {"ref_name": {"include": ["refs/heads/release/*"], "exclude": []}},
+  "rules": [{"type": "required_signatures"}]
+}
+EOF
+```
+
+`enforcement: evaluate` 是灰度模式——规则生效但只记录不拦截，先用它跑两周看 audit log 再切 active。
 ## 延伸阅读
 
 沿着同一主题继续深入：

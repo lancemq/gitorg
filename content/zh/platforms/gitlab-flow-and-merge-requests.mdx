@@ -130,6 +130,18 @@ GitLab Flow 特别适合这些场景：
   mistakes="如果流程显得很复杂，先问交付模型是不是真的需要这些分支。|如果 MR 成了唯一上下文入口，通常说明上游计划层还不够健康。|如果 merge readiness 说不清，先定义规则再加流程。"
 />
 
+## MR 的关键设置位
+
+```bash
+# 用 API 看一个 MR 的核心字段（脚本化 review 流程的起点）
+glab mr view 42
+glab mr merge 42 --squash --when-pipeline-succeeds --remove-source-branch
+```
+
+- **Squash and merge**：MR 标题即最终提交信息（GitLab 12+ 支持编辑），多提交的试错历史压成一个干净提交；配合「Squash commits when accepting」项目默认值。
+- **Merge trains（Premium）**：MR 排队进「待合并列车」，每班车把所有排队 MR 叠在一起跑 CI，通过即自动合并——把「各自测完但合到一起才挂」的问题前置。
+- **合并后删源分支**是默认推荐：MR 里已有完整历史，长留分支只会让分支列表失真。
+- **approval rules 可以按 Code Owners 文件自动指派**：`CODEOWNERS` 里 `services/payment/ @pay-team` 一行，改这个目录的 MR 自动找 pay-team 审。
 ## 延伸阅读
 
 沿着同一主题继续深入：

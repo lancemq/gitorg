@@ -26,8 +26,29 @@ export const metadata = {
 ## 基本示例
 
 ```bash
-git ls-files
+git ls-files                # 列出索引里的全部文件（= Git 正在跟踪的）
+git ls-files src/           # 限路径
+git ls-files --others       # 反向：未跟踪的文件
+git ls-files -i -c --exclude-standard   # 已跟踪但被 .gitignore 命中的（应清理的遗留）
 ```
+
+## 排查三连
+
+```bash
+# 1. 冲突现场：哪些文件处于未合并状态
+git ls-files -u
+# 100644 <base-hash> 1   src/app.ts     ← stage 1 = 基准版
+# 100644 <ours-hash> 2   src/app.ts     ← stage 2 = 我方
+# 100644 <theirs-hash>3  src/app.ts     ← stage 3 = 对方
+
+# 2. 工作区删了但索引里还在的
+git ls-files -d
+
+# 3. 改动过未暂存的
+git ls-files -m
+```
+
+`ls-files -u` 是冲突排查里最直接的入口：三条同路径不同 stage 的记录就是冲突本体，`git add` 解决的本质是把三行压回一行 stage 0。
 
 ## 这条命令在流程里解决什么问题
 

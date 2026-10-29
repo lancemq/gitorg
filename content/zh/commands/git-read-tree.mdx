@@ -56,6 +56,15 @@ git read-tree --reset -u HEAD
 - `read-tree` 操作的是索引而非直接操作工作区（除非加 `-u`），理解树-索引-工作区三者的关系很重要。
 - 除非你确实在编写底层脚本或实现自定义的 Git 操作，否则通常应该使用更高层的命令（如 `git reset`、`git checkout`）来代替。
 
+## 它和两个近亲的区别
+
+```bash
+git read-tree -u --reset HEAD    # 索引 + 工作区都同步到 HEAD（危险：丢未提交改动）
+git read-tree HEAD               # 只动索引（工作区原样——文件还是旧的，状态会显示为已修改）
+git read-tree --prefix=old/ 3a91f2c   # 把某树塞进索引的子路径（两棵树合并进一个索引）
+```
+
+绝大多数人需要的其实是 `git restore --source=HEAD --staged --worktree .` 或 `git reset --hard`，read-tree 的舞台在脚本里：`--prefix` 合并两棵树是实现「把 A 仓库的产物挂到 B 仓库子目录」这类部署流程的原语。日常手工操作碰不到它是正常的。
 ## 延伸阅读
 
 沿着同一主题继续深入：

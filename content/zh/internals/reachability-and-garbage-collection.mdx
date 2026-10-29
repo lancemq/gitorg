@@ -224,6 +224,21 @@ reset 更常见的效果是移动引用，而不是马上删除底层对象。
 - `git gc`
 - `git prune`
 
+## 可达性的判定与 gc 的保护网
+
+```bash
+# 从所有引用出发，标记可达对象
+git fsck --unreachable        # 列出不可达对象（gc 的清理候选）
+git fsck --lost-found         # 顺手存到 .git/lost-found/
+
+# gc 的三重保护，防止误删还没被引用接住的对象：
+git config gc.pruneExpire     # 默认 2.weeks.ago——不可达对象满两周才物理删除
+# ① reflog 还在：reset 丢的提交经由 HEAD 的 reflog 可达，gc 不碰
+# ② 宽限期：即使不可达，2 周内 prune 跳过
+# ③ 并发锁：gc 运行时锁仓库，避免边收边产生新对象
+```
+
+`git gc --prune=now` 同时绕过 ②（直接立即删）——它安全的前提是 ① 已经失效或你确认不要了。判断「这个对象还能不能救」的唯一标准：`git fsck --unreachable` 还列不列出它。
 ## 延伸阅读
 
 沿着同一主题继续深入：

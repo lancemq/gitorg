@@ -98,6 +98,27 @@ export const metadata = {
 
 ## 6. force push 真正危险的地方
 
+它不是「覆盖了远端」这么简单，而是让**其他人的下次 pull 变成陷阱**：对方本地还拿着旧历史，pull 会把两条线重新合并出重复提交，或者更糟——直接 fast-forward 到他们没见过的历史。
+
+```bash
+# 被别人 force push 打中后的自救：不要 pull，先 rebase
+git fetch
+git rebase --onto origin/main @{u}@{1} feature/login
+# 或最简单：放弃本地的旧基线，只保留自己的提交
+git rebase origin/main
+```
+
+团队协作场景用 `--force-with-lease` 代替 `--force`：
+
+```bash
+git push --force-with-lease
+# 只有当远端还停在你上次 fetch 的位置时才覆盖
+# 别人在你之后推过 → 拒绝执行，不会盲踩
+```
+
+`--force-with-lease` 防的是「覆盖别人的新提交」，防不了「成心改写」；它是安全网不是授权。改写已共享历史仍然需要走团队约定。
+
+
 `git push --force` 的危险不只是覆盖远端，而是它会让别人本地对那段历史的理解瞬间失效。
 
 如果确实非推不可，至少应该满足两个条件：
