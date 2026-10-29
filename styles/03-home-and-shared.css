@@ -77,7 +77,7 @@
   color: var(--text-muted);
   font-size: 13px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
 }
 
 h1,
@@ -100,7 +100,7 @@ h1 {
   max-width: 100%;
   font-family: var(--font-body), sans-serif;
   font-size: clamp(1.7rem, 2.8vw, 2.2rem);
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.02;
   text-wrap: balance;
 }
@@ -108,14 +108,14 @@ h1 {
 h2 {
   font-family: var(--font-body), sans-serif;
   font-size: clamp(1.15rem, 1.5vw, 1.32rem);
-  font-weight: 780;
+  font-weight: 700;
   line-height: 1.08;
 }
 
 h3 {
   font-family: var(--font-body), sans-serif;
   font-size: 1rem;
-  font-weight: 760;
+  font-weight: 600;
   line-height: 1.18;
 }
 
@@ -127,15 +127,15 @@ h3 {
 }
 
 [data-locale="zh"] h1 {
-  font-weight: 820;
+  font-weight: 700;
 }
 
 [data-locale="zh"] h2 {
-  font-weight: 800;
+  font-weight: 700;
 }
 
 [data-locale="zh"] h3 {
-  font-weight: 780;
+  font-weight: 700;
 }
 
 [data-locale="en"] h1,
@@ -146,15 +146,15 @@ h3 {
 }
 
 [data-locale="en"] h1 {
-  font-weight: 720;
+  font-weight: 700;
 }
 
 [data-locale="en"] h2 {
-  font-weight: 680;
+  font-weight: 600;
 }
 
 [data-locale="en"] h3 {
-  font-weight: 650;
+  font-weight: 600;
 }
 
 [data-locale="en"] .lead,
@@ -168,7 +168,7 @@ h3 {
 [data-locale="en"] .cta p,
 [data-locale="en"] .meta-card span,
 [data-locale="en"] .note-card p {
-  line-height: 1.72;
+  line-height: 1.75;
 }
 
 [data-locale="en"] .section-head > p {
@@ -205,7 +205,7 @@ h3 {
 .entry-card p {
   margin: 0;
   color: var(--text-muted);
-  line-height: 1.65;
+  line-height: 1.6;
 }
 
 [data-locale="zh"] .lead,
@@ -296,7 +296,7 @@ h3 {
 .stat-card strong {
   font-size: 1.8rem;
   font-family: var(--font-body), sans-serif;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 [data-locale="zh"] .meta-card strong,
@@ -305,13 +305,13 @@ h3 {
 [data-locale="zh"] .doc-callout-header strong,
 [data-locale="zh"] .practice-lab-header strong,
 [data-locale="zh"] .brand-text {
-  font-weight: 780;
+  font-weight: 700;
 }
 
 [data-locale="zh"] .learning-track-link strong,
 [data-locale="zh"] .learning-path-step-head h3,
 [data-locale="zh"] .sequence-card strong {
-  font-weight: 760;
+  font-weight: 600;
 }
 
 [data-locale="zh"] .brand-text,
@@ -328,7 +328,7 @@ h3 {
 
 [data-locale="zh"] .nav-item,
 [data-locale="zh"] .nav-subitem {
-  font-weight: 560;
+  font-weight: 500;
 }
 
 [data-locale="en"] .meta-card strong,
@@ -337,13 +337,13 @@ h3 {
 [data-locale="en"] .doc-callout-header strong,
 [data-locale="en"] .practice-lab-header strong,
 [data-locale="en"] .brand-text {
-  font-weight: 680;
+  font-weight: 500;
 }
 
 [data-locale="en"] .learning-track-link strong,
 [data-locale="en"] .learning-path-step-head h3,
 [data-locale="en"] .sequence-card strong {
-  font-weight: 640;
+  font-weight: 600;
 }
 
 .meta-label {
@@ -351,7 +351,7 @@ h3 {
   color: var(--text-muted);
   font-size: 13px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
 }
 
 .meta-grid {
@@ -390,10 +390,10 @@ h3 {
   position: relative;
   overflow: hidden;
   padding: 18px;
-  border-radius: 28px;
+  border-radius: 14px;
   background:
     #ffffff;
-  box-shadow: 0 22px 40px rgba(24, 24, 27, 0.05);
+  box-shadow: var(--shadow-soft);
 }
 
 .entry-hub-panel::before {
@@ -468,7 +468,7 @@ h3 {
   border-color: rgba(24, 24, 27, 0.05);
   background: linear-gradient(180deg, rgba(24, 24, 27, 0.06), rgba(24, 24, 27, 0.04));
   color: #9a3412;
-  box-shadow: 0 8px 18px rgba(24, 24, 27, 0.06);
+  box-shadow: var(--shadow);
 }
 
 .entry-tab-panel {
@@ -491,7 +491,7 @@ h3 {
   color: var(--primary);
   font-size: 0.76rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
@@ -517,7 +517,7 @@ h3 {
 .entry-tab-caption {
   color: var(--text-muted);
   font-size: 0.78rem;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
@@ -571,7 +571,7 @@ h3 {
   color: var(--text-muted);
   font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
 }
 
 .entry-card h3 {
@@ -736,7 +736,7 @@ h3 {
 }
 
 .roadmap-link {
-  border-radius: 18px;
+  border-radius: 14px;
   transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
@@ -807,7 +807,7 @@ h3 {
   gap: 6px;
   padding: 14px 16px;
   border: 1px solid rgba(24, 24, 27, 0.08);
-  border-radius: 18px;
+  border-radius: 14px;
   background: rgba(255, 255, 255, 0.82);
 }
 
@@ -840,7 +840,7 @@ h3 {
   background: rgba(255, 255, 255, 0.9);
   color: #9a3412;
   font-size: 0.82rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .update-entry {
@@ -883,7 +883,7 @@ h3 {
   color: var(--text-muted);
   font-size: 0.76rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
@@ -893,7 +893,7 @@ h3 {
   border-radius: 22px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 0.96));
-  box-shadow: 0 14px 26px rgba(24, 24, 27, 0.04);
+  box-shadow: var(--shadow-soft);
 }
 
 .update-kicker {
@@ -901,7 +901,7 @@ h3 {
   color: var(--primary);
   font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 

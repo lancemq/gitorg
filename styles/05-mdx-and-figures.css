@@ -30,7 +30,7 @@
 .mdx-content p,
 .mdx-content li {
   color: var(--text-muted);
-  line-height: 1.78;
+  line-height: 1.75;
 }
 
 [data-locale="zh"] .mdx-content p,
@@ -46,7 +46,7 @@
 .mdx-content > p:first-of-type {
   color: var(--text-muted);
   font-size: 1rem;
-  line-height: 1.78;
+  line-height: 1.75;
 }
 
 [data-locale="zh"] .mdx-content > p:first-of-type {
@@ -111,7 +111,7 @@
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.96));
   font-size: 13px;
-  line-height: 1.7;
+  line-height: 1.75;
 }
 
 .mdx-content pre code {
@@ -210,7 +210,7 @@
 
 .mdx-content td {
   color: var(--text-muted);
-  line-height: 1.7;
+  line-height: 1.75;
 }
 
 .mdx-content tr:last-child td {
@@ -229,7 +229,7 @@
 .doc-figure {
   margin: 1.4rem 0 1.6rem;
   border: 1px solid var(--border);
-  border-radius: 24px;
+  border-radius: 14px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.98));
   box-shadow: 0 20px 34px rgba(24, 24, 27, 0.05);
@@ -266,7 +266,7 @@
   margin: 1.4rem 0;
   padding: 18px 18px 18px 20px;
   border: 1px solid rgba(24, 24, 27, 0.08);
-  border-radius: 24px;
+  border-radius: 14px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 1));
   box-shadow: 0 16px 26px rgba(24, 24, 27, 0.05);
@@ -389,7 +389,7 @@
 .history-lane-header span {
   color: var(--text-muted);
   font-size: 0.78rem;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
@@ -506,7 +506,7 @@
   min-height: 100%;
   padding: 16px;
   border: 1px solid rgba(24, 24, 27, 0.08);
-  border-radius: 18px;
+  border-radius: 14px;
   background: rgba(255, 255, 255, 0.88);
 }
 
@@ -521,7 +521,7 @@
   color: var(--text-muted);
   font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
@@ -751,7 +751,7 @@
   gap: 10px;
   padding: 16px;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 14px;
   background: #fff;
 }
 
@@ -776,8 +776,8 @@
 .gitflow-support-label {
   color: var(--text-muted);
   font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
@@ -892,7 +892,7 @@
   gap: 6px;
   padding: 16px;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 14px;
   background: #fff;
 }
 
@@ -920,7 +920,7 @@
 .stash-arrow-label {
   color: var(--text-muted);
   font-size: 0.78rem;
-  font-weight: 600;
+  font-weight: 500;
   white-space: nowrap;
 }
 
@@ -959,8 +959,8 @@
 .reflog-branch-label {
   color: var(--text-muted);
   font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
@@ -995,15 +995,15 @@
   gap: 12px;
   padding: 16px;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 14px;
   background: #fff;
 }
 
 .command-flow-label {
   color: var(--text-muted);
   font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
@@ -1055,7 +1055,7 @@
   padding: 0 4px;
   color: var(--text-muted);
   font-size: 0.82rem;
-  line-height: 1.7;
+  line-height: 1.75;
 }
 
 .commit-graph-figure {
@@ -1071,7 +1071,7 @@
   border-radius: 22px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 1));
-  box-shadow: 0 14px 24px rgba(24, 24, 27, 0.04);
+  box-shadow: var(--shadow-soft);
   overflow: hidden;
 }
 
@@ -1093,7 +1093,7 @@
   color: var(--text-muted);
   font-size: 0.76rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
@@ -1236,7 +1236,7 @@
   margin: 1.8rem 0;
   padding: 20px;
   border: 1px solid var(--border);
-  border-radius: 28px;
+  border-radius: 14px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.98));
   box-shadow: 0 18px 30px rgba(24, 24, 27, 0.05);
@@ -1267,7 +1267,7 @@
 .practice-lab-header p {
   margin: 0;
   color: var(--text-muted);
-  line-height: 1.7;
+  line-height: 1.75;
 }
 
 .practice-lab-grid {
@@ -1386,7 +1386,7 @@
   font-style: normal;
   color: var(--text-muted);
   font-size: 0.76rem;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -1395,7 +1395,7 @@
   color: var(--text-muted);
   font-size: 0.76rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   white-space: nowrap;
 }
 
@@ -1492,7 +1492,7 @@
   font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   color: var(--text-muted);
 }
 
@@ -1625,7 +1625,7 @@
 }
 
 .lp-step-label {
-  font-weight: 600;
+  font-weight: 500;
   color: #3f3f46;
 }
 
