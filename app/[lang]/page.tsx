@@ -304,6 +304,38 @@ export default async function LocalizedHomePage({ params }: Props) {
         ]}
       />
 
+      <section className="section" id="sites">
+        <div className="section-head">
+          <div>
+            <p className="eyebrow">{locale === "zh" ? "Sites" : "Sites"}</p>
+            <h2>{locale === "zh" ? "站点导航" : "Site Navigation"}</h2>
+          </div>
+        </div>
+        <div className="topics-grid">
+          <a className="topics-card" href="https://git.aiqo.top/">
+            <strong>GitOrg Atlas</strong>
+            <span>
+              {locale === "zh"
+                ? "Git 学习与参考主站：命令、工作流、最佳实践、原理与恢复手册。"
+                : "The main Git learning site: commands, workflows, best practices, internals and recovery."}
+            </span>
+          </a>
+          <a
+            className="topics-card"
+            href="https://openclaw.aiqo.top/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <strong>OpenClaw</strong>
+            <span>
+              {locale === "zh"
+                ? "OpenClaw 子域站点。"
+                : "The OpenClaw subdomain site."}
+            </span>
+          </a>
+        </div>
+      </section>
+
       <section className="section section-latest" id="latest">
         <div className="section-head">
           <div>
