@@ -110,15 +110,21 @@ export default function RootLayout({
           />
         ) : null}
         {children}
-        <Script id="baidu-analytics" strategy="afterInteractive">
-          {`var _hmt = _hmt || [];
+        {/* Baidu Tongji: raw script tag so the code appears verbatim in the
+            initial HTML source (Baidu's installer checks raw HTML, and
+            next/script afterInteractive only emits it into the RSC payload). */}
+        <script
+          id="baidu-analytics"
+          dangerouslySetInnerHTML={{
+            __html: `var _hmt = _hmt || [];
 (function() {
   var hm = document.createElement("script");
   hm.src = "https://hm.baidu.com/hm.js?176fd538b165fb6ce5b9251c5e541c1f";
   var s = document.getElementsByTagName("script")[0];
   s.parentNode.insertBefore(hm, s);
-})();`}
-        </Script>
+})();`,
+          }}
+        />
         <Analytics />
         <WebVitalsReporter />
       </body>
